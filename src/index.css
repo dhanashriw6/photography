@@ -1,0 +1,245 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap');
+
+:root {
+  --color-mocha: #4B2E2B;
+  --color-coffee: #6F4E37;
+  --color-caramel: #C19A6B;
+  --color-beige: #F5EFE6;
+  --color-cream: #FAF7F2;
+  --color-black: #1a1a1a;
+  --color-white: #ffffff;
+
+  --font-heading: 'Cormorant Garamond', serif;
+  --font-body: 'Montserrat', sans-serif;
+
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 2rem;
+  --spacing-lg: 4rem;
+  --spacing-xl: 8rem;
+
+  --transition-slow: 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  --transition-normal: 0.3s ease-out;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-beige);
+  color: var(--color-mocha);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* Film Grain Overlay */
+.grain-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Utilities */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-sm);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  border: 1px solid currentColor;
+  border-radius: 9999px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  background: transparent;
+  color: var(--color-mocha);
+  text-decoration: none;
+}
+
+.btn:hover {
+  background-color: var(--color-mocha);
+  color: var(--color-beige);
+}
+
+.btn-primary {
+  background-color: var(--color-mocha);
+  color: var(--color-beige);
+  border-color: var(--color-mocha);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-coffee);
+  border-color: var(--color-coffee);
+}
+
+/* Cursor Cleanup */
+body {
+  cursor: none;
+  /* We will use a custom cursor */
+}
+
+a,
+button,
+.btn {
+  cursor: none;
+  /* Ensure interactive elements don't show default cursor */
+}
+
+/* Marquee Animation */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-container {
+  overflow: hidden;
+  display: flex;
+  white-space: nowrap;
+  padding: 2rem 0;
+  background-color: var(--color-coffee);
+  /* Contrast band */
+  color: var(--color-beige);
+}
+
+.marquee-content {
+  display: flex;
+  animation: scroll 20s linear infinite;
+}
+
+.marquee-item {
+  font-family: var(--font-heading);
+  font-size: 4rem;
+  padding: 0 4rem;
+  text-transform: uppercase;
+  font-style: italic;
+}
+
+/* New Animations */
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(193, 154, 107, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 40px rgba(193, 154, 107, 0.6);
+  }
+}
+
+/* Utility Classes */
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection Styling */
+::selection {
+  background-color: var(--color-caramel);
+  color: var(--color-mocha);
+}
+
+.text-mask-anim {
+  background: linear-gradient(45deg,
+      var(--color-mocha) 0%,
+      var(--color-caramel) 25%,
+      #4a3c31 50%,
+      var(--color-caramel) 75%,
+      var(--color-mocha) 100%);
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shine 5s linear infinite;
+}
+
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
+}

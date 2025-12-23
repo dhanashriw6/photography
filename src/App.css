@@ -1,0 +1,26 @@
+/* App.css - Intentionally left largely empty to rely on index.css global styles */
+.hero-text {
+  font-size: clamp(3rem, 8vw, 8rem);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.hero-subtitle {
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-top: 2rem;
+}
+
+.scrolling-text {
+  white-space: nowrap;
+  font-family: var(--font-heading);
+  font-size: 10rem;
+  opacity: 0.05;
+  pointer-events: none;
+}
+
+.card-hover:hover .card-bg {
+  transform: scale(1.05);
+}
