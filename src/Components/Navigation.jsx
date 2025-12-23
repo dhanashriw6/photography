@@ -1,5 +1,6 @@
 import React from 'react';
 import { Camera } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Navigation = () => (
   <nav style={{
@@ -23,6 +24,8 @@ const Navigation = () => (
       <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Photographers</a>
       <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Stories</a>
       <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Login</a>
+      {/* <Link to="/v1">V1</Link> */}
+      <a href="/v1" style={{ color: 'inherit', textDecoration: 'none' }}>v2</a>
     </div>
   </nav>
 );
