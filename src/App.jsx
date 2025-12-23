@@ -20,11 +20,12 @@ import Hero2 from './Components/Hero2';
 function App() {
   return (
     <div className="App">
-      <BrowserRouter>
+     
       <Routes>
+        <Route path="/" element={<Hero />} />
         <Route path="/v1" element={<Hero2 />} />
       </Routes>
-      </BrowserRouter>
+   
       <ScrollProgress />
       <CustomCursor />
       <div className="grain-overlay" />
