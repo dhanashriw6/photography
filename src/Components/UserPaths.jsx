@@ -14,7 +14,7 @@ const ShutterBlades = ({ isOpen }) => {
       pointerEvents: 'none',
       zIndex: 3
     }}>
-      {blades.map((angle, i) => (
+      {/* {blades.map((angle, i) => (
         <motion.div
           key={i}
           animate={{
@@ -34,7 +34,7 @@ const ShutterBlades = ({ isOpen }) => {
             clipPath: 'polygon(0% 0%, 100% 0%, 50% 100%)',
           }}
         />
-      ))}
+      ))} */}
     </div>
   );
 };

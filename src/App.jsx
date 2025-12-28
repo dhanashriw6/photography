@@ -22,7 +22,7 @@ function App() {
     <div className="App">
      
       <Routes>
-        <Route path="/" element={<Hero />} />
+        <Route path="/" element={<Hero2 />} />
         <Route path="/v1" element={<Hero2 />} />
       </Routes>
    
@@ -30,11 +30,11 @@ function App() {
       <CustomCursor />
       <div className="grain-overlay" />
       <Navigation />
-      <Hero />
+      {/* <Hero /> */}
       <MarqueeStrip />
-      <ImageGallery />
+      {/* <ImageGallery /> */}
       <div style={{ padding: '0 0' }}>
-        <UserPaths />
+        {/* <UserPaths /> */}
       </div>
       {/* <Features /> */}
       <FAQ />

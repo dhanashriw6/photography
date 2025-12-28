@@ -25,9 +25,9 @@ const Navigation = () => (
       <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Stories</a>
       <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Login</a>
       {/* <Link to="/v1">V1</Link> */}
-  <Link to="/v1" style={{ color: 'inherit', textDecoration: 'none' }}>
+  {/* <Link to="/v1" style={{ color: 'inherit', textDecoration: 'none' }}>
   v2
-</Link>
+</Link> */}
     </div>
   </nav>
 );

@@ -1,12 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap');
 
 :root {
-  --color-mocha: #4B2E2B;
-  --color-coffee: #6F4E37;
-  --color-caramel: #C19A6B;
-  --color-beige: #F5EFE6;
+  /* New Palette */
+  --color-soft-black: #151515;
+  --color-paper-beige: #F4EFE8;
+  --color-muted-gold: #E1B65C;
+  --color-earth-brown: #8A5C3B;
+  --color-soft-gray: #AFA8A2;
+  --color-forest-green: #3A8F6F;
+
+  /* Mapping to existing variable names for backward compatibility (best effort) */
+  --color-mocha: var(--color-soft-black);
+  --color-coffee: var(--color-earth-brown);
+  --color-caramel: var(--color-muted-gold);
+  --color-beige: var(--color-paper-beige);
   --color-cream: #FAF7F2;
-  --color-black: #1a1a1a;
+  /* Kept or matching paper beige? Let's keep distinct if needed, or map to paper beige */
+  --color-black: var(--color-soft-black);
   --color-white: #ffffff;
 
   --font-heading: 'Cormorant Garamond', serif;
@@ -120,38 +130,190 @@ button,
 }
 
 /* Marquee Animation */
+/* Marquee Animation */
 @keyframes scroll {
   0% {
     transform: translateX(0);
   }
 
   100% {
-    transform: translateX(-50%);
+    transform: translateX(-100%);
   }
 }
 
+
+@keyframes perspectiveRotate {
+  0% {
+    transform: perspective(800px) rotateY(-25deg) rotateX(5deg) translateZ(0px);
+    opacity: 0.7;
+  }
+
+  50% {
+    transform: perspective(800px) rotateY(0deg) rotateX(0deg) translateZ(50px);
+    opacity: 1;
+  }
+
+  100% {
+    transform: perspective(800px) rotateY(25deg) rotateX(-5deg) translateZ(0px);
+    opacity: 0.7;
+  }
+}
+
+@keyframes wave {
+   0% {
+     transform: translateY(-35px) rotate(-3deg);
+   }
+   
+
+   50% {
+     transform: translateY(20px) rotate(3deg);
+   }
+
+   100% {
+     transform: translateY(35px) rotate(3deg);
+   }
+}
+
 .marquee-container {
+   overflow: hidden;
+   display: flex;
+   white-space: nowrap;
+   padding: 4rem 0;
+   /* Increase padding to accommodate wave amplitude */
+   background-color: var(--color-coffee);
+   color: var(--color-beige);
+   position: relative;
+   /* Add a mask for soft edges? Optional */
+}
+
+    .marquee-content {
+   display: flex;
+   animation: scroll 40s linear infinite;
+   /* Slower speed for elegance */
+   align-items: center;
+}
+
+.marquee-item-wrapper {
+   /* The wrapper handles the vertical wave motion */
+   /* We use a negative delay based on index to create the wave pattern */
+   animation: wave 2.5s ease-in-out infinite alternate;
+   animation-delay: calc(var(--i) * -0.3125s);
+   /* 2.5s / 8 (or 16) approx. Needs to be tuned for smoothness */
+   /* For simple phase alignment: just ensure smooth visual flow. Precision isn't strictly required for the wave itself to look good, 
+//      but for the loop to be perfect, the phase at the join must match.
+     
+//      If we have 16 items repeated. 
+//      We interpret the wave as continuous.
+//   */
+  display: flex;
+    align-items: center;   justify-content: center;
+  padding: 0 3rem;
+ /* Spacing between items */
+}
+
+.marquee-item {
+   font-family: var(--font-heading);
+   font-size: 3.5rem;
+   text-transform: uppercase;
+   font-style: italic;
+   display: flex;
+   align-items: center;
+   gap: 1rem;
+   transition: all 0.3s ease;
+   cursor: pointer;
+}
+
+.marquee-icon {
+   color: var(--color-muted-gold);
+   transition: transform 0.3s ease;
+}
+
+/* Hover Effects */
+.marquee-container:hover .marquee-content {
+   animation-play-state: paused;
+}
+
+/* We also pause the wave so the items stop bobbing when you try to click/read */
+.marquee-container:hover .marquee-item-wrapper {
+   animation-play-state: paused;
+}
+
+  .marquee-item:hover {
+   transform: scale(1.1);
+   color: var(--color-white);
+   text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.marquee-item:hover .marquee-icon {
+   transform: rotate(15deg) scale(1.2);
+   color: var(--color-white);
+}
+
+/* .marquee-container {
+  --marquee-motion: 'perspective';
   overflow: hidden;
   display: flex;
   white-space: nowrap;
-  padding: 2rem 0;
+  padding: 4rem 0;
   background-color: var(--color-coffee);
-  /* Contrast band */
   color: var(--color-beige);
+  position: relative;
+  perspective: 1000px;
 }
 
 .marquee-content {
   display: flex;
-  animation: scroll 20s linear infinite;
+  animation: scroll 40s linear infinite;
+  align-items: center;
+}
+
+.marquee-item-wrapper {
+  animation: perspectiveRotate 3s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.375s);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3rem;
+  transform-style: preserve-3d;
+
+
 }
 
 .marquee-item {
   font-family: var(--font-heading);
-  font-size: 4rem;
-  padding: 0 4rem;
+  font-size: 3.5rem;
   text-transform: uppercase;
   font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
+
+.marquee-icon {
+  color: var(--color-muted-gold);
+  transition: transform 0.3s ease;
+}
+
+.marquee-container:hover .marquee-content {
+  animation-play-state: paused;
+}
+
+.marquee-container:hover .marquee-item-wrapper {
+  animation-play-state: paused;
+}
+
+.marquee-item:hover {
+  transform: scale(1.1);
+  color: var(--color-white);
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.marquee-item:hover .marquee-icon {
+  transform: rotate(15deg) scale(1.2);
+  color: var(--color-white);
+} */
 
 /* New Animations */
 @keyframes pulse {
