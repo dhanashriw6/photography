@@ -13,7 +13,9 @@ import {
   ImageGallery,
   FAQ,
   CTASection,
-  Footer
+  Footer,
+  VideoShowcase,
+  PinterestGrid
 } from './Components';
 import Hero2 from './Components/Hero2';
 
@@ -34,8 +36,10 @@ function App() {
       <MarqueeStrip />
       {/* <ImageGallery /> */}
       <div style={{ padding: '0 0' }}>
-        {/* <UserPaths /> */}
+        <UserPaths />
       </div>
+      <VideoShowcase />
+      <PinterestGrid />
       {/* <Features /> */}
       <FAQ />
       {/* <CTASection /> */}

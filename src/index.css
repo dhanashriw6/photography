@@ -1,22 +1,35 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap');
 
-:root {
-  /* New Palette */
-  --color-soft-black: #151515;
-  --color-paper-beige: #F4EFE8;
-  --color-muted-gold: #E1B65C;
-  --color-earth-brown: #8A5C3B;
-  --color-soft-gray: #AFA8A2;
-  --color-forest-green: #3A8F6F;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  /* Mapping to existing variable names for backward compatibility (best effort) */
+:root {
+  /* New Palette - Exact Hex Codes from User */
+  --color-orange: #F08E2E;
+  --color-red: #B8392D;
+  --color-teal: #2C7A8A;
+  --color-cream: #F7F3E8;
+  --color-light-blue: #A6E1EB;
+  --color-black: #1A1A1A;
+
+  /* Reskinning Existing Semantics */
+  --color-soft-black: var(--color-black);
+  --color-paper-beige: var(--color-cream);
+  --color-muted-gold: var(--color-orange);
+  /* Replaces gold with the vibrant orange */
+  --color-earth-brown: var(--color-red);
+  /* Replaces brown with the deep red */
+  --color-soft-gray: var(--color-light-blue);
+  /* Replaces gray with light blue */
+  --color-forest-green: var(--color-teal);
+  /* Replaces green with teal */
+
+  /* Backward Compatibility Mappings */
   --color-mocha: var(--color-soft-black);
   --color-coffee: var(--color-earth-brown);
   --color-caramel: var(--color-muted-gold);
   --color-beige: var(--color-paper-beige);
-  --color-cream: #FAF7F2;
-  /* Kept or matching paper beige? Let's keep distinct if needed, or map to paper beige */
-  --color-black: var(--color-soft-black);
   --color-white: #ffffff;
 
   --font-heading: 'Cormorant Garamond', serif;
@@ -160,93 +173,94 @@ button,
 }
 
 @keyframes wave {
-   0% {
-     transform: translateY(-35px) rotate(-3deg);
-   }
-   
+  0% {
+    transform: translateY(-35px) rotate(-3deg);
+  }
 
-   50% {
-     transform: translateY(20px) rotate(3deg);
-   }
 
-   100% {
-     transform: translateY(35px) rotate(3deg);
-   }
+  50% {
+    transform: translateY(20px) rotate(3deg);
+  }
+
+  100% {
+    transform: translateY(35px) rotate(3deg);
+  }
 }
 
 .marquee-container {
-   overflow: hidden;
-   display: flex;
-   white-space: nowrap;
-   padding: 4rem 0;
-   /* Increase padding to accommodate wave amplitude */
-   background-color: var(--color-coffee);
-   color: var(--color-beige);
-   position: relative;
-   /* Add a mask for soft edges? Optional */
+  overflow: hidden;
+  display: flex;
+  white-space: nowrap;
+  padding: 4rem 0;
+  /* Increase padding to accommodate wave amplitude */
+  background-color: var(--color-coffee);
+  color: var(--color-beige);
+  position: relative;
+  /* Add a mask for soft edges? Optional */
 }
 
-    .marquee-content {
-   display: flex;
-   animation: scroll 40s linear infinite;
-   /* Slower speed for elegance */
-   align-items: center;
+.marquee-content {
+  display: flex;
+  animation: scroll 40s linear infinite;
+  /* Slower speed for elegance */
+  align-items: center;
 }
 
 .marquee-item-wrapper {
-   /* The wrapper handles the vertical wave motion */
-   /* We use a negative delay based on index to create the wave pattern */
-   animation: wave 2.5s ease-in-out infinite alternate;
-   animation-delay: calc(var(--i) * -0.3125s);
-   /* 2.5s / 8 (or 16) approx. Needs to be tuned for smoothness */
-   /* For simple phase alignment: just ensure smooth visual flow. Precision isn't strictly required for the wave itself to look good, 
+  /* The wrapper handles the vertical wave motion */
+  /* We use a negative delay based on index to create the wave pattern */
+  animation: wave 2.5s ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * -0.3125s);
+  /* 2.5s / 8 (or 16) approx. Needs to be tuned for smoothness */
+  /* For simple phase alignment: just ensure smooth visual flow. Precision isn't strictly required for the wave itself to look good, 
 //      but for the loop to be perfect, the phase at the join must match.
      
 //      If we have 16 items repeated. 
 //      We interpret the wave as continuous.
 //   */
   display: flex;
-    align-items: center;   justify-content: center;
+  align-items: center;
+  justify-content: center;
   padding: 0 3rem;
- /* Spacing between items */
+  /* Spacing between items */
 }
 
 .marquee-item {
-   font-family: var(--font-heading);
-   font-size: 3.5rem;
-   text-transform: uppercase;
-   font-style: italic;
-   display: flex;
-   align-items: center;
-   gap: 1rem;
-   transition: all 0.3s ease;
-   cursor: pointer;
+  font-family: var(--font-heading);
+  font-size: 3.5rem;
+  text-transform: uppercase;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .marquee-icon {
-   color: var(--color-muted-gold);
-   transition: transform 0.3s ease;
+  color: var(--color-muted-gold);
+  transition: transform 0.3s ease;
 }
 
 /* Hover Effects */
 .marquee-container:hover .marquee-content {
-   animation-play-state: paused;
+  animation-play-state: paused;
 }
 
 /* We also pause the wave so the items stop bobbing when you try to click/read */
 .marquee-container:hover .marquee-item-wrapper {
-   animation-play-state: paused;
+  animation-play-state: paused;
 }
 
-  .marquee-item:hover {
-   transform: scale(1.1);
-   color: var(--color-white);
-   text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+.marquee-item:hover {
+  transform: scale(1.1);
+  color: var(--color-white);
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
 }
 
 .marquee-item:hover .marquee-icon {
-   transform: rotate(15deg) scale(1.2);
-   color: var(--color-white);
+  transform: rotate(15deg) scale(1.2);
+  color: var(--color-white);
 }
 
 /* .marquee-container {
@@ -404,4 +418,370 @@ html {
   to {
     background-position: 200% center;
   }
+}
+
+/* Video Showcase Section */
+.video-showcase-section {
+  position: relative;
+  padding: var(--spacing-xl) var(--spacing-sm);
+  background-color: var(--color-beige);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Abstract Background Shapes */
+.video-bg-shape {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: 1;
+  opacity: 0.6;
+}
+
+.shape-1 {
+  width: 400px;
+  height: 400px;
+  background-color: var(--color-muted-gold);
+  top: -100px;
+  left: -100px;
+  animation: float 8s ease-in-out infinite;
+}
+
+.shape-2 {
+  width: 300px;
+  height: 300px;
+  background-color: var(--color-forest-green);
+  bottom: -50px;
+  right: -50px;
+  animation: float 6s ease-in-out infinite reverse;
+}
+
+.shape-3 {
+  width: 200px;
+  height: 200px;
+  background-color: var(--color-earth-brown);
+  top: 40%;
+  left: 80%;
+  animation: pulse 4s ease-in-out infinite;
+}
+
+/* Video Player Frame */
+.video-player-container {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 900px;
+  background-color: #000;
+  border-radius: 20px;
+  padding: 15px 20px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+  transform: perspective(1000px) rotateX(2deg);
+  transition: transform 0.5s ease;
+}
+
+.video-player-container:hover {
+  transform: perspective(1000px) rotateX(0deg) scale(1.02);
+}
+
+/* Player Header */
+.player-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  margin-bottom: 15px;
+  opacity: 0.8;
+}
+
+.player-brand {
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.player-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Video Content Area */
+.video-content-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  background-color: #1a1a1a;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.video-element {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.9;
+}
+
+/* Viewfinder Overlay */
+.viewfinder-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.rec-status {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ff3b3b;
+  font-family: var(--font-body);
+  font-weight: 700;
+  letter-spacing: 1px;
+  font-size: 0.9rem;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
+.rec-dot {
+  width: 10px;
+  height: 10px;
+  background-color: #ff3b3b;
+  border-radius: 50%;
+  animation: blink 1.5s step-end infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.viewfinder-corners {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  border: 2px solid transparent;
+}
+
+.corner {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-color: rgba(255, 255, 255, 0.6);
+  border-style: solid;
+}
+
+.tl {
+  top: 0;
+  left: 0;
+  border-width: 2px 0 0 2px;
+}
+
+.tr {
+  top: 0;
+  right: 0;
+  border-width: 2px 2px 0 0;
+}
+
+.bl {
+  bottom: 0;
+  left: 0;
+  border-width: 0 0 2px 2px;
+}
+
+.br {
+  bottom: 0;
+  right: 0;
+  border-width: 0 2px 2px 0;
+}
+
+.center-play-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70px;
+  height: 70px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.center-play-btn:hover {
+  background: #fff;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.play-icon {
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 18px solid #fff;
+  margin-left: 5px;
+  transition: border-left-color 0.3s;
+}
+
+.center-play-btn:hover .play-icon {
+  border-left-color: var(--color-mocha);
+}
+
+.video-info {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  font-family: monospace;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+}
+
+/* Player Footer Controls */
+.player-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 15px;
+  color: #888;
+}
+
+.control-group {
+  display: flex;
+  gap: 15px;
+  font-size: 0.9rem;
+}
+
+.control-icon {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.control-icon:hover {
+  color: #fff;
+}
+
+.timeline {
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: #555;
+  background: #222;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Pinterest Grid Section */
+.pinterest-grid-section {
+  padding: var(--spacing-xl) var(--spacing-sm);
+  background-color: var(--color-beige);
+  position: relative;
+  overflow: hidden;
+}
+
+.pinterest-bg-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(var(--color-orange) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.1;
+  z-index: 1;
+  mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+}
+
+.pinterest-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: 0;
+  opacity: 0.4;
+}
+
+.blob-1 {
+  width: 500px;
+  height: 500px;
+  background: var(--color-orange);
+  top: -100px;
+  left: -100px;
+}
+
+.blob-2 {
+  width: 600px;
+  height: 600px;
+  background: var(--color-teal);
+  bottom: -150px;
+  right: -150px;
+}
+
+
+/* 
+   We use columns for the masonry effect.
+   It's the simplest way to get "Pinterest style" where vertical spacing is compact.
+*/
+.pinterest-grid-container {
+  max-width: 1400px;
+  /* Match standard container */
+  margin: 0 auto;
+  column-count: 3;
+  column-gap: 1.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 1024px) {
+  .pinterest-grid-container {
+    column-count: 2;
+  }
+}
+
+@media (max-width: 600px) {
+  .pinterest-grid-container {
+    column-count: 1;
+  }
+}
+
+.pinterest-item {
+  break-inside: avoid;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  border-radius: 12px;
+  cursor: zoom-in;
+  position: relative;
+  /* Ensure nice flow */
+}
+
+.pinterest-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: filter 0.3s ease;
+  border-radius: 12px;
+  /* Optional: Subtle shadow */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.pinterest-item:hover img {
+  filter: brightness(0.9);
 }

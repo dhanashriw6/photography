@@ -10,3 +10,6 @@ export { default as ImageGallery } from './ImageGallery';
 export { default as FAQ } from './FAQ';
 export { default as CTASection } from './CTASection';
 export { default as Footer } from './Footer';
+export { default as VideoShowcase } from './VideoShowcase';
+export { default as PinterestGrid } from './PinterestGrid';
+

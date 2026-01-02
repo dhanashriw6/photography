@@ -36,7 +36,7 @@ const FAQ = () => {
   return (
     <section style={{ 
       padding: '10rem 2rem', 
-      background: 'linear-gradient(135deg, var(--color-mocha) 0%, #5a3a2f 100%)',
+      background: 'linear-gradient(135deg, var(--color-teal) 0%, #1e5a66 100%)',
       position: 'relative',
       overflow: 'hidden'
     }}>
@@ -64,7 +64,7 @@ const FAQ = () => {
           width: '400px',
           height: '400px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(193,154,107,0.2) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(240, 142, 46, 0.15) 0%, transparent 70%)',
           pointerEvents: 'none',
           filter: 'blur(100px)'
         }}
@@ -83,7 +83,7 @@ const FAQ = () => {
           width: '500px',
           height: '500px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(193,154,107,0.15) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(240, 142, 46, 0.12) 0%, transparent 70%)',
           pointerEvents: 'none',
           filter: 'blur(120px)'
         }}
@@ -106,14 +106,14 @@ const FAQ = () => {
             style={{
               display: 'inline-block',
               padding: '0.75rem 2rem',
-              background: 'rgba(193,154,107,0.15)',
+              background: 'rgba(240, 142, 46, 0.15)',
               borderRadius: '50px',
               marginBottom: '2rem',
-              border: '1px solid rgba(193,154,107,0.3)'
+              border: '1px solid rgba(240, 142, 46, 0.3)'
             }}
           >
             <span style={{
-              color: 'var(--color-caramel)',
+              color: 'var(--color-orange)',
               fontSize: '0.9rem',
               textTransform: 'uppercase',
               letterSpacing: '0.2em',
@@ -130,12 +130,12 @@ const FAQ = () => {
             transition={{ delay: 0.3 }}
             style={{ 
               fontSize: 'clamp(3rem, 6vw, 5rem)', 
-              color: 'var(--color-beige)',
+              color: 'var(--color-cream)',
               marginBottom: '1.5rem',
               lineHeight: 1.1
             }}
           >
-            We Have <span style={{ fontStyle: 'italic', color: 'var(--color-caramel)' }}>Answers</span>
+            We Have <span style={{ fontStyle: 'italic', color: 'var(--color-orange)' }}>Answers</span>
           </motion.h2>
           
           <motion.p
@@ -145,7 +145,7 @@ const FAQ = () => {
             transition={{ delay: 0.4 }}
             style={{
               fontSize: '1.2rem',
-              color: 'var(--color-beige)',
+              color: 'var(--color-cream)',
               maxWidth: '700px',
               margin: '0 auto'
             }}
@@ -182,9 +182,9 @@ const FAQ = () => {
                       width: '100%',
                       padding: '2rem',
                       background: isOpen 
-                        ? 'linear-gradient(135deg, rgba(193,154,107,0.2), rgba(193,154,107,0.1))' 
+                        ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.3), rgba(26, 26, 26, 0.1))' 
                         : 'rgba(255,255,255,0.03)',
-                      border: `2px solid ${isOpen ? 'var(--color-caramel)' : 'rgba(245,239,230,0.1)'}`,
+                      border: `2px solid ${isOpen ? 'var(--color-orange)' : 'rgba(247, 243, 232, 0.1)'}`,
                       borderRadius: '20px',
                       cursor: 'pointer',
                       textAlign: 'left',
@@ -207,12 +207,12 @@ const FAQ = () => {
                         height: '50px',
                         borderRadius: '50%',
                         background: isOpen 
-                          ? 'var(--color-caramel)' 
-                          : 'rgba(193,154,107,0.2)',
+                          ? 'var(--color-orange)' 
+                          : 'rgba(240, 142, 46, 0.2)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: isOpen ? 'var(--color-mocha)' : 'var(--color-caramel)'
+                        color: isOpen ? 'var(--color-black)' : 'var(--color-orange)'
                       }}
                     >
                       {isOpen ? <Minus size={24} /> : <Plus size={24} />}
@@ -222,7 +222,7 @@ const FAQ = () => {
                     <div style={{ flex: 1 }}>
                       <motion.span
                         animate={{ 
-                          color: isOpen ? 'var(--color-caramel)' : 'var(--color-beige)'
+                          color: isOpen ? 'var(--color-orange)' : 'var(--color-cream)'
                         }}
                         style={{
                           fontFamily: 'var(--font-heading)',
@@ -243,7 +243,7 @@ const FAQ = () => {
                       }}
                       style={{
                         fontSize: '0.85rem',
-                        color: isOpen ? 'var(--color-caramel)' : 'rgba(245,239,230,0.5)',
+                        color: isOpen ? 'var(--color-orange)' : 'rgba(247, 243, 232, 0.5)',
                         fontWeight: '700',
                         fontFamily: 'var(--font-heading)'
                       }}
@@ -262,7 +262,7 @@ const FAQ = () => {
                         top: '50%',
                         width: '4px',
                         height: '60%',
-                        background: 'var(--color-caramel)',
+                        background: 'var(--color-orange)',
                         borderRadius: '4px',
                         transform: 'translateY(-50%)'
                       }}
@@ -287,7 +287,7 @@ const FAQ = () => {
               backdropFilter: 'blur(30px)',
               borderRadius: '30px',
               padding: '4rem',
-              border: '1px solid rgba(193,154,107,0.2)',
+              border: '1px solid rgba(240, 142, 46, 0.2)',
               minHeight: '500px',
               display: 'flex',
               flexDirection: 'column',
@@ -312,7 +312,7 @@ const FAQ = () => {
                     fontSize: '8rem',
                     fontFamily: 'var(--font-heading)',
                     fontWeight: 'bold',
-                    color: 'rgba(193,154,107,0.15)',
+                    color: 'var(--color-orange)',
                     lineHeight: 1,
                     marginBottom: '2rem'
                   }}
@@ -327,7 +327,7 @@ const FAQ = () => {
                   transition={{ delay: 0.3 }}
                   style={{
                     fontSize: 'clamp(1.5rem, 3vw, 2rem)',
-                    color: 'var(--color-beige)',
+                    color: 'var(--color-cream)',
                     marginBottom: '2rem',
                     fontFamily: 'var(--font-heading)',
                     lineHeight: 1.3
@@ -344,7 +344,7 @@ const FAQ = () => {
                   style={{
                     fontSize: '1.15rem',
                     lineHeight: 1.8,
-                    color: 'var(--color-beige)',
+                    color: 'var(--color-cream)',
                     fontFamily: 'var(--font-body)'
                   }}
                 >
@@ -358,7 +358,7 @@ const FAQ = () => {
                   transition={{ delay: 0.6, duration: 0.8 }}
                   style={{
                     height: '3px',
-                    background: 'linear-gradient(90deg, var(--color-caramel), transparent)',
+                    background: 'linear-gradient(90deg, var(--color-orange), transparent)',
                     marginTop: '2rem',
                     borderRadius: '2px'
                   }}

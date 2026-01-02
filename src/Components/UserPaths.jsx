@@ -54,8 +54,8 @@ const UserPaths = () => {
   return (
     <section style={{ 
       padding: '10rem 2rem', 
-      background: 'var(--color-black)', 
-      color: 'var(--color-beige)', 
+      background: 'var(--color-cream)', 
+      color: 'var(--color-black)', 
       position: 'relative', 
       overflow: 'hidden' 
     }}>
@@ -63,7 +63,7 @@ const UserPaths = () => {
       <div style={{
         position: 'absolute',
         inset: 0,
-        background: 'radial-gradient(circle at center, rgba(193,154,107,0.1) 0%, transparent 60%)',
+        background: 'radial-gradient(circle at center, rgba(240, 142, 46, 0.05) 0%, transparent 60%)',
         opacity: 0.6
       }} />
 
@@ -83,7 +83,7 @@ const UserPaths = () => {
                alignItems: 'center', 
                gap: '0.5rem',
                marginBottom: '1rem',
-               color: 'var(--color-caramel)'
+               color: 'var(--color-orange)'
              }}
           >
             <Aperture className="spin-slow" size={20} />
@@ -91,12 +91,13 @@ const UserPaths = () => {
               fontFamily: 'var(--font-body)', 
               fontSize: '0.9rem',
               textTransform: 'uppercase', 
-              letterSpacing: '0.2em' 
+              letterSpacing: '0.2em',
+              fontWeight: 600
             }}>
               Choose Your Lens
             </span>
           </motion.div>
-          <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', color: 'var(--color-beige)' }}>
+          <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', color: 'var(--color-black)', fontWeight: 700 }}>
             Start Your Journey
           </h2>
         </motion.div>
@@ -134,9 +135,10 @@ const UserPaths = () => {
                 height: '450px',
                 borderRadius: '24px',
                 overflow: 'hidden',
-                background: 'var(--color-mocha)',
+                background: 'var(--color-black)',
                 cursor: 'pointer',
-                border: '1px solid rgba(245, 239, 230, 0.1)'
+                border: '1px solid rgba(26, 26, 26, 0.1)',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.1)'
               }}
             >
               {/* Background Image with Zoom */}
@@ -238,7 +240,7 @@ const UserPaths = () => {
                        background: 'rgba(255,255,255,0.1)',
                        backdropFilter: 'blur(10px)',
                        borderRadius: '12px',
-                       color: 'var(--color-caramel)'
+                       color: 'var(--color-orange)'
                      }}
                      whileHover={{ rotate: 15, scale: 1.1 }}
                    >
@@ -249,7 +251,7 @@ const UserPaths = () => {
                      fontSize: '2rem', 
                      marginBottom: '0.8rem', 
                      fontFamily: 'var(--font-heading)',
-                     color: 'white'
+                     color: 'var(--color-cream)'
                    }}>
                      {item.title}
                    </h3>
@@ -258,8 +260,8 @@ const UserPaths = () => {
                      fontFamily: 'var(--font-body)', 
                      lineHeight: 1.6, 
                      marginBottom: '2rem', 
-                     opacity: 0.8,
-                     color: 'rgba(255,255,255,0.8)',
+                     opacity: 0.9,
+                     color: 'var(--color-cream)',
                      height: activeCard === item.id ? 'auto' : '0',
                      overflow: 'hidden',
                      transition: 'all 0.5s ease'
@@ -275,8 +277,8 @@ const UserPaths = () => {
                     //  onClick={()=>console.log("clicked")}
                      className="btn" 
                      style={{ 
-                       background: 'var(--color-caramel)', 
-                       color: 'var(--color-mocha)',
+                       background: 'var(--color-orange)', 
+                       color: 'var(--color-black)',
                        border: 'none',
                        padding: '1rem 2rem',
                        display: 'flex',

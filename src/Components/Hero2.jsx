@@ -49,7 +49,7 @@ const Hero2 = () => {
       position: 'relative',
       overflow: 'hidden',
       padding: '4rem 2rem 2rem',
-      background: 'var(--color-paper-beige)',
+      background: 'white',
       color: 'var(--color-soft-black)'
     }}>
       {/* Animated Background Gradient Orbs */}
