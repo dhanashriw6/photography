@@ -56,7 +56,8 @@ const Hero2 = () => {
       <motion.div
         animate={{
           scale: [1, 1.2, 1],
-          opacity: [0.3, 0.5, 0.3]
+          opacity: [0.3, 0.5, 0.3],
+
         }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         style={{
@@ -389,6 +390,7 @@ const Hero2 = () => {
           </motion.span>
         </motion.p>
 
+
         {/* Enhanced Title */}
         <h1 className="hero-text" style={{ 
           color: 'var(--color-soft-black)', 
@@ -410,6 +412,7 @@ const Hero2 = () => {
                         ease: [0.22, 1, 0.36, 1],
                         opacity: { duration: 0.5, delay: index * 0.05 }
                       }}
+                      
                       whileHover={{ 
                         y: -10, 
                         color: 'var(--color-muted-gold)',

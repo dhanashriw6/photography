@@ -15,7 +15,9 @@ import {
   CTASection,
   Footer,
   VideoShowcase,
-  PinterestGrid
+  PinterestGrid,
+  StatsCounter,
+  Testimonials
 } from './Components';
 import Hero2 from './Components/Hero2';
 
@@ -39,7 +41,9 @@ function App() {
         <UserPaths />
       </div>
       <VideoShowcase />
+      <StatsCounter />
       <PinterestGrid />
+      <Testimonials />
       {/* <Features /> */}
       <FAQ />
       {/* <CTASection /> */}
