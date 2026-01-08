@@ -1,17 +1,18 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
 import { Search, Camera, ArrowRight, Sparkles, Zap } from 'lucide-react';
+import SectionSeparator from './SectionSeparator';
 
 const Hero = () => {
   const containerRef = useRef(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [activeCard, setActiveCard] = useState(null);
-  const [cardMousePos, setCardMousePos] = useState({ x: 0, y: 0 });
   const { scrollY } = useScroll();
-  
+
   // Parallax for main content
-  const y = useTransform(scrollY, [0, 1000], [0, 300]);
-  const opacity = useTransform(scrollY, [0, 600], [1, 0]);
+  const y = useTransform(scrollY, [0, 1000], [0, 200]);
+  // Removed opacity fade to ensure visibility at all times
+
 
   // Mouse move effect tracking
   const handleMouseMove = (e) => {
@@ -48,14 +49,15 @@ const Hero = () => {
   ];
 
   const userPaths = [
-    { 
+    {
       id: 'customer',
       icon: Search,
       title: "Hire a Photographer",
       desc: "Find the perfect artist for your vision. Browse portfolios, compare styles, and book your ideal photographer.",
       action: "Find Talent",
       bgImage: "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=800&q=80",
-      gradient: "linear-gradient(135deg, rgba(240, 142, 46, 0.9) 0%, rgba(200, 100, 30, 0.95) 100%)"
+      gradient: "linear-gradient(135deg, rgba(240, 142, 46, 0.95) 0%, rgba(200, 100, 30, 0.98) 100%)",
+      accent: "var(--color-orange)"
     },
     {
       id: 'creator',
@@ -64,34 +66,36 @@ const Hero = () => {
       desc: "Showcase your portfolio, connect with clients, and grow your photography business on our platform.",
       action: "Start Creating",
       bgImage: "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=800&q=80",
-      gradient: "linear-gradient(135deg, rgba(75, 46, 43, 0.9) 0%, rgba(50, 30, 28, 0.95) 100%)"
+      gradient: "linear-gradient(135deg, rgba(44, 122, 138, 0.95) 0%, rgba(20, 80, 90, 0.98) 100%)",
+      accent: "var(--color-teal)" // Changed to Teal for variety, matching palette
     }
   ];
 
   return (
-    <div 
+    <div
       ref={containerRef}
       style={{
         position: 'relative',
-        minHeight: '100vh',
+        minHeight: '200vh',
         width: '100%',
         overflow: 'hidden',
-        background: 'var(--color-mocha)',
+        background: 'var(--color-black)',
         paddingTop: '8rem',
         paddingBottom: '8rem',
+        color: 'var(--color-cream)'
       }}
     >
-      {/* Dynamic Background Columns with Parallax */}
-      <motion.div 
+      {/* Background with Parallax Columns - Kept as requested */}
+      <motion.div
         style={{
           position: 'absolute',
           inset: '-20%',
           display: 'flex',
           gap: '2rem',
           transform: 'rotate(-12deg) scale(1.1)',
-          opacity: 0.3,
-          filter: 'grayscale(40%) sepia(25%)',
-          zIndex: 0,
+          // opacity: 0.15, // Reduced flexibility for better text contrast
+          filter: 'grayscale(100%) sepia(10%) contrast(1.2)',
+          zIndex: 1,
         }}
       >
         <ParallaxColumn images={[...col1, ...col1, ...col1]} duration={45} yStart="-50%" />
@@ -100,15 +104,15 @@ const Hero = () => {
         <ParallaxColumn images={[...col1, ...col1, ...col1]} duration={40} reverse yStart="-30%" />
       </motion.div>
 
-      {/* Floating Particles */}
+      {/* Floating Particles - Visual enhancements */}
       <FloatingParticles />
 
-      {/* Gradient Overlay */}
+      {/* Heavy Gradient Fade for Readability - Made darker */}
       <div style={{
         position: 'absolute',
         inset: 0,
-        background: 'radial-gradient(circle at 50% 50%, rgba(240, 142, 46, 0.08) 0%, transparent 70%)',
-        zIndex: 1,
+        background: 'linear-gradient(to bottom, rgba(26,26,26,0.8) 0%, rgba(26,26,26,0.95) 100%)',
+        zIndex: 2,
         pointerEvents: 'none'
       }} />
 
@@ -116,9 +120,8 @@ const Hero = () => {
       <motion.div
         style={{
           position: 'relative',
-          zIndex: 10,
+          zIndex: 20,
           y: y,
-          opacity: opacity,
           maxWidth: '1400px',
           margin: '0 auto',
           padding: '0 2rem',
@@ -129,55 +132,57 @@ const Hero = () => {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          style={{ 
-            textAlign: 'center', 
-            marginBottom: '5rem',
+          style={{
+            textAlign: 'center',
+            marginBottom: '6rem',
             position: 'relative'
           }}
         >
-          <motion.div 
+          <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            style={{ 
-              display: 'inline-flex', 
-              alignItems: 'center', 
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
               gap: '0.75rem',
-              marginBottom: '1.5rem',
-              padding: '0.75rem 1.5rem',
+              marginBottom: '2rem',
+              padding: '0.5rem 1.25rem',
               background: 'rgba(240, 142, 46, 0.1)',
-              backdropFilter: 'blur(10px)',
-              borderRadius: '50px',
-              border: '1px solid rgba(240, 142, 46, 0.2)',
-              color: 'var(--color-orange)'
+              borderRadius: '100px',
+              border: '1px solid rgba(240, 142, 46, 0.3)',
+              color: 'var(--color-orange)',
+              boxShadow: '0 0 20px rgba(240, 142, 46, 0.2)'
             }}
           >
-            <Sparkles size={20} />
-            <span style={{ 
-              fontFamily: 'var(--font-body)', 
-              fontSize: '0.9rem',
-              textTransform: 'uppercase', 
-              letterSpacing: '0.15em',
+            <Sparkles size={16} fill="currentColor" />
+            <span style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: '0.85rem',
+              textTransform: 'uppercase',
+              letterSpacing: '0.2em',
               fontWeight: 600
             }}>
               Choose Your Path
             </span>
           </motion.div>
 
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            style={{ 
-              fontSize: 'clamp(3rem, 7vw, 5.5rem)', 
-              color: 'var(--color-cream)', 
-              fontWeight: 700,
-              marginBottom: '1rem',
-              lineHeight: 1.1,
-              textShadow: '0 4px 20px rgba(0,0,0,0.3)'
+            style={{
+              fontSize: 'clamp(3.5rem, 8vw, 6.5rem)',
+              color: 'var(--color-cream)',
+              fontWeight: 400, // Thinner, more elegant
+              marginBottom: '1.5rem',
+              lineHeight: 1,
+              fontFamily: 'var(--font-heading)',
+              letterSpacing: '-0.02em',
+              textShadow: '0 20px 40px rgba(0,0,0,0.5)'
             }}
           >
-            Start Your Journey
+            Start Your <span style={{ color: 'var(--color-orange)', fontStyle: 'italic' }}>Journey</span>
           </motion.h1>
 
           <motion.p
@@ -185,340 +190,150 @@ const Hero = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.5 }}
             style={{
-              fontSize: '1.25rem',
-              color: 'rgba(255, 248, 240, 0.7)',
-              maxWidth: '600px',
+              fontSize: 'clamp(1.1rem, 2vw, 1.35rem)',
+              color: 'rgba(247, 243, 232, 0.6)',
+              maxWidth: '650px',
               margin: '0 auto',
-              fontFamily: 'var(--font-body)'
+              fontFamily: 'var(--font-body)',
+              lineHeight: 1.6
             }}
           >
-            Whether you're looking to hire or showcase your talent
+            Connect with world-class photographers or showcase your own artistic vision to a global audience.
           </motion.p>
         </motion.div>
 
-        {/* User Path Cards */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
-          gap: '3rem',
-          position: 'relative'
-        }}>
-          {userPaths.map((item, index) => (
-            <PathCard 
+        {/* User Path Cards - Cinematic Accordion Style */}
+        <div className="flex flex-col md:flex-row gap-6 w-full h-auto md:h-[550px] relative z-20 mx-auto max-w-7xl pb-12">
+          {userPaths.map((item) => (
+            <PathCard
               key={item.id}
               item={item}
-              index={index}
               isActive={activeCard === item.id}
-              onHoverStart={() => setActiveCard(item.id)}
-              onHoverEnd={() => setActiveCard(null)}
-              mousePosition={mousePosition}
+              setActive={setActiveCard}
             />
           ))}
         </div>
       </motion.div>
 
-      {/* Bottom Gradient Overlay */}
+      {/* Decorative Bottom Fade */}
       <div style={{
         position: 'absolute',
         bottom: 0,
         left: 0,
         width: '100%',
-        height: '300px',
-        background: 'linear-gradient(to top, var(--color-mocha) 0%, transparent 100%)',
+        height: '400px',
+        background: 'linear-gradient(to top, var(--color-black) 10%, transparent 100%)',
         zIndex: 5,
         pointerEvents: 'none'
       }} />
+
+      {/* Scalloped Section Separator */}
+      <SectionSeparator flip={false} />
     </div>
   );
 };
 
-// Path Card Component with Magnetic Effect
-const PathCard = ({ item, index, isActive, onHoverStart, onHoverEnd, mousePosition }) => {
-  const cardRef = useRef(null);
-  const [localMouse, setLocalMouse] = useState({ x: 0, y: 0 });
-
-  const handleCardMouseMove = (e) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left - rect.width / 2) / 20;
-    const y = (e.clientY - rect.top - rect.height / 2) / 20;
-    setLocalMouse({ x, y });
-  };
-
-  const magneticX = useSpring(isActive ? localMouse.x : 0, { stiffness: 150, damping: 15 });
-  const magneticY = useSpring(isActive ? localMouse.y : 0, { stiffness: 150, damping: 15 });
-
+// New Cinematic Accordion Card
+const PathCard = ({ item, isActive, setActive }) => {
   return (
     <motion.div
-      ref={cardRef}
-      initial={{ opacity: 0, y: 60 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ delay: index * 0.2, duration: 0.8 }}
-      onHoverStart={onHoverStart}
-      onHoverEnd={onHoverEnd}
-      onMouseMove={handleCardMouseMove}
-      style={{
-        position: 'relative',
-        height: '500px',
-        borderRadius: '28px',
-        overflow: 'hidden',
-        cursor: 'pointer',
-        x: magneticX,
-        y: magneticY,
-      }}
+      layout
+      onHoverStart={() => setActive(item.id)}
+      onHoverEnd={() => setActive(null)}
+      className={`relative flex-1 group overflow-hidden rounded-3xl cursor-pointer border border-white/10 transition-all duration-500 ease-in-out ${isActive ? 'flex-[2]' : 'flex-1'} min-h-[400px] md:min-h-0`}
     >
-      {/* Ripple Effect Container */}
-      <AnimatePresence>
-        {isActive && <RippleEffect />}
-      </AnimatePresence>
-
       {/* Background Image */}
       <motion.div
-        animate={{ 
-          scale: isActive ? 1.15 : 1,
-        }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: `url(${item.bgImage})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      />
+        animate={{ scale: isActive ? 1.05 : 1 }}
+        transition={{ duration: 0.7 }}
+        className="absolute inset-0 w-full h-full"
+      >
+        <img
+          src={item.bgImage}
+          alt={item.title}
+          className="w-full h-full object-cover transition-all duration-500 grayscale group-hover:grayscale-0"
+        />
+        {/* Dark Overlay that lightens on hover */}
+        <div className="absolute inset-0 bg-black/60 group-hover:bg-black/30 transition-colors duration-500" />
 
-      {/* Gradient Overlay */}
-      <motion.div 
-        animate={{
-          opacity: isActive ? 1 : 0.95
-        }}
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: item.gradient,
-          zIndex: 1
-        }} 
-      />
+        {/* Color Gradient Accent */}
+        <div
+          className="absolute inset-0 opacity-40 mix-blend-overlay transition-opacity duration-500 group-hover:opacity-80"
+          style={{ background: item.gradient }}
+        />
+      </motion.div>
 
-      {/* Glassmorphic Border */}
-      <motion.div
-        animate={{
-          opacity: isActive ? 1 : 0.5,
-          scale: isActive ? 1.02 : 1
-        }}
-        transition={{ duration: 0.4 }}
-        style={{
-          position: 'absolute',
-          inset: 0,
-          borderRadius: '28px',
-          padding: '2px',
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1))',
-          WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-          WebkitMaskComposite: 'xor',
-          maskComposite: 'exclude',
-          zIndex: 10,
-          pointerEvents: 'none'
-        }}
-      />
+      {/* Content Container */}
+      <div className="absolute inset-0 p-8 flex flex-col justify-center items-center z-10 text-center transition-colors duration-500 bg-black/40 group-hover:bg-black/60">
 
-      {/* Content */}
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        padding: '3rem',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        zIndex: 5,
-      }}>
-        {/* Icon */}
-        <motion.div
-          animate={{
-            scale: isActive ? 1.1 : 1,
-            rotate: isActive ? 5 : 0
-          }}
-          transition={{ duration: 0.4 }}
-          style={{
-            display: 'inline-flex',
-            alignSelf: 'flex-start',
-            padding: '1.25rem',
-            background: 'rgba(255, 248, 240, 0.15)',
-            backdropFilter: 'blur(10px)',
-            borderRadius: '20px',
-            border: '1px solid rgba(255, 248, 240, 0.2)',
-            color: 'var(--color-cream)',
-          }}
-        >
-          {React.createElement(item.icon, { size: 36, strokeWidth: 2 })}
-        </motion.div>
-
-        {/* Text Content */}
-        <div>
-          <motion.h3 
-            animate={{
-              y: isActive ? -5 : 0
-            }}
-            style={{ 
-              fontSize: 'clamp(2rem, 3vw, 2.75rem)', 
-              marginBottom: '1rem', 
-              fontFamily: 'var(--font-heading)',
-              color: 'var(--color-cream)',
-              fontWeight: 700,
-              lineHeight: 1.2
+        {/* Icon & Title Wrapper */}
+        <div className="flex flex-col items-center transform transition-transform duration-500 ease-out group-hover:-translate-y-2">
+          <div
+            className="flex items-center justify-center p-2 h-15 w-15 rounded-full mb-6 text-cream backdrop-blur-md border border-white/20 transition-colors duration-300 shadow-lg"
+            style={{
+              backgroundColor: isActive ? item.accent : 'rgba(255,255,255,0.1)',
+              color: isActive ? '#fff' : 'var(--color-cream)'
             }}
           >
+            {React.createElement(item.icon, { size: 32, strokeWidth: 1.5 })}
+          </div>
+
+          <h3 className="text-4xl md:text-5xl font-heading font-bold text-cream mb-4 leading-tight drop-shadow-lg">
             {item.title}
-          </motion.h3>
-          
-          <motion.p 
-            animate={{
-              opacity: isActive ? 1 : 0.85,
-              y: isActive ? 0 : 10
-            }}
-            transition={{ duration: 0.3 }}
-            style={{ 
-              fontFamily: 'var(--font-body)', 
-              lineHeight: 1.6, 
-              marginBottom: '2rem', 
-              color: 'rgba(255, 248, 240, 0.9)',
-              fontSize: '1.1rem'
-            }}
-          >
-            {item.desc}
-          </motion.p>
-          
-          <motion.button 
-            animate={{
-              x: isActive ? 10 : 0,
-              scale: isActive ? 1.05 : 1
-            }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ duration: 0.3 }}
-            className="btn" 
-            style={{ 
-              background: 'var(--color-cream)', 
-              color: 'var(--color-mocha)',
-              border: 'none',
-              padding: '1.25rem 2.5rem',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              fontWeight: 700,
-              fontSize: '1rem',
-              borderRadius: '12px',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
-              transition: 'all 0.3s ease'
-            }}
-          >
-            {item.action} 
-            <motion.div
-              animate={{ x: isActive ? 5 : 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <ArrowRight size={20} />
-            </motion.div>
-          </motion.button>
+          </h3>
         </div>
+
+        {/* Description & Action - Hidden by default, revealed on hover/active */}
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: isActive ? 1 : 0, height: isActive ? 'auto' : 0 }}
+          transition={{ duration: 0.4 }}
+          className="overflow-hidden flex flex-col items-center w-full"
+        >
+          <p className="text-lg text-gray-200 font-body leading-relaxed mb-8 max-w-lg mx-auto drop-shadow-md">
+            {item.desc}
+          </p>
+
+          <button
+            className="flex items-center gap-3 p-4 mx-3 w-52  h-16 justify-center rounded-full text-sm font-bold uppercase tracking-widest transition-all duration-300 hover:scale-105 hover:shadow-xl"
+            style={{
+              backgroundColor: item.accent,
+              color: '#fff',
+              boxShadow: `0 4px 20px -5px ${item.accent}`
+            }}
+          >
+            {item.action}
+            <ArrowRight size={18} />
+          </button>
+        </motion.div>
       </div>
 
-      {/* Shine Effect */}
-      <AnimatePresence>
-        {isActive && (
-          <motion.div
-            initial={{ x: '-100%', opacity: 0 }}
-            animate={{ x: '100%', opacity: [0, 0.5, 0] }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1, ease: "easeInOut" }}
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
-              zIndex: 15,
-              pointerEvents: 'none'
-            }}
-          />
-        )}
-      </AnimatePresence>
+      {/* Decorative Border Glow on Active */}
+      <div
+        className={`absolute inset-0 rounded-3xl border-2 transition-opacity duration-300 pointer-events-none ${isActive ? 'opacity-100' : 'opacity-0'}`}
+        style={{ borderColor: item.accent }}
+      />
     </motion.div>
   );
 };
 
-// Ripple Effect Component
-const RippleEffect = () => (
-  <>
-    {[...Array(3)].map((_, i) => (
-      <motion.div
-        key={i}
-        initial={{ scale: 0, opacity: 0.6 }}
-        animate={{ scale: 2, opacity: 0 }}
-        transition={{ 
-          duration: 1.5, 
-          delay: i * 0.2,
-          repeat: Infinity,
-          ease: "easeOut"
-        }}
-        style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          width: '100%',
-          height: '100%',
-          borderRadius: '50%',
-          border: '2px solid rgba(255, 248, 240, 0.5)',
-          transform: 'translate(-50%, -50%)',
-          zIndex: 2,
-          pointerEvents: 'none'
-        }}
-      />
-    ))}
-  </>
-);
-
-// Floating Particles Component
+// Simple Floating Particles
 const FloatingParticles = () => {
-  const particles = Array.from({ length: 20 }, (_, i) => ({
-    id: i,
-    size: Math.random() * 4 + 2,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    duration: Math.random() * 10 + 15,
-    delay: Math.random() * 5
-  }));
-
   return (
-    <div style={{
-      position: 'absolute',
-      inset: 0,
-      zIndex: 2,
-      pointerEvents: 'none',
-      overflow: 'hidden'
-    }}>
-      {particles.map(particle => (
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+      {[...Array(15)].map((_, i) => (
         <motion.div
-          key={particle.id}
-          initial={{ 
-            x: `${particle.x}vw`, 
-            y: `${particle.y}vh`,
-            opacity: 0 
-          }}
-          animate={{ 
-            y: [`${particle.y}vh`, `${particle.y - 30}vh`, `${particle.y}vh`],
-            opacity: [0, 0.6, 0]
-          }}
-          transition={{
-            duration: particle.duration,
-            delay: particle.delay,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
+          key={i}
+          initial={{ opacity: 0, y: Math.random() * 100 + "%", x: Math.random() * 100 + "%" }}
+          animate={{ opacity: [0, 0.4, 0], y: "-=100px" }}
+          transition={{ duration: Math.random() * 10 + 10, repeat: Infinity, delay: Math.random() * 10 }}
           style={{
             position: 'absolute',
-            width: `${particle.size}px`,
-            height: `${particle.size}px`,
+            width: '4px',
+            height: '4px',
+            background: 'var(--color-orange)',
             borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(240, 142, 46, 0.8), transparent)',
-            filter: 'blur(1px)'
+            filter: 'blur(2px)'
           }}
         />
       ))}
@@ -546,29 +361,29 @@ const ParallaxColumn = ({ images, duration, reverse, yStart = "0%" }) => (
     }}
   >
     {images.map((src, i) => (
-      <div key={i} style={{ 
-        position: 'relative', 
-        borderRadius: '12px', 
+      <div key={i} style={{
+        position: 'relative',
+        borderRadius: '12px',
         overflow: 'hidden',
         height: '400px',
         width: '100%',
         boxShadow: '0 20px 50px rgba(0,0,0,0.5)'
       }}>
-        <img 
-          src={src} 
-          alt="Film Frame" 
-          style={{ 
-            width: '100%', 
-            height: '100%', 
+        <img
+          src={src}
+          alt="Film Frame"
+          style={{
+            width: '100%',
+            height: '100%',
             objectFit: 'cover',
-            filter: 'grayscale(20%) contrast(1.1)' 
-          }} 
+            filter: 'grayscale(20%) contrast(1.1)'
+          }}
         />
         <div style={{
-           position: 'absolute',
-           inset: 0,
-           background: 'rgba(75, 46, 43, 0.2)',
-           mixBlendMode: 'multiply'
+          position: 'absolute',
+          inset: 0,
+          background: 'rgba(26, 26, 26, 0.3)',
+          mixBlendMode: 'multiply'
         }} />
       </div>
     ))}
@@ -576,21 +391,3 @@ const ParallaxColumn = ({ images, duration, reverse, yStart = "0%" }) => (
 );
 
 export default Hero;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

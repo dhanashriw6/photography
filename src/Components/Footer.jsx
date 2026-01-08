@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Instagram, Twitter, Linkedin, Mail, Send, Camera, Film, Heart } from 'lucide-react';
+import SectionSeparator from './SectionSeparator';
 
 const Footer = () => {
   const [email, setEmail] = useState('');
@@ -27,6 +28,7 @@ const Footer = () => {
       color: 'var(--color-paper-beige)',
       overflow: 'hidden'
     }}>
+      <SectionSeparator flip={true} />
       {/* Animated Background Gradient Orbs */}
       <motion.div
         animate={{

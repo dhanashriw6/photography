@@ -256,6 +256,7 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Quote, ThumbsUp, Star, Heart } from 'lucide-react';
+import SectionSeparator from './SectionSeparator';
 
 const testimonials = [
   {
@@ -397,6 +398,7 @@ const RenderCard = ({ item }) => {
          flexDirection: "column",
          justifyContent: "center"
        }}>
+
           <div style={{
               position: "absolute",
               left: "-30px",
@@ -635,6 +637,7 @@ const Testimonials = () => {
         overflow: 'hidden'
       }}
     >
+      <SectionSeparator flip={true} />
       {/* Background Decor */}
       <motion.div style={{ position: 'absolute', inset: 0, y: yBg, pointerEvents: 'none', zIndex: 0 }}>
           <div style={{

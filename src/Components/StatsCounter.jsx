@@ -1,12 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import { motion, useInView, useMotionValue, useSpring } from 'framer-motion';
+import SectionSeparator from './SectionSeparator';
 
 const StatCard = ({ value, suffix, label, image, index }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
   const motionValue = useMotionValue(0);
   const springValue = useSpring(motionValue, { duration: 3000, bounce: 0 });
-  
+
   useEffect(() => {
     if (isInView) {
       motionValue.set(value);
@@ -35,7 +36,7 @@ const StatCard = ({ value, suffix, label, image, index }) => {
         position: 'relative',
         borderRadius: '24px',
         overflow: 'hidden',
-        minWidth: '300px',
+        minWidth: '21%',
         height: '180px',
         cursor: 'pointer',
         boxShadow: '0 10px 40px rgba(0,0,0,0.15)'
@@ -50,8 +51,8 @@ const StatCard = ({ value, suffix, label, image, index }) => {
         backgroundPosition: 'center',
         filter: 'brightness(0.6) saturate(0.8)',
         transition: 'all 0.4s ease'
-      }} 
-      className="stat-bg"
+      }}
+        className="stat-bg"
       />
 
       {/* Gradient Overlay */}
@@ -85,7 +86,7 @@ const StatCard = ({ value, suffix, label, image, index }) => {
             gap: '0.2rem'
           }}>
             <span ref={displayValue}>0</span>
-            <span style={{ 
+            <span style={{
               fontSize: '2.5rem',
               color: 'var(--color-orange)',
               fontWeight: 'bold'
@@ -145,7 +146,7 @@ const StatsCounter = () => {
       label: 'Hours Recorded',
       image: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?w=600&q=80' // Film/video
     },
-    
+
   ];
 
   return (
@@ -163,26 +164,29 @@ const StatsCounter = () => {
         backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(0,0,0,0.05) 1px, transparent 0)',
         backgroundSize: '40px 40px'
       }} />
+      <SectionSeparator flip={true} />
 
-      <div className="container" style={{ 
-        position: 'relative', 
-        zIndex: 1, 
-        maxWidth: '1400px', 
-        margin: '0 auto' 
+
+      <div className="container" style={{
+        position: 'relative',
+        zIndex: 1,
+        maxWidth: '1400px',
+        margin: '0 auto'
       }}>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          style={{ 
-            textAlign: 'center', 
-            marginBottom: '4rem' 
+          style={{
+            textAlign: 'center',
+            marginBottom: '4rem'
           }}
         >
-          <h2 style={{ 
-            fontSize: 'clamp(2.5rem, 5vw, 4rem)', 
-            color: 'var(--color-cream)', 
+
+          <h2 style={{
+            fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+            color: 'var(--color-cream)',
             marginBottom: '1rem',
             fontFamily: 'var(--font-heading)'
           }}>
@@ -206,7 +210,7 @@ const StatsCounter = () => {
           gap: '3.5rem',
           overflowX: 'auto',
           overflowY: 'hidden',
-         
+
           scrollbarWidth: 'thin',
           scrollbarColor: 'var(--color-orange) transparent'
         }}>
@@ -221,6 +225,7 @@ const StatsCounter = () => {
             />
           ))}
         </div>
+
       </div>
 
       {/* Custom Scrollbar Styles */}

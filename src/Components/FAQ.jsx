@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Minus, HelpCircle, MessageCircle, Sparkles } from 'lucide-react';
+import SectionSeparator from './SectionSeparator';
 
 const FAQ = () => {
   const [openIndex, setOpenIndex] = useState(0);
@@ -34,12 +35,14 @@ const FAQ = () => {
   ];
 
   return (
-    <section style={{ 
-      padding: '10rem 2rem', 
+    <section style={{
+      padding: '10rem 2rem',
       background: 'linear-gradient(135deg, var(--color-teal) 0%, #1e5a66 100%)',
       position: 'relative',
       overflow: 'hidden'
     }}>
+      <SectionSeparator flip={true} />
+
       {/* Animated Background Pattern */}
       <div style={{
         position: 'absolute',
@@ -51,7 +54,7 @@ const FAQ = () => {
 
       {/* Floating Orbs */}
       <motion.div
-        animate={{ 
+        animate={{
           y: [0, -40, 0],
           x: [0, 40, 0],
           scale: [1, 1.2, 1]
@@ -70,7 +73,7 @@ const FAQ = () => {
         }}
       />
       <motion.div
-        animate={{ 
+        animate={{
           y: [0, 50, 0],
           x: [0, -30, 0],
           scale: [1, 1.3, 1]
@@ -123,13 +126,13 @@ const FAQ = () => {
             </span>
           </motion.div>
 
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
-            style={{ 
-              fontSize: 'clamp(3rem, 6vw, 5rem)', 
+            style={{
+              fontSize: 'clamp(3rem, 6vw, 5rem)',
               color: 'var(--color-cream)',
               marginBottom: '1.5rem',
               lineHeight: 1.1
@@ -137,7 +140,7 @@ const FAQ = () => {
           >
             We Have <span style={{ fontStyle: 'italic', color: 'var(--color-orange)' }}>Answers</span>
           </motion.h2>
-          
+
           <motion.p
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 0.8 }}
@@ -155,8 +158,8 @@ const FAQ = () => {
         </motion.div>
 
         {/* Split Layout */}
-        <div style={{ 
-          display: 'grid', 
+        <div style={{
+          display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))',
           gap: '4rem',
           alignItems: 'start'
@@ -165,7 +168,7 @@ const FAQ = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {faqs.map((faq, index) => {
               const isOpen = openIndex === index;
-              
+
               return (
                 <motion.div
                   key={index}
@@ -181,8 +184,8 @@ const FAQ = () => {
                     style={{
                       width: '100%',
                       padding: '2rem',
-                      background: isOpen 
-                        ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.3), rgba(26, 26, 26, 0.1))' 
+                      background: isOpen
+                        ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.3), rgba(26, 26, 26, 0.1))'
                         : 'rgba(255,255,255,0.03)',
                       border: `2px solid ${isOpen ? 'var(--color-orange)' : 'rgba(247, 243, 232, 0.1)'}`,
                       borderRadius: '20px',
@@ -197,7 +200,7 @@ const FAQ = () => {
                   >
                     {/* Icon */}
                     <motion.div
-                      animate={{ 
+                      animate={{
                         scale: isOpen ? 1.1 : 1,
                         rotate: isOpen ? 360 : 0
                       }}
@@ -206,8 +209,8 @@ const FAQ = () => {
                         minWidth: '50px',
                         height: '50px',
                         borderRadius: '50%',
-                        background: isOpen 
-                          ? 'var(--color-orange)' 
+                        background: isOpen
+                          ? 'var(--color-orange)'
                           : 'rgba(240, 142, 46, 0.2)',
                         display: 'flex',
                         alignItems: 'center',
@@ -221,13 +224,14 @@ const FAQ = () => {
                     {/* Question Text */}
                     <div style={{ flex: 1 }}>
                       <motion.span
-                        animate={{ 
+                        animate={{
                           color: isOpen ? 'var(--color-orange)' : 'var(--color-cream)'
                         }}
                         style={{
+                        
                           fontFamily: 'var(--font-heading)',
                           fontSize: 'clamp(1.1rem, 2vw, 1.4rem)',
-                          fontWeight: '500',
+                          fontWeight: isOpen? '700': '500',
                           display: 'block'
                         }}
                       >
@@ -237,7 +241,7 @@ const FAQ = () => {
 
                     {/* Number Badge */}
                     <motion.div
-                      animate={{ 
+                      animate={{
                         scale: isOpen ? 1.2 : 1,
                         opacity: isOpen ? 1 : 0.5
                       }}
@@ -292,7 +296,7 @@ const FAQ = () => {
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
-              marginTop:"5rem"
+              marginTop: "5rem"
             }}
           >
             <AnimatePresence mode="wait">

@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Battery, Play, Pause, SkipBack, SkipForward, Square } from 'lucide-react';
 import heroVideo from '../assets/Videos/herovideo.mp4';
+import SectionSeparator from './SectionSeparator';
 
 const VideoShowcase = () => {
     const videoRef = useRef(null);
@@ -60,7 +61,7 @@ const VideoShowcase = () => {
                     transition={{ duration: 1.5, delay: 0.5 }}
                 />
             </motion.svg>
-                <motion.div
+            <motion.div
                 style={{ position: 'absolute', top: '45%', left: '10%', zIndex: 1 }}
                 animate={{ rotate: 360 }}
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
@@ -106,18 +107,19 @@ const VideoShowcase = () => {
                     transition={{ duration: 2, delay: 1 }}
                 />
             </motion.svg>
+            <SectionSeparator flip={false} />
 
             <div className="video-player-container">
                 <div className="player-header">
                     <span className="player-brand">FilmFlare</span>
                     <div className="player-status">
-                         <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>100%</span>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>100%</span>
                         <Battery size={18} fill="currentColor" />
                     </div>
                 </div>
 
                 <div className="video-content-wrapper">
-                    <video 
+                    <video
                         ref={videoRef}
                         className="video-element"
                         src={heroVideo}
@@ -125,7 +127,7 @@ const VideoShowcase = () => {
                         playsInline
                         onClick={togglePlay}
                     />
-                    
+
                     <div className="viewfinder-overlay">
                         {/* Viewfinder Corners */}
                         <div className="viewfinder-corners">
@@ -147,7 +149,7 @@ const VideoShowcase = () => {
                                 <div className="play-icon"></div>
                             </button>
                         )}
-                        
+
                         {/* Video Info Overlay */}
                         <div className="video-info">
                             ISO 800  F5.6  1/50
@@ -166,7 +168,7 @@ const VideoShowcase = () => {
                         <Square size={20} className="control-icon" />
                         <SkipForward size={20} className="control-icon" />
                     </div>
-                    
+
                     <div className="timeline">
                         00:00:14:08
                     </div>

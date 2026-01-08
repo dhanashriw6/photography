@@ -424,7 +424,7 @@ const Hero2 = () => {
                   </motion.span>
               ))}
           </div>
-          <div style={{ display: 'flex', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', overflow: 'hidden', width: '100%', justifyContent: 'center' }}>
               {titleline2.map((char, index) => (
                   <motion.span
                       key={index}

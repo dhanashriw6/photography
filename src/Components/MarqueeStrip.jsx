@@ -19,6 +19,7 @@ const MarqueeStrip = () => {
 
   return (
     <div className="marquee-container">
+      
       <div className="marquee-content">
         {items.map((item, index) => (
           <div 
