@@ -1,16 +1,17 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
+import { Search, Camera, ArrowRight, Sparkles, Zap } from 'lucide-react';
 
 const Hero = () => {
   const containerRef = useRef(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [activeCard, setActiveCard] = useState(null);
+  const [cardMousePos, setCardMousePos] = useState({ x: 0, y: 0 });
   const { scrollY } = useScroll();
   
   // Parallax for main content
-  const y = useTransform(scrollY, [0, 1000], [0, 400]);
-  const opacity = useTransform(scrollY, [0, 500], [1, 0]);
-  const scale = useTransform(scrollY, [0, 1000], [1, 0.9]);
+  const y = useTransform(scrollY, [0, 1000], [0, 300]);
+  const opacity = useTransform(scrollY, [0, 600], [1, 0]);
 
   // Mouse move effect tracking
   const handleMouseMove = (e) => {
@@ -25,9 +26,6 @@ const Hero = () => {
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
-
-  const moveX = useSpring(mousePosition.x * 50, { stiffness: 100, damping: 20 });
-  const moveY = useSpring(mousePosition.y * 50, { stiffness: 100, damping: 20 });
 
   // Image Columns Data
   const col1 = [
@@ -49,22 +47,41 @@ const Hero = () => {
     "https://images.unsplash.com/photo-1524250502761-1ac6f2e30d43?w=800&q=80",
   ];
 
+  const userPaths = [
+    { 
+      id: 'customer',
+      icon: Search,
+      title: "Hire a Photographer",
+      desc: "Find the perfect artist for your vision. Browse portfolios, compare styles, and book your ideal photographer.",
+      action: "Find Talent",
+      bgImage: "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=800&q=80",
+      gradient: "linear-gradient(135deg, rgba(240, 142, 46, 0.9) 0%, rgba(200, 100, 30, 0.95) 100%)"
+    },
+    {
+      id: 'creator',
+      icon: Camera,
+      title: "Join as Photographer",
+      desc: "Showcase your portfolio, connect with clients, and grow your photography business on our platform.",
+      action: "Start Creating",
+      bgImage: "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=800&q=80",
+      gradient: "linear-gradient(135deg, rgba(75, 46, 43, 0.9) 0%, rgba(50, 30, 28, 0.95) 100%)"
+    }
+  ];
+
   return (
     <div 
       ref={containerRef}
       style={{
         position: 'relative',
-        height: '120vh', // Extend slightly to cover elastic scrolling
+        minHeight: '100vh',
         width: '100%',
         overflow: 'hidden',
         background: 'var(--color-mocha)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        perspective: '1000px'
+        paddingTop: '8rem',
+        paddingBottom: '8rem',
       }}
     >
-      {/* Dynamic Background Columns */}
+      {/* Dynamic Background Columns with Parallax */}
       <motion.div 
         style={{
           position: 'absolute',
@@ -72,8 +89,8 @@ const Hero = () => {
           display: 'flex',
           gap: '2rem',
           transform: 'rotate(-12deg) scale(1.1)',
-          opacity: 0.4,
-          filter: 'grayscale(30%) sepia(20%)',
+          opacity: 0.3,
+          filter: 'grayscale(40%) sepia(25%)',
           zIndex: 0,
         }}
       >
@@ -83,117 +100,433 @@ const Hero = () => {
         <ParallaxColumn images={[...col1, ...col1, ...col1]} duration={40} reverse yStart="-30%" />
       </motion.div>
 
-      {/* Main Content Card - Frosted Glass Effect */}
+      {/* Floating Particles */}
+      <FloatingParticles />
+
+      {/* Gradient Overlay */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'radial-gradient(circle at 50% 50%, rgba(240, 142, 46, 0.08) 0%, transparent 70%)',
+        zIndex: 1,
+        pointerEvents: 'none'
+      }} />
+
+      {/* Main Content */}
       <motion.div
         style={{
-          zIndex: 10,
           position: 'relative',
+          zIndex: 10,
           y: y,
           opacity: opacity,
-          scale: scale,
-          x: moveX,
-          // rotateX: moveY, // Subtle 3D tilt
-          // rotateY: moveX,
+          maxWidth: '1400px',
+          margin: '0 auto',
+          padding: '0 2rem',
         }}
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
       >
-        <div style={{
-           display: 'flex',
-           flexDirection: 'column',
-           alignItems: 'center',
-           textAlign: 'center'
-        }}>
-          
-
-          {/* Huge Title with Blend Mode */}
-          <h1 className="hero-title" style={{
-            fontFamily: 'var(--font-heading)',
-            fontSize: 'clamp(5rem, 15vw, 12rem)',
-            lineHeight: 0.85,
-            color: 'var(--color-beige)',
-            textShadow: '0 20px 40px rgba(0,0,0,0.3)',
-            mixBlendMode: 'overlay',
-            pointerEvents: 'none'
-          }}>
-            <motion.div
-              initial={{ y: 100, opacity: 0, rotate: 5 }}
-              animate={{ y: 0, opacity: 1, rotate: 0 }}
-              transition={{ duration: 1.2, ease: [0.19, 1, 0.22, 1], delay: 0.3 }}
-            >
-              FILM
-            </motion.div>
-            <motion.div
-              initial={{ y: 100, opacity: 0, rotate: -5 }}
-              animate={{ y: 0, opacity: 1, rotate: 0 }}
-              transition={{ duration: 1.2, ease: [0.19, 1, 0.22, 1], delay: 0.45 }}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2rem' }}
-            >
-              <span style={{ fontStyle: 'italic', fontFamily: 'serif', fontWeight: '300' }}>&</span> FRAME
-            </motion.div>
-          </h1>
-
-          {/* Subtitle and Description */}
-          <motion.p
-             initial={{ opacity: 0, y: 20 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ delay: 0.8, duration: 1 }}
-             style={{ 
-               maxWidth: '600px', 
-               color: 'var(--color-beige)', 
-               opacity: 0.9,
-               fontSize: 'clamp(1rem, 2vw, 1.2rem)',
-               marginTop: '2rem',
-               lineHeight: 1.6,
-               fontWeight: 300
-             }}
-          >
-            A curated sanctuary for visual storytellers. We bridge the gap between 
-            <span style={{ fontStyle: 'italic', color: 'var(--color-caramel)', margin: '0 5px' }}>raw artistry</span> 
-            and commercial opportunity.
-          </motion.p>
-
-          {/* CTA Group */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1, duration: 1 }}
-            style={{
-              marginTop: '3rem',
-              display: 'flex',
-              gap: '1.5rem',
-              alignItems: 'center'
+        {/* Header Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          style={{ 
+            textAlign: 'center', 
+            marginBottom: '5rem',
+            position: 'relative'
+          }}
+        >
+          <motion.div 
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            style={{ 
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              gap: '0.75rem',
+              marginBottom: '1.5rem',
+              padding: '0.75rem 1.5rem',
+              background: 'rgba(240, 142, 46, 0.1)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '50px',
+              border: '1px solid rgba(240, 142, 46, 0.2)',
+              color: 'var(--color-orange)'
             }}
           >
-            <CtaButton primary>
-              Explore Talent <ArrowRight size={18} />
-            </CtaButton>
-           <CtaButton primary>
-             Join as Photographer  <ArrowRight size={18} />
-            </CtaButton>
+            <Sparkles size={20} />
+            <span style={{ 
+              fontFamily: 'var(--font-body)', 
+              fontSize: '0.9rem',
+              textTransform: 'uppercase', 
+              letterSpacing: '0.15em',
+              fontWeight: 600
+            }}>
+              Choose Your Path
+            </span>
           </motion.div>
+
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            style={{ 
+              fontSize: 'clamp(3rem, 7vw, 5.5rem)', 
+              color: 'var(--color-cream)', 
+              fontWeight: 700,
+              marginBottom: '1rem',
+              lineHeight: 1.1,
+              textShadow: '0 4px 20px rgba(0,0,0,0.3)'
+            }}
+          >
+            Start Your Journey
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            style={{
+              fontSize: '1.25rem',
+              color: 'rgba(255, 248, 240, 0.7)',
+              maxWidth: '600px',
+              margin: '0 auto',
+              fontFamily: 'var(--font-body)'
+            }}
+          >
+            Whether you're looking to hire or showcase your talent
+          </motion.p>
+        </motion.div>
+
+        {/* User Path Cards */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
+          gap: '3rem',
+          position: 'relative'
+        }}>
+          {userPaths.map((item, index) => (
+            <PathCard 
+              key={item.id}
+              item={item}
+              index={index}
+              isActive={activeCard === item.id}
+              onHoverStart={() => setActiveCard(item.id)}
+              onHoverEnd={() => setActiveCard(null)}
+              mousePosition={mousePosition}
+            />
+          ))}
         </div>
       </motion.div>
-      
-      {/* Decorative Overlay Gradient (Bottom) */}
+
+      {/* Bottom Gradient Overlay */}
       <div style={{
         position: 'absolute',
         bottom: 0,
         left: 0,
         width: '100%',
-        height: '400px',
+        height: '300px',
         background: 'linear-gradient(to top, var(--color-mocha) 0%, transparent 100%)',
         zIndex: 5,
         pointerEvents: 'none'
       }} />
-
     </div>
   );
 };
 
-// Sub-components
+// Path Card Component with Magnetic Effect
+const PathCard = ({ item, index, isActive, onHoverStart, onHoverEnd, mousePosition }) => {
+  const cardRef = useRef(null);
+  const [localMouse, setLocalMouse] = useState({ x: 0, y: 0 });
 
+  const handleCardMouseMove = (e) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left - rect.width / 2) / 20;
+    const y = (e.clientY - rect.top - rect.height / 2) / 20;
+    setLocalMouse({ x, y });
+  };
+
+  const magneticX = useSpring(isActive ? localMouse.x : 0, { stiffness: 150, damping: 15 });
+  const magneticY = useSpring(isActive ? localMouse.y : 0, { stiffness: 150, damping: 15 });
+
+  return (
+    <motion.div
+      ref={cardRef}
+      initial={{ opacity: 0, y: 60 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ delay: index * 0.2, duration: 0.8 }}
+      onHoverStart={onHoverStart}
+      onHoverEnd={onHoverEnd}
+      onMouseMove={handleCardMouseMove}
+      style={{
+        position: 'relative',
+        height: '500px',
+        borderRadius: '28px',
+        overflow: 'hidden',
+        cursor: 'pointer',
+        x: magneticX,
+        y: magneticY,
+      }}
+    >
+      {/* Ripple Effect Container */}
+      <AnimatePresence>
+        {isActive && <RippleEffect />}
+      </AnimatePresence>
+
+      {/* Background Image */}
+      <motion.div
+        animate={{ 
+          scale: isActive ? 1.15 : 1,
+        }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: `url(${item.bgImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      />
+
+      {/* Gradient Overlay */}
+      <motion.div 
+        animate={{
+          opacity: isActive ? 1 : 0.95
+        }}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: item.gradient,
+          zIndex: 1
+        }} 
+      />
+
+      {/* Glassmorphic Border */}
+      <motion.div
+        animate={{
+          opacity: isActive ? 1 : 0.5,
+          scale: isActive ? 1.02 : 1
+        }}
+        transition={{ duration: 0.4 }}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          borderRadius: '28px',
+          padding: '2px',
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1))',
+          WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+          WebkitMaskComposite: 'xor',
+          maskComposite: 'exclude',
+          zIndex: 10,
+          pointerEvents: 'none'
+        }}
+      />
+
+      {/* Content */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        padding: '3rem',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        zIndex: 5,
+      }}>
+        {/* Icon */}
+        <motion.div
+          animate={{
+            scale: isActive ? 1.1 : 1,
+            rotate: isActive ? 5 : 0
+          }}
+          transition={{ duration: 0.4 }}
+          style={{
+            display: 'inline-flex',
+            alignSelf: 'flex-start',
+            padding: '1.25rem',
+            background: 'rgba(255, 248, 240, 0.15)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: '20px',
+            border: '1px solid rgba(255, 248, 240, 0.2)',
+            color: 'var(--color-cream)',
+          }}
+        >
+          {React.createElement(item.icon, { size: 36, strokeWidth: 2 })}
+        </motion.div>
+
+        {/* Text Content */}
+        <div>
+          <motion.h3 
+            animate={{
+              y: isActive ? -5 : 0
+            }}
+            style={{ 
+              fontSize: 'clamp(2rem, 3vw, 2.75rem)', 
+              marginBottom: '1rem', 
+              fontFamily: 'var(--font-heading)',
+              color: 'var(--color-cream)',
+              fontWeight: 700,
+              lineHeight: 1.2
+            }}
+          >
+            {item.title}
+          </motion.h3>
+          
+          <motion.p 
+            animate={{
+              opacity: isActive ? 1 : 0.85,
+              y: isActive ? 0 : 10
+            }}
+            transition={{ duration: 0.3 }}
+            style={{ 
+              fontFamily: 'var(--font-body)', 
+              lineHeight: 1.6, 
+              marginBottom: '2rem', 
+              color: 'rgba(255, 248, 240, 0.9)',
+              fontSize: '1.1rem'
+            }}
+          >
+            {item.desc}
+          </motion.p>
+          
+          <motion.button 
+            animate={{
+              x: isActive ? 10 : 0,
+              scale: isActive ? 1.05 : 1
+            }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+            className="btn" 
+            style={{ 
+              background: 'var(--color-cream)', 
+              color: 'var(--color-mocha)',
+              border: 'none',
+              padding: '1.25rem 2.5rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              fontWeight: 700,
+              fontSize: '1rem',
+              borderRadius: '12px',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+              transition: 'all 0.3s ease'
+            }}
+          >
+            {item.action} 
+            <motion.div
+              animate={{ x: isActive ? 5 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <ArrowRight size={20} />
+            </motion.div>
+          </motion.button>
+        </div>
+      </div>
+
+      {/* Shine Effect */}
+      <AnimatePresence>
+        {isActive && (
+          <motion.div
+            initial={{ x: '-100%', opacity: 0 }}
+            animate={{ x: '100%', opacity: [0, 0.5, 0] }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1, ease: "easeInOut" }}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
+              zIndex: 15,
+              pointerEvents: 'none'
+            }}
+          />
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+};
+
+// Ripple Effect Component
+const RippleEffect = () => (
+  <>
+    {[...Array(3)].map((_, i) => (
+      <motion.div
+        key={i}
+        initial={{ scale: 0, opacity: 0.6 }}
+        animate={{ scale: 2, opacity: 0 }}
+        transition={{ 
+          duration: 1.5, 
+          delay: i * 0.2,
+          repeat: Infinity,
+          ease: "easeOut"
+        }}
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          width: '100%',
+          height: '100%',
+          borderRadius: '50%',
+          border: '2px solid rgba(255, 248, 240, 0.5)',
+          transform: 'translate(-50%, -50%)',
+          zIndex: 2,
+          pointerEvents: 'none'
+        }}
+      />
+    ))}
+  </>
+);
+
+// Floating Particles Component
+const FloatingParticles = () => {
+  const particles = Array.from({ length: 20 }, (_, i) => ({
+    id: i,
+    size: Math.random() * 4 + 2,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    duration: Math.random() * 10 + 15,
+    delay: Math.random() * 5
+  }));
+
+  return (
+    <div style={{
+      position: 'absolute',
+      inset: 0,
+      zIndex: 2,
+      pointerEvents: 'none',
+      overflow: 'hidden'
+    }}>
+      {particles.map(particle => (
+        <motion.div
+          key={particle.id}
+          initial={{ 
+            x: `${particle.x}vw`, 
+            y: `${particle.y}vh`,
+            opacity: 0 
+          }}
+          animate={{ 
+            y: [`${particle.y}vh`, `${particle.y - 30}vh`, `${particle.y}vh`],
+            opacity: [0, 0.6, 0]
+          }}
+          transition={{
+            duration: particle.duration,
+            delay: particle.delay,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          style={{
+            position: 'absolute',
+            width: `${particle.size}px`,
+            height: `${particle.size}px`,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(240, 142, 46, 0.8), transparent)',
+            filter: 'blur(1px)'
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+// Parallax Column Component
 const ParallaxColumn = ({ images, duration, reverse, yStart = "0%" }) => (
   <motion.div
     initial={{ y: reverse ? "0%" : "-50%" }}
@@ -234,83 +567,13 @@ const ParallaxColumn = ({ images, duration, reverse, yStart = "0%" }) => (
         <div style={{
            position: 'absolute',
            inset: 0,
-           background: 'rgba(75, 46, 43, 0.2)', // Tint
+           background: 'rgba(75, 46, 43, 0.2)',
            mixBlendMode: 'multiply'
         }} />
       </div>
     ))}
   </motion.div>
 );
-
-const CtaButton = ({ children, primary }) => {
-  const [isHovered, setHovered] = useState(false);
-  
-  return (
-    <motion.button
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={() => setHovered(false)}
-      whileTap={{ scale: 0.95 }}
-      style={{
-        padding: '1rem 2rem',
-        borderRadius: '99px',
-        border: '1px solid',
-        borderColor: primary ? 'var(--color-beige)' : 'rgba(245, 239, 230, 0.3)',
-        background: primary ? 'var(--color-beige)' : 'transparent',
-        color: primary ? 'var(--color-mocha)' : 'var(--color-beige)',
-        fontSize: '1rem',
-        fontFamily: 'var(--font-body)',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.5rem',
-        position: 'relative',
-        overflow: 'hidden',
-        fontWeight: 500,
-        textTransform: 'uppercase',
-        letterSpacing: '0.05em'
-      }}
-    >
-      <span style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        {children}
-      </span>
-      {/* Fill Animation */}
-      <motion.div
-        initial={{ x: '-100%' }}
-        animate={{ x: isHovered ? '0%' : '-100%' }}
-        transition={{ duration: 0.3, ease: 'easeOut' }}
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: primary ? 'var(--color-caramel)' : 'var(--color-beige)',
-          zIndex: 1
-        }}
-      />
-      {primary && (
-         <motion.div 
-           animate={{ x: isHovered ? '0%' : '-100%' }}
-           style={{
-             position: 'absolute',
-             inset: 0,
-             background: 'var(--color-caramel)',
-             zIndex: 1
-           }}
-           transition={{ duration: 0.3 }}
-         />
-      )}
-      {!primary && (
-         <motion.div 
-           animate={{ opacity: isHovered ? 0.1 : 0 }}
-           style={{
-             position: 'absolute',
-             inset: 0,
-             background: 'white',
-             zIndex: 1
-           }}
-         />
-      )}
-    </motion.button>
-  );
-};
 
 export default Hero;
 
@@ -331,457 +594,3 @@ export default Hero;
 
 
 
-    // <motion.div 
-    //     initial={{ opacity: 0, y: 50 }}
-    //     animate={{ opacity: 1, y: 0 }}
-    //     transition={{ delay: 2, duration: 1 }}
-    //     style={{
-    //       width: '100%',
-    //       height: '400px', // Adjusted height
-    //       position: 'relative',
-    //       perspective: '1500px',
-    //       display: 'flex',
-    //       justifyContent: 'center',
-    //       alignItems: 'center',
-    //       marginTop: 'auto', // Push to bottom
-    //       marginBottom: '2rem'
-    //     }}
-    //   >
-    //     {/* Carousel Controls */}
-    //     <button 
-    //       onClick={handlePrev}
-    //       style={{
-    //         position: 'absolute',
-    //         left: '5%',
-    //         zIndex: 20,
-    //         background: 'rgba(21, 21, 21, 0.1)',
-    //         backdropFilter: 'blur(5px)',
-    //         border: '1px solid var(--color-soft-gray)',
-    //         borderRadius: '50%',
-    //         padding: '10px',
-    //         cursor: 'pointer',
-    //         color: 'var(--color-soft-black)',
-    //         display: 'flex',
-    //         alignItems: 'center',
-    //         justifyContent: 'center'
-    //       }}
-    //     >
-    //       <ArrowLeft size={24} />
-    //     </button>
-    //     <button 
-    //       onClick={handleNext}
-    //       style={{
-    //         position: 'absolute',
-    //         right: '5%',
-    //         zIndex: 20,
-    //         background: 'rgba(21, 21, 21, 0.1)',
-    //         backdropFilter: 'blur(5px)',
-    //         border: '1px solid var(--color-soft-gray)',
-    //         borderRadius: '50%',
-    //         padding: '10px',
-    //         cursor: 'pointer',
-    //         color: 'var(--color-soft-black)',
-    //         display: 'flex',
-    //         alignItems: 'center',
-    //         justifyContent: 'center'
-    //       }}
-    //     >
-    //       <ArrowRight size={24} />
-    //     </button>
-
-    //     {/* Carousel Stage */}
-    //     <div 
-    //       ref={containerRef}
-    //       style={{
-    //         position: 'relative',
-    //         width: '100%',
-    //         height: '100%',
-    //         display: 'flex',
-    //         justifyContent: 'center',
-    //         alignItems: 'center',
-    //         transformStyle: 'preserve-3d',
-    //       }}
-    //     >
-    //       {galleryImages.map((src, index) => {
-    //         let offset = index - activeIndex;
-    //         if (offset > galleryImages.length / 2) offset -= galleryImages.length;
-    //         if (offset < -galleryImages.length / 2) offset += galleryImages.length;
-
-    //         const absOffset = Math.abs(offset);
-    //         const isActive = offset === 0;
-            
-    //         return (
-    //           <motion.div
-    //             key={index}
-    //             initial={false}
-    //             animate={{
-    //               x: offset * 220,
-    //               z: -absOffset * 100 - (absOffset * 50),
-    //               rotateY: offset * -15,
-    //               scale: 1 - absOffset * 0.1,
-    //               opacity: Math.abs(offset) > 3 ? 0 : 1 - absOffset * 0.15,
-    //             }}
-    //             transition={{
-    //               type: "spring",
-    //               stiffness: 200,
-    //               damping: 25,
-    //               mass: 1
-    //             }}
-    //             style={{
-    //               position: 'absolute',
-    //               width: '260px',
-    //               height: '350px',
-    //               borderRadius: '16px',
-    //               overflow: 'hidden',
-    //               background: '#fff',
-    //               boxShadow: isActive ? '0 20px 50px rgba(0,0,0,0.2)' : '0 10px 30px rgba(0,0,0,0.1)',
-    //               transformStyle: 'preserve-3d',
-    //               zIndex: galleryImages.length - absOffset,
-    //               cursor: 'pointer',
-    //             }}
-    //             onClick={() => setActiveIndex(index)}
-    //           >
-    //             <img 
-    //               src={src} 
-    //               alt={`Gallery ${index}`} 
-    //               style={{
-    //                 width: '100%',
-    //                 height: '100%',
-    //                 objectFit: 'cover',
-    //                 filter: isActive ? 'none' : 'grayscale(30%) brightness(0.9)',
-    //                 transition: 'filter 0.5s ease'
-    //               }}
-    //             />
-    //             {!isActive && (
-    //               <div style={{
-    //                 position: 'absolute',
-    //                 inset: 0,
-    //                 background: 'rgba(244, 239, 232, 0.4)',
-    //                 pointerEvents: 'none'
-    //               }} />
-    //             )}
-    //           </motion.div>
-    //         );
-    //       })}
-    //     </div>
-    //   </motion.div>
-
-//     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap');
-
-// :root {
-//   /* New Palette */
-//   --color-soft-black: #151515;
-//   --color-paper-beige: #F4EFE8;
-//   --color-muted-gold: #E1B65C;
-//   --color-earth-brown: #8A5C3B;
-//   --color-soft-gray: #AFA8A2;
-//   --color-forest-green: #3A8F6F;
-
-//   /* Mapping to existing variable names for backward compatibility (best effort) */
-//   --color-mocha: var(--color-soft-black);
-//   --color-coffee: var(--color-earth-brown);
-//   --color-caramel: var(--color-muted-gold);
-//   --color-beige: var(--color-paper-beige);
-//   --color-cream: #FAF7F2;
-//   /* Kept or matching paper beige? Let's keep distinct if needed, or map to paper beige */
-//   --color-black: var(--color-soft-black);
-//   --color-white: #ffffff;
-
-//   --font-heading: 'Cormorant Garamond', serif;
-//   --font-body: 'Montserrat', sans-serif;
-
-//   --spacing-xs: 0.5rem;
-//   --spacing-sm: 1rem;
-//   --spacing-md: 2rem;
-//   --spacing-lg: 4rem;
-//   --spacing-xl: 8rem;
-
-//   --transition-slow: 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-//   --transition-normal: 0.3s ease-out;
-// }
-
-// * {
-//   margin: 0;
-//   padding: 0;
-//   box-sizing: border-box;
-// }
-
-// body {
-//   font-family: var(--font-body);
-//   background-color: var(--color-beige);
-//   color: var(--color-mocha);
-//   overflow-x: hidden;
-//   -webkit-font-smoothing: antialiased;
-// }
-
-// h1,
-// h2,
-// h3,
-// h4,
-// h5,
-// h6 {
-//   font-family: var(--font-heading);
-//   font-weight: 600;
-//   line-height: 1.1;
-// }
-
-// img {
-//   max-width: 100%;
-//   display: block;
-// }
-
-// /* Film Grain Overlay */
-// .grain-overlay {
-//   position: fixed;
-//   top: 0;
-//   left: 0;
-//   width: 100%;
-//   height: 100%;
-//   pointer-events: none;
-//   z-index: 9999;
-//   opacity: 0.05;
-//   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-// }
-
-// /* Utilities */
-// .container {
-//   max-width: 1400px;
-//   margin: 0 auto;
-//   padding: 0 var(--spacing-sm);
-// }
-
-// .btn {
-//   display: inline-flex;
-//   align-items: center;
-//   gap: 0.5rem;
-//   padding: 1rem 2rem;
-//   border: 1px solid currentColor;
-//   border-radius: 9999px;
-//   font-family: var(--font-body);
-//   font-size: 0.9rem;
-//   text-transform: uppercase;
-//   letter-spacing: 0.1em;
-//   transition: all var(--transition-normal);
-//   cursor: pointer;
-//   background: transparent;
-//   color: var(--color-mocha);
-//   text-decoration: none;
-// }
-
-// .btn:hover {
-//   background-color: var(--color-mocha);
-//   color: var(--color-beige);
-// }
-
-// .btn-primary {
-//   background-color: var(--color-mocha);
-//   color: var(--color-beige);
-//   border-color: var(--color-mocha);
-// }
-
-// .btn-primary:hover {
-//   background-color: var(--color-coffee);
-//   border-color: var(--color-coffee);
-// }
-
-// /* Cursor Cleanup */
-// body {
-//   cursor: none;
-//   /* We will use a custom cursor */
-// }
-
-// a,
-// button,
-// .btn {
-//   cursor: none;
-//   /* Ensure interactive elements don't show default cursor */
-// }
-
-// /* Marquee Animation */
-// /* Marquee Animation */
-// @keyframes scroll {
-//   0% {
-//     transform: translateX(0);
-//   }
-
-//   100% {
-//     transform: translateX(-100%);
-//   }
-// }
-
-// @keyframes wave {
-//   0% {
-//     transform: translateY(-15px) rotate(-3deg);
-//   }
-
-//   100% {
-//     transform: translateY(15px) rotate(3deg);
-//   }
-// }
-
-// .marquee-container {
-//   overflow: hidden;
-//   display: flex;
-//   white-space: nowrap;
-//   padding: 4rem 0;
-//   /* Increase padding to accommodate wave amplitude */
-//   background-color: var(--color-coffee);
-//   color: var(--color-beige);
-//   position: relative;
-//   /* Add a mask for soft edges? Optional */
-// }
-
-// .marquee-content {
-//   display: flex;
-//   animation: scroll 40s linear infinite;
-//   /* Slower speed for elegance */
-//   align-items: center;
-// }
-
-// .marquee-item-wrapper {
-//   /* The wrapper handles the vertical wave motion */
-//   /* We use a negative delay based on index to create the wave pattern */
-//   animation: wave 2.5s ease-in-out infinite alternate;
-//   animation-delay: calc(var(--i) * -0.3125s);
-//   /* 2.5s / 8 (or 16) approx. Needs to be tuned for smoothness */
-//   /* For simple phase alignment: just ensure smooth visual flow. Precision isn't strictly required for the wave itself to look good, 
-//      but for the loop to be perfect, the phase at the join must match.
-     
-//      If we have 16 items repeated. 
-//      We interpret the wave as continuous.
-//   */
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   padding: 0 3rem;
-//   /* Spacing between items */
-// }
-
-// .marquee-item {
-//   font-family: var(--font-heading);
-//   font-size: 3.5rem;
-//   text-transform: uppercase;
-//   font-style: italic;
-//   display: flex;
-//   align-items: center;
-//   gap: 1rem;
-//   transition: all 0.3s ease;
-//   cursor: pointer;
-// }
-
-// .marquee-icon {
-//   color: var(--color-muted-gold);
-//   transition: transform 0.3s ease;
-// }
-
-// /* Hover Effects */
-// .marquee-container:hover .marquee-content {
-//   animation-play-state: paused;
-// }
-
-// /* We also pause the wave so the items stop bobbing when you try to click/read */
-// .marquee-container:hover .marquee-item-wrapper {
-//   animation-play-state: paused;
-// }
-
-// .marquee-item:hover {
-//   transform: scale(1.1);
-//   color: var(--color-white);
-//   text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-// }
-
-// .marquee-item:hover .marquee-icon {
-//   transform: rotate(15deg) scale(1.2);
-//   color: var(--color-white);
-// }
-
-// /* New Animations */
-// @keyframes pulse {
-
-//   0%,
-//   100% {
-//     opacity: 1;
-//   }
-
-//   50% {
-//     opacity: 0.7;
-//   }
-// }
-
-// @keyframes float {
-
-//   0%,
-//   100% {
-//     transform: translateY(0);
-//   }
-
-//   50% {
-//     transform: translateY(-20px);
-//   }
-// }
-
-// @keyframes shimmer {
-//   0% {
-//     background-position: -1000px 0;
-//   }
-
-//   100% {
-//     background-position: 1000px 0;
-//   }
-// }
-
-// @keyframes glow {
-
-//   0%,
-//   100% {
-//     box-shadow: 0 0 20px rgba(193, 154, 107, 0.3);
-//   }
-
-//   50% {
-//     box-shadow: 0 0 40px rgba(193, 154, 107, 0.6);
-//   }
-// }
-
-// /* Utility Classes */
-// .animate-pulse {
-//   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-// }
-
-// .animate-float {
-//   animation: float 3s ease-in-out infinite;
-// }
-
-// .animate-glow {
-//   animation: glow 2s ease-in-out infinite;
-// }
-
-// /* Smooth Scrolling */
-// html {
-//   scroll-behavior: smooth;
-// }
-
-// /* Selection Styling */
-// ::selection {
-//   background-color: var(--color-caramel);
-//   color: var(--color-mocha);
-// }
-
-// .text-mask-anim {
-//   background: linear-gradient(45deg,
-//       var(--color-mocha) 0%,
-//       var(--color-caramel) 25%,
-//       #4a3c31 50%,
-//       var(--color-caramel) 75%,
-//       var(--color-mocha) 100%);
-//   background-size: 200% auto;
-//   color: transparent;
-//   -webkit-background-clip: text;
-//   background-clip: text;
-//   animation: shine 5s linear infinite;
-// }
-
-// @keyframes shine {
-//   to {
-//     background-position: 200% center;
-//   }
-// }

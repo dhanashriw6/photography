@@ -8,7 +8,6 @@ import {
   CustomCursor,
   ScrollProgress,
   MarqueeStrip,
-  UserPaths,
   Features,
   ImageGallery,
   FAQ,
@@ -34,12 +33,9 @@ function App() {
       <CustomCursor />
       <div className="grain-overlay" />
       <Navigation />
-      {/* <Hero /> */}
       <MarqueeStrip />
+      <Hero />
       {/* <ImageGallery /> */}
-      <div style={{ padding: '0 0' }}>
-        <UserPaths />
-      </div>
       <VideoShowcase />
       <StatsCounter />
       <PinterestGrid />
