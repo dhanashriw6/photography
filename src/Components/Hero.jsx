@@ -248,11 +248,11 @@ const PathCard = ({ item, isActive, setActive }) => {
         transition={{ duration: 0.7 }}
         className="absolute inset-0 w-full h-full"
       >
-        <img
+        {/* <img
           src={item.bgImage}
           alt={item.title}
           className="w-full h-full object-cover transition-all duration-500 grayscale group-hover:grayscale-0"
-        />
+        /> */}
         {/* Dark Overlay that lightens on hover */}
         <div className="absolute inset-0 bg-black/60 group-hover:bg-black/30 transition-colors duration-500" />
 
