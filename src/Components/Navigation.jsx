@@ -13,8 +13,9 @@ const Navigation = () => (
     justifyContent: 'space-between',
     alignItems: 'center',
     zIndex: 50,
-    mixBlendMode: 'difference',
-    color: 'var(--color-beige)'
+    // mixBlendMode: 'difference',
+    color: 'var(--color-beige)',
+    backgroundColor: 'var(--color-black)',
   }}>
     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <Camera size={24} />
