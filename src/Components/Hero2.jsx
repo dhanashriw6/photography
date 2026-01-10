@@ -5,8 +5,8 @@ import { ArrowRight, ArrowDown, ArrowLeft } from 'lucide-react';
 const Hero2 = () => {
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 500], [0, 200]);
-  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
-  
+  const opacity = useTransform(scrollY, [0, 1000], [1, 0]);
+
   // Carousel State
   const [activeIndex, setActiveIndex] = useState(3);
   const containerRef = useRef(null);
@@ -37,8 +37,8 @@ const Hero2 = () => {
     setActiveIndex(prev => (prev - 1 + galleryImages.length) % galleryImages.length);
   };
 
-  const titleline1 = "Film Frame".split("");
-  const titleline2 = "Studio".split("");
+  const titleline1 = "FullTime".split("");
+  const titleline2 = "Photographer".split("");
 
   return (
     <header style={{
@@ -192,7 +192,7 @@ const Hero2 = () => {
         }}
         style={{
           position: 'absolute',
-          top: '20%',
+          top: '10%',
           right: '10%',
           zIndex: 5,
           pointerEvents: 'none'
@@ -322,7 +322,7 @@ const Hero2 = () => {
         style={{
           position: 'absolute',
           top: '30%',
-          right: '25%',
+          right: '15%',
           zIndex: 5,
           pointerEvents: 'none'
         }}
@@ -361,7 +361,7 @@ const Hero2 = () => {
           }}
         />
 
-        <motion.p 
+        <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
@@ -386,73 +386,75 @@ const Hero2 = () => {
               letterSpacing: '0.05em'
             }}
           >
-            Curated Photography Marketplace
+            Find the Right Photographer. Book with Confidence.
+
           </motion.span>
         </motion.p>
 
 
         {/* Enhanced Title */}
-        <h1 className="hero-text" style={{ 
-          color: 'var(--color-soft-black)', 
-          margin: '1.5rem 0', 
-          display: 'flex', 
-          flexDirection: 'column', 
+        <h1 className="hero-text" style={{
+          color: 'var(--color-soft-black)',
+          margin: '1.5rem 0',
+          display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           position: 'relative'
         }}>
           <div style={{ display: 'flex', overflow: 'hidden' }}>
-              {titleline1.map((char, index) => (
-                  <motion.span
-                      key={index}
-                      initial={{ y: 200, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ 
-                        duration: 1, 
-                        delay: index * 0.05, 
-                        ease: [0.22, 1, 0.36, 1],
-                        opacity: { duration: 0.5, delay: index * 0.05 }
-                      }}
-                      
-                      whileHover={{ 
-                        y: -10, 
-                        color: 'var(--color-muted-gold)',
-                        transition: { duration: 0.2 }
-                      }}
-                      style={{ display: 'inline-block', cursor: 'none' }}
-                  >
-                      {char === " " ? "\u00A0" : char}
-                  </motion.span>
-              ))}
+            {titleline1.map((char, index) => (
+              <motion.span
+                key={index}
+                initial={{ y: 200, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{
+                  duration: 1,
+                  delay: index * 0.05,
+                  ease: [0.22, 1, 0.36, 1],
+                  opacity: { duration: 0.5, delay: index * 0.05 }
+                }}
+
+                whileHover={{
+                  y: -10,
+                  color: 'var(--color-muted-gold)',
+                  transition: { duration: 0.2 }
+                }}
+                style={{ display: 'inline-block', cursor: 'none', fontSize: '6rem' }}
+              >
+                {char === " " ? "\u00A0" : char}
+              </motion.span>
+            ))}
           </div>
           <div style={{ display: 'flex', overflow: 'hidden', width: '100%', justifyContent: 'center' }}>
-              {titleline2.map((char, index) => (
-                  <motion.span
-                      key={index}
-                      initial={{ y: 200, opacity: 0, rotateX: 90 }}
-                      animate={{ y: 0, opacity: 1, rotateX: 0 }}
-                      transition={{ 
-                        duration: 1.2, 
-                        delay: 0.5 + index * 0.06, 
-                        ease: [0.22, 1, 0.36, 1],
-                        opacity: { duration: 0.5, delay: 0.5 + index * 0.06 }
-                      }}
-                      whileHover={{ 
-                        y: -10,
-                        rotateZ: 5,
-                        color: 'var(--color-muted-gold)',
-                        transition: { duration: 0.2 }
-                      }}
-                      style={{ 
-                        fontStyle: 'italic', 
-                        fontFamily: 'var(--font-heading)',
-                        display: 'inline-block',
-                        cursor: 'none',
-                        transformStyle: 'preserve-3d'
-                      }}
-                  >
-                      {char}
-                  </motion.span>
-              ))}
+            {titleline2.map((char, index) => (
+              <motion.span
+                key={index}
+                initial={{ y: 200, opacity: 0, rotateX: 90 }}
+                animate={{ y: 0, opacity: 1, rotateX: 0 }}
+                transition={{
+                  duration: 1.2,
+                  delay: 0.5 + index * 0.06,
+                  ease: [0.22, 1, 0.36, 1],
+                  opacity: { duration: 0.5, delay: 0.5 + index * 0.06 }
+                }}
+                whileHover={{
+                  y: -10,
+                  rotateZ: 5,
+                  color: 'var(--color-muted-gold)',
+                  transition: { duration: 0.2 }
+                }}
+                style={{
+                  fontStyle: 'italic',
+                  fontFamily: 'var(--font-heading)',
+                  display: 'inline-block',
+                  cursor: 'none',
+                  transformStyle: 'preserve-3d',
+                  fontSize: '6rem'
+                }}
+              >
+                {char}
+              </motion.span>
+            ))}
           </div>
         </h1>
 
@@ -470,7 +472,7 @@ const Hero2 = () => {
             lineHeight: 1.6
           }}
         >
-          Where <motion.span 
+          Where <motion.span
             animate={{ opacity: [1, 0.5, 1] }}
             transition={{ duration: 2, repeat: Infinity }}
             style={{ color: 'var(--color-muted-gold)', fontWeight: '600' }}
@@ -510,8 +512,8 @@ const Hero2 = () => {
             Explore Talent <ArrowRight size={20} style={{ marginLeft: '10px' }} />
           </motion.button>
           <motion.button
-            whileHover={{ 
-              scale: 1.05, 
+            whileHover={{
+              scale: 1.05,
               borderColor: 'var(--color-soft-black)',
               background: 'var(--color-soft-black)',
               color: 'var(--color-paper-beige)'
@@ -535,160 +537,117 @@ const Hero2 = () => {
       </motion.div>
 
       {/* 3D Curved Carousel with Enhanced Depth */}
-        <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 2, duration: 1 }}
         style={{
           width: '100%',
-          height: '900px', // Adjusted height
+          height: '500px',
           position: 'relative',
-          perspective: '1500px',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          marginTop: 'auto', // Push to bottom
-          marginBottom: '2rem'
+          marginTop: '20%',
+          // marginBottom: '2rem'
         }}
       >
-        {/* Carousel Controls */}
-        {/* <button 
-          onClick={handlePrev}
+        <div
           style={{
-            position: 'absolute',
-            left: '5%',
-            zIndex: 20,
-            background: 'rgba(21, 21, 21, 0.1)',
-            backdropFilter: 'blur(5px)',
-            border: '1px solid var(--color-soft-gray)',
-            borderRadius: '50%',
-            padding: '10px',
-            cursor: 'pointer',
-            color: 'var(--color-soft-black)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          <ArrowLeft size={24} />
-        </button>
-        <button 
-          onClick={handleNext}
-          style={{
-            position: 'absolute',
-            right: '5%',
-            zIndex: 20,
-            background: 'rgba(21, 21, 21, 0.1)',
-            backdropFilter: 'blur(5px)',
-            border: '1px solid var(--color-soft-gray)',
-            borderRadius: '50%',
-            padding: '10px',
-            cursor: 'pointer',
-            color: 'var(--color-soft-black)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          <ArrowRight size={24} />
-        </button> */}
-
-        {/* Carousel Stage */}
-        <div 
-          ref={containerRef}
-          style={{
-            position: 'relative',
+            perspective: '600px',
+            perspectiveOrigin: 'center center',
             width: '100%',
             height: '100%',
             display: 'flex',
             justifyContent: 'center',
-            alignItems: 'center',
-            transformStyle: 'preserve-3d',
+            alignItems: 'center'
           }}
         >
-          {galleryImages.map((src, index) => {
-            let offset = index - activeIndex;
-            // Handle infinite loop logic
-            if (offset > galleryImages.length / 2) offset -= galleryImages.length;
-            if (offset < -galleryImages.length / 2) offset += galleryImages.length;
+          <div
+            ref={containerRef}
+            style={{
+              position: 'relative',
+              width: '100%',
+              height: '100%',
+              transformStyle: 'preserve-3d'
+            }}
+          >
+            {galleryImages.map((src, index) => {
+              let offset = index - activeIndex;
+              if (offset > galleryImages.length / 2) offset -= galleryImages.length;
+              if (offset < -galleryImages.length / 2) offset += galleryImages.length;
 
-            const absOffset = Math.abs(offset);
-            const isActive = offset === 0;
+              const absOffset = Math.abs(offset);
+              const isActive = offset === 0;
 
-            // Arc Configuration
-            const radius = 600; // Radius of the circle
-            const angleStep = 15; // Degrees between each card
-            const baseAngle = offset * angleStep;
-            
-            // Convert to radians for math
-            const rad = (baseAngle * Math.PI) / 180;
+              // Inward curve calculation
+              const angle = offset * 35;
+              const radius = 550;
+              const translateX = Math.sin(angle * Math.PI / 180) * radius;
+              const translateZ = radius - Math.cos(angle * Math.PI / 180) * radius - 200;
+              const rotateY = -angle;
+              const scale = 0.85 + (1 - absOffset * 0.15);
+              const opacity = absOffset > 3 ? 0 : 1 - absOffset * 0.2;
+              const zIndex = 10 - absOffset;
 
-            // Calculate positions based on polar coordinates (Rainbow/Fan Arc)
-            // Center is top of arc (0,0)
-            const x = radius * Math.sin(rad);
-            // Y needs to go DOWN as we move away from center to create rainbow shape
-            // cos(0) = 1, cos(small) < 1. 
-            // We want y=0 at center, and y > 0 at sides.
-            const y = radius * (1 - Math.cos(rad));
-
-            return (
-              <motion.div
-                key={index}
-                initial={false}
-                animate={{
-                  x: x,
-                  y: y + (absOffset * 10), // Add extra drop for dramatic effect
-                  rotateZ: baseAngle, // Rotate to match arc
-                  // scale: 1 - absOffset * 0.05, // Slight scaling down
-                  zIndex: galleryImages.length - absOffset,
-                  opacity: Math.abs(offset) > 3 ? 0 : 1, // Fade out distant items
-                }}
-                transition={{
-                  type: "spring",
-                  stiffness: 150,
-                  damping: 20,
-                  mass: 1
-                }}
-                style={{
-                  position: 'absolute',
-                  width: '280px',
-                  height: '340px',
-                  borderRadius: '24px', // Softer rounded corners
-                  overflow: 'hidden',
-                  background: '#fff',
-                  boxShadow: isActive 
-                    ? '0 25px 50px -12px rgba(0,0,0,0.5)' 
-                    : '0 10px 30px -5px rgba(0,0,0,0.3)',
-                  transformOrigin: '50% 100%', // Rotate from bottom for better fan effect? Or center? Let's try center first.
-                  // actually transformOrigin center is safer for specific x/y calcs.
-                  cursor: 'pointer',
-                  border: isActive ? '4px solid var(--color-muted-gold)' : 'none'
-                }}
-                onClick={() => setActiveIndex(index)}
-              >
-                <img 
-                  src={src} 
-                  alt={`Gallery ${index}`} 
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    pointerEvents: 'none' // Prevent drag issues
+              return (
+                <motion.div
+                  key={index}
+                  initial={false}
+                  animate={{
+                    transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
+                    opacity: opacity,
+                    zIndex: zIndex
                   }}
-                />
-                
-                {/* Gradient Overlay for depth */}
-                <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: isActive 
-                    ? 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.2) 100%)' 
-                    : 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%)',
-                  transition: 'all 0.3s ease'
-                }} />
-              </motion.div>
-            );
-          })}
+                  transition={{
+                    duration: 0.7,
+                    ease: [0.22, 1, 0.36, 1]
+                  }}
+                  style={{
+                    position: 'absolute',
+                    left: '50%',
+                    top: '50%',
+                    marginLeft: '-140px',
+                    marginTop: '-170px',
+                    width: '180px',
+                    height: '240px',
+                    borderRadius: '24px',
+                    overflow: 'hidden',
+                    background: '#fff',
+                    boxShadow: isActive
+                      ? '0 25px 50px -12px rgba(0,0,0,0.5)'
+                      : '0 10px 30px -5px rgba(0,0,0,0.3)',
+                    transformStyle: 'preserve-3d',
+                    cursor: 'pointer',
+                    border: isActive ? '4px solid var(--color-muted-gold)' : 'none',
+                    pointerEvents: absOffset === 0 ? 'auto' : 'none'
+                  }}
+                  onClick={() => setActiveIndex(index)}
+                >
+                  <img
+                    src={src}
+                    alt={`Gallery ${index}`}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      pointerEvents: 'none'
+                    }}
+                  />
+
+                  {/* Gradient Overlay */}
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: isActive
+                      ? 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.2) 100%)'
+                      : 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%)',
+                    transition: 'all 0.3s ease'
+                  }} />
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
       </motion.div>
 

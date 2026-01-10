@@ -111,7 +111,7 @@ const Hero = () => {
       <div style={{
         position: 'absolute',
         inset: 0,
-        background: 'linear-gradient(to bottom, rgba(26,26,26,0.8) 0%, rgba(26,26,26,0.95) 100%)',
+        background: 'linear-gradient(to bottom, rgba(13, 13, 13, 0.4) 0%, rgba(10, 10, 10, 0.6) 100%)',
         zIndex: 2,
         pointerEvents: 'none'
       }} />
@@ -148,11 +148,11 @@ const Hero = () => {
               gap: '0.75rem',
               marginBottom: '2rem',
               padding: '0.5rem 1.25rem',
-              background: 'rgba(240, 142, 46, 0.1)',
+              background: 'rgba(248, 130, 12, 0.3)',
               borderRadius: '100px',
-              border: '1px solid rgba(240, 142, 46, 0.3)',
+              border: '1px solid rgba(248, 130, 12, 0.3)',
               color: 'var(--color-orange)',
-              boxShadow: '0 0 20px rgba(240, 142, 46, 0.2)'
+              boxShadow: '0 0 20px rgba(248, 130, 12, 0.2)'
             }}
           >
             <Sparkles size={16} fill="currentColor" />
@@ -278,7 +278,7 @@ const PathCard = ({ item, isActive, setActive }) => {
             {React.createElement(item.icon, { size: 32, strokeWidth: 1.5 })}
           </div>
 
-          <h3 className="text-4xl md:text-5xl font-heading font-bold text-cream mb-4 leading-tight drop-shadow-lg">
+          <h3 className={`${isActive?'text-5xl':'text-4xl'} font-heading font-bold text-cream mb-4 leading-tight drop-shadow-lg`}>
             {item.title}
           </h3>
         </div>
@@ -367,23 +367,23 @@ const ParallaxColumn = ({ images, duration, reverse, yStart = "0%" }) => (
         overflow: 'hidden',
         height: '400px',
         width: '100%',
-        boxShadow: '0 20px 50px rgba(0,0,0,0.5)'
+        // boxShadow: '0 20px 50px rgba(0,0,0,0.5)'
       }}>
         <img
           src={src}
-          alt="Film Frame"
+          alt="FullTime Photographer"
           style={{
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            filter: 'grayscale(20%) contrast(1.1)'
+            filter: 'grayscale(10%) contrast(1.1)'
           }}
         />
         <div style={{
           position: 'absolute',
           inset: 0,
-          background: 'rgba(26, 26, 26, 0.3)',
-          mixBlendMode: 'multiply'
+          // background: 'rgba(26, 26, 26, 0.3)',
+          // mixBlendMode: 'multiply'
         }} />
       </div>
     ))}

@@ -19,7 +19,7 @@ const Navigation = () => (
   }}>
     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <Camera size={24} />
-      <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', fontWeight: 'bold' }}>Film Frame Studio</span>
+      <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', fontWeight: 'bold' }}>FullTime Photographer</span>
     </div>
     <div style={{ display: 'flex', gap: '2rem', fontFamily: 'var(--font-body)', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
       <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Photographers</a>
@@ -41,8 +41,8 @@ const Hero = () => {
   const rotate1 = useTransform(scrollY, [0, 500], [0, 10]);
   const rotate2 = useTransform(scrollY, [0, 500], [0, -15]);
 
-  const titleline1 = "Film Frame".split("");
-  const titleline2 = "Studio".split("");
+  const titleline1 = "FullTime".split("");
+  const titleline2 = "Photographer".split("");
 
   // Floating poster images
   const posters = [
@@ -250,7 +250,7 @@ const Hero = () => {
               pointerEvents: 'none'
             }}
           >
-            FILM FRAME
+            FullTime Photographer
           </motion.div>
 
           <div style={{ display: 'flex', overflow: 'hidden' }}>
@@ -981,7 +981,7 @@ const Testimonials = () => {
     {
       name: "Sarah Mitchell",
       role: "Wedding Client",
-      text: "Film Frame Studio connected us with an incredible photographer who captured our special day perfectly. The platform made everything seamless!",
+      text: "FullTime Photographer connected us with an incredible photographer who captured our special day perfectly. The platform made everything seamless!",
       rating: 5,
       image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&q=80"
     },
@@ -995,7 +995,7 @@ const Testimonials = () => {
     {
       name: "Emily Chen",
       role: "Brand Manager",
-      text: "We've hired multiple photographers through Film Frame for our campaigns. The quality and professionalism are consistently outstanding.",
+      text: "We've hired multiple photographers through FullTime Photographer for our campaigns. The quality and professionalism are consistently outstanding.",
       rating: 5,
       image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&q=80"
     }
@@ -1483,7 +1483,7 @@ const CTASection = () => {
               margin: '0 auto 3rem'
             }}
           >
-            Join thousands of clients and creators who trust Film Frame Studio for exceptional photography experiences.
+            Join thousands of clients and creators who trust FullTime Photographer for exceptional photography experiences.
           </motion.p>
 
           <div 
@@ -1542,7 +1542,7 @@ function App() {
         background: 'var(--color-black)', 
         color: 'var(--color-beige)' 
       }}>
-        <p style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem' }}>Film Frame Studio</p>
+        <p style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem' }}>FullTime Photographer</p>
         <p style={{ marginTop: '1rem', opacity: 0.5, fontFamily: 'var(--font-body)', fontSize: '0.8rem' }}>&copy; 2024 All Rights Reserved</p>
       </footer>
     </div>

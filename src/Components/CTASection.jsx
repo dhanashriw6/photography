@@ -83,7 +83,7 @@ const CTASection = () => {
               margin: '0 auto 3rem'
             }}
           >
-            Join thousands of clients and creators who trust Film Frame Studio for exceptional photography experiences.
+            Join thousands of clients and creators who trust FullTime Photographer for exceptional photography experiences.
           </motion.p>
 
           <div 

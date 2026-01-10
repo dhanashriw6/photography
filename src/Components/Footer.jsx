@@ -386,7 +386,7 @@ const Footer = () => {
                 cursor: 'pointer'
               }}
             >
-              Film Frame Studio
+              FullTime Photographer
             </motion.h2>
             <p style={{
               fontFamily: 'var(--font-body)',
@@ -463,7 +463,7 @@ const Footer = () => {
             opacity: 0.5,
             margin: 0
           }}>
-            &copy; {new Date().getFullYear()} Film Frame Studio. All Rights Reserved. Crafted with{' '}
+            &copy; {new Date().getFullYear()} FullTime Photographer. All Rights Reserved. Crafted with{' '}
             <motion.span
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 1, repeat: Infinity }}

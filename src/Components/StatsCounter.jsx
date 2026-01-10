@@ -42,7 +42,6 @@ const StatCard = ({ value, suffix, label, image, index }) => {
         boxShadow: '0 10px 40px rgba(0,0,0,0.15)'
       }}
     >
-      {/* Background Image */}
       <div style={{
         position: 'absolute',
         inset: 0,
@@ -55,14 +54,12 @@ const StatCard = ({ value, suffix, label, image, index }) => {
         className="stat-bg"
       />
 
-      {/* Gradient Overlay */}
       <div style={{
         position: 'absolute',
         inset: 0,
         background: 'linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%)'
       }} />
 
-      {/* Content */}
       <div style={{
         position: 'relative',
         zIndex: 2,
@@ -72,7 +69,6 @@ const StatCard = ({ value, suffix, label, image, index }) => {
         flexDirection: 'column',
         justifyContent: 'space-between'
       }}>
-        {/* Number */}
         <div>
           <h3 style={{
             fontSize: '3.5rem',
@@ -96,7 +92,6 @@ const StatCard = ({ value, suffix, label, image, index }) => {
           </h3>
         </div>
 
-        {/* Label */}
         <p style={{
           fontFamily: 'var(--font-body)',
           color: 'rgba(255, 255, 255, 0.9)',
@@ -109,7 +104,6 @@ const StatCard = ({ value, suffix, label, image, index }) => {
         </p>
       </div>
 
-      {/* Hover effect styles */}
       <style>{`
         .stat-bg:hover {
           filter: brightness(0.8) saturate(1) !important;
@@ -120,99 +114,178 @@ const StatCard = ({ value, suffix, label, image, index }) => {
   );
 };
 
+const AnimatedText = ({ text, delay = 0 }) => {
+  const characters = text.split('');
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.03,
+        delayChildren: delay
+      }
+    }
+  };
+
+  const charVariants = {
+    hidden: {
+      opacity: 0,
+      y: 20,
+      rotateX: -90,
+      filter: 'blur(8px)'
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      rotateX: 0,
+      filter: 'blur(0px)',
+      transition: {
+        type: 'spring',
+        damping: 12,
+        stiffness: 100
+      }
+    }
+  };
+
+  return (
+    <motion.span
+      variants={containerVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-100px" }}
+      style={{ display: 'inline-block' }}
+    >
+      {characters.map((char, index) => (
+        <motion.span
+          key={`${char}-${index}`}
+          variants={charVariants}
+          style={{
+            display: 'inline-block',
+            transformOrigin: '50% 100%',
+            whiteSpace: char === ' ' ? 'pre' : 'normal'
+          }}
+        >
+          {char}
+        </motion.span>
+      ))}
+    </motion.span>
+  );
+};
+
 const StatsCounter = () => {
   const stats = [
     {
       value: 1200,
       suffix: '+',
       label: 'Shoots Completed',
-      image: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=600&q=80' // Camera/photography
+      image: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=600&q=80'
     },
     {
       value: 850,
       suffix: '+',
       label: 'Active Creatives',
-      image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&q=80' // Team/people
+      image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&q=80'
     },
     {
       value: 45,
       suffix: '+',
       label: 'Awards Won',
-      image: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&q=80' // Trophy/awards
+      image: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&q=80'
     },
     {
       value: 15,
       suffix: 'K+',
       label: 'Hours Recorded',
-      image: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?w=600&q=80' // Film/video
+      image: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?w=600&q=80'
     },
-
   ];
 
   return (
     <section style={{
       position: 'relative',
       padding: '8rem 2rem',
-      background: 'var(--color-black)',
-      overflow: 'hidden'
+      background: '#0a0a0a',
+      overflow: 'hidden',
+      minHeight: '100vh'
     }}>
-      {/* Background Pattern */}
       <div style={{
         position: 'absolute',
         inset: 0,
         opacity: 0.4,
-        backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(0,0,0,0.05) 1px, transparent 0)',
+        backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)',
         backgroundSize: '40px 40px'
       }} />
       <SectionSeparator flip={true} />
-
-
       <div className="container" style={{
         position: 'relative',
         zIndex: 1,
         maxWidth: '1400px',
         margin: '0 auto'
       }}>
-        {/* Header */}
+        {/* Animated Header with character-by-character reveal */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
           style={{
             textAlign: 'center',
             marginBottom: '4rem'
           }}
         >
-
           <h2 style={{
             fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-            color: 'var(--color-cream)',
+            color: '#f5f1e8',
             marginBottom: '1rem',
-            fontFamily: 'var(--font-heading)'
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            fontWeight: 700,
+            lineHeight: 1.2,
+            letterSpacing: '-0.02em',
+            perspective: '1000px'
           }}>
-            Our Impact in Numbers
+            <AnimatedText text="Our Impact in Numbers" delay={0.2} />
           </h2>
-          <p style={{
-            fontFamily: 'var(--font-body)',
-            color: 'var(--color-cream)',
-            opacity: 0.7,
-            maxWidth: '600px',
-            margin: '0 auto',
-            fontSize: '1.1rem'
-          }}>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 0.7, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 1.2 }}
+            style={{
+              fontFamily: 'system-ui, -apple-system, sans-serif',
+              color: '#f5f1e8',
+              opacity: 0.7,
+              maxWidth: '600px',
+              margin: '0 auto',
+              fontSize: '1.1rem',
+              lineHeight: 1.6
+            }}
+          >
             Join thousands of creatives who are already making their mark
-          </p>
+          </motion.p>
+
+          {/* Decorative animated line */}
+          <motion.div
+            initial={{ scaleX: 0, opacity: 0 }}
+            whileInView={{ scaleX: 1, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, delay: 1.5, ease: "easeInOut" }}
+            style={{
+              height: '2px',
+              width: '120px',
+              background: 'linear-gradient(90deg, transparent, #ff6b35, transparent)',
+              margin: '2rem auto',
+              transformOrigin: 'center',
+              borderRadius: '2px'
+            }}
+          />
         </motion.div>
 
-        {/* Stats Cards - Horizontal Scroll */}
+        {/* Stats Cards */}
         <div style={{
           display: 'flex',
           gap: '3.5rem',
           overflowX: 'auto',
           overflowY: 'hidden',
-
           scrollbarWidth: 'thin',
-          scrollbarColor: 'var(--color-orange) transparent'
+          scrollbarColor: '#ff6b35 transparent'
         }}>
           {stats.map((stat, index) => (
             <StatCard
@@ -225,11 +298,18 @@ const StatsCounter = () => {
             />
           ))}
         </div>
-
       </div>
 
-      {/* Custom Scrollbar Styles */}
       <style>{`
+        :root {
+          --font-heading: system-ui, -apple-system, sans-serif;
+          --font-body: system-ui, -apple-system, sans-serif;
+          --color-cream: #f5f1e8;
+          --color-orange: #ff6b35;
+          --color-red: #d64933;
+          --color-black: #0a0a0a;
+        }
+
         .container > div:last-child::-webkit-scrollbar {
           height: 8px;
         }
