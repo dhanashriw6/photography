@@ -5,32 +5,38 @@
 @tailwind utilities;
 
 :root {
-  /* New Palette - Exact Hex Codes from User */
-  --color-orange: #F08E2E;
-  --color-red: #B8392D;
-  --color-teal: #2C7A8A;
-  --color-cream: #F7F3E8;
-  --color-light-blue: #A6E1EB;
-  --color-black: #1A1A1A;
+  /* New Monochrome + Warm Accent Palette */
+  --color-midnight-blue: #111212;
+  --color-dark-slate-gray: #2E2D2B;
+  --color-black: #000;
+  --color-gray: #888888;
+  --color-silver: #BBBBBB;
+  --color-linen: #F7F4E9;
+  --color-pale: #FEEFA3;
+  --color-old-lace: #FEFAE7;
+  --color-orange: #FFAE00;
+  --color-khaki: #FFE24F;
+  --color-cornsilk: #FFF8E0;
+  --color-ivory: #FFFEF5;
+  --color-white: #FFFEFA;
 
-  /* Reskinning Existing Semantics */
-  --color-soft-black: var(--color-black);
-  --color-paper-beige: var(--color-cream);
+  /* Semantic Color Mappings */
+  --color-soft-black: var(--color-midnight-blue);
+  --color-paper-beige: var(--color-linen);
   --color-muted-gold: var(--color-orange);
-  /* Replaces gold with the vibrant orange */
-  --color-earth-brown: var(--color-red);
-  /* Replaces brown with the deep red */
-  --color-soft-gray: var(--color-light-blue);
-  /* Replaces gray with light blue */
-  --color-forest-green: var(--color-teal);
-  /* Replaces green with teal */
+  --color-earth-brown: var(--color-dark-slate-gray);
+  --color-soft-gray: var(--color-gray);
+  --color-forest-green: var(--color-khaki);
 
   /* Backward Compatibility Mappings */
-  --color-mocha: var(--color-soft-black);
-  --color-coffee: var(--color-earth-brown);
-  --color-caramel: var(--color-muted-gold);
-  --color-beige: var(--color-paper-beige);
-  --color-white: #ffffff;
+  --color-mocha: var(--color-midnight-blue);
+  --color-coffee: var(--color-dark-slate-gray);
+  --color-caramel: var(--color-orange);
+  --color-beige: var(--color-linen);
+  --color-teal: var(--color-gray);
+  --color-light-blue: var(--color-silver);
+  --color-red: var(--color-dark-slate-gray);
+  --color-cream: var(--color-old-lace);
 
   --font-heading: 'Cormorant Garamond', serif;
   --font-body: 'Montserrat', sans-serif;
@@ -191,10 +197,10 @@ button,
   overflow: hidden;
   display: flex;
   white-space: nowrap;
-  padding: 4rem 0;
+  padding: 3rem 0;
   /* Increase padding to accommodate wave amplitude */
-  background-color: var(--color-coffee);
-  color: var(--color-beige);
+  background-color: var(--color-pale);
+  color: var(--color-orange);
   position: relative;
   /* Add a mask for soft edges? Optional */
 }

@@ -66,8 +66,8 @@ const Hero = () => {
       desc: "Showcase your portfolio, connect with clients, and grow your photography business on our platform.",
       action: "Start Creating",
       bgImage: "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=800&q=80",
-      gradient: "linear-gradient(135deg, rgba(44, 122, 138, 0.95) 0%, rgba(20, 80, 90, 0.98) 100%)",
-      accent: "var(--color-teal)" // Changed to Teal for variety, matching palette
+      gradient: "linear-gradient(135deg, rgba(240, 142, 46, 0.95) 0%, rgba(200, 100, 30, 0.98) 100%)",
+      accent: "var(--color-orange)"
     }
   ];
 
@@ -148,13 +148,15 @@ const Hero = () => {
               gap: '0.75rem',
               marginBottom: '2rem',
               padding: '0.5rem 1.25rem',
-              background: 'rgba(248, 130, 12, 0.3)',
+
+              background: 'rgba(255, 226, 79, 0.25)', // #FFE24F with transparency
               borderRadius: '100px',
-              border: '1px solid rgba(248, 130, 12, 0.3)',
-              color: 'var(--color-orange)',
-              boxShadow: '0 0 20px rgba(248, 130, 12, 0.2)'
+              border: '1px solid rgba(255, 226, 79, 0.4)',
+              color: '#FFE24F',
+              boxShadow: '0 0 20px rgba(255, 226, 79, 0.35)'
             }}
           >
+
             <Sparkles size={16} fill="currentColor" />
             <span style={{
               fontFamily: 'var(--font-body)',
@@ -182,7 +184,7 @@ const Hero = () => {
               textShadow: '0 20px 40px rgba(0,0,0,0.5)'
             }}
           >
-            Start Your <span style={{ color: 'var(--color-orange)', fontStyle: 'italic' }}>Journey</span>
+            Start Your <span style={{ color: 'var(--color-khaki)', fontStyle: 'italic' }}>Journey</span>
           </motion.h1>
 
           <motion.p
@@ -278,7 +280,7 @@ const PathCard = ({ item, isActive, setActive }) => {
             {React.createElement(item.icon, { size: 32, strokeWidth: 1.5 })}
           </div>
 
-          <h3 className={`${isActive?'text-5xl':'text-4xl'} font-heading font-bold text-cream mb-4 leading-tight drop-shadow-lg`}>
+          <h3 className={`${isActive ? 'text-5xl' : 'text-4xl'} font-heading font-bold text-cream mb-4 leading-tight drop-shadow-lg`}>
             {item.title}
           </h3>
         </div>
@@ -295,11 +297,11 @@ const PathCard = ({ item, isActive, setActive }) => {
           </p>
 
           <button
-            className="flex items-center gap-3 p-4 mx-3 w-52  h-16 justify-center rounded-full text-sm font-bold uppercase tracking-widest transition-all duration-300 hover:scale-105 hover:shadow-xl"
+            className="flex items-center gap-3 p-2 w-50  h-15 justify-center rounded-full text-sm font-bold uppercase tracking-widest transition-all duration-300 hover:scale-105 hover:shadow-xl"
             style={{
               backgroundColor: item.accent,
               color: '#fff',
-              boxShadow: `0 4px 20px -5px ${item.accent}`
+              // boxShadow: `0 4px 20px -5px ${item.accent}`
             }}
           >
             {item.action}

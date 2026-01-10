@@ -336,7 +336,7 @@ const Hero2 = () => {
           fontWeight: '700',
           fontSize: '0.95rem',
           fontStyle: 'italic',
-          color: 'var(--color-paper-beige)',
+          color: 'var(--color-soft-black)',
           boxShadow: '4px 4px 0px var(--color-soft-black)',
           transform: 'rotate(-8deg)'
         }}>
@@ -573,12 +573,24 @@ const Hero2 = () => {
             }}
           >
             {galleryImages.map((src, index) => {
+              // Calculate the shortest circular distance
               let offset = index - activeIndex;
-              if (offset > galleryImages.length / 2) offset -= galleryImages.length;
-              if (offset < -galleryImages.length / 2) offset += galleryImages.length;
+              const totalImages = galleryImages.length;
+
+              // Normalize offset to find shortest path around the circle
+              if (offset > totalImages / 2) {
+                offset = offset - totalImages;
+              } else if (offset < -totalImages / 2) {
+                offset = offset + totalImages;
+              }
 
               const absOffset = Math.abs(offset);
               const isActive = offset === 0;
+
+              // Hide images that are too far away to prevent overlay
+              if (absOffset > 2.5) {
+                return null;
+              }
 
               // Inward curve calculation
               const angle = offset * 35;
@@ -587,8 +599,8 @@ const Hero2 = () => {
               const translateZ = radius - Math.cos(angle * Math.PI / 180) * radius - 200;
               const rotateY = -angle;
               const scale = 0.85 + (1 - absOffset * 0.15);
-              const opacity = absOffset > 3 ? 0 : 1 - absOffset * 0.2;
-              const zIndex = 10 - absOffset;
+              const opacity = 1 - absOffset * 0.25;
+              const zIndex = Math.round(10 - absOffset);
 
               return (
                 <motion.div

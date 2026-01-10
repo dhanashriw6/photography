@@ -114,7 +114,7 @@ const StatCard = ({ value, suffix, label, image, index }) => {
   );
 };
 
-const AnimatedText = ({ text, delay = 0 }) => {
+export const AnimatedText = ({ text, delay = 0 }) => {
   const characters = text.split('');
 
   const containerVariants = {
@@ -232,7 +232,7 @@ const StatsCounter = () => {
         >
           <h2 style={{
             fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-            color: '#f5f1e8',
+            color: 'var(--color-khaki)',
             marginBottom: '1rem',
             fontFamily: 'system-ui, -apple-system, sans-serif',
             fontWeight: 700,

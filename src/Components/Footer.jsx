@@ -21,10 +21,10 @@ const Footer = () => {
   ];
 
   return (
-    <footer style={{ 
+    <footer style={{
       position: 'relative',
-      padding: '6rem 2rem 2rem', 
-      background: 'var(--color-soft-black)', 
+      padding: '6rem 2rem 2rem',
+      background: 'var(--color-soft-black)',
       color: 'var(--color-paper-beige)',
       overflow: 'hidden'
     }}>
@@ -43,7 +43,7 @@ const Footer = () => {
           width: '500px',
           height: '500px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(193,154,107,0.3) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(255,174,0,0.3) 0%, transparent 70%)',
           filter: 'blur(100px)',
           pointerEvents: 'none'
         }}
@@ -61,7 +61,7 @@ const Footer = () => {
           width: '600px',
           height: '600px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(138,92,59,0.25) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(255,226,79,0.25) 0%, transparent 70%)',
           filter: 'blur(120px)',
           pointerEvents: 'none'
         }}
@@ -87,11 +87,11 @@ const Footer = () => {
         }}
       >
         <div style={{
-          background: 'var(--color-muted-gold)',
+          background: 'var(--color-pale)',
           border: '3px solid var(--color-paper-beige)',
           borderRadius: '50%',
           padding: '1rem',
-          
+
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center'
@@ -122,10 +122,10 @@ const Footer = () => {
       >
         <div style={{
           background: 'var(--color-paper-beige)',
-          border: '3px solid var(--color-muted-gold)',
+          border: '3px solid var(--color-pale)',
           borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
           padding: '1.2rem',
-          boxShadow: '5px 5px 0px rgba(193,154,107,0.4)',
+          boxShadow: '5px 5px 0px rgba(255,174,0,0.4)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center'
@@ -160,15 +160,15 @@ const Footer = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '4px 4px 0px rgba(244,236,220,0.3)'
+          boxShadow: '4px 4px 0px rgba(247,243,233,0.3)'
         }}>
           <Heart size={24} color="var(--color-paper-beige)" fill="var(--color-paper-beige)" />
         </div>
       </motion.div>
 
       {/* Main Footer Content */}
-      <div style={{ 
-        position: 'relative', 
+      <div style={{
+        position: 'relative',
         zIndex: 10,
         maxWidth: '1400px',
         margin: '0 auto'
@@ -183,9 +183,9 @@ const Footer = () => {
             textAlign: 'center',
             marginBottom: '5rem',
             padding: '3rem',
-            background: 'rgba(244,236,220,0.05)',
+            background: 'rgba(247,243,233,0.05)',
             borderRadius: '30px',
-            border: '2px solid rgba(244,236,220,0.1)',
+            border: '2px solid rgba(247,243,233,0.1)',
             backdropFilter: 'blur(10px)'
           }}
         >
@@ -195,9 +195,9 @@ const Footer = () => {
             }}
             transition={{ duration: 3, repeat: Infinity }}
           >
-            <Send size={40} color="var(--color-muted-gold)" style={{ marginBottom: '1rem' }} />
+            <Send size={40} color="var(--color-pale)" style={{ marginBottom: '1rem' }} />
           </motion.div>
-          
+
           <h3 style={{
             fontFamily: 'var(--font-heading)',
             fontSize: 'clamp(1.8rem, 3vw, 2.5rem)',
@@ -207,11 +207,11 @@ const Footer = () => {
           }}>
             Stay In The Frame
           </h3>
-          
+
           <p style={{
             fontFamily: 'var(--font-body)',
             fontSize: '1.1rem',
-            color: 'var(--color-paper-beige)',
+            color: 'var(--color-pale)',
             opacity: 0.8,
             marginBottom: '2rem',
             maxWidth: '600px',
@@ -244,8 +244,8 @@ const Footer = () => {
                 minWidth: '250px',
                 padding: '1rem 1.5rem',
                 borderRadius: '50px',
-                border: '2px solid var(--color-muted-gold)',
-                background: 'rgba(244,236,220,0.1)',
+                border: '2px solid var(--color-pale)',
+                background: 'rgba(247,243,233,0.1)',
                 color: 'var(--color-paper-beige)',
                 fontFamily: 'var(--font-body)',
                 fontSize: '1rem',
@@ -253,22 +253,22 @@ const Footer = () => {
                 transition: 'all 0.3s ease'
               }}
               onFocus={(e) => {
-                e.target.style.background = 'rgba(244,236,220,0.15)';
+                e.target.style.background = 'rgba(247,243,233,0.15)';
                 e.target.style.borderColor = 'var(--color-paper-beige)';
               }}
               onBlur={(e) => {
-                e.target.style.background = 'rgba(244,236,220,0.1)';
+                e.target.style.background = 'rgba(247,243,233,0.1)';
                 e.target.style.borderColor = 'var(--color-muted-gold)';
               }}
             />
             <motion.button
-              whileHover={{ scale: 1.05, boxShadow: '0 10px 30px rgba(193,154,107,0.4)' }}
+              whileHover={{ scale: 1.05, boxShadow: '0 10px 30px rgba(255,174,0,0.4)' }}
               whileTap={{ scale: 0.95 }}
               style={{
                 padding: '1rem 2.5rem',
                 borderRadius: '50px',
                 border: 'none',
-                background: 'var(--color-muted-gold)',
+                background: 'var(--color-pale)',
                 color: 'var(--color-soft-black)',
                 fontFamily: 'var(--font-body)',
                 fontWeight: '600',
@@ -279,7 +279,7 @@ const Footer = () => {
                 gap: '0.5rem'
               }}
             >
-              Subscribe 
+              Subscribe
             </motion.button>
           </motion.div>
         </motion.div>
@@ -353,7 +353,7 @@ const Footer = () => {
           transition={{ duration: 1, delay: 0.4 }}
           style={{
             height: '2px',
-            background: 'linear-gradient(90deg, transparent, var(--color-muted-gold), transparent)',
+            background: 'linear-gradient(90deg, transparent, var(--color-khaki), transparent)',
             marginBottom: '3rem',
             transformOrigin: 'center'
           }}
@@ -413,8 +413,8 @@ const Footer = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: social.delay, duration: 0.4, type: 'spring' }}
-                whileHover={{ 
-                  scale: 1.2, 
+                whileHover={{
+                  scale: 1.2,
                   rotate: 360,
                   backgroundColor: social.color
                 }}
@@ -425,7 +425,7 @@ const Footer = () => {
                   width: '50px',
                   height: '50px',
                   borderRadius: '50%',
-                  background: isHovered === idx ? social.color : 'rgba(244,236,220,0.1)',
+                  background: isHovered === idx ? social.color : 'rgba(247,243,233,0.1)',
                   border: `2px solid ${isHovered === idx ? social.color : 'var(--color-muted-gold)'}`,
                   display: 'flex',
                   alignItems: 'center',
@@ -434,9 +434,9 @@ const Footer = () => {
                   transition: 'all 0.3s ease'
                 }}
               >
-                <social.icon 
-                  size={22} 
-                  color={isHovered === idx ? '#fff' : 'var(--color-paper-beige)'} 
+                <social.icon
+                  size={22}
+                  color={isHovered === idx ? '#fff' : 'var(--color-paper-beige)'}
                 />
               </motion.a>
             ))}
@@ -452,7 +452,7 @@ const Footer = () => {
           style={{
             marginTop: '3rem',
             paddingTop: '2rem',
-            borderTop: '1px solid rgba(244,236,220,0.1)',
+            borderTop: '1px solid rgba(247,243,233,0.1)',
             textAlign: 'center'
           }}
         >
