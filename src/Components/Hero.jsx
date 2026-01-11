@@ -174,7 +174,7 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
             style={{
-              fontSize: 'clamp(3.5rem, 8vw, 6.5rem)',
+              fontSize: '5.5rem',
               color: 'var(--color-cream)',
               fontWeight: 400, // Thinner, more elegant
               marginBottom: '1.5rem',

@@ -231,14 +231,14 @@ const StatsCounter = () => {
           }}
         >
           <h2 style={{
-            fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+            fontSize: '5.5rem',
             color: 'var(--color-khaki)',
             marginBottom: '1rem',
-            fontFamily: 'system-ui, -apple-system, sans-serif',
-            fontWeight: 700,
             lineHeight: 1.2,
             letterSpacing: '-0.02em',
-            perspective: '1000px'
+            perspective: '1000px',
+            fontFamily: 'var(--font-heading)',
+            fontWeight: 700,  
           }}>
             <AnimatedText text="Our Impact in Numbers" delay={0.2} />
           </h2>

@@ -18,7 +18,8 @@ const Hero2 = () => {
     "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80",
     "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600&q=80",
     "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80",
-    "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=600&q=80"
+    "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=600&q=80",
+    
   ];
 
   // Auto-play effect for carousel
@@ -399,9 +400,11 @@ const Hero2 = () => {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
+          fontFamily:"var(--font-hero)",
           position: 'relative'
+          
         }}>
-          <div style={{ display: 'flex', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', overflow: 'hidden',}}>
             {titleline1.map((char, index) => (
               <motion.span
                 key={index}
@@ -419,13 +422,13 @@ const Hero2 = () => {
                   color: 'var(--color-muted-gold)',
                   transition: { duration: 0.2 }
                 }}
-                style={{ display: 'inline-block', cursor: 'none', fontSize: '6rem' }}
+                style={{ display: 'inline-block', cursor: 'none', fontSize: '5rem' }}
               >
                 {char === " " ? "\u00A0" : char}
               </motion.span>
             ))}
           </div>
-          <div style={{ display: 'flex', overflow: 'hidden', width: '100%', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', overflow: 'hidden', width: '100%', justifyContent: 'center', }}>
             {titleline2.map((char, index) => (
               <motion.span
                 key={index}
@@ -445,11 +448,11 @@ const Hero2 = () => {
                 }}
                 style={{
                   fontStyle: 'italic',
-                  fontFamily: 'var(--font-heading)',
+                 
                   display: 'inline-block',
                   cursor: 'none',
                   transformStyle: 'preserve-3d',
-                  fontSize: '6rem'
+                  fontSize: '5rem'
                 }}
               >
                 {char}
@@ -588,18 +591,18 @@ const Hero2 = () => {
               const isActive = offset === 0;
 
               // Hide images that are too far away to prevent overlay
-              if (absOffset > 2.5) {
+              if (absOffset > 3.5) {
                 return null;
               }
 
               // Inward curve calculation
-              const angle = offset * 35;
-              const radius = 550;
+              const angle = offset * 25; // Reduced from 35 to decrease gap
+              const radius = 600; // Reduced from 550 to bring images closer
               const translateX = Math.sin(angle * Math.PI / 180) * radius;
               const translateZ = radius - Math.cos(angle * Math.PI / 180) * radius - 200;
               const rotateY = -angle;
-              const scale = 0.85 + (1 - absOffset * 0.15);
-              const opacity = 1 - absOffset * 0.25;
+              const scale = 1; // Keep all images the same size
+              const opacity = 1 ;
               const zIndex = Math.round(10 - absOffset);
 
               return (
@@ -621,8 +624,8 @@ const Hero2 = () => {
                     top: '50%',
                     marginLeft: '-140px',
                     marginTop: '-170px',
-                    width: '180px',
-                    height: '240px',
+                    width: '250px',
+                    height: '300px',
                     borderRadius: '24px',
                     overflow: 'hidden',
                     background: '#fff',

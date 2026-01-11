@@ -136,7 +136,7 @@ const FAQ = () => {
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
             style={{
-              fontSize: 'clamp(3rem, 6vw, 5rem)',
+              fontSize: '5.5rem',
               color: 'var(--color-old-lace)',
               marginBottom: '1.5rem',
               lineHeight: 1.1
