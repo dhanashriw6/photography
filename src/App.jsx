@@ -41,8 +41,8 @@ function App() {
       <StatsCounter />
       <PinterestGrid />
       <Testimonials />
-      {/* <Features /> */}
       <FAQ />
+      <Features />
       {/* <CTASection /> */}
       <Footer />
     </div>

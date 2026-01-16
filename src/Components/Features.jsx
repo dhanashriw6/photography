@@ -45,7 +45,7 @@ const item = {
 
 const Features = () => {
     const steps = [
-        { icon: <Search />, title: "Discover", desc: "Explore curated portfolios tailored to your vision" },
+        { icon: <Search/>, title: "Discover", desc: "Explore curated portfolios tailored to your vision" },
         { icon: <Calendar />, title: "Book", desc: "Instant scheduling with real-time availability" },
         { icon: <UserCheck />, title: "Connect", desc: "Collaborate with verified creative professionals" },
         { icon: <Star />, title: "Review", desc: "Share your experience and inspire others" },
@@ -53,7 +53,7 @@ const Features = () => {
     
       return (
         <section style={{ 
-          padding: '12rem 2rem', 
+          padding: '6rem 2rem', 
           background: 'linear-gradient(180deg, var(--color-cream) 0%, var(--color-beige) 100%)',
           position: 'relative', 
           overflow: 'hidden' 
@@ -243,14 +243,14 @@ const Features = () => {
                       width: '80px',
                       height: '80px',
                       borderRadius: '20px',
-                      background: 'linear-gradient(135deg, var(--color-caramel), var(--color-mocha))',
+                      background: 'linear-gradient(135deg, var(--color-khaki), var(--color-orange))',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       marginBottom: '2rem',
                       boxShadow: '0 10px 30px rgba(193,154,107,0.3)',
                       position: 'relative',
-                      zIndex: 1
+                      zIndex: 1,
                     }}
                   >
                     <motion.div
@@ -313,8 +313,8 @@ const Features = () => {
                       width: '40px',
                       height: '40px',
                       borderRadius: '50%',
-                      background: 'var(--color-caramel)',
-                      color: 'var(--color-beige)',
+                      background: 'var(--color-khaki)',
+                      color: 'var(--color-black)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -345,35 +345,7 @@ const Features = () => {
               ))}
             </div>
 
-            {/* Bottom CTA */}
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.8, duration: 0.8 }}
-              style={{ 
-                textAlign: 'center', 
-                marginTop: '5rem' 
-              }}
-            >
-              <motion.button
-                whileHover={{ 
-                  scale: 1.05,
-                  boxShadow: '0 20px 50px rgba(75,46,43,0.3)'
-                }}
-                whileTap={{ scale: 0.95 }}
-                className="btn btn-primary"
-                style={{
-                  background: 'var(--color-mocha)',
-                  color: 'var(--color-beige)',
-                  fontSize: '1.1rem',
-                  padding: '1.3rem 3rem',
-                  borderRadius: '50px'
-                }}
-              >
-                Start Your Journey <ArrowRight size={20} />
-              </motion.button>
-            </motion.div>
+      
           </div>
         </section>
       );
