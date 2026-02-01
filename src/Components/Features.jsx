@@ -1,354 +1,254 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Calendar, UserCheck, Star, ArrowRight } from "lucide-react";
-
-const steps = [
-  {
-    icon: Search,
-    title: "Discover",
-    desc: "Explore curated photographer portfolios",
-  },
-  {
-    icon: Calendar,
-    title: "Book",
-    desc: "Instant scheduling with live availability",
-  },
-  {
-    icon: UserCheck,
-    title: "Connect",
-    desc: "Work only with verified professionals",
-  },
-  {
-    icon: Star,
-    title: "Review",
-    desc: "Share your experience & build trust",
-  },
-];
-
-const container = {
-  hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.2,
-    },
-  },
-};
-
-const item = {
-  hidden: { opacity: 0, y: 60 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
-  },
-};
+import { Search, Calendar, UserCheck, Star } from "lucide-react";
 
 const Features = () => {
-    const steps = [
-        { icon: <Search/>, title: "Discover", desc: "Explore curated portfolios tailored to your vision" },
-        { icon: <Calendar />, title: "Book", desc: "Instant scheduling with real-time availability" },
-        { icon: <UserCheck />, title: "Connect", desc: "Collaborate with verified creative professionals" },
-        { icon: <Star />, title: "Review", desc: "Share your experience and inspire others" },
-      ];
-    
-      return (
-        <section style={{ 
-          padding: '6rem 2rem', 
-          background: 'linear-gradient(180deg, var(--color-cream) 0%, var(--color-beige) 100%)',
-          position: 'relative', 
-          overflow: 'hidden' 
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+
+  const steps = [
+    {
+      title: "Discover",
+      desc: "Explore curated portfolios tailored to your vision",
+      image: "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?w=800&h=600&fit=crop" // Creative portfolio/gallery wall
+    },
+    {
+      title: "Book",
+      desc: "Instant scheduling with real-time availability",
+      image: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&h=600&fit=crop" // Calendar/planner with notes
+    },
+    {
+      title: "Connect",
+      desc: "Collaborate with verified creative professionals",
+      image: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&h=600&fit=crop" // People collaborating/handshake
+    },
+    {
+      title: "Review",
+      desc: "Share your experience and inspire others",
+      image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=800&h=600&fit=crop" // Feedback/rating stars
+    },
+  ];
+
+  return (
+    <section style={{
+      padding: '8rem 2rem',
+      background: 'var(--color-black)',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      <div className="container" style={{ maxWidth: '1600px', margin: '0 auto' }}>
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          style={{ textAlign: 'center', marginBottom: '4rem', position: 'relative' }}
+        >
+          <motion.span
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 0.7, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            style={{
+              color: 'var(--color-orange)',
+              fontFamily: 'var(--font-body)',
+              fontSize: '0.95rem',
+              textTransform: 'uppercase',
+              letterSpacing: '0.25em',
+              display: 'block',
+              marginBottom: '1.5rem'
+            }}
+          >
+            How It Works
+          </motion.span>
+          <motion.h2
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            style={{
+              fontSize: '160px',
+              color: 'var(--color-white)',
+              fontFamily: 'Oswald',
+              marginBottom: '1rem',
+              width: '70%',
+              margin: 'auto'
+            }}
+          >
+            Your Journey to Perfect Imagery
+          </motion.h2>
+        </motion.div>
+
+        {/* Horizontal Cards Container */}
+        <div style={{
+          display: 'flex',
+          gap: '1.5rem',
+          position: 'relative',
+          height: '500px',
+          alignItems: 'center'
         }}>
-          {/* Animated Background Orbs */}
-          <motion.div
-            animate={{ 
-              y: [0, -50, 0],
-              x: [0, 30, 0],
-              scale: [1, 1.2, 1]
-            }}
-            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-            style={{
-              position: 'absolute',
-              top: '5%',
-              right: '10%',
-              width: '500px',
-              height: '500px',
-              borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(193,154,107,0.15) 0%, transparent 70%)',
-              pointerEvents: 'none',
-              filter: 'blur(80px)'
-            }}
-          />
-          <motion.div
-            animate={{ 
-              y: [0, 40, 0],
-              x: [0, -20, 0],
-              scale: [1, 1.1, 1]
-            }}
-            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-            style={{
-              position: 'absolute',
-              bottom: '10%',
-              left: '5%',
-              width: '400px',
-              height: '400px',
-              borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(75,46,43,0.1) 0%, transparent 70%)',
-              pointerEvents: 'none',
-              filter: 'blur(70px)'
-            }}
-          />
+          {steps.map((step, index) => {
+            const isHovered = hoveredIndex === index;
+            const isAnyHovered = hoveredIndex !== null;
 
-          <div className="container">
-            {/* Header */}
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-              style={{ textAlign: 'center', marginBottom: '6rem', position: 'relative' }}
-            >
+            return (
               <motion.div
-                initial={{ width: 0 }}
-                whileInView={{ width: '80px' }}
+                key={index}
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.3 }}
+                transition={{
+                  duration: 0.8,
+                  delay: index * 0.1,
+                  ease: [0.22, 1, 0.36, 1]
+                }}
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                animate={{
+                  flex: isHovered ? 2.5 : (isAnyHovered ? 0.5 : 1),
+                  opacity: isAnyHovered ? (isHovered ? 1 : 0.4) : 1,
+                }}
                 style={{
-                  height: '3px',
-                  background: 'var(--color-caramel)',
-                  margin: '0 auto 2rem',
-                  borderRadius: '2px'
-                }}
-              />
-              <motion.span 
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 0.7, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-                style={{ 
-                  color: 'var(--color-caramel)', 
-                  fontFamily: 'var(--font-body)', 
-                  fontSize: '0.95rem',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.25em',
-                  display: 'block',
-                  marginBottom: '1.5rem'
+                  position: 'relative',
+                  height: '100%',
+                  borderRadius: '24px',
+                  overflow: 'hidden',
+                  cursor: 'pointer',
+                  boxShadow: isHovered
+                    ? '0 30px 80px rgba(0,0,0,0.5)'
+                    : '0 10px 40px rgba(0,0,0,0.3)',
+                  transition: 'box-shadow 0.4s ease',
                 }}
               >
-                How It Works
-              </motion.span>
-              <motion.h2 
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.3, duration: 0.8 }}
-                style={{ 
-                  fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', 
-                  color: 'var(--color-mocha)',
-                  fontFamily: 'var(--font-heading)',
-                  marginBottom: '1rem'
-                }}
-              >
-                Your Journey to Perfect Imagery
-              </motion.h2>
-              <motion.p
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 0.6 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.4 }}
-                style={{
-                  fontSize: '1.1rem',
-                  color: 'var(--color-coffee)',
-                  maxWidth: '600px',
-                  margin: '0 auto'
-                }}
-              >
-                Four simple steps to bring your creative vision to life
-              </motion.p>
-            </motion.div>
-
-            {/* Cards Grid */}
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
-              gap: '2rem',
-              position: 'relative'
-            }}>
-              {steps.map((step, index) => (
-                <motion.div 
-                  key={index}
-                  initial={{ opacity: 0, y: 80, rotateX: -15 }}
-                  whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ 
-                    duration: 0.8, 
-                    delay: index * 0.2,
-                    ease: [0.22, 1, 0.36, 1]
+                {/* Background Image */}
+                <motion.div
+                  animate={{
+                    scale: isHovered ? 1.1 : 1,
                   }}
-                  whileHover={{ 
-                    y: -15,
-                    scale: 1.02,
-                    transition: { duration: 0.3 }
-                  }}
+                  transition={{ duration: 0.6 }}
                   style={{
-                    background: 'rgba(255, 255, 255, 0.7)',
-                    backdropFilter: 'blur(20px)',
-                    borderRadius: '24px',
-                    padding: '3rem 2rem',
-                    border: '1px solid rgba(193,154,107,0.2)',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.05)',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    transformStyle: 'preserve-3d'
+                    position: 'absolute',
+                    inset: 0,
+                    backgroundImage: `url(${step.image})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    filter: isHovered ? 'brightness(0.7)' : 'brightness(0.5)',
+                    transition: 'filter 0.4s ease'
                   }}
-                >
-                  {/* Number Badge - Large Background */}
-                  <motion.div
-                    initial={{ scale: 0, opacity: 0 }}
-                    whileInView={{ scale: 1, opacity: 0.05 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.2 + 0.3, duration: 0.6 }}
+                />
+
+                {/* Dark Overlay */}
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: isHovered
+                    ? 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%)'
+                    : 'linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.8) 100%)',
+                  transition: 'background 0.4s ease'
+                }} />
+
+                {/* Content Container */}
+                <div style={{
+                  position: 'relative',
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-end',
+                  padding: isHovered ? '3rem' : '2rem',
+                  transition: 'padding 0.4s ease'
+                }}>
+                  {/* Title - Always Visible */}
+                  <motion.h3
+                    animate={{
+                      fontFamily: isHovered
+                        ? "'Playfair Display', serif"
+                        : "'Oswald', sans-serif",
+                      fontSize: isHovered ? '3.5rem' : '2rem',
+                      marginBottom: isHovered ? '1.5rem' : '0.5rem'
+                    }}
+                    transition={{ duration: 0.4 }}
                     style={{
-                      position: 'absolute',
-                      top: '-20px',
-                      right: '-20px',
-                      fontSize: '12rem',
-                      fontFamily: 'var(--font-heading)',
-                      fontWeight: 'bold',
-                      color: 'var(--color-mocha)',
-                      lineHeight: 1,
-                      pointerEvents: 'none',
-                      zIndex: 0
+                      color: 'white',
+                      fontWeight: isHovered ? '700' : '600',
+                      lineHeight: 1.1,
+                      textTransform: isHovered ? 'none' : 'uppercase',
+                      letterSpacing: isHovered ? '-0.02em' : '0.05em',
+                      textShadow: '0 2px 20px rgba(0,0,0,0.5)',
+                      writingMode: isHovered ? 'horizontal-tb' : (isAnyHovered ? 'vertical-rl' : 'horizontal-tb'),
+                      transform: isHovered ? 'none' : (isAnyHovered ? 'rotate(180deg)' : 'none'),
+                      transition: 'all 0.4s ease'
                     }}
                   >
-                    {index + 1}
-                  </motion.div>
+                    {step.title}
+                  </motion.h3>
 
-                  {/* Icon Container */}
+                  {/* Expanded Content - Only on Hover */}
                   <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    whileInView={{ scale: 1, rotate: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ 
-                      delay: index * 0.2 + 0.2,
-                      duration: 0.8,
-                      type: 'spring',
-                      stiffness: 200
+                    animate={{
+                      opacity: isHovered ? 1 : 0,
+                      height: isHovered ? 'auto' : 0,
                     }}
-                    whileHover={{ 
-                      scale: 1.1,
-                      rotate: 360,
-                      transition: { duration: 0.6 }
-                    }}
+                    transition={{ duration: 0.4 }}
                     style={{
-                      width: '80px',
-                      height: '80px',
-                      borderRadius: '20px',
-                      background: 'linear-gradient(135deg, var(--color-khaki), var(--color-orange))',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginBottom: '2rem',
-                      boxShadow: '0 10px 30px rgba(193,154,107,0.3)',
-                      position: 'relative',
-                      zIndex: 1,
+                      overflow: 'hidden'
                     }}
                   >
                     <motion.div
-                      animate={{ 
-                        boxShadow: [
-                          '0 0 0 0 rgba(193,154,107,0.4)',
-                          '0 0 0 20px rgba(193,154,107,0)',
-                        ]
-                      }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      style={{
-                        position: 'absolute',
-                        inset: 0,
-                        borderRadius: '20px'
-                      }}
-                    />
-                    {React.cloneElement(step.icon, { 
-                      size: 36, 
-                      color: 'var(--color-beige)',
-                      strokeWidth: 2
-                    })}
-                  </motion.div>
+                      initial={{ y: 20 }}
+                      animate={{ y: isHovered ? 0 : 20 }}
+                      transition={{ duration: 0.4, delay: isHovered ? 0.1 : 0 }}
+                    >
+                      <p style={{
+                        fontSize: '1.1rem',
+                        lineHeight: 1.6,
+                        color: 'rgba(255,255,255,0.9)',
+                        marginBottom: '2rem',
+                        fontFamily: 'var(--font-body)'
+                      }}>
+                        {step.desc}
+                      </p>
 
-                  {/* Content */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.2 + 0.4 }}
-                    style={{ position: 'relative', zIndex: 1 }}
-                  >
-                    <h3 style={{ 
-                      fontFamily: 'var(--font-heading)', 
-                      fontSize: '1.8rem', 
-                      marginBottom: '1rem',
-                      color: 'var(--color-mocha)'
-                    }}>
-                      {step.title}
-                    </h3>
-                    <p style={{ 
-                      fontSize: '1rem', 
-                      lineHeight: 1.7,
-                      color: 'var(--color-coffee)',
-                      opacity: 0.8
-                    }}>
-                      {step.desc}
-                    </p>
-                  </motion.div>
 
-                  {/* Step Number Badge - Small */}
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    whileInView={{ scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.2 + 0.5, type: 'spring' }}
-                    style={{
-                      position: 'absolute',
-                      top: '1.5rem',
-                      right: '1.5rem',
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '50%',
-                      background: 'var(--color-khaki)',
-                      color: 'var(--color-black)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontFamily: 'var(--font-heading)',
-                      fontWeight: 'bold',
-                      fontSize: '1.2rem',
-                      zIndex: 2,
-                      boxShadow: '0 4px 15px rgba(193,154,107,0.4)'
-                    }}
-                  >
-                    {index + 1}
-                  </motion.div>
 
-                  {/* Hover Gradient Overlay */}
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    whileHover={{ opacity: 1 }}
-                    style={{
-                      position: 'absolute',
-                      inset: 0,
-                      background: 'linear-gradient(135deg, rgba(193,154,107,0.1), transparent)',
-                      borderRadius: '24px',
-                      pointerEvents: 'none',
-                      zIndex: 0
-                    }}
-                  />
+
+                    </motion.div>
+                  </motion.div>
+                </div>
+
+                {/* Step Number Badge */}
+                <motion.div
+                  animate={{
+                    scale: isHovered ? 1.2 : 1,
+                    opacity: isHovered ? 0 : 1
+                  }}
+                  style={{
+                    position: 'absolute',
+                    top: '1.5rem',
+                    right: '1.5rem',
+                    width: '45px',
+                    height: '45px',
+                    borderRadius: '50%',
+                    background: 'var(--color-khaki)',
+                    color: 'var(--color-black)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontFamily: "'Oswald', sans-serif",
+                    fontWeight: 'bold',
+                    fontSize: '1.3rem',
+                    boxShadow: '0 4px 20px rgba(255,140,0,0.4)',
+                    transition: 'opacity 0.3s ease'
+                  }}
+                >
+                  {index + 1}
                 </motion.div>
-              ))}
-            </div>
-
-      
-          </div>
-        </section>
-      );
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
 }
 
 export default Features;

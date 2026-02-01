@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
+import SectionSeparator from './SectionSeparator';
 
 const PinterestGrid = () => {
    
@@ -23,6 +24,7 @@ const PinterestGrid = () => {
 
     return (
         <section className="pinterest-grid-section">
+            <SectionSeparator flip={true} />
             {/* Animated Background Elements */}
             <div className="pinterest-bg-pattern" />
             <motion.div 

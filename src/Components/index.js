@@ -14,4 +14,5 @@ export { default as VideoShowcase } from './VideoShowcase';
 export { default as PinterestGrid } from './PinterestGrid';
 export { default as StatsCounter } from './StatsCounter';
 export { default as Testimonials } from './Testimonials';
+export { default as Categories } from './Categories';
 

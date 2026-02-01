@@ -22,6 +22,8 @@ const VideoShowcase = () => {
     return (
         <section className="video-showcase-section">
             {/* Animated Doodles */}
+            
+
             <motion.svg
                 width="200" height="200"
                 viewBox="0 0 200 200"

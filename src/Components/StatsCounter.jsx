@@ -216,7 +216,7 @@ const StatsCounter = () => {
         backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)',
         backgroundSize: '40px 40px'
       }} />
-      <SectionSeparator flip={true} />
+      <SectionSeparator flip={false} />
       <div className="container" style={{
         position: 'relative',
         zIndex: 1,
@@ -231,7 +231,7 @@ const StatsCounter = () => {
           }}
         >
           <h2 style={{
-            fontSize: '5.5rem',
+            fontSize: '150px',
             color: 'var(--color-khaki)',
             marginBottom: '1rem',
             lineHeight: 1.2,

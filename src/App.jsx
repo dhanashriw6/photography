@@ -16,7 +16,8 @@ import {
   VideoShowcase,
   PinterestGrid,
   StatsCounter,
-  Testimonials
+  Testimonials,
+  Categories
 } from './Components';
 import Hero2 from './Components/Hero2';
 import Carousel from './Components/Carousel';
@@ -24,21 +25,22 @@ import Carousel from './Components/Carousel';
 function App() {
   return (
     <div className="App">
-     
+
       <Routes>
         <Route path="/" element={<Hero2 />} />
         <Route path="/v1" element={<Carousel />} />
       </Routes>
-   
+
+      <Categories />
       <ScrollProgress />
       <CustomCursor />
       <div className="grain-overlay" />
       <Navigation />
       <MarqueeStrip />
+      <StatsCounter />
+      <VideoShowcase />
       <Hero />
       {/* <ImageGallery /> */}
-      <VideoShowcase />
-      <StatsCounter />
       <PinterestGrid />
       <Testimonials />
       <FAQ />

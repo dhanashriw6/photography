@@ -136,13 +136,14 @@ const FAQ = () => {
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
             style={{
-              fontSize: '5.5rem',
-              color: 'var(--color-old-lace)',
+               fontSize: '160px',
+              color: 'var(--color-khaki)',
               marginBottom: '1.5rem',
-              lineHeight: 1.1
+              lineHeight: 1.1,
+              fontFamily: "Oswald", 
             }}
           >
-            We Have <span style={{ fontStyle: 'italic', color: 'var(--color-khaki)' }}>Answers</span>
+            We Have Answers
           </motion.h2>
 
           <motion.p
@@ -233,10 +234,10 @@ const FAQ = () => {
                         }}
                         style={{
 
-                          fontFamily: 'var(--font-heading)',
                           fontSize: 'clamp(1.1rem, 2vw, 1.4rem)',
                           fontWeight: isOpen ? '700' : '500',
-                          display: 'block'
+                          display: 'block',
+                          fontFamily: "Oswald", 
                         }}
                       >
                         {faq.question}
@@ -253,7 +254,7 @@ const FAQ = () => {
                         fontSize: '0.85rem',
                         color: isOpen ? 'var(--color-khaki)' : 'rgba(247, 244, 233, 0.5)',
                         fontWeight: '700',
-                        fontFamily: 'var(--font-heading)'
+                        fontFamily: "Oswald", 
                       }}
                     >
                       {String(index + 1).padStart(2, '0')}
@@ -318,7 +319,7 @@ const FAQ = () => {
                   transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
                   style={{
                     fontSize: '8rem',
-                    fontFamily: 'var(--font-heading)',
+                    fontFamily: "Oswald", 
                     fontWeight: 'bold',
                     color: 'var(--color-khaki)',
                     lineHeight: 1,
@@ -337,7 +338,7 @@ const FAQ = () => {
                     fontSize: 'clamp(1.5rem, 3vw, 2rem)',
                     color: 'var(--color-old-lace)',
                     marginBottom: '2rem',
-                    fontFamily: 'var(--font-heading)',
+                    fontFamily: "Oswald", 
                     lineHeight: 1.3
                   }}
                 >
@@ -353,7 +354,7 @@ const FAQ = () => {
                     fontSize: '1.15rem',
                     lineHeight: 1.8,
                     color: 'var(--color-old-lace)',
-                    fontFamily: 'var(--font-body)'
+                    fontFamily: "Oswald", 
                   }}
                 >
                   {faqs[openIndex].answer}

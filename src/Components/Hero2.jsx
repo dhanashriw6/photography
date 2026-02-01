@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, ArrowDown, ArrowLeft } from 'lucide-react';
+import SectionSeparator from './SectionSeparator';
 
 const Hero2 = () => {
   const { scrollY } = useScroll();
@@ -19,7 +20,6 @@ const Hero2 = () => {
     "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600&q=80",
     "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80",
     "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=600&q=80",
-    
   ];
 
   // Auto-play effect for carousel
@@ -38,635 +38,805 @@ const Hero2 = () => {
     setActiveIndex(prev => (prev - 1 + galleryImages.length) % galleryImages.length);
   };
 
-  const titleline1 = "FullTime".split("");
-  const titleline2 = "Photographer".split("");
+  const shootText = "Shoot.".split("");
+  const editText = "Edit.".split("");
+  const deliverText = "Deliver.".split("");
+  const repeatText = "Repeat.".split("");
 
   return (
-    <header style={{
+    <div style={{
       minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      position: 'relative',
-      overflow: 'hidden',
-      padding: '4rem 2rem 2rem',
-      background: 'white',
-      color: 'var(--color-soft-black)'
+      background: '#111212',
+      color: '#FFFEFA',
+      fontFamily: 'system-ui, -apple-system, sans-serif'
     }}>
-      {/* Animated Background Gradient Orbs */}
-      <motion.div
-        animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.3, 0.5, 0.3],
-
-        }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        style={{
-          position: 'absolute',
-          top: '-10%',
-          left: '-5%',
-          width: '600px',
-          height: '600px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(193,154,107,0.2) 0%, transparent 70%)',
-          filter: 'blur(80px)',
-          pointerEvents: 'none'
-        }}
-      />
-      <motion.div
-        animate={{
-          scale: [1, 1.3, 1],
-          opacity: [0.2, 0.4, 0.2]
-        }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        style={{
-          position: 'absolute',
-          bottom: '-10%',
-          right: '-5%',
-          width: '700px',
-          height: '700px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(75,46,43,0.15) 0%, transparent 70%)',
-          filter: 'blur(100px)',
-          pointerEvents: 'none'
-        }}
-      />
-
-      {/* Floating Badges - Doodle Style */}
-      {/* Badge 1 - Cinematic (Star shape) */}
-      <motion.div
-        animate={{
-          y: [0, -20, 0],
-          rotate: [0, 5, -5, 0],
-        }}
-        transition={{
-          duration: 6,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-        style={{
-          position: 'absolute',
-          top: '15%',
-          left: '8%',
-          zIndex: 5,
-          pointerEvents: 'none'
-        }}
-      >
-        <div style={{
-          background: 'var(--color-paper-beige)',
-          border: '3px solid var(--color-soft-black)',
-          borderRadius: '50%',
-          padding: '1.2rem 1.5rem',
-          fontFamily: 'var(--font-body)',
-          fontWeight: '600',
-          fontSize: '0.85rem',
-          textTransform: 'uppercase',
-          letterSpacing: '0.05em',
-          color: 'var(--color-soft-black)',
-          boxShadow: '4px 4px 0px var(--color-soft-black)',
-          transform: 'rotate(-12deg)',
-          position: 'relative'
-        }}>
-          Cinematic
-          {/* Star decoration */}
-          <div style={{
-            position: 'absolute',
-            top: '-8px',
-            right: '-8px',
-            width: '24px',
-            height: '24px',
-            background: 'var(--color-muted-gold)',
-            clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)',
-            border: '2px solid var(--color-soft-black)'
-          }} />
-        </div>
-      </motion.div>
-
-      {/* Badge 2 - Creative (Blob shape) */}
-      <motion.div
-        animate={{
-          y: [0, 15, 0],
-          x: [0, -10, 0],
-          rotate: [0, -8, 0],
-        }}
-        transition={{
-          duration: 7,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 1
-        }}
-        style={{
-          position: 'absolute',
-          top: '40%',
-          left: '7%',
-          zIndex: 5,
-          pointerEvents: 'none'
-        }}
-      >
-        <div style={{
-          background: 'var(--color-muted-gold)',
-          border: '3px solid var(--color-soft-black)',
-          borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
-          padding: '1rem 1.8rem',
-          fontFamily: 'var(--font-heading)',
-          fontWeight: '600',
-          fontSize: '1rem',
-          fontStyle: 'italic',
-          color: 'var(--color-soft-black)',
-          boxShadow: '5px 5px 0px var(--color-soft-black)',
-          transform: 'rotate(8deg)'
-        }}>
-          Creative
-        </div>
-      </motion.div>
-
-      {/* Badge 3 - Editorial (Spiky circle) */}
-      <motion.div
-        animate={{
-          y: [0, -25, 0],
-          rotate: [0, 360],
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: "linear"
-        }}
-        style={{
-          position: 'absolute',
-          top: '10%',
-          right: '10%',
-          zIndex: 5,
-          pointerEvents: 'none'
-        }}
-      >
-        <div style={{
-          position: 'relative',
-          width: '100px',
-          height: '100px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          {/* Spiky background */}
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'var(--color-paper-beige)',
-            border: '7px solid var(--color-soft-black)',
-            clipPath: 'polygon(50% 0%, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0% 50%, 40% 40%)',
-            boxShadow: '4px 4px 0px var(--color-soft-black)'
-          }} />
-          <span style={{
-            position: 'relative',
-            fontFamily: 'var(--font-body)',
-            fontWeight: '700',
-            fontSize: '0.75rem',
-            textTransform: 'uppercase',
-            color: 'var(--color-soft-black)',
-            letterSpacing: '0.05em',
-            zIndex: 1
-          }}>
-            Editorial
-          </span>
-        </div>
-      </motion.div>
-
-      {/* Badge 4 - Artistic (Rounded rectangle) */}
-      <motion.div
-        animate={{
-          y: [0, 18, 0],
-          x: [0, 12, 0],
-          rotate: [0, 10, -10, 0],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 0.5
-        }}
-        style={{
-          position: 'absolute',
-          top: '45%',
-          right: '15%',
-          zIndex: 5,
-          pointerEvents: 'none'
-        }}
-      >
-        <div style={{
-          background: 'var(--color-earth-brown)',
-          border: '3px solid var(--color-soft-black)',
-          borderRadius: '25px',
-          padding: '0.9rem 1.6rem',
-          fontFamily: 'var(--font-body)',
-          fontWeight: '600',
-          fontSize: '0.85rem',
-          textTransform: 'uppercase',
-          letterSpacing: '0.08em',
-          color: 'var(--color-paper-beige)',
-          boxShadow: '4px 4px 0px var(--color-soft-black)',
-          transform: 'rotate(-5deg)'
-        }}>
-          Artistic
-        </div>
-      </motion.div>
-
-      {/* Badge 5 - Premium (Pill shape) */}
-      <motion.div
-        animate={{
-          y: [0, -15, 0],
-          scale: [1, 1.05, 1],
-        }}
-        transition={{
-          duration: 5,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 2
-        }}
-        style={{
-          position: 'absolute',
-          top: '27%',
-          left: '15%',
-          zIndex: 5,
-          pointerEvents: 'none'
-        }}
-      >
-        <div style={{
-          background: 'var(--color-soft-black)',
-          border: '3px solid var(--color-soft-black)',
-          borderRadius: '50px',
-          padding: '0.8rem 1.5rem',
-          fontFamily: 'var(--font-body)',
-          fontWeight: '600',
-          fontSize: '0.8rem',
-          textTransform: 'uppercase',
-          letterSpacing: '0.1em',
-          color: 'var(--color-muted-gold)',
-          boxShadow: '5px 5px 0px rgba(0,0,0,0.3)',
-          transform: 'rotate(3deg)'
-        }}>
-          Premium
-        </div>
-      </motion.div>
-
-      {/* Badge 6 - Bold (Square with rounded corners) */}
-      <motion.div
-        animate={{
-          y: [0, 20, 0],
-          rotate: [0, -15, 15, 0],
-        }}
-        transition={{
-          duration: 9,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 1.5
-        }}
-        style={{
-          position: 'absolute',
-          top: '30%',
-          right: '15%',
-          zIndex: 5,
-          pointerEvents: 'none'
-        }}
-      >
-        <div style={{
-          background: 'var(--color-forest-green)',
-          border: '3px solid var(--color-soft-black)',
-          borderRadius: '15px',
-          padding: '1rem 1.4rem',
-          fontFamily: 'var(--font-heading)',
-          fontWeight: '700',
-          fontSize: '0.95rem',
-          fontStyle: 'italic',
-          color: 'var(--color-soft-black)',
-          boxShadow: '4px 4px 0px var(--color-soft-black)',
-          transform: 'rotate(-8deg)'
-        }}>
-          Bold
-        </div>
-      </motion.div>
-
-
-      {/* Main Content */}
-      <motion.div style={{ y, opacity, textAlign: 'center', zIndex: 10, position: 'relative', marginBottom: '2rem' }}>
-        {/* Decorative Line Above */}
+    
+      <header style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        position: 'relative',
+        overflow: 'hidden',
+        padding: '4rem 2rem 2rem',
+        background: '#111212',
+        color: '#FFFEFA'
+      }}>
+        {/* Animated Background Gradient Orbs */}
         <motion.div
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 1, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.15, 0.25, 0.15],
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
           style={{
-            width: '100px',
-            height: '2px',
-            background: 'var(--color-muted-gold)',
-            margin: '0 auto 2rem',
-            transformOrigin: 'center'
+            position: 'absolute',
+            top: '-10%',
+            left: '-5%',
+            width: '600px',
+            height: '600px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(255,174,0,0.15) 0%, transparent 70%)',
+            filter: 'blur(80px)',
+            pointerEvents: 'none'
+          }}
+        />
+        <motion.div
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.1, 0.2, 0.1]
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+          style={{
+            position: 'absolute',
+            bottom: '-10%',
+            right: '-5%',
+            width: '700px',
+            height: '700px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(255,226,79,0.12) 0%, transparent 70%)',
+            filter: 'blur(100px)',
+            pointerEvents: 'none'
           }}
         />
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="hero-subtitle"
-          style={{
-            position: 'relative',
-            display: 'inline-block'
-          }}
-        >
-          <motion.span
-            animate={{
-              backgroundPosition: ['0% 50%', '100% 50%', '0% 50%']
-            }}
-            transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
-            style={{
-              background: 'linear-gradient(90deg, var(--color-soft-black), var(--color-muted-gold), var(--color-soft-black))',
-              backgroundSize: '200% auto',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              fontWeight: 500,
-              letterSpacing: '0.05em'
-            }}
-          >
-            Find the Right Photographer. Book with Confidence.
-
-          </motion.span>
-        </motion.p>
-
-
-        {/* Enhanced Title */}
-        <h1 className="hero-text" style={{
-          color: 'var(--color-soft-black)',
-          margin: '1.5rem 0',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          fontFamily:"var(--font-hero)",
-          position: 'relative'
-          
-        }}>
-          <div style={{ display: 'flex', overflow: 'hidden',}}>
-            {titleline1.map((char, index) => (
-              <motion.span
-                key={index}
-                initial={{ y: 200, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{
-                  duration: 1,
-                  delay: index * 0.05,
-                  ease: [0.22, 1, 0.36, 1],
-                  opacity: { duration: 0.5, delay: index * 0.05 }
-                }}
-
-                whileHover={{
-                  y: -10,
-                  color: 'var(--color-muted-gold)',
-                  transition: { duration: 0.2 }
-                }}
-                style={{ display: 'inline-block', cursor: 'none', fontSize: '5rem' }}
-              >
-                {char === " " ? "\u00A0" : char}
-              </motion.span>
-            ))}
-          </div>
-          <div style={{ display: 'flex', overflow: 'hidden', width: '100%', justifyContent: 'center', }}>
-            {titleline2.map((char, index) => (
-              <motion.span
-                key={index}
-                initial={{ y: 200, opacity: 0, rotateX: 90 }}
-                animate={{ y: 0, opacity: 1, rotateX: 0 }}
-                transition={{
-                  duration: 1.2,
-                  delay: 0.5 + index * 0.06,
-                  ease: [0.22, 1, 0.36, 1],
-                  opacity: { duration: 0.5, delay: 0.5 + index * 0.06 }
-                }}
-                whileHover={{
-                  y: -10,
-                  rotateZ: 5,
-                  color: 'var(--color-muted-gold)',
-                  transition: { duration: 0.2 }
-                }}
-                style={{
-                  fontStyle: 'italic',
-                 
-                  display: 'inline-block',
-                  cursor: 'none',
-                  transformStyle: 'preserve-3d',
-                  fontSize: '5rem'
-                }}
-              >
-                {char}
-              </motion.span>
-            ))}
-          </div>
-        </h1>
-
-        {/* Tagline */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 1 }}
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: 'clamp(0.9rem, 1.5vw, 1.2rem)',
-            color: 'var(--color-earth-brown)',
-            maxWidth: '600px',
-            margin: '2rem auto 0',
-            lineHeight: 1.6
-          }}
-        >
-          Where <motion.span
-            animate={{ opacity: [1, 0.5, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            style={{ color: 'var(--color-muted-gold)', fontWeight: '600' }}
-          >
-            artistry
-          </motion.span> meets opportunity
-        </motion.p>
-
-        {/* CTA Buttons */}
+        {/* Floating Badges - Dark Theme */}
+        {/* Badge 1 - Timeless */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.8, duration: 0.8 }}
+          animate={{
+            y: [0, -10, 0],
+            x: [650, 700, 650],
+            rotate: [0, 5, -5, 0],
+          }}
+          transition={{
+            duration: 6,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
           style={{
-            display: 'flex',
-            gap: '1.5rem',
-            marginTop: '3rem',
-            justifyContent: 'center',
-            flexWrap: 'wrap'
+            position: 'absolute',
+            top: '15%',
+            left: '8%',
+            zIndex: 5,
+            pointerEvents: 'none'
           }}
         >
-          <motion.button
-            whileHover={{ scale: 1.05, boxShadow: '0 10px 40px rgba(138, 92, 59, 0.3)' }}
-            whileTap={{ scale: 0.95 }}
-            className="btn btn-primary"
-            style={{
-              background: 'var(--color-soft-black)',
-              color: 'var(--color-paper-beige)',
-              fontSize: '1rem',
-              padding: '1.2rem 2.5rem',
-              border: 'none',
-              borderRadius: '50px',
-              fontFamily: 'var(--font-body)',
-              cursor: 'pointer'
-            }}
-          >
-            Explore Talent <ArrowRight size={20} style={{ marginLeft: '10px' }} />
-          </motion.button>
-          <motion.button
-            whileHover={{
-              scale: 1.05,
-              borderColor: 'var(--color-soft-black)',
-              background: 'var(--color-soft-black)',
-              color: 'var(--color-paper-beige)'
-            }}
-            whileTap={{ scale: 0.95 }}
-            className="btn"
-            style={{
-              fontSize: '1rem',
-              padding: '1.2rem 2.5rem',
-              border: '1px solid var(--color-soft-black)',
-              background: 'transparent',
-              color: 'var(--color-soft-black)',
-              borderRadius: '50px',
-              fontFamily: 'var(--font-body)',
-              cursor: 'pointer'
-            }}
-          >
-            Join as Photographer
-          </motion.button>
+          <div style={{
+            background: '#FEEFA3',
+            border: '2px solid #FFAE00',
+            borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
+            padding: '1rem 1.5rem',
+            fontWeight: '700',
+            fontSize: '0.85rem',
+            textTransform: 'capitalize',
+            letterSpacing: '0.05em',
+            color: '#111212',
+            boxShadow: '0 0 20px rgba(255,174,0,0.3)',
+            transform: 'rotate(-12deg)',
+            position: 'relative'
+          }}>
+            Timeless
+          </div>
         </motion.div>
-      </motion.div>
 
-      {/* 3D Curved Carousel with Enhanced Depth */}
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 2, duration: 1 }}
-        style={{
-          width: '100%',
-          height: '500px',
-          position: 'relative',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginTop: '20%',
-          // marginBottom: '2rem'
-        }}
-      >
-        <div
+        {/* Badge 2 - Creative */}
+        <motion.div
+          animate={{
+            y: [-10, -12, 0],
+            x: [-850, -900, -850],
+            rotate: [0, -8, 0],
+          }}
+          transition={{
+            duration: 7,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1
+          }}
           style={{
-            perspective: '600px',
-            perspectiveOrigin: 'center center',
+            position: 'absolute',
+            top: '40%',
+            right: '10%',
+            zIndex: 5,
+            pointerEvents: 'none'
+          }}
+        >
+          <div style={{
+            background: '#FEEFA3',
+            border: '2px solid #FFAE00',
+            borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
+            padding: '1rem 1.8rem',
+            fontWeight: '700',
+            fontSize: '1rem',
+            color: '#111212',
+            boxShadow: '0 0 25px rgba(255,174,0,0.4)',
+            transform: 'rotate(8deg)'
+          }}>
+            Creative
+          </div>
+        </motion.div>
+
+        {/* Badge 3 - Studio & On-Location Shoots */}
+        <motion.div
+          animate={{
+            y: [0, -1, 0],
+            x: [700, 750, 700],
+          }}
+          transition={{
+            duration: 5,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2
+          }}
+          style={{
+            position: 'absolute',
+            top: '22%',
+            left: '15%',
+            zIndex: 5,
+            pointerEvents: 'none'
+          }}
+        >
+          <div style={{
+            background: '#2E2D2B',
+            border: '2px solid #FFAE00',
+            borderRadius: '50px',
+            padding: '0.7rem 1.3rem',
+            fontWeight: '600',
+            fontSize: '0.75rem',
+            textTransform: 'capitalize',
+            letterSpacing: '0.05em',
+            color: '#FEEFA3',
+            boxShadow: '0 0 20px rgba(255,174,0,0.3)',
+            transform: 'rotate(3deg)'
+          }}>
+            Studio & On-Location Shoots
+          </div>
+        </motion.div>
+
+
+
+
+
+
+
+        {/* Additional Floating Badges with Different Shapes */}
+
+        {/* Badge 7 - Flower/Star Shape - "Edgy" */}
+        <motion.div
+          animate={{
+                       x: [-850, -900, -850],
+
+            y: [0, -8, 0],
+            rotate: [0, 360],
+          }}
+          transition={{
+            rotate: { duration: 20, repeat: Infinity, ease: "linear" },
+            scale: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+          }}
+          style={{
+            position: 'absolute',
+            top: '18%',
+            right: '12%',
+            zIndex: 5,
+            pointerEvents: 'none'
+          }}
+        >
+          <div style={{
+            position: 'relative',
+            width: '90px',
+            height: '90px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              background: '#FEEFA3',
+              clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)',
+              boxShadow: '0 0 25px rgba(255,226,79,0.4)'
+            }} />
+            <span style={{
+              position: 'relative',
+              fontWeight: '700',
+              fontSize: '0.8rem',
+              color: '#111212',
+              letterSpacing: '0.05em',
+              zIndex: 1
+            }}>
+              Edgy
+            </span>
+          </div>
+        </motion.div>
+
+
+        {/* Badge 9 - Sunburst Shape - "Bold" */}
+        <motion.div
+          animate={{
+            x: [-400, -450, -400],
+            y: [0, 12, 0],
+            rotate: [0, 360],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          style={{
+            position: 'absolute',
+            top: '32%',
+            right: '8%',
+            zIndex: 5,
+            pointerEvents: 'none'
+          }}
+        >
+          <div style={{
+            position: 'relative',
+            width: '95px',
+            height: '95px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            {/* Sunburst rays */}
+            {[...Array(12)].map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  position: 'absolute',
+                  width: '3px',
+                  height: '45px',
+                  background: 'linear-gradient(to bottom, #FFE24F, transparent)',
+                  top: '50%',
+                  left: '50%',
+                  transformOrigin: 'top center',
+                  transform: `translate(-50%, -100%) rotate(${i * 30}deg)`
+                }}
+              />
+            ))}
+            {/* Center circle */}
+            <div style={{
+              position: 'relative',
+              width: '70px',
+              height: '70px',
+              borderRadius: '50%',
+              background: '#FEEFA3',
+              border: '2px solid #FFAE00',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 0 20px rgba(255,226,79,0.4)',
+              zIndex: 1
+            }}>
+              <span style={{
+                fontWeight: '700',
+                fontSize: '0.8rem',
+                color: '#111212',
+                letterSpacing: '0.05em'
+              }}>
+                Bold
+              </span>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Badge 10 - Flower Shape - "Fresh" */}
+        <motion.div
+          animate={{
+            x: [300, 350, 300],
+            y: [0, -12, 0],
+            rotate: [0, 10, -10, 0],
+          }}
+          transition={{
+            duration: 7,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1.2
+          }}
+          style={{
+            position: 'absolute',
+            bottom: '40%',
+            left: '8%',
+            zIndex: 5,
+            pointerEvents: 'none'
+          }}
+        >
+          <div style={{
+            position: 'relative',
+            width: '80px',
+            height: '80px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            {/* Flower petals */}
+            {[...Array(5)].map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  position: 'absolute',
+                  width: '35px',
+                  height: '35px',
+                  borderRadius: '50%',
+                  background: '#FEEFA3',
+                  border: '2px solid #FFAE00',
+                  top: '50%',
+                  left: '50%',
+                  transformOrigin: 'center center',
+                  transform: `translate(-50%, -50%) translate(${Math.cos(i * 72 * Math.PI / 180) * 25}px, ${Math.sin(i * 72 * Math.PI / 180) * 25}px)`
+                }}
+              />
+            ))}
+            {/* Center */}
+            <div style={{
+              position: 'relative',
+              width: '45px',
+              height: '45px',
+              borderRadius: '50%',
+              background: '#111212',
+              border: '2px solid #FFAE00',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 0 15px rgba(255,174,0,0.4)',
+              zIndex: 1
+            }}>
+              <span style={{
+                fontWeight: '700',
+                fontSize: '0.65rem',
+                color: '#FEEFA3',
+                letterSpacing: '0.05em'
+              }}>
+                Fresh
+              </span>
+            </div>
+          </div>
+        </motion.div>
+
+
+
+
+
+
+
+        {/* Main Content */}
+        <motion.div style={{ y, opacity, textAlign: 'center', zIndex: 10, position: 'relative', marginBottom: '2rem' }}>
+          {/* Decorative Line Above */}
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 1, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              width: '100px',
+              height: '2px',
+              background: '#FFAE00',
+              margin: '0 auto 2rem',
+              transformOrigin: 'center',
+              boxShadow: '0 0 10px rgba(255,174,0,0.5)'
+            }}
+          />
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            style={{
+              position: 'relative',
+              display: 'inline-block'
+            }}
+          >
+            <motion.span
+              animate={{
+                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%']
+              }}
+              transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+              style={{
+                background: 'linear-gradient(90deg, #BBBBBB, #FFAE00, #FFE24F, #BBBBBB)',
+                backgroundSize: '200% auto',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                fontWeight: 500,
+                letterSpacing: '0.08em',
+                fontSize: '1.1rem',
+              }}
+            >
+              Find the Right Photographer. Book with Confidence.            </motion.span>
+          </motion.p>
+
+
+          <h1 style={{
+            margin: '1.5rem 0',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            position: 'relative',
+            fontWeight: '900'
+          }}>
+            {/* Shoot. */}
+            <div style={{ display: 'flex', overflow: 'visible', padding: '0.5rem 2rem' }}>
+              {shootText.map((char, index) => (
+                <motion.span
+                  key={index}
+                  initial={{ y: 200, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{
+                    duration: 1,
+                    delay: index * 0.05,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  whileHover={{
+                    scale: 1.15,
+                    y: -15,
+                    transition: { duration: 0.3 }
+                  }}
+                  style={{
+                    display: 'inline-block',
+                    cursor: 'pointer',
+                    fontSize: 'clamp(3.5rem, 10vw, 7rem)',
+                    color: '#FFE24F',
+                    letterSpacing: '-0.03em',
+                    textShadow: '0 2px 20px rgba(0,0,0,0.3)'
+                  }}
+                >
+                  {char === " " ? "\u00A0" : char}
+                </motion.span>
+              ))}
+            </div>
+
+            {/* Edit. - Golden gradient */}
+            <div style={{
+              display: 'flex',
+              overflow: 'visible',
+              width: '100%',
+              justifyContent: 'center',
+
+              paddingLeft: '1.5rem',
+            }}>
+              {editText.map((char, index) => (
+                <motion.span
+                  key={index}
+                  initial={{ y: 200, opacity: 0, scale: 0.5 }}
+                  animate={{ y: 0, opacity: 1, scale: 1 }}
+                  transition={{
+                    duration: 1.2,
+                    delay: 0.3 + index * 0.06,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  whileHover={{
+                    scale: 1.15,
+                    y: -15,
+                    transition: { duration: 0.3 }
+                  }}
+                  style={{
+                    display: 'inline-block',
+                    cursor: 'pointer',
+                    fontSize: 'clamp(3.5rem, 10vw, 7rem)',
+                    color: '#FFE24F',
+                    letterSpacing: '-0.03em',
+                    textShadow: '0 2px 20px rgba(0,0,0,0.3)'
+
+                  }}
+                >
+                  {char}
+                </motion.span>
+              ))}
+            </div>
+
+            {/* Deliver. - Golden gradient */}
+            <div style={{
+              display: 'flex',
+              overflow: 'visible',
+              width: '100%',
+              justifyContent: 'center',
+              padding: '0.5rem 2rem',
+              marginLeft: '-1rem',
+              marginRight: '-1rem'
+            }}>
+              {deliverText.map((char, index) => (
+                <motion.span
+                  key={index}
+                  initial={{ y: 200, opacity: 0, scale: 0.5 }}
+                  animate={{ y: 0, opacity: 1, scale: 1 }}
+                  transition={{
+                    duration: 1.2,
+                    delay: 0.6 + index * 0.06,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  whileHover={{
+                    scale: 1.15,
+                    y: -15,
+                    transition: { duration: 0.3 }
+                  }}
+                  style={{
+                    display: 'inline-block',
+                    cursor: 'pointer',
+                    fontSize: 'clamp(3.5rem, 10vw, 7rem)',
+                    color: '#FFE24F',
+                    letterSpacing: '-0.03em',
+                    textShadow: '0 2px 20px rgba(0,0,0,0.3)'
+                  }}
+                >
+                  {char}
+                </motion.span>
+              ))}
+            </div>
+
+            {/* Repeat. */}
+            <div style={{ display: 'flex', overflow: 'visible', padding: '0.5rem 2rem' }}>
+              {repeatText.map((char, index) => (
+                <motion.span
+                  key={index}
+                  initial={{ y: 200, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{
+                    duration: 1,
+                    delay: 0.9 + index * 0.05,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  whileHover={{
+                    scale: 1.15,
+                    y: -15,
+                    transition: { duration: 0.3 }
+                  }}
+                  style={{
+                    display: 'inline-block',
+                    cursor: 'pointer',
+                    fontSize: 'clamp(3.5rem, 10vw, 7rem)',
+                    color: '#FFE24F',
+                    letterSpacing: '-0.03em',
+                    textShadow: '0 2px 20px rgba(0,0,0,0.3)'
+                  }}
+                >
+                  {char === " " ? "\u00A0" : char}
+                </motion.span>
+              ))}
+            </div>
+          </h1>
+          {/* Tagline */}
+          {/* <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5, duration: 1 }}
+            style={{
+
+              fontSize: 'clamp(0.9rem, 1.5vw, 1.2rem)',
+              color: '#BBBBBB',
+              maxWidth: '600px',
+              margin: '2rem auto 0',
+              lineHeight: 1.6,
+              fontWeight: '400'
+            }}
+          >
+            Where artistry meets opportunity.          </motion.p> */}
+
+          {/* CTA Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.8, duration: 0.8 }}
+            style={{
+              display: 'flex',
+              gap: '1.5rem',
+              marginTop: '3rem',
+              justifyContent: 'center',
+              flexWrap: 'wrap'
+            }}
+          >
+            <motion.button
+              whileHover={{
+                scale: 1.05,
+                boxShadow: '0 0 40px rgba(255,174,0,0.6)',
+                background: 'linear-gradient(135deg, #FFAE00, #FFE24F)'
+              }}
+              whileTap={{ scale: 0.95 }}
+              style={{
+                background: '#FFAE00',
+                color: '#111212',
+                fontSize: '1.5rem',
+                padding: '1.2rem 2.5rem',
+                border: 'none',
+                borderRadius: '50px',
+
+                fontWeight: '700',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                boxShadow: '0 0 20px rgba(255,174,0,0.3)'
+              }}
+            >
+             Find a Photographer <ArrowRight size={20} />
+            </motion.button>
+            <motion.button
+              whileHover={{
+                scale: 1.05,
+                borderColor: '#FFAE00',
+                background: '#FFAE00',
+                color: '#111212',
+                boxShadow: '0 0 30px rgba(255,174,0,0.4)'
+              }}
+              whileTap={{ scale: 0.95 }}
+              style={{
+                fontSize: '1.5rem',
+                padding: '1.2rem 2.5rem',
+                border: '2px solid #FEEFA3',
+                background: 'transparent',
+                color: '#FEEFA3',
+                borderRadius: '50px',
+
+                fontWeight: '600',
+                cursor: 'pointer'
+              }}
+            >
+              Join as Photographer
+            </motion.button>
+          </motion.div>
+        </motion.div>
+
+        {/* 3D Curved Carousel with Enhanced Depth */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 2, duration: 1 }}
+          style={{
             width: '100%',
-            height: '100%',
+            height: '500px',
+            position: 'relative',
             display: 'flex',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            marginTop: '20%'
           }}
         >
           <div
-            ref={containerRef}
             style={{
-              position: 'relative',
+              perspective: '600px',
+              perspectiveOrigin: 'center center',
               width: '100%',
               height: '100%',
-              transformStyle: 'preserve-3d'
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
             }}
           >
-            {galleryImages.map((src, index) => {
-              // Calculate the shortest circular distance
-              let offset = index - activeIndex;
-              const totalImages = galleryImages.length;
+            <div
+              ref={containerRef}
+              style={{
+                position: 'relative',
+                width: '100%',
+                height: '100%',
+                transformStyle: 'preserve-3d'
+              }}
+            >
+              {galleryImages.map((src, index) => {
+                let offset = index - activeIndex;
+                const totalImages = galleryImages.length;
 
-              // Normalize offset to find shortest path around the circle
-              if (offset > totalImages / 2) {
-                offset = offset - totalImages;
-              } else if (offset < -totalImages / 2) {
-                offset = offset + totalImages;
-              }
+                if (offset > totalImages / 2) {
+                  offset = offset - totalImages;
+                } else if (offset < -totalImages / 2) {
+                  offset = offset + totalImages;
+                }
 
-              const absOffset = Math.abs(offset);
-              const isActive = offset === 0;
+                const absOffset = Math.abs(offset);
+                const isActive = offset === 0;
 
-              // Hide images that are too far away to prevent overlay
-              if (absOffset > 3.5) {
-                return null;
-              }
+                if (absOffset > 3.5) {
+                  return null;
+                }
 
-              // Inward curve calculation
-              const angle = offset * 25; // Reduced from 35 to decrease gap
-              const radius = 600; // Reduced from 550 to bring images closer
-              const translateX = Math.sin(angle * Math.PI / 180) * radius;
-              const translateZ = radius - Math.cos(angle * Math.PI / 180) * radius - 200;
-              const rotateY = -angle;
-              const scale = 1; // Keep all images the same size
-              const opacity = 1 ;
-              const zIndex = Math.round(10 - absOffset);
+                const angle = offset * 25;
+                const radius = 600;
+                const translateX = Math.sin(angle * Math.PI / 180) * radius;
+                const translateZ = radius - Math.cos(angle * Math.PI / 180) * radius - 200;
+                const rotateY = -angle;
+                const scale = 1;
+                const opacity = 1;
+                const zIndex = Math.round(10 - absOffset);
 
-              return (
-                <motion.div
-                  key={index}
-                  initial={false}
-                  animate={{
-                    transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
-                    opacity: opacity,
-                    zIndex: zIndex
-                  }}
-                  transition={{
-                    duration: 0.7,
-                    ease: [0.22, 1, 0.36, 1]
-                  }}
-                  style={{
-                    position: 'absolute',
-                    left: '50%',
-                    top: '50%',
-                    marginLeft: '-140px',
-                    marginTop: '-170px',
-                    width: '250px',
-                    height: '300px',
-                    borderRadius: '24px',
-                    overflow: 'hidden',
-                    background: '#fff',
-                    boxShadow: isActive
-                      ? '0 25px 50px -12px rgba(0,0,0,0.5)'
-                      : '0 10px 30px -5px rgba(0,0,0,0.3)',
-                    transformStyle: 'preserve-3d',
-                    cursor: 'pointer',
-                    border: isActive ? '4px solid var(--color-muted-gold)' : 'none',
-                    pointerEvents: absOffset === 0 ? 'auto' : 'none'
-                  }}
-                  onClick={() => setActiveIndex(index)}
-                >
-                  <img
-                    src={src}
-                    alt={`Gallery ${index}`}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      pointerEvents: 'none'
+                return (
+                  <motion.div
+                    key={index}
+                    initial={false}
+                    animate={{
+                      transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
+                      opacity: opacity,
+                      zIndex: zIndex
                     }}
-                  />
+                    transition={{
+                      duration: 0.7,
+                      ease: [0.22, 1, 0.36, 1]
+                    }}
+                    style={{
+                      position: 'absolute',
+                      left: '50%',
+                      top: '50%',
+                      marginLeft: '-140px',
+                      marginTop: '-170px',
+                      width: '250px',
+                      height: '300px',
+                      borderRadius: '24px',
+                      overflow: 'hidden',
+                      background: '#fff',
+                      boxShadow: isActive
+                        ? '0 25px 50px -12px rgba(255,174,0,0.4), 0 0 30px rgba(255,174,0,0.3)'
+                        : '0 10px 30px -5px rgba(0,0,0,0.5)',
+                      transformStyle: 'preserve-3d',
+                      cursor: 'pointer',
+                      border: isActive ? '3px solid #FFAE00' : '1px solid rgba(255,174,0,0.2)',
+                      pointerEvents: absOffset === 0 ? 'auto' : 'none'
+                    }}
+                    onClick={() => setActiveIndex(index)}
+                  >
+                    <img
+                      src={src}
+                      alt={`Gallery ${index}`}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        pointerEvents: 'none'
+                      }}
+                    />
 
-                  {/* Gradient Overlay */}
-                  <div style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: isActive
-                      ? 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.2) 100%)'
-                      : 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%)',
-                    transition: 'all 0.3s ease'
-                  }} />
-                </motion.div>
-              );
-            })}
+                    {/* Gradient Overlay */}
+                    <div style={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: isActive
+                        ? 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 100%)'
+                        : 'linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.7) 100%)',
+                      transition: 'all 0.3s ease'
+                    }} />
+
+                    {/* Active indicator */}
+                    {isActive && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        style={{
+                          position: 'absolute',
+                          bottom: '15px',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          width: '40px',
+                          height: '4px',
+                          background: '#FFAE00',
+                          borderRadius: '2px',
+                          boxShadow: '0 0 15px rgba(255,174,0,0.8)'
+                        }}
+                      />
+                    )}
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      </motion.div>
-
-    </header>
+        </motion.div>
+      </header>
+      
+    </div>
+    
   );
 };
 

@@ -159,7 +159,6 @@ const Hero = () => {
 
             <Sparkles size={16} fill="currentColor" />
             <span style={{
-              fontFamily: 'var(--font-body)',
               fontSize: '0.85rem',
               textTransform: 'uppercase',
               letterSpacing: '0.2em',
@@ -174,17 +173,18 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
             style={{
-              fontSize: '5.5rem',
-              color: 'var(--color-cream)',
+              fontSize: '160px',
+              color: 'var(--color-khaki)',
               fontWeight: 400, // Thinner, more elegant
               marginBottom: '1.5rem',
               lineHeight: 1,
-              fontFamily: 'var(--font-heading)',
+              fontFamily: "Oswald", 
               letterSpacing: '-0.02em',
               textShadow: '0 20px 40px rgba(0,0,0,0.5)'
             }}
           >
-            Start Your <span style={{ color: 'var(--color-khaki)', fontStyle: 'italic' }}>Journey</span>
+            {/* Start Your <span style={{ color: 'var(--color-khaki)', fontStyle: 'italic' }}>Journey</span> */}
+            Start Your Journey
           </motion.h1>
 
           <motion.p
@@ -196,7 +196,6 @@ const Hero = () => {
               color: 'rgba(247, 243, 232, 0.6)',
               maxWidth: '650px',
               margin: '0 auto',
-              fontFamily: 'var(--font-body)',
               lineHeight: 1.6
             }}
           >
@@ -230,7 +229,7 @@ const Hero = () => {
       }} />
 
       {/* Scalloped Section Separator */}
-      <SectionSeparator flip={false} />
+      <SectionSeparator flip={true} />
     </div>
   );
 };
@@ -243,6 +242,9 @@ const PathCard = ({ item, isActive, setActive }) => {
       onHoverStart={() => setActive(item.id)}
       onHoverEnd={() => setActive(null)}
       className={`relative flex-1 group overflow-hidden rounded-3xl cursor-pointer border border-white/10 transition-all duration-500 ease-in-out ${isActive ? 'flex-[2]' : 'flex-1'} min-h-[400px] md:min-h-0`}
+      style={{
+        fontFamily: "Oswald", 
+      }}
     >
       {/* Background Image */}
       <motion.div
@@ -280,7 +282,7 @@ const PathCard = ({ item, isActive, setActive }) => {
             {React.createElement(item.icon, { size: 32, strokeWidth: 1.5 })}
           </div>
 
-          <h3 className={`${isActive ? 'text-5xl' : 'text-4xl'} font-heading font-bold text-cream mb-4 leading-tight drop-shadow-lg`}>
+          <h3 style={{fontFamily: "Oswald", }} className={`${isActive ? 'text-5xl' : 'text-4xl'} font-heading font-bold text-cream mb-4 leading-tight drop-shadow-lg`}>
             {item.title}
           </h3>
         </div>
