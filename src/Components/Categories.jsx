@@ -88,8 +88,8 @@ const Categories = () => {
             {/* Sticky Container */}
             <div style={{
                 position: 'sticky',
-                top: 0,
-                height: '100vh',
+                top: 5,
+                height: '110vh',
                 display: 'flex',
                 alignItems: 'center',
                 overflow: 'hidden'
