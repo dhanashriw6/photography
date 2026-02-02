@@ -5,7 +5,7 @@ import SectionSeparator from './SectionSeparator';
 
 const Hero2 = () => {
   const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 500], [0, 200]);
+  const y = useTransform(scrollY, [0, 500], [0, 100]);
   const opacity = useTransform(scrollY, [0, 1000], [1, 0]);
 
   // Carousel State
@@ -13,13 +13,13 @@ const Hero2 = () => {
   const containerRef = useRef(null);
 
   const galleryImages = [
-    "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=600&q=80",
-    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&q=80",
-    "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80",
-    "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80",
-    "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600&q=80",
-    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80",
-    "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=600&q=80",
+    { type: 'image', src: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=600&q=80" },
+    { type: 'video', src: "https://videos.pexels.com/video-files/3571264/3571264-uhd_2560_1440_30fps.mp4" },
+    { type: 'image', src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&q=80" },
+    { type: 'video', src: "https://videos.pexels.com/video-files/3209828/3209828-uhd_2560_1440_25fps.mp4" },
+    { type: 'image', src: "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80" },
+    { type: 'video', src: "https://videos.pexels.com/video-files/3571264/3571264-uhd_2560_1440_30fps.mp4" },
+    { type: 'image', src: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80" },
   ];
 
   // Auto-play effect for carousel
@@ -50,7 +50,7 @@ const Hero2 = () => {
       color: '#FFFEFA',
       fontFamily: 'system-ui, -apple-system, sans-serif'
     }}>
-    
+
       <header style={{
         minHeight: '100vh',
         display: 'flex',
@@ -58,7 +58,8 @@ const Hero2 = () => {
         alignItems: 'center',
         position: 'relative',
         overflow: 'hidden',
-        padding: '4rem 2rem 2rem',
+        // padding: '4rem 2rem 2rem',
+        paddingTop: "4rem%",
         background: '#111212',
         color: '#FFFEFA'
       }}>
@@ -104,7 +105,7 @@ const Hero2 = () => {
         {/* Badge 1 - Timeless */}
         <motion.div
           animate={{
-            y: [0, -10, 0],
+            y: [10, 20, 10],
             x: [650, 700, 650],
             rotate: [0, 5, -5, 0],
           }}
@@ -179,7 +180,7 @@ const Hero2 = () => {
         <motion.div
           animate={{
             y: [0, -1, 0],
-            x: [700, 750, 700],
+            x: [1000, 1050, 1000],
           }}
           transition={{
             duration: 5,
@@ -223,9 +224,9 @@ const Hero2 = () => {
         {/* Badge 7 - Flower/Star Shape - "Edgy" */}
         <motion.div
           animate={{
-                       x: [-850, -900, -850],
+            x: [-950, -1000, -950],
 
-            y: [0, -8, 0],
+            y: [-40, -50, -40],
             rotate: [0, 360],
           }}
           transition={{
@@ -272,7 +273,7 @@ const Hero2 = () => {
         {/* Badge 9 - Sunburst Shape - "Bold" */}
         <motion.div
           animate={{
-            x: [-400, -450, -400],
+            x: [-300, -350, -300],
             y: [0, 12, 0],
             rotate: [0, 360],
           }}
@@ -419,7 +420,7 @@ const Hero2 = () => {
 
 
         {/* Main Content */}
-        <motion.div style={{ y, opacity, textAlign: 'center', zIndex: 10, position: 'relative', marginBottom: '2rem' }}>
+        <motion.div style={{ y, opacity, textAlign: 'center', zIndex: 10, position: 'relative' }}>
           {/* Decorative Line Above */}
           <motion.div
             initial={{ scaleX: 0 }}
@@ -435,33 +436,7 @@ const Hero2 = () => {
             }}
           />
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            style={{
-              position: 'relative',
-              display: 'inline-block'
-            }}
-          >
-            <motion.span
-              animate={{
-                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%']
-              }}
-              transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
-              style={{
-                background: 'linear-gradient(90deg, #BBBBBB, #FFAE00, #FFE24F, #BBBBBB)',
-                backgroundSize: '200% auto',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                fontWeight: 500,
-                letterSpacing: '0.08em',
-                fontSize: '1.1rem',
-              }}
-            >
-              Find the Right Photographer. Book with Confidence.            </motion.span>
-          </motion.p>
+
 
 
           <h1 style={{
@@ -472,146 +447,183 @@ const Hero2 = () => {
             position: 'relative',
             fontWeight: '900'
           }}>
-            {/* Shoot. */}
-            <div style={{ display: 'flex', overflow: 'visible', padding: '0.5rem 2rem' }}>
-              {shootText.map((char, index) => (
-                <motion.span
-                  key={index}
-                  initial={{ y: 200, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{
-                    duration: 1,
-                    delay: index * 0.05,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                  whileHover={{
-                    scale: 1.15,
-                    y: -15,
-                    transition: { duration: 0.3 }
-                  }}
-                  style={{
-                    display: 'inline-block',
-                    cursor: 'pointer',
-                    fontSize: 'clamp(3.5rem, 10vw, 7rem)',
-                    color: '#FFE24F',
-                    letterSpacing: '-0.03em',
-                    textShadow: '0 2px 20px rgba(0,0,0,0.3)'
-                  }}
-                >
-                  {char === " " ? "\u00A0" : char}
-                </motion.span>
-              ))}
+            <div className='flex capitalize'>
+              {/* Shoot. */}
+              <div style={{ display: 'flex', overflow: 'visible', padding: '0.5rem 2rem' }}>
+                {shootText.map((char, index) => (
+                  <motion.span
+                    key={index}
+                    initial={{ y: 200, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{
+                      duration: 1,
+                      delay: index * 0.05,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                    whileHover={{
+                      scale: 1.15,
+                      y: -15,
+                      transition: { duration: 0.3 }
+                    }}
+                    style={{
+                      display: 'inline-block',
+                      cursor: 'pointer',
+                      fontSize: 'clamp(3.5rem, 10vw, 7rem)',
+                      color: '#FFE24F',
+                      letterSpacing: '-0.03em',
+                      textShadow: '0 2px 20px rgba(0,0,0,0.3)'
+                    }}
+                  >
+                    {char === " " ? "\u00A0" : char}
+                  </motion.span>
+                ))}
+              </div>
+
+              {/* Edit. - Golden gradient */}
+              <div style={{
+                display: 'flex',
+                overflow: 'visible',
+                width: '100%',
+                justifyContent: 'center',
+
+                paddingLeft: '1.5rem',
+              }}>
+                {editText.map((char, index) => (
+                  <motion.span
+                    key={index}
+                    initial={{ y: 200, opacity: 0, scale: 0.5 }}
+                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                    transition={{
+                      duration: 1.2,
+                      delay: 0.3 + index * 0.06,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                    whileHover={{
+                      scale: 1.15,
+                      y: -15,
+                      transition: { duration: 0.3 }
+                    }}
+                    style={{
+                      display: 'inline-block',
+                      cursor: 'pointer',
+                      fontSize: 'clamp(3.5rem, 10vw, 7rem)',
+                      color: '#FFE24F',
+                      letterSpacing: '-0.03em',
+                      textShadow: '0 2px 20px rgba(0,0,0,0.3)'
+
+                    }}
+                  >
+                    {char}
+                  </motion.span>
+                ))}
+              </div>
             </div>
 
-            {/* Edit. - Golden gradient */}
-            <div style={{
-              display: 'flex',
-              overflow: 'visible',
-              width: '100%',
-              justifyContent: 'center',
+            <div className='flex capitalize'>
+              {/* Deliver. - Golden gradient */}
+              <div style={{
+                display: 'flex',
+                overflow: 'visible',
+                width: '100%',
+                justifyContent: 'center',
+                padding: '0.5rem 2rem',
+                marginLeft: '-1rem',
+                marginRight: '-1rem'
+              }}>
+                {deliverText.map((char, index) => (
+                  <motion.span
+                    key={index}
+                    initial={{ y: 200, opacity: 0, scale: 0.5 }}
+                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                    transition={{
+                      duration: 1.2,
+                      delay: 0.6 + index * 0.06,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                    whileHover={{
+                      scale: 1.15,
+                      y: -15,
+                      transition: { duration: 0.3 }
+                    }}
+                    style={{
+                      display: 'inline-block',
+                      cursor: 'pointer',
+                      fontSize: 'clamp(3.5rem, 10vw, 7rem)',
+                      color: '#FFE24F',
+                      letterSpacing: '-0.03em',
+                      textShadow: '0 2px 20px rgba(0,0,0,0.3)'
+                    }}
+                  >
+                    {char}
+                  </motion.span>
+                ))}
+              </div>
 
-              paddingLeft: '1.5rem',
-            }}>
-              {editText.map((char, index) => (
-                <motion.span
-                  key={index}
-                  initial={{ y: 200, opacity: 0, scale: 0.5 }}
-                  animate={{ y: 0, opacity: 1, scale: 1 }}
-                  transition={{
-                    duration: 1.2,
-                    delay: 0.3 + index * 0.06,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                  whileHover={{
-                    scale: 1.15,
-                    y: -15,
-                    transition: { duration: 0.3 }
-                  }}
-                  style={{
-                    display: 'inline-block',
-                    cursor: 'pointer',
-                    fontSize: 'clamp(3.5rem, 10vw, 7rem)',
-                    color: '#FFE24F',
-                    letterSpacing: '-0.03em',
-                    textShadow: '0 2px 20px rgba(0,0,0,0.3)'
-
-                  }}
-                >
-                  {char}
-                </motion.span>
-              ))}
+              {/* Repeat. */}
+              <div style={{ display: 'flex', overflow: 'visible', padding: '0.5rem 2rem' }}>
+                {repeatText.map((char, index) => (
+                  <motion.span
+                    key={index}
+                    initial={{ y: 200, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{
+                      duration: 1,
+                      delay: 0.9 + index * 0.05,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                    whileHover={{
+                      scale: 1.15,
+                      y: -15,
+                      transition: { duration: 0.3 }
+                    }}
+                    style={{
+                      display: 'inline-block',
+                      cursor: 'pointer',
+                      fontSize: 'clamp(3.5rem, 10vw, 7rem)',
+                      color: '#FFE24F',
+                      letterSpacing: '-0.03em',
+                      textShadow: '0 2px 20px rgba(0,0,0,0.3)'
+                    }}
+                  >
+                    {char === " " ? "\u00A0" : char}
+                  </motion.span>
+                ))}
+              </div>
             </div>
 
-            {/* Deliver. - Golden gradient */}
-            <div style={{
-              display: 'flex',
-              overflow: 'visible',
-              width: '100%',
-              justifyContent: 'center',
-              padding: '0.5rem 2rem',
-              marginLeft: '-1rem',
-              marginRight: '-1rem'
-            }}>
-              {deliverText.map((char, index) => (
-                <motion.span
-                  key={index}
-                  initial={{ y: 200, opacity: 0, scale: 0.5 }}
-                  animate={{ y: 0, opacity: 1, scale: 1 }}
-                  transition={{
-                    duration: 1.2,
-                    delay: 0.6 + index * 0.06,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                  whileHover={{
-                    scale: 1.15,
-                    y: -15,
-                    transition: { duration: 0.3 }
-                  }}
-                  style={{
-                    display: 'inline-block',
-                    cursor: 'pointer',
-                    fontSize: 'clamp(3.5rem, 10vw, 7rem)',
-                    color: '#FFE24F',
-                    letterSpacing: '-0.03em',
-                    textShadow: '0 2px 20px rgba(0,0,0,0.3)'
-                  }}
-                >
-                  {char}
-                </motion.span>
-              ))}
-            </div>
 
-            {/* Repeat. */}
-            <div style={{ display: 'flex', overflow: 'visible', padding: '0.5rem 2rem' }}>
-              {repeatText.map((char, index) => (
-                <motion.span
-                  key={index}
-                  initial={{ y: 200, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{
-                    duration: 1,
-                    delay: 0.9 + index * 0.05,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                  whileHover={{
-                    scale: 1.15,
-                    y: -15,
-                    transition: { duration: 0.3 }
-                  }}
-                  style={{
-                    display: 'inline-block',
-                    cursor: 'pointer',
-                    fontSize: 'clamp(3.5rem, 10vw, 7rem)',
-                    color: '#FFE24F',
-                    letterSpacing: '-0.03em',
-                    textShadow: '0 2px 20px rgba(0,0,0,0.3)'
-                  }}
-                >
-                  {char === " " ? "\u00A0" : char}
-                </motion.span>
-              ))}
-            </div>
           </h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            style={{
+              position: 'relative',
+              display: 'inline-block',
+              width: "60%",
+              margin: "auto",
+            }}
+          >
+            <motion.span
+              animate={{
+                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%']
+              }}
+              transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+              style={{
+                // background: 'linear-gradient(90deg, #BBBBBB, #FFAE00, #FFE24F, #BBBBBB)',
+                // backgroundSize: '200% auto',
+                // WebkitBackgroundClip: 'text',
+                // WebkitTextFillColor: 'transparent',
+                // backgroundClip: 'text',
+
+                fontWeight: 800,
+                letterSpacing: '0.08em',
+                fontSize: '40px',
+                color: '#FFf',
+              }}
+            >
+              Find the Right Photographer. Book with Confidence.            </motion.span>
+          </motion.p>
           {/* Tagline */}
           {/* <motion.p
             initial={{ opacity: 0 }}
@@ -665,7 +677,7 @@ const Hero2 = () => {
                 boxShadow: '0 0 20px rgba(255,174,0,0.3)'
               }}
             >
-             Find a Photographer <ArrowRight size={20} />
+              Find a Photographer <ArrowRight size={20} />
             </motion.button>
             <motion.button
               whileHover={{
@@ -705,12 +717,12 @@ const Hero2 = () => {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            marginTop: '20%'
+            marginTop: '5rem'
           }}
         >
           <div
             style={{
-              perspective: '600px',
+              perspective: '1000px',
               perspectiveOrigin: 'center center',
               width: '100%',
               height: '100%',
@@ -728,7 +740,7 @@ const Hero2 = () => {
                 transformStyle: 'preserve-3d'
               }}
             >
-              {galleryImages.map((src, index) => {
+              {galleryImages.map((item, index) => {
                 let offset = index - activeIndex;
                 const totalImages = galleryImages.length;
 
@@ -751,7 +763,7 @@ const Hero2 = () => {
                 const translateZ = radius - Math.cos(angle * Math.PI / 180) * radius - 200;
                 const rotateY = -angle;
                 const scale = 1;
-                const opacity = 1;
+                const opacity = absOffset > 3 ? 0 : 1;
                 const zIndex = Math.round(10 - absOffset);
 
                 return (
@@ -788,16 +800,32 @@ const Hero2 = () => {
                     }}
                     onClick={() => setActiveIndex(index)}
                   >
-                    <img
-                      src={src}
-                      alt={`Gallery ${index}`}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        pointerEvents: 'none'
-                      }}
-                    />
+                    {item.type === 'video' ? (
+                      <video
+                        src={item.src}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          pointerEvents: 'none'
+                        }}
+                      />
+                    ) : (
+                      <img
+                        src={item.src}
+                        alt={`Gallery ${index}`}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          pointerEvents: 'none'
+                        }}
+                      />
+                    )}
 
                     {/* Gradient Overlay */}
                     <div style={{
@@ -834,9 +862,9 @@ const Hero2 = () => {
           </div>
         </motion.div>
       </header>
-      
+
     </div>
-    
+
   );
 };
 
