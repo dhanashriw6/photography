@@ -41,7 +41,7 @@ const FAQ = () => {
       position: 'relative',
       overflow: 'hidden'
     }}>
-      <SectionSeparator flip={true} />
+      <SectionSeparator flip={true} fill="#FEEFA3" />
 
       {/* Animated Background Pattern */}
       <div style={{

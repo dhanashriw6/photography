@@ -1,5 +1,6 @@
 import React from 'react';
 import { Clapperboard, Camera, Aperture, Film, Palette, Sparkles, Star, Music } from 'lucide-react';
+import SectionSeparator from './SectionSeparator';
 
 
 const MarqueeStrip = () => {
@@ -14,37 +15,38 @@ const MarqueeStrip = () => {
     { text: "Studio", icon: Music },
   ];
 
-  
+
   const items = [...baseItems];
 
   return (
     <div className="marquee-container">
-      
+          <SectionSeparator fill='#000' />
+
       <div className="marquee-content">
         {items.map((item, index) => (
-          <div 
-            key={`strip-1-${index}`} 
+          <div
+            key={`strip-1-${index}`}
             className="marquee-item-wrapper"
             style={{ '--i': index }}
           >
-            <span className="marquee-item">
+            <div className="marquee-item">
               <item.icon className="marquee-icon" size={32} />
               {item.text}
-            </span>
+            </div>
           </div>
         ))}
       </div>
       <div className="marquee-content" aria-hidden="true">
         {items.map((item, index) => (
-          <div 
-            key={`strip-2-${index}`} 
+          <div
+            key={`strip-2-${index}`}
             className="marquee-item-wrapper"
             style={{ '--i': index }}
           >
-            <span className="marquee-item">
+            <div className="marquee-item">
               <item.icon className="marquee-icon" size={32} />
               {item.text}
-            </span>
+            </div>
           </div>
         ))}
       </div>

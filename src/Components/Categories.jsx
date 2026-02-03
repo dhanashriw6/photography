@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Camera, Film, Video, Image, Sparkles, Clapperboard, Users, Award } from 'lucide-react';
+import SectionSeparator from './SectionSeparator';
 
 const Categories = () => {
     const containerRef = useRef(null);
@@ -82,8 +83,9 @@ const Categories = () => {
             style={{
                 height: `${categoryCount * 100}vh`, // Make section tall enough for all categories
                 position: 'relative',
-                background: 'var(--color-cream)',
+                // background: 'var(--color-cream)',
             }}
+            className='categories'
         >
             {/* Sticky Container */}
             <div style={{
@@ -94,6 +96,7 @@ const Categories = () => {
                 alignItems: 'center',
                 overflow: 'hidden'
             }}>
+                
                 <div className="container" style={{
                     maxWidth: '1400px',
                     margin: '0 auto',
@@ -103,13 +106,48 @@ const Categories = () => {
                     alignItems: 'center',
                     gap: '8rem'
                 }}>
+                       <motion.div
+                     animate={{
+                       y: [-80],
+                       x: [ -1250],
+                       rotate: [0, -8, 0],
+                     }}
+                     transition={{
+                       duration: 7,
+                       repeat: Infinity,
+                       ease: "easeInOut",
+                       delay: 1
+                     }}
+                     style={{
+                       position: 'absolute',
+                       top: '40%',
+                       right: '10%',
+                       zIndex: 5,
+                       pointerEvents: 'none'
+                     }}
+                   >
+                     <div style={{
+                       background: '#FEEFA3',
+                       border: '2px solid #FFAE00',
+                       borderRadius: '20% 70% 30% 70% / 30% 30% 80% 40%',
+                       padding: '1rem 1.8rem',
+                       fontWeight: '700',
+                       fontSize: '1rem',
+                       color: '#111212',
+                       boxShadow: '0 0 25px rgba(255,174,0,0.4)',
+                       transform: 'rotate(8deg)'
+                     }}>
+                       Categories
+                     </div>
+                   </motion.div>
                     {/* Left Side - Fixed Content */}
                     <div style={{
                         flex: '0 0 45%',
                         position: 'relative',
                         zIndex: 2
                     }}>
-                        <motion.span
+                        
+                        {/* <motion.span
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
@@ -125,7 +163,7 @@ const Categories = () => {
                             }}
                         >
                             CATEGORIES
-                        </motion.span>
+                        </motion.span> */}
 
                         <motion.h2
                             initial={{ opacity: 0, y: 30 }}
@@ -348,6 +386,7 @@ const Categories = () => {
                     </div>
                 </div>
             </div>
+            
         </section>
     );
 };

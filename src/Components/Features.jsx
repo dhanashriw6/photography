@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Search, Calendar, UserCheck, Star } from "lucide-react";
+import SectionSeparator from "./SectionSeparator";
 
 const Features = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -31,10 +32,11 @@ const Features = () => {
   return (
     <section style={{
       padding: '8rem 2rem',
-      background: 'var(--color-black)',
+      background: 'var(--color-pale)',
       position: 'relative',
       overflow: 'hidden'
     }}>
+      <SectionSeparator flip={true} fill="var(--color-black)" />
       <div className="container" style={{ maxWidth: '1600px', margin: '0 auto' }}>
         {/* Header */}
         <motion.div
@@ -68,7 +70,7 @@ const Features = () => {
             transition={{ delay: 0.3, duration: 0.8 }}
             style={{
               fontSize: '160px',
-              color: 'var(--color-white)',
+              color: 'var(--color-black)',
               fontFamily: 'Oswald',
               marginBottom: '1rem',
               width: '70%',

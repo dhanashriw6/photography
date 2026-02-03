@@ -28,7 +28,7 @@ const Footer = () => {
       color: 'var(--color-paper-beige)',
       overflow: 'hidden'
     }}>
-      <SectionSeparator flip={true} />
+      <SectionSeparator flip={true} fill="var(--color-pale)" />
       {/* Animated Background Gradient Orbs */}
       <motion.div
         animate={{

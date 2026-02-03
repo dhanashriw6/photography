@@ -105,8 +105,8 @@ const Hero2 = () => {
         {/* Badge 1 - Timeless */}
         <motion.div
           animate={{
-            y: [10, 20, 10],
-            x: [650, 700, 650],
+            y: [-10, -20, -10],
+         x: [1200, 1250, 1200],
             rotate: [0, 5, -5, 0],
           }}
           transition={{
@@ -144,7 +144,7 @@ const Hero2 = () => {
         <motion.div
           animate={{
             y: [-10, -12, 0],
-            x: [-850, -900, -850],
+            x: [-1050, -1100, -1050],
             rotate: [0, -8, 0],
           }}
           transition={{
@@ -226,7 +226,7 @@ const Hero2 = () => {
           animate={{
             x: [-950, -1000, -950],
 
-            y: [-40, -50, -40],
+            y: [-90, -80, -90],
             rotate: [0, 360],
           }}
           transition={{
@@ -415,7 +415,7 @@ const Hero2 = () => {
 
 
 
-
+    <SectionSeparator/>
 
 
 
@@ -862,6 +862,7 @@ const Hero2 = () => {
           </div>
         </motion.div>
       </header>
+  
 
     </div>
 

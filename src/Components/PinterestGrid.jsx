@@ -24,7 +24,7 @@ const PinterestGrid = () => {
 
     return (
         <section className="pinterest-grid-section">
-            <SectionSeparator flip={true} />
+            <SectionSeparator flip={true} fill="#000"/>
             {/* Animated Background Elements */}
             <div className="pinterest-bg-pattern" />
             <motion.div 
