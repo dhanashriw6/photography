@@ -106,7 +106,7 @@ const Hero2 = () => {
         <motion.div
           animate={{
             y: [-10, -20, -10],
-         x: [1200, 1250, 1200],
+            x: [1200, 1250, 1200],
             rotate: [0, 5, -5, 0],
           }}
           transition={{
@@ -415,7 +415,7 @@ const Hero2 = () => {
 
 
 
-    <SectionSeparator/>
+        <SectionSeparator />
 
 
 
@@ -862,7 +862,7 @@ const Hero2 = () => {
           </div>
         </motion.div>
       </header>
-  
+
 
     </div>
 

@@ -69,7 +69,7 @@ const Features = () => {
             viewport={{ once: true }}
             transition={{ delay: 0.3, duration: 0.8 }}
             style={{
-              fontSize: '160px',
+              fontSize: '150px',
               color: 'var(--color-black)',
               fontFamily: 'Oswald',
               marginBottom: '1rem',

@@ -20,7 +20,7 @@ const MarqueeStrip = () => {
 
   return (
     <div className="marquee-container">
-          <SectionSeparator fill='#000' />
+      <SectionSeparator fill='#000' />
 
       <div className="marquee-content">
         {items.map((item, index) => (
@@ -29,9 +29,11 @@ const MarqueeStrip = () => {
             className="marquee-item-wrapper"
             style={{ '--i': index }}
           >
-            <div className="marquee-item">
-              <item.icon className="marquee-icon" size={32} />
-              {item.text}
+            <div className="marquee-rotator" style={{ '--i': index }}>
+              <div className="marquee-item">
+                <item.icon className="marquee-icon" size={32} />
+                {item.text}
+              </div>
             </div>
           </div>
         ))}
@@ -43,9 +45,11 @@ const MarqueeStrip = () => {
             className="marquee-item-wrapper"
             style={{ '--i': index }}
           >
-            <div className="marquee-item">
-              <item.icon className="marquee-icon" size={32} />
-              {item.text}
+            <div className="marquee-rotator" style={{ '--i': index }}>
+              <div className="marquee-item">
+                <item.icon className="marquee-icon" size={32} />
+                {item.text}
+              </div>
             </div>
           </div>
         ))}
