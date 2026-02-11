@@ -109,8 +109,8 @@ const Footer = () => {
         style={{
           position: 'absolute',
           top: '20%',
-          left: '5%',
-          zIndex: 5,
+          left: '15%',
+          zIndex: 15,
           pointerEvents: 'none',
           opacity: 0.8
         }}
@@ -123,9 +123,9 @@ const Footer = () => {
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
         style={{
           position: 'absolute',
-          bottom: '30%',
-          right: '8%',
-          zIndex: 5,
+          bottom: '20%',
+          right: '10%',
+          zIndex: 15,
           pointerEvents: 'none',
           opacity: 0.6
         }}
@@ -308,7 +308,7 @@ const Footer = () => {
               }}>
                 {section.title}
               </h4>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              <ul style={{ listStyle: 'none', padding: 0, marginTop: '1rem', margin: 0 }}>
                 {section.links.map((link, linkIdx) => (
                   <motion.li
                     key={linkIdx}
@@ -408,7 +408,7 @@ const Footer = () => {
               cursor: 'pointer',
               letterSpacing: '1px'
             }}>
-              FILM<span style={{ color: 'var(--color-khaki)' }}>FLARE</span>
+              Online<span style={{ color: 'var(--color-khaki)' }}>Photographer</span>
             </h2>
             <p style={{
               fontFamily: 'var(--font-body)',

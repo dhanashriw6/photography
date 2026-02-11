@@ -36,15 +36,15 @@ const Hero = () => {
     "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&q=80",
   ];
   const col2 = [
-    "https://images.unsplash.com/photo-1554048612-387768052bf7?w=800&q=80",
+    "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=80",
     "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&q=80",
-    "https://images.unsplash.com/photo-1471341971474-273d2b0b27b5?w=800&q=80",
+    "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80",
     "https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?w=800&q=80",
   ];
   const col3 = [
     "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&q=80",
     "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=80",
-    "https://images.unsplash.com/photo-1520390138845-fd2d229dd552?w=800&q=80",
+    "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&q=80",
     "https://images.unsplash.com/photo-1524250502761-1ac6f2e30d43?w=800&q=80",
   ];
 
@@ -178,7 +178,7 @@ const Hero = () => {
               fontWeight: 400, // Thinner, more elegant
               marginBottom: '1.5rem',
               lineHeight: 1,
-              fontFamily: "Oswald", 
+              fontFamily: "Oswald",
               letterSpacing: '-0.02em',
               textShadow: '0 20px 40px rgba(0,0,0,0.5)'
             }}
@@ -243,7 +243,7 @@ const PathCard = ({ item, isActive, setActive }) => {
       onHoverEnd={() => setActive(null)}
       className={`relative flex-1 group overflow-hidden rounded-3xl cursor-pointer border border-white/10 transition-all duration-500 ease-in-out ${isActive ? 'flex-[2]' : 'flex-1'} min-h-[400px] md:min-h-0`}
       style={{
-        fontFamily: "Oswald", 
+        fontFamily: "Oswald",
       }}
     >
       {/* Background Image */}
@@ -271,7 +271,7 @@ const PathCard = ({ item, isActive, setActive }) => {
       <div className="absolute inset-0 p-8 flex flex-col justify-center items-center z-10 text-center transition-colors duration-500 bg-black/40 group-hover:bg-black/60">
 
         {/* Icon & Title Wrapper */}
-        <div className="flex flex-col items-center transform transition-transform duration-500 ease-out group-hover:-translate-y-2">
+        <div className="flex flex-col gap-4 items-center transform transition-transform duration-500 ease-out group-hover:-translate-y-2">
           <div
             className="flex items-center justify-center p-2 h-15 w-15 rounded-full mb-6 text-cream backdrop-blur-md border border-white/20 transition-colors duration-300 shadow-lg"
             style={{
@@ -282,7 +282,7 @@ const PathCard = ({ item, isActive, setActive }) => {
             {React.createElement(item.icon, { size: 32, strokeWidth: 1.5 })}
           </div>
 
-          <h3 style={{fontFamily: "Oswald", }} className={`${isActive ? 'text-5xl' : 'text-4xl'} font-heading font-bold text-cream mb-4 leading-tight drop-shadow-lg`}>
+          <h3 style={{ fontFamily: "Oswald", }} className={`${isActive ? 'text-5xl' : 'text-4xl'} font-heading font-bold text-cream mb-4 leading-tight drop-shadow-lg`}>
             {item.title}
           </h3>
         </div>
@@ -292,7 +292,7 @@ const PathCard = ({ item, isActive, setActive }) => {
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: isActive ? 1 : 0, height: isActive ? 'auto' : 0 }}
           transition={{ duration: 0.4 }}
-          className="overflow-hidden flex flex-col items-center w-full"
+          className="overflow-hidden flex flex-col gap-6 items-center w-full"
         >
           <p className="text-lg text-gray-200 font-body leading-relaxed mb-8 max-w-lg mx-auto drop-shadow-md">
             {item.desc}
@@ -375,7 +375,7 @@ const ParallaxColumn = ({ images, duration, reverse, yStart = "0%" }) => (
       }}>
         <img
           src={src}
-          alt="FullTime Photographer"
+          alt="Online Photographer"
           style={{
             width: '100%',
             height: '100%',

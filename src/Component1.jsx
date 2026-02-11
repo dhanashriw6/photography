@@ -19,7 +19,7 @@ const Navigation = () => (
   }}>
     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <Camera size={24} />
-      <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', fontWeight: 'bold' }}>FullTime Photographer</span>
+      <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', fontWeight: 'bold' }}>Online Photographer</span>
     </div>
     <div style={{ display: 'flex', gap: '2rem', fontFamily: 'var(--font-body)', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
       <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Photographers</a>
@@ -33,7 +33,7 @@ const Hero = () => {
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 500], [0, 200]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
-  
+
   // Parallax effects for different layers
   const y1 = useTransform(scrollY, [0, 500], [0, 150]);
   const y2 = useTransform(scrollY, [0, 500], [0, 250]);
@@ -41,33 +41,33 @@ const Hero = () => {
   const rotate1 = useTransform(scrollY, [0, 500], [0, 10]);
   const rotate2 = useTransform(scrollY, [0, 500], [0, -15]);
 
-  const titleline1 = "FullTime".split("");
+  const titleline1 = "Online".split("");
   const titleline2 = "Photographer".split("");
 
   // Floating poster images
   const posters = [
-    { 
+    {
       url: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=400&q=80",
       position: { top: '15%', left: '8%' },
       delay: 0.3,
       yTransform: y1,
       rotate: rotate1
     },
-    { 
+    {
       url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80",
       position: { top: '60%', left: '12%' },
       delay: 0.5,
       yTransform: y2,
       rotate: rotate2
     },
-    { 
+    {
       url: "https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80",
       position: { top: '20%', right: '10%' },
       delay: 0.4,
       yTransform: y3,
       rotate: rotate1
     },
-    { 
+    {
       url: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&q=80",
       position: { top: '65%', right: '8%' },
       delay: 0.6,
@@ -132,8 +132,8 @@ const Hero = () => {
           key={index}
           initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
           animate={{ opacity: 1, scale: 1, rotate: 0 }}
-          transition={{ 
-            duration: 1.2, 
+          transition={{
+            duration: 1.2,
             delay: poster.delay,
             ease: [0.22, 1, 0.36, 1]
           }}
@@ -146,8 +146,8 @@ const Hero = () => {
           }}
         >
           <motion.div
-            whileHover={{ 
-              scale: 1.1, 
+            whileHover={{
+              scale: 1.1,
               rotate: 5,
               zIndex: 20
             }}
@@ -196,7 +196,7 @@ const Hero = () => {
           }}
         />
 
-        <motion.p 
+        <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
@@ -224,11 +224,11 @@ const Hero = () => {
         </motion.p>
 
         {/* Enhanced Title with Stagger and Bounce */}
-        <h1 className="hero-text" style={{ 
-          color: 'var(--color-mocha)', 
-          margin: '1.5rem 0', 
-          display: 'flex', 
-          flexDirection: 'column', 
+        <h1 className="hero-text" style={{
+          color: 'var(--color-mocha)',
+          margin: '1.5rem 0',
+          display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           position: 'relative'
         }}>
@@ -250,61 +250,61 @@ const Hero = () => {
               pointerEvents: 'none'
             }}
           >
-            FullTime Photographer
+            Online Photographer
           </motion.div>
 
           <div style={{ display: 'flex', overflow: 'hidden' }}>
-              {titleline1.map((char, index) => (
-                  <motion.span
-                      key={index}
-                      initial={{ y: 200, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ 
-                        duration: 1, 
-                        delay: index * 0.05, 
-                        ease: [0.22, 1, 0.36, 1],
-                        opacity: { duration: 0.5, delay: index * 0.05 }
-                      }}
-                      whileHover={{ 
-                        y: -10, 
-                        color: 'var(--color-caramel)',
-                        transition: { duration: 0.2 }
-                      }}
-                      style={{ display: 'inline-block', cursor: 'none' }}
-                  >
-                      {char === " " ? "\u00A0" : char}
-                  </motion.span>
-              ))}
+            {titleline1.map((char, index) => (
+              <motion.span
+                key={index}
+                initial={{ y: 200, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{
+                  duration: 1,
+                  delay: index * 0.05,
+                  ease: [0.22, 1, 0.36, 1],
+                  opacity: { duration: 0.5, delay: index * 0.05 }
+                }}
+                whileHover={{
+                  y: -10,
+                  color: 'var(--color-caramel)',
+                  transition: { duration: 0.2 }
+                }}
+                style={{ display: 'inline-block', cursor: 'none' }}
+              >
+                {char === " " ? "\u00A0" : char}
+              </motion.span>
+            ))}
           </div>
           <div style={{ display: 'flex', overflow: 'hidden' }}>
-              {titleline2.map((char, index) => (
-                  <motion.span
-                      key={index}
-                      initial={{ y: 200, opacity: 0, rotateX: 90 }}
-                      animate={{ y: 0, opacity: 1, rotateX: 0 }}
-                      transition={{ 
-                        duration: 1.2, 
-                        delay: 0.5 + index * 0.06, 
-                        ease: [0.22, 1, 0.36, 1],
-                        opacity: { duration: 0.5, delay: 0.5 + index * 0.06 }
-                      }}
-                      whileHover={{ 
-                        y: -10,
-                        rotateZ: 5,
-                        color: 'var(--color-caramel)',
-                        transition: { duration: 0.2 }
-                      }}
-                      style={{ 
-                        fontStyle: 'italic', 
-                        fontFamily: 'var(--font-heading)',
-                        display: 'inline-block',
-                        cursor: 'none',
-                        transformStyle: 'preserve-3d'
-                      }}
-                  >
-                      {char}
-                  </motion.span>
-              ))}
+            {titleline2.map((char, index) => (
+              <motion.span
+                key={index}
+                initial={{ y: 200, opacity: 0, rotateX: 90 }}
+                animate={{ y: 0, opacity: 1, rotateX: 0 }}
+                transition={{
+                  duration: 1.2,
+                  delay: 0.5 + index * 0.06,
+                  ease: [0.22, 1, 0.36, 1],
+                  opacity: { duration: 0.5, delay: 0.5 + index * 0.06 }
+                }}
+                whileHover={{
+                  y: -10,
+                  rotateZ: 5,
+                  color: 'var(--color-caramel)',
+                  transition: { duration: 0.2 }
+                }}
+                style={{
+                  fontStyle: 'italic',
+                  fontFamily: 'var(--font-heading)',
+                  display: 'inline-block',
+                  cursor: 'none',
+                  transformStyle: 'preserve-3d'
+                }}
+              >
+                {char}
+              </motion.span>
+            ))}
           </div>
         </h1>
 
@@ -322,7 +322,7 @@ const Hero = () => {
             lineHeight: 1.6
           }}
         >
-          Where <motion.span 
+          Where <motion.span
             animate={{ opacity: [1, 0.5, 1] }}
             transition={{ duration: 2, repeat: Infinity }}
             style={{ color: 'var(--color-caramel)', fontWeight: '600' }}
@@ -358,8 +358,8 @@ const Hero = () => {
             Explore Talent <ArrowRight size={20} />
           </motion.button>
           <motion.button
-            whileHover={{ 
-              scale: 1.05, 
+            whileHover={{
+              scale: 1.05,
               borderColor: 'var(--color-mocha)',
               background: 'var(--color-mocha)',
               color: 'var(--color-beige)'
@@ -377,7 +377,7 @@ const Hero = () => {
       </motion.div>
 
       {/* Animated Scroll Indicator */}
-      <motion.div 
+      <motion.div
         style={{
           position: 'absolute',
           bottom: '8vh',
@@ -407,7 +407,7 @@ const Hero = () => {
           Scroll
         </motion.span>
         <motion.div
-          animate={{ 
+          animate={{
             scaleY: [1, 1.5, 1],
             opacity: [0.5, 1, 0.5]
           }}
@@ -421,35 +421,35 @@ const Hero = () => {
 };
 
 const CustomCursor = () => {
-    const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
-    
-    React.useEffect(() => {
-      const updateMousePosition = (e) => {
-        setMousePosition({ x: e.clientX, y: e.clientY });
-      };
-      window.addEventListener('mousemove', updateMousePosition);
-      return () => window.removeEventListener('mousemove', updateMousePosition);
-    }, []);
-  
-    return (
-      <motion.div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          x: mousePosition.x - 16,
-          y: mousePosition.y - 16,
-          width: '32px',
-          height: '32px',
-          borderRadius: '50%',
-          backgroundColor: 'var(--color-white)',
-          mixBlendMode: 'difference',
-          pointerEvents: 'none',
-          zIndex: 9999
-        }}
-        transition={{ type: 'spring', stiffness: 500, damping: 28 }}
-      />
-    );
+  const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
+
+  React.useEffect(() => {
+    const updateMousePosition = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', updateMousePosition);
+    return () => window.removeEventListener('mousemove', updateMousePosition);
+  }, []);
+
+  return (
+    <motion.div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        x: mousePosition.x - 16,
+        y: mousePosition.y - 16,
+        width: '32px',
+        height: '32px',
+        borderRadius: '50%',
+        backgroundColor: 'var(--color-white)',
+        mixBlendMode: 'difference',
+        pointerEvents: 'none',
+        zIndex: 9999
+      }}
+      transition={{ type: 'spring', stiffness: 500, damping: 28 }}
+    />
+  );
 };
 
 // Scroll Progress Indicator
@@ -479,34 +479,34 @@ const ScrollProgress = () => {
 };
 
 const MarqueeStrip = () => {
-    return (
-      <div className="marquee-container">
-        <div className="marquee-content">
-          <span className="marquee-item">Cinematic</span>
-          <span className="marquee-item">editorial</span>
-          <span className="marquee-item">Portrait</span>
-          <span className="marquee-item">Film</span>
-          <span className="marquee-item">Art</span>
-          <span className="marquee-item">Cinematic</span>
-          <span className="marquee-item">editorial</span>
-          <span className="marquee-item">Portrait</span>
-          <span className="marquee-item">Film</span>
-          <span className="marquee-item">Art</span>
-        </div>
-        <div className="marquee-content" aria-hidden="true">
-          <span className="marquee-item">Cinematic</span>
-          <span className="marquee-item">editorial</span>
-          <span className="marquee-item">Portrait</span>
-          <span className="marquee-item">Film</span>
-          <span className="marquee-item">Art</span>
-          <span className="marquee-item">Cinematic</span>
-          <span className="marquee-item">editorial</span>
-          <span className="marquee-item">Portrait</span>
-          <span className="marquee-item">Film</span>
-          <span className="marquee-item">Art</span>
-        </div>
+  return (
+    <div className="marquee-container">
+      <div className="marquee-content">
+        <span className="marquee-item">Cinematic</span>
+        <span className="marquee-item">editorial</span>
+        <span className="marquee-item">Portrait</span>
+        <span className="marquee-item">Film</span>
+        <span className="marquee-item">Art</span>
+        <span className="marquee-item">Cinematic</span>
+        <span className="marquee-item">editorial</span>
+        <span className="marquee-item">Portrait</span>
+        <span className="marquee-item">Film</span>
+        <span className="marquee-item">Art</span>
       </div>
-    )
+      <div className="marquee-content" aria-hidden="true">
+        <span className="marquee-item">Cinematic</span>
+        <span className="marquee-item">editorial</span>
+        <span className="marquee-item">Portrait</span>
+        <span className="marquee-item">Film</span>
+        <span className="marquee-item">Art</span>
+        <span className="marquee-item">Cinematic</span>
+        <span className="marquee-item">editorial</span>
+        <span className="marquee-item">Portrait</span>
+        <span className="marquee-item">Film</span>
+        <span className="marquee-item">Art</span>
+      </div>
+    </div>
+  )
 }
 
 const UserPaths = () => {
@@ -514,7 +514,7 @@ const UserPaths = () => {
     <section style={{ padding: '8rem 2rem', background: 'var(--color-mocha)', color: 'var(--color-beige)', position: 'relative', overflow: 'hidden' }}>
       {/* Floating Particles */}
       <motion.div
-        animate={{ 
+        animate={{
           y: [0, -30, 0],
           x: [0, 20, 0],
           rotate: [0, 10, 0]
@@ -533,7 +533,7 @@ const UserPaths = () => {
         }}
       />
       <motion.div
-        animate={{ 
+        animate={{
           y: [0, 40, 0],
           x: [0, -30, 0],
           rotate: [0, -15, 0]
@@ -560,13 +560,13 @@ const UserPaths = () => {
           transition={{ duration: 0.8 }}
           style={{ textAlign: 'center', marginBottom: '4rem' }}
         >
-          <motion.span 
+          <motion.span
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            style={{ 
-              color: 'var(--color-caramel)', 
-              fontFamily: 'var(--font-body)', 
+            style={{
+              color: 'var(--color-caramel)',
+              fontFamily: 'var(--font-body)',
               fontSize: '1rem',
               textTransform: 'uppercase',
               letterSpacing: '0.2em'
@@ -580,21 +580,21 @@ const UserPaths = () => {
         </motion.div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '4rem' }}>
-          
+
           {/* Customer Path */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            whileHover={{ 
+            whileHover={{
               y: -10,
               boxShadow: '0 20px 60px rgba(193,154,107,0.3)',
               borderColor: 'var(--color-caramel)'
             }}
-            style={{ 
-              padding: '3rem', 
-              border: '1px solid rgba(245, 239, 230, 0.2)', 
+            style={{
+              padding: '3rem',
+              border: '1px solid rgba(245, 239, 230, 0.2)',
               borderRadius: '16px',
               position: 'relative',
               overflow: 'hidden',
@@ -603,7 +603,7 @@ const UserPaths = () => {
             }}
             className="card-hover"
           >
-            <motion.div 
+            <motion.div
               style={{ marginBottom: '2rem' }}
               whileHover={{ scale: 1.2, rotate: 10 }}
               transition={{ type: 'spring', stiffness: 300 }}
@@ -614,9 +614,9 @@ const UserPaths = () => {
             <p style={{ fontFamily: 'var(--font-body)', lineHeight: 1.6, marginBottom: '2rem', opacity: 0.8 }}>
               Find the perfect artist for your vision. Search by style, location, and budget. Transparent pricing and secure booking.
             </p>
-            <motion.a 
-              href="#" 
-              className="btn btn-primary" 
+            <motion.a
+              href="#"
+              className="btn btn-primary"
               style={{ borderColor: 'var(--color-beige)', color: 'var(--color-beige)' }}
               whileHover={{ scale: 1.05, boxShadow: '0 5px 20px rgba(193,154,107,0.4)' }}
               whileTap={{ scale: 0.95 }}
@@ -626,19 +626,19 @@ const UserPaths = () => {
           </motion.div>
 
           {/* Creator Path */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            whileHover={{ 
+            whileHover={{
               y: -10,
               boxShadow: '0 20px 60px rgba(193,154,107,0.3)',
               borderColor: 'var(--color-caramel)'
             }}
-            style={{ 
-              padding: '3rem', 
-              border: '1px solid rgba(245, 239, 230, 0.2)', 
+            style={{
+              padding: '3rem',
+              border: '1px solid rgba(245, 239, 230, 0.2)',
               borderRadius: '16px',
               background: 'rgba(255,255,255,0.05)',
               position: 'relative',
@@ -647,7 +647,7 @@ const UserPaths = () => {
             }}
             className="card-hover"
           >
-            <motion.div 
+            <motion.div
               style={{ marginBottom: '2rem' }}
               whileHover={{ scale: 1.2, rotate: -10 }}
               transition={{ type: 'spring', stiffness: 300 }}
@@ -658,9 +658,9 @@ const UserPaths = () => {
             <p style={{ fontFamily: 'var(--font-body)', lineHeight: 1.6, marginBottom: '2rem', opacity: 0.8 }}>
               Showcase your portfolio, manage bookings, and grow your business. We handle the logistics so you can focus on art.
             </p>
-            <motion.a 
-              href="#" 
-              className="btn btn-primary" 
+            <motion.a
+              href="#"
+              className="btn btn-primary"
               style={{ borderColor: 'var(--color-beige)', color: 'var(--color-beige)' }}
               whileHover={{ scale: 1.05, boxShadow: '0 5px 20px rgba(193,154,107,0.4)' }}
               whileTap={{ scale: 0.95 }}
@@ -676,157 +676,157 @@ const UserPaths = () => {
 };
 
 const Features = () => {
-    const steps = [
-        { icon: <Search />, title: "Discover", desc: "Browse portfolios" },
-        { icon: <Calendar />, title: "Book", desc: "Seamless scheduling" },
-        { icon: <UserCheck />, title: "Connect", desc: "Verified artists" },
-        { icon: <Star />, title: "Review", desc: "Share experience" },
-      ];
-    
-      return (
-        <section style={{ padding: '8rem 2rem', background: 'var(--color-beige)' }}>
-          <div className="container">
-            <div style={{ borderTop: '1px solid var(--color-mocha)', padding: '2rem 0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '2rem' }}>
-                <div style={{ flex: '1 1 300px' }}>
-                    <h2 style={{ fontSize: '3rem', maxWidth: '400px' }}>The Innovative Process</h2>
-                </div>
-                <div style={{ flex: '2 1 600px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
-                    {steps.map((step, index) => (
-                        <div key={index}>
-                            <motion.div 
-                                style={{ marginBottom: '1rem', color: 'var(--color-mocha)' }}
-                                whileHover={{ rotate: 15, scale: 1.1 }}
-                            >
-                                {React.cloneElement(step.icon, { size: 40 })}
-                            </motion.div>
-                            <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '0.5rem' }}>{step.title}</h4>
-                            <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>{step.desc}</p>
-                        </div>
-                    ))}
-                </div>
-            </div>
+  const steps = [
+    { icon: <Search />, title: "Discover", desc: "Browse portfolios" },
+    { icon: <Calendar />, title: "Book", desc: "Seamless scheduling" },
+    { icon: <UserCheck />, title: "Connect", desc: "Verified artists" },
+    { icon: <Star />, title: "Review", desc: "Share experience" },
+  ];
+
+  return (
+    <section style={{ padding: '8rem 2rem', background: 'var(--color-beige)' }}>
+      <div className="container">
+        <div style={{ borderTop: '1px solid var(--color-mocha)', padding: '2rem 0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '2rem' }}>
+          <div style={{ flex: '1 1 300px' }}>
+            <h2 style={{ fontSize: '3rem', maxWidth: '400px' }}>The Innovative Process</h2>
           </div>
-        </section>
-      );
+          <div style={{ flex: '2 1 600px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
+            {steps.map((step, index) => (
+              <div key={index}>
+                <motion.div
+                  style={{ marginBottom: '1rem', color: 'var(--color-mocha)' }}
+                  whileHover={{ rotate: 15, scale: 1.1 }}
+                >
+                  {React.cloneElement(step.icon, { size: 40 })}
+                </motion.div>
+                <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '0.5rem' }}>{step.title}</h4>
+                <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 const ImageGallery = () => {
-    const targetRef = useRef(null);
-    const { scrollYProgress } = useScroll({ target: targetRef });
-    const x = useTransform(scrollYProgress, [0, 1], ["0%", "-55%"]); 
-    const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1, 1.05, 1]);
+  const targetRef = useRef(null);
+  const { scrollYProgress } = useScroll({ target: targetRef });
+  const x = useTransform(scrollYProgress, [0, 1], ["0%", "-55%"]);
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1, 1.05, 1]);
 
-    const images = [
-      { id: 1, url: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=80", title: "Cinematic Portraits", year: "2024" },
-      { id: 2, url: "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80", title: "Wedding Stories", year: "2023" },
-      { id: 3, url: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&q=80", title: "Fashion Editorials", year: "2024" },
-      { id: 4, url: "https://images.unsplash.com/photo-1554048612-387768052bf7?w=800&q=80", title: "Commercial Shoots", year: "2023" },
-      { id: 5, url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80", title: "Artistic Vision", year: "2024" },
-    ];
-  
-    return (
-      <section ref={targetRef} style={{ height: '300vh', position: 'relative' }}>
-        <motion.div style={{ 
-          position: 'sticky', 
-          top: 0, 
-          height: '100vh', 
-          overflow: 'hidden',
+  const images = [
+    { id: 1, url: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=80", title: "Cinematic Portraits", year: "2024" },
+    { id: 2, url: "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80", title: "Wedding Stories", year: "2023" },
+    { id: 3, url: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&q=80", title: "Fashion Editorials", year: "2024" },
+    { id: 4, url: "https://images.unsplash.com/photo-1554048612-387768052bf7?w=800&q=80", title: "Commercial Shoots", year: "2023" },
+    { id: 5, url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80", title: "Artistic Vision", year: "2024" },
+  ];
+
+  return (
+    <section ref={targetRef} style={{ height: '300vh', position: 'relative' }}>
+      <motion.div style={{
+        position: 'sticky',
+        top: 0,
+        height: '100vh',
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        background: 'var(--color-black)',
+        scale
+      }}>
+        <motion.div style={{
           display: 'flex',
-          alignItems: 'center',
-          background: 'var(--color-black)',
-          scale
+          gap: '0',
+          height: '100%',
+          x
         }}>
-          <motion.div style={{ 
-            display: 'flex', 
-            gap: '0', 
-            height: '100%',
-            x 
+          <div style={{
+            minWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            padding: '0 6rem',
+            borderRight: '1px solid rgba(255,255,255,0.1)'
           }}>
-            <div style={{ 
-              minWidth: '100vw', 
-              display: 'flex', 
-              flexDirection: 'column', 
-              justifyContent: 'center', 
-              padding: '0 6rem',
-              borderRight: '1px solid rgba(255,255,255,0.1)'
-            }}>
-               <motion.span 
-                 initial={{ opacity: 0 }}
-                 whileInView={{ opacity: 1 }}
-                 transition={{ delay: 0.2 }}
-                 style={{ color: 'var(--color-caramel)', fontFamily: 'var(--font-body)', fontSize: '1.2rem', marginBottom: '2rem', display: 'block' }}
-               >
-                 (01) — Portfolio
-               </motion.span>
-               <h2 style={{ fontSize: 'clamp(4rem, 8vw, 8rem)', color: 'var(--color-beige)', lineHeight: 0.9, marginBottom: '2rem' }}>
-                 Visual<br/>Stories
-               </h2>
-               <p style={{ color: 'rgba(245, 239, 230, 0.6)', fontFamily: 'var(--font-body)', maxWidth: '400px' }}>
-                 A curated collection of moments captured in time. Scroll to explore the depth of our artists' vision.
-               </p>
-            </div>
-            {images.map((img, index) => (
-                <motion.div 
-                  key={img.id} 
-                  style={{ 
-                    position: 'relative', 
-                    minWidth: '60vw', 
+            <motion.span
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              style={{ color: 'var(--color-caramel)', fontFamily: 'var(--font-body)', fontSize: '1.2rem', marginBottom: '2rem', display: 'block' }}
+            >
+              (01) — Portfolio
+            </motion.span>
+            <h2 style={{ fontSize: 'clamp(4rem, 8vw, 8rem)', color: 'var(--color-beige)', lineHeight: 0.9, marginBottom: '2rem' }}>
+              Visual<br />Stories
+            </h2>
+            <p style={{ color: 'rgba(245, 239, 230, 0.6)', fontFamily: 'var(--font-body)', maxWidth: '400px' }}>
+              A curated collection of moments captured in time. Scroll to explore the depth of our artists' vision.
+            </p>
+          </div>
+          {images.map((img, index) => (
+            <motion.div
+              key={img.id}
+              style={{
+                position: 'relative',
+                minWidth: '60vw',
+                height: '100%',
+                borderRight: '1px solid rgba(255,255,255,0.1)',
+                overflow: 'hidden'
+              }}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
+                <motion.img
+                  whileHover={{ scale: 1.1, rotate: 2 }}
+                  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                  src={img.url}
+                  alt={img.title}
+                  style={{
+                    width: '100%',
                     height: '100%',
-                    borderRight: '1px solid rgba(255,255,255,0.1)',
-                    overflow: 'hidden'
+                    objectFit: 'cover',
+                    filter: 'grayscale(20%)',
                   }}
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  transition={{ delay: index * 0.1 }}
+                />
+              </div>
+              <motion.div
+                style={{
+                  position: 'absolute',
+                  bottom: '0',
+                  left: 0,
+                  padding: '2rem',
+                  background: 'linear-gradient(transparent, black)',
+                  width: '100%'
+                }}
+                initial={{ y: 100, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+              >
+                <motion.span
+                  whileHover={{ scale: 1.1 }}
+                  style={{
+                    color: 'var(--color-caramel)',
+                    fontSize: '0.9rem',
+                    border: '1px solid var(--color-caramel)',
+                    padding: '0.2rem 0.5rem',
+                    borderRadius: '50px',
+                    display: 'inline-block'
+                  }}
                 >
-                  <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
-                    <motion.img 
-                      whileHover={{ scale: 1.1, rotate: 2 }}
-                      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                      src={img.url} 
-                      alt={img.title}
-                      style={{ 
-                        width: '100%', 
-                        height: '100%', 
-                        objectFit: 'cover', 
-                        filter: 'grayscale(20%)',
-                      }} 
-                    />
-                  </div>
-                  <motion.div 
-                    style={{ 
-                      position: 'absolute', 
-                      bottom: '0', 
-                      left: 0, 
-                      padding: '2rem',
-                      background: 'linear-gradient(transparent, black)',
-                      width: '100%'
-                    }}
-                    initial={{ y: 100, opacity: 0 }}
-                    whileInView={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                  >
-                    <motion.span 
-                      whileHover={{ scale: 1.1 }}
-                      style={{ 
-                        color: 'var(--color-caramel)', 
-                        fontSize: '0.9rem', 
-                        border: '1px solid var(--color-caramel)', 
-                        padding: '0.2rem 0.5rem', 
-                        borderRadius: '50px',
-                        display: 'inline-block'
-                      }}
-                    >
-                      {img.year}
-                    </motion.span>
-                    <p style={{ color: 'var(--color-beige)', fontFamily: 'var(--font-heading)', fontSize: '2.5rem', fontStyle: 'italic', marginTop: '1rem' }}>{img.title}</p>
-                  </motion.div>
-                </motion.div>
-            ))}
-          </motion.div>
+                  {img.year}
+                </motion.span>
+                <p style={{ color: 'var(--color-beige)', fontFamily: 'var(--font-heading)', fontSize: '2.5rem', fontStyle: 'italic', marginTop: '1rem' }}>{img.title}</p>
+              </motion.div>
+            </motion.div>
+          ))}
         </motion.div>
-      </section>
-    )
+      </motion.div>
+    </section>
+  )
 }
 
 // Animated Counter Component
@@ -840,7 +840,7 @@ const AnimatedCounter = ({ target, suffix = "" }) => {
       let start = 0;
       const duration = 2000;
       const increment = target / (duration / 16);
-      
+
       const timer = setInterval(() => {
         start += increment;
         if (start >= target) {
@@ -871,7 +871,7 @@ const StatsCounter = () => {
     <section style={{ padding: '8rem 2rem', background: 'var(--color-cream)', position: 'relative', overflow: 'hidden' }}>
       {/* Floating Background Elements */}
       <motion.div
-        animate={{ 
+        animate={{
           y: [0, -20, 0],
           rotate: [0, 5, 0]
         }}
@@ -887,7 +887,7 @@ const StatsCounter = () => {
           pointerEvents: 'none'
         }}
       />
-      
+
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
@@ -896,13 +896,13 @@ const StatsCounter = () => {
           transition={{ duration: 0.8 }}
           style={{ textAlign: 'center', marginBottom: '4rem' }}
         >
-          <motion.span 
+          <motion.span
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            style={{ 
-              color: 'var(--color-caramel)', 
-              fontFamily: 'var(--font-body)', 
+            style={{
+              color: 'var(--color-caramel)',
+              fontFamily: 'var(--font-body)',
               fontSize: '1rem',
               textTransform: 'uppercase',
               letterSpacing: '0.2em',
@@ -918,10 +918,10 @@ const StatsCounter = () => {
           </h2>
         </motion.div>
 
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
-          gap: '3rem' 
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+          gap: '3rem'
         }}>
           {stats.map((stat, index) => (
             <motion.div
@@ -944,24 +944,24 @@ const StatsCounter = () => {
               <motion.div
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.6 }}
-                style={{ 
-                  color: 'var(--color-caramel)', 
+                style={{
+                  color: 'var(--color-caramel)',
                   marginBottom: '1rem',
                   display: 'inline-block'
                 }}
               >
                 {stat.icon}
               </motion.div>
-              <h3 style={{ 
-                fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', 
+              <h3 style={{
+                fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
                 color: 'var(--color-mocha)',
                 fontFamily: 'var(--font-heading)',
                 marginBottom: '0.5rem'
               }}>
                 <AnimatedCounter target={stat.value} suffix={stat.suffix} />
               </h3>
-              <p style={{ 
-                color: 'var(--color-coffee)', 
+              <p style={{
+                color: 'var(--color-coffee)',
                 fontSize: '1rem',
                 fontFamily: 'var(--font-body)'
               }}>
@@ -981,7 +981,7 @@ const Testimonials = () => {
     {
       name: "Sarah Mitchell",
       role: "Wedding Client",
-      text: "FullTime Photographer connected us with an incredible photographer who captured our special day perfectly. The platform made everything seamless!",
+      text: "Online Photographer connected us with an incredible photographer who captured our special day perfectly. The platform made everything seamless!",
       rating: 5,
       image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&q=80"
     },
@@ -995,7 +995,7 @@ const Testimonials = () => {
     {
       name: "Emily Chen",
       role: "Brand Manager",
-      text: "We've hired multiple photographers through FullTime Photographer for our campaigns. The quality and professionalism are consistently outstanding.",
+      text: "We've hired multiple photographers through Online Photographer for our campaigns. The quality and professionalism are consistently outstanding.",
       rating: 5,
       image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&q=80"
     }
@@ -1010,13 +1010,13 @@ const Testimonials = () => {
           viewport={{ once: true }}
           style={{ textAlign: 'center', marginBottom: '4rem' }}
         >
-          <motion.span 
+          <motion.span
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            style={{ 
-              color: 'var(--color-caramel)', 
-              fontFamily: 'var(--font-body)', 
+            style={{
+              color: 'var(--color-caramel)',
+              fontFamily: 'var(--font-body)',
               fontSize: '1rem',
               textTransform: 'uppercase',
               letterSpacing: '0.2em',
@@ -1032,10 +1032,10 @@ const Testimonials = () => {
           </h2>
         </motion.div>
 
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-          gap: '2rem' 
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gap: '2rem'
         }}>
           {testimonials.map((testimonial, index) => (
             <motion.div
@@ -1067,22 +1067,22 @@ const Testimonials = () => {
                   </motion.div>
                 ))}
               </div>
-              <p style={{ 
-                fontFamily: 'var(--font-body)', 
-                lineHeight: 1.8, 
+              <p style={{
+                fontFamily: 'var(--font-body)',
+                lineHeight: 1.8,
                 marginBottom: '2rem',
                 fontSize: '1.05rem'
               }}>
                 "{testimonial.text}"
               </p>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <motion.img 
+                <motion.img
                   whileHover={{ scale: 1.1 }}
-                  src={testimonial.image} 
+                  src={testimonial.image}
                   alt={testimonial.name}
-                  style={{ 
-                    width: '50px', 
-                    height: '50px', 
+                  style={{
+                    width: '50px',
+                    height: '50px',
                     borderRadius: '50%',
                     objectFit: 'cover',
                     border: '2px solid var(--color-caramel)'
@@ -1141,10 +1141,10 @@ const PricingPlans = () => {
           viewport={{ once: true }}
           style={{ textAlign: 'center', marginBottom: '4rem' }}
         >
-          <motion.span 
-            style={{ 
-              color: 'var(--color-caramel)', 
-              fontFamily: 'var(--font-body)', 
+          <motion.span
+            style={{
+              color: 'var(--color-caramel)',
+              fontFamily: 'var(--font-body)',
               fontSize: '1rem',
               textTransform: 'uppercase',
               letterSpacing: '0.2em'
@@ -1157,9 +1157,9 @@ const PricingPlans = () => {
           </h2>
         </motion.div>
 
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
           gap: '2rem',
           maxWidth: '1200px',
           margin: '0 auto'
@@ -1171,7 +1171,7 @@ const PricingPlans = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
-              whileHover={{ 
+              whileHover={{
                 y: -15,
                 rotateY: 5,
                 rotateX: 5,
@@ -1211,11 +1211,11 @@ const PricingPlans = () => {
                   Popular
                 </motion.div>
               )}
-              
+
               <motion.div
                 whileHover={{ rotate: 360, scale: 1.2 }}
                 transition={{ duration: 0.6 }}
-                style={{ 
+                style={{
                   color: plan.popular ? 'var(--color-caramel)' : 'var(--color-mocha)',
                   marginBottom: '1.5rem'
                 }}
@@ -1223,8 +1223,8 @@ const PricingPlans = () => {
                 {plan.icon}
               </motion.div>
 
-              <h3 style={{ 
-                fontSize: '1.8rem', 
+              <h3 style={{
+                fontSize: '1.8rem',
                 fontFamily: 'var(--font-heading)',
                 marginBottom: '1rem'
               }}>
@@ -1232,8 +1232,8 @@ const PricingPlans = () => {
               </h3>
 
               <div style={{ marginBottom: '2rem' }}>
-                <span style={{ 
-                  fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', 
+                <span style={{
+                  fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
                   fontFamily: 'var(--font-heading)',
                   fontWeight: 'bold'
                 }}>
@@ -1242,8 +1242,8 @@ const PricingPlans = () => {
                 <span style={{ opacity: 0.7 }}>{plan.period}</span>
               </div>
 
-              <ul style={{ 
-                listStyle: 'none', 
+              <ul style={{
+                listStyle: 'none',
                 marginBottom: '2rem',
                 display: 'flex',
                 flexDirection: 'column',
@@ -1256,9 +1256,9 @@ const PricingPlans = () => {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 + i * 0.05 }}
-                    style={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
                       gap: '0.75rem',
                       fontFamily: 'var(--font-body)',
                       fontSize: '0.95rem'
@@ -1374,7 +1374,7 @@ const FAQ = () => {
                   <ArrowDown size={24} />
                 </motion.div>
               </motion.button>
-              
+
               <motion.div
                 initial={false}
                 animate={{
@@ -1384,7 +1384,7 @@ const FAQ = () => {
                 transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                 style={{ overflow: 'hidden' }}
               >
-                <div style={{ 
+                <div style={{
                   padding: '0 2rem 2rem 2rem',
                   fontFamily: 'var(--font-body)',
                   lineHeight: 1.8,
@@ -1408,14 +1408,14 @@ const CTASection = () => {
 
   const handleMouseMove = (e) => {
     if (!buttonRef.current) return;
-    
+
     const rect = buttonRef.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
-    
+
     const deltaX = (e.clientX - centerX) * 0.3;
     const deltaY = (e.clientY - centerY) * 0.3;
-    
+
     setMousePosition({ x: deltaX, y: deltaY });
   };
 
@@ -1424,8 +1424,8 @@ const CTASection = () => {
   };
 
   return (
-    <section style={{ 
-      padding: '10rem 2rem', 
+    <section style={{
+      padding: '10rem 2rem',
       background: 'var(--color-black)',
       color: 'var(--color-beige)',
       position: 'relative',
@@ -1455,9 +1455,9 @@ const CTASection = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <motion.h2 
-            style={{ 
-              fontSize: 'clamp(3rem, 7vw, 6rem)', 
+          <motion.h2
+            style={{
+              fontSize: 'clamp(3rem, 7vw, 6rem)',
               lineHeight: 1.1,
               marginBottom: '2rem',
               fontFamily: 'var(--font-heading)'
@@ -1466,27 +1466,27 @@ const CTASection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            Ready to Create<br/>
+            Ready to Create<br />
             <span style={{ fontStyle: 'italic', color: 'var(--color-caramel)' }}>Something Beautiful?</span>
           </motion.h2>
-          
+
           <motion.p
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 0.8 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            style={{ 
-              fontSize: '1.2rem', 
+            style={{
+              fontSize: '1.2rem',
               marginBottom: '3rem',
               fontFamily: 'var(--font-body)',
               maxWidth: '600px',
               margin: '0 auto 3rem'
             }}
           >
-            Join thousands of clients and creators who trust FullTime Photographer for exceptional photography experiences.
+            Join thousands of clients and creators who trust Online Photographer for exceptional photography experiences.
           </motion.p>
 
-          <div 
+          <div
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
             style={{ display: 'inline-block' }}
@@ -1528,7 +1528,7 @@ function App() {
       <MarqueeStrip />
       <ImageGallery />
       <div style={{ padding: '0 0' }}>
-          <UserPaths />
+        <UserPaths />
       </div>
       <StatsCounter />
       <Features />
@@ -1536,7 +1536,7 @@ function App() {
       <PricingPlans />
       <FAQ />
       <CTASection />
-    
+
     </div>
   );
 }

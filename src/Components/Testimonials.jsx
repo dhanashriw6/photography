@@ -93,7 +93,7 @@ const TestimonialCard = ({ item, index }) => {
           transform: 'translateX(-50%) rotate(-1deg)',
           width: '120px',
           height: '35px',
-          backgroundColor: 'rgba(255, 255, 255, 0.4)',
+          backgroundColor: 'rgba(236, 230, 109, 0.4)',
           borderLeft: '2px solid rgba(255,255,255,0.1)',
           borderRight: '2px solid rgba(255,255,255,0.1)',
           backdropFilter: 'blur(2px)',
@@ -160,7 +160,7 @@ const TestimonialCard = ({ item, index }) => {
             "{item.text}"
           </p>
 
-          <div style={{ marginTop: 'auto', width: '100%', textAlign: 'left', paddingLeft: '0.5rem' }}>
+          <div style={{ marginTop: 'auto', width: '100%', textAlign: 'center' }}>
             <h4 style={{
               fontFamily: 'var(--font-heading)',
               fontWeight: 700,
@@ -201,7 +201,7 @@ const Testimonials = () => {
     <section
       ref={containerRef}
       style={{
-        padding: '8rem 0 12rem 0',
+        padding: '8rem 0 0 0',
         background: 'var(--color-pale)',
         position: 'relative',
         overflow: 'hidden'

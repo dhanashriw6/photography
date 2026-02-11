@@ -59,7 +59,7 @@ const Hero2 = () => {
         position: 'relative',
         overflow: 'hidden',
         // padding: '4rem 2rem 2rem',
-        paddingTop: "4rem%",
+        paddingTop: "7rem",
         background: '#111212',
         color: '#FFFEFA'
       }}>

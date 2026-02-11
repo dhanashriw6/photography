@@ -52,7 +52,7 @@ const Features = () => {
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
             style={{
-              color: 'var(--color-orange)',
+              color: 'var(--color-black)',
               fontFamily: 'var(--font-body)',
               fontSize: '0.95rem',
               textTransform: 'uppercase',
@@ -163,9 +163,9 @@ const Features = () => {
                   <motion.h3
                     animate={{
                       fontFamily: isHovered
-                        ? "'Playfair Display', serif"
+                        ? "'Freckle Face'"
                         : "'Oswald', sans-serif",
-                      fontSize: isHovered ? '3.5rem' : '2rem',
+                      fontSize: isHovered ? '4.5rem' : '2rem',
                       marginBottom: isHovered ? '1.5rem' : '0.5rem'
                     }}
                     transition={{ duration: 0.4 }}
@@ -201,11 +201,11 @@ const Features = () => {
                       transition={{ duration: 0.4, delay: isHovered ? 0.1 : 0 }}
                     >
                       <p style={{
-                        fontSize: '1.1rem',
+                        fontSize: '1.3rem',
                         lineHeight: 1.6,
                         color: 'rgba(255,255,255,0.9)',
                         marginBottom: '2rem',
-                        fontFamily: 'var(--font-body)'
+                        fontFamily: 'Oswald'
                       }}>
                         {step.desc}
                       </p>

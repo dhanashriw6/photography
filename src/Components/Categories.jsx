@@ -96,7 +96,7 @@ const Categories = () => {
                 alignItems: 'center',
                 overflow: 'hidden'
             }}>
-                
+
                 <div className="container" style={{
                     maxWidth: '1400px',
                     margin: '0 auto',
@@ -106,47 +106,47 @@ const Categories = () => {
                     alignItems: 'center',
                     gap: '8rem'
                 }}>
-                       <motion.div
-                     animate={{
-                       y: [-80],
-                       x: [ -1250],
-                       rotate: [0, -8, 0],
-                     }}
-                     transition={{
-                       duration: 7,
-                       repeat: Infinity,
-                       ease: "easeInOut",
-                       delay: 1
-                     }}
-                     style={{
-                       position: 'absolute',
-                       top: '40%',
-                       right: '10%',
-                       zIndex: 5,
-                       pointerEvents: 'none'
-                     }}
-                   >
-                     <div style={{
-                       background: '#FEEFA3',
-                       border: '2px solid #FFAE00',
-                       borderRadius: '20% 70% 30% 70% / 30% 30% 80% 40%',
-                       padding: '1rem 1.8rem',
-                       fontWeight: '700',
-                       fontSize: '1rem',
-                       color: '#111212',
-                       boxShadow: '0 0 25px rgba(255,174,0,0.4)',
-                       transform: 'rotate(8deg)'
-                     }}>
-                       Categories
-                     </div>
-                   </motion.div>
+                    <motion.div
+                        animate={{
+                            y: [-80],
+                            x: [-1250],
+                            rotate: [0, -8, 0],
+                        }}
+                        transition={{
+                            duration: 7,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                            delay: 1
+                        }}
+                        style={{
+                            position: 'absolute',
+                            top: '40%',
+                            right: '10%',
+                            zIndex: 5,
+                            pointerEvents: 'none'
+                        }}
+                    >
+                        <div style={{
+                            background: '#FEEFA3',
+                            border: '2px solid #FFAE00',
+                            borderRadius: '20% 70% 30% 70% / 30% 30% 80% 40%',
+                            padding: '1rem 1.8rem',
+                            fontWeight: '700',
+                            fontSize: '1rem',
+                            color: '#111212',
+                            boxShadow: '0 0 25px rgba(255,174,0,0.4)',
+                            transform: 'rotate(8deg)'
+                        }}>
+                            Categories
+                        </div>
+                    </motion.div>
                     {/* Left Side - Fixed Content */}
                     <div style={{
                         flex: '0 0 45%',
                         position: 'relative',
                         zIndex: 2
                     }}>
-                        
+
                         {/* <motion.span
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -213,37 +213,30 @@ const Categories = () => {
                             const start = index / categoryCount;
                             const end = (index + 1) / categoryCount;
 
+                            const isLast = index === categoryCount - 1;
+
                             const opacity = useTransform(
                                 scrollYProgress,
-                                [
-                                    Math.max(0, start - 0.05),
-                                    start,
-                                    end,
-                                    Math.min(1, end + 0.05)
-                                ],
-                                [0, 1, 1, 0]
+                                isLast
+                                    ? [Math.max(0, start - 0.05), start, end]
+                                    : [Math.max(0, start - 0.05), start, end, Math.min(1, end + 0.05)],
+                                isLast ? [0, 1, 1] : [0, 1, 1, 0]
                             );
 
                             const y = useTransform(
                                 scrollYProgress,
-                                [
-                                    Math.max(0, start - 0.05),
-                                    start,
-                                    end,
-                                    Math.min(1, end + 0.05)
-                                ],
-                                [100, 0, 0, -100]
+                                isLast
+                                    ? [Math.max(0, start - 0.05), start, end]
+                                    : [Math.max(0, start - 0.05), start, end, Math.min(1, end + 0.05)],
+                                isLast ? [100, 0, 0] : [100, 0, 0, -100]
                             );
 
                             const scale = useTransform(
                                 scrollYProgress,
-                                [
-                                    Math.max(0, start - 0.05),
-                                    start,
-                                    end,
-                                    Math.min(1, end + 0.05)
-                                ],
-                                [0.8, 1, 1, 0.8]
+                                isLast
+                                    ? [Math.max(0, start - 0.05), start, end]
+                                    : [Math.max(0, start - 0.05), start, end, Math.min(1, end + 0.05)],
+                                isLast ? [0.8, 1, 1] : [0.8, 1, 1, 0.8]
                             );
 
                             return (
@@ -345,6 +338,7 @@ const Categories = () => {
                                             position: 'relative',
                                             zIndex: 1,
                                             marginTop: 'auto',
+                                            marginBottom: '8%',
                                             padding: '2.5rem 3rem 3rem',
                                             background: 'white'
                                         }}>
@@ -386,7 +380,7 @@ const Categories = () => {
                     </div>
                 </div>
             </div>
-            
+
         </section>
     );
 };

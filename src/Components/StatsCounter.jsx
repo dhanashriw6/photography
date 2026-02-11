@@ -194,10 +194,10 @@ const StatsCounter = () => {
       image: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&q=80'
     },
     {
-      value: 15,
-      suffix: 'K+',
+      value: 15000,
+      suffix: '+',
       label: 'Hours Recorded',
-      image: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?w=600&q=80'
+      image: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=600&q=80'
     },
   ];
 

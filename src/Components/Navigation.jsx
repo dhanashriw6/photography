@@ -18,7 +18,7 @@ const Navigation = () => (
   }}>
     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <Camera size={24} />
-      <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', fontWeight: 'bold' }}>FullTime Photographer</span>
+      <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', fontWeight: 'bold' }}>Online Photographer</span>
     </div>
     {/* <div style={{ display: 'flex', gap: '2rem', fontFamily: 'var(--font-body)', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
       <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Photographers</a>

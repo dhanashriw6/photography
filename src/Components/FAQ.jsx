@@ -261,23 +261,6 @@ const FAQ = () => {
                     </motion.div>
                   </motion.button>
 
-                  {/* Active Indicator */}
-                  {isOpen && (
-                    <motion.div
-                      layoutId="activeIndicator"
-                      style={{
-                        position: 'absolute',
-                        left: '-10px',
-                        top: '50%',
-                        width: '4px',
-                        height: '60%',
-                        background: 'var(--color-khaki)',
-                        borderRadius: '4px',
-                        transform: 'translateY(-50%)'
-                      }}
-                      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                    />
-                  )}
                 </motion.div>
               );
             })}

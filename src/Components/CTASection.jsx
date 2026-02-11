@@ -8,14 +8,14 @@ const CTASection = () => {
 
   const handleMouseMove = (e) => {
     if (!buttonRef.current) return;
-    
+
     const rect = buttonRef.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
-    
+
     const deltaX = (e.clientX - centerX) * 0.3;
     const deltaY = (e.clientY - centerY) * 0.3;
-    
+
     setMousePosition({ x: deltaX, y: deltaY });
   };
 
@@ -24,8 +24,8 @@ const CTASection = () => {
   };
 
   return (
-    <section style={{ 
-      padding: '10rem 2rem', 
+    <section style={{
+      padding: '10rem 2rem',
       background: 'var(--color-black)',
       color: 'var(--color-beige)',
       position: 'relative',
@@ -55,9 +55,9 @@ const CTASection = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <motion.h2 
-            style={{ 
-              fontSize: 'clamp(3rem, 7vw, 6rem)', 
+          <motion.h2
+            style={{
+              fontSize: 'clamp(3rem, 7vw, 6rem)',
               lineHeight: 1.1,
               marginBottom: '2rem',
               fontFamily: 'var(--font-heading)'
@@ -66,27 +66,27 @@ const CTASection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            Ready to Create<br/>
+            Ready to Create<br />
             <span style={{ fontStyle: 'italic', color: 'var(--color-caramel)' }}>Something Beautiful?</span>
           </motion.h2>
-          
+
           <motion.p
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 0.8 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            style={{ 
-              fontSize: '1.2rem', 
+            style={{
+              fontSize: '1.2rem',
               marginBottom: '3rem',
               fontFamily: 'var(--font-body)',
               maxWidth: '600px',
               margin: '0 auto 3rem'
             }}
           >
-            Join thousands of clients and creators who trust FullTime Photographer for exceptional photography experiences.
+            Join thousands of clients and creators who trust Online Photographer for exceptional photography experiences.
           </motion.p>
 
-          <div 
+          <div
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
             style={{ display: 'inline-block' }}

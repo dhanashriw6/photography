@@ -22,7 +22,7 @@ const VideoShowcase = () => {
     return (
         <section className="video-showcase-section">
             {/* Animated Doodles */}
-            
+
 
             <motion.svg
                 width="200" height="200"
@@ -113,7 +113,7 @@ const VideoShowcase = () => {
 
             <div className="video-player-container">
                 <div className="player-header">
-                    <span className="player-brand">FullTime Photographer</span>
+                    <span className="player-brand">Online Photographer</span>
                     <div className="player-status">
                         <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>100%</span>
                         <Battery size={18} fill="currentColor" />
