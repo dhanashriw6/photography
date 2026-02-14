@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 
-export const AnimatedText = ({ text, delay = 0 }) => {
+export const AnimatedText = ({ text, delay = 0, display = 'inline-block' }) => {
   const characters = text.split('');
 
   const containerVariants = {
@@ -40,7 +40,10 @@ export const AnimatedText = ({ text, delay = 0 }) => {
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: "-100px" }}
-      style={{ display: 'inline-block' }}
+      style={{ 
+        display: display,
+        width: display === 'block' ? '100%' : 'auto'
+      }}
     >
       {characters.map((char, index) => (
         <motion.span

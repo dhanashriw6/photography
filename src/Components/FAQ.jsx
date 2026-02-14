@@ -66,7 +66,7 @@ const FAQ = () => {
         opacity: 0.3
       }} />
 
-      {/* Floating Orbs - Reduced on mobile */}
+      {/* Floating Orbs - Responsive sizing */}
       <motion.div
         animate={{
           y: [0, -40, 0],
@@ -106,11 +106,13 @@ const FAQ = () => {
         }}
       />
 
-      <div className="container" style={{ 
-        maxWidth: '1400px', 
+      <div style={{ 
+        maxWidth: '1400px',
+        margin: '0 auto',
         position: 'relative', 
         zIndex: 1,
-        padding: isMobile ? '0' : '0 2rem'
+        padding: isMobile ? '0' : '0 2rem',
+        width: '100%'
       }}>
         {/* Header */}
         <motion.div
@@ -156,28 +158,31 @@ const FAQ = () => {
               ? 'clamp(2.5rem, 10vw, 4rem)' 
               : isTablet 
                 ? 'clamp(4rem, 10vw, 6rem)' 
-                : '150px',
+                : 'clamp(4rem, 8vw, 9rem)',
             color: 'var(--color-khaki)',
-            marginBottom: '1rem',
+            marginBottom: '2rem',
             lineHeight: 1.2,
             letterSpacing: '-0.02em',
             perspective: '1000px',
             fontFamily: 'var(--font-heading)',
             fontWeight: 700,
+            whiteSpace: isMobile || isTablet ? 'normal' : 'nowrap',
+            overflow: 'visible',
+            display: 'block',
+            width: '100%'
           }}>
             {isMobile ? (
-              // Simple fade for mobile
               <motion.span
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
+                style={{ display: 'block' }}
               >
                 We Have Answers
               </motion.span>
             ) : (
-              // Animated text for desktop
-              <AnimatedText text="We Have Answers" delay={0.2} />
+              <AnimatedText text="We Have Answers" delay={0.2} display="block" />
             )}
           </h2>
 
@@ -198,7 +203,7 @@ const FAQ = () => {
           </motion.p>
         </motion.div>
 
-        {/* Layout - Stack on mobile, split on desktop */}
+        {/* Layout - Stack on mobile/tablet, split on desktop */}
         {isMobile || isTablet ? (
           // Mobile/Tablet: Single column accordion
           <div style={{ 
@@ -353,9 +358,10 @@ const FAQ = () => {
           // Desktop: Split layout with sticky answer panel
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))',
+            gridTemplateColumns: '1fr 1fr',
             gap: '4rem',
-            alignItems: 'start'
+            alignItems: 'start',
+            maxWidth: '100%'
           }}>
             {/* Left Side - Questions */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -376,7 +382,7 @@ const FAQ = () => {
                       whileHover={{ x: 10 }}
                       style={{
                         width: '100%',
-                        padding: '2rem',
+                        padding: '1.75rem',
                         background: isOpen
                           ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.3), rgba(26, 26, 26, 0.1))'
                           : 'rgba(255,255,255,0.03)',
@@ -388,7 +394,7 @@ const FAQ = () => {
                         backdropFilter: 'blur(10px)',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '1.5rem'
+                        gap: '1.25rem'
                       }}
                     >
                       {/* Icon */}
@@ -399,8 +405,8 @@ const FAQ = () => {
                         }}
                         transition={{ duration: 0.5 }}
                         style={{
-                          minWidth: '50px',
-                          height: '50px',
+                          minWidth: '48px',
+                          height: '48px',
                           borderRadius: '50%',
                           background: isOpen
                             ? 'var(--color-khaki)'
@@ -408,23 +414,25 @@ const FAQ = () => {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: isOpen ? 'var(--color-black)' : 'var(--color-khaki)'
+                          color: isOpen ? 'var(--color-black)' : 'var(--color-khaki)',
+                          flexShrink: 0
                         }}
                       >
-                        {isOpen ? <Minus size={24} /> : <Plus size={24} />}
+                        {isOpen ? <Minus size={22} /> : <Plus size={22} />}
                       </motion.div>
 
                       {/* Question Text */}
-                      <div style={{ flex: 1 }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
                         <motion.span
                           animate={{
                             color: isOpen ? 'var(--color-khaki)' : 'var(--color-old-lace)'
                           }}
                           style={{
-                            fontSize: 'clamp(1.1rem, 2vw, 1.4rem)',
+                            fontSize: 'clamp(1rem, 1.5vw, 1.25rem)',
                             fontWeight: isOpen ? '700' : '500',
                             display: 'block',
                             fontFamily: "Oswald",
+                            lineHeight: 1.3
                           }}
                         >
                           {faq.question}
@@ -442,6 +450,7 @@ const FAQ = () => {
                           color: isOpen ? 'var(--color-khaki)' : 'rgba(247, 244, 233, 0.5)',
                           fontWeight: '700',
                           fontFamily: "Oswald",
+                          flexShrink: 0
                         }}
                       >
                         {String(index + 1).padStart(2, '0')}
@@ -464,13 +473,12 @@ const FAQ = () => {
                 background: 'rgba(255,255,255,0.05)',
                 backdropFilter: 'blur(30px)',
                 borderRadius: '30px',
-                padding: '4rem',
+                padding: 'clamp(2.5rem, 4vw, 4rem)',
                 border: '1px solid rgba(255, 174, 0, 0.2)',
                 minHeight: '500px',
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'center',
-                marginTop: "5rem"
+                justifyContent: 'center'
               }}
             >
               <AnimatePresence mode="wait">
@@ -487,7 +495,7 @@ const FAQ = () => {
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
                     style={{
-                      fontSize: '8rem',
+                      fontSize: 'clamp(5rem, 10vw, 8rem)',
                       fontFamily: "Oswald",
                       fontWeight: 'bold',
                       color: 'var(--color-khaki)',
@@ -504,9 +512,9 @@ const FAQ = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3 }}
                     style={{
-                      fontSize: 'clamp(1.5rem, 3vw, 2rem)',
+                      fontSize: 'clamp(1.25rem, 2.5vw, 1.75rem)',
                       color: 'var(--color-old-lace)',
-                      marginBottom: '2rem',
+                      marginBottom: '1.5rem',
                       fontFamily: "Oswald",
                       lineHeight: 1.3
                     }}
@@ -520,7 +528,7 @@ const FAQ = () => {
                     animate={{ opacity: 0.9 }}
                     transition={{ delay: 0.4 }}
                     style={{
-                      fontSize: '1.15rem',
+                      fontSize: 'clamp(1rem, 1.5vw, 1.15rem)',
                       lineHeight: 1.8,
                       color: 'var(--color-old-lace)',
                       fontFamily: "Oswald",

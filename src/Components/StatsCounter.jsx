@@ -185,19 +185,26 @@ const StatsCounter = () => {
         <motion.div
           style={{
             textAlign: 'center',
-            marginBottom: isMobile ? '3rem' : '4rem'
+            marginBottom: isMobile ? '3rem' : '4rem',
+            maxWidth: '100%',
+            overflow: 'visible'
           }}
         >
           <h2 style={{
-            fontSize: isMobile ? 'clamp(2rem, 8vw, 3.5rem)' : isTablet ? 'clamp(3rem, 8vw, 5rem)' : '150px',
+            fontSize: isMobile ? 'clamp(2rem, 8vw, 3.5rem)' : isTablet ? 'clamp(3rem, 8vw, 5rem)' : 'clamp(80px, 10vw, 150px)',
             color: 'var(--color-khaki)',
-            marginBottom: '1rem',
+            marginBottom: '2rem',
             lineHeight: 1.2,
             letterSpacing: '-0.02em',
             perspective: '1000px',
             fontFamily: 'var(--font-heading)',
             fontWeight: 700,
-            padding: isMobile ? '0 1rem' : '0'
+            padding: isMobile ? '0 1rem' : '0',
+            whiteSpace: isMobile || isTablet ? 'normal' : 'nowrap',
+            overflow: 'visible',
+            maxWidth: '100%',
+            display: 'block',
+            width: '100%'
           }}>
             {isMobile ? (
               // Simple fade-in for mobile (better performance)
@@ -206,16 +213,17 @@ const StatsCounter = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
+                style={{ display: 'block' }}
               >
                 Our Impact in Numbers
               </motion.span>
             ) : (
-              // Animated text for desktop
-              <AnimatedText text="Our Impact in Numbers" delay={0.2} />
+              // Animated text for desktop - with block display
+              <AnimatedText text="Our Impact in Numbers" delay={0.2} display="block" />
             )}
           </h2>
 
-          <motion.p
+          {/* <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 0.7, y: 0 }}
             viewport={{ once: true }}
@@ -228,11 +236,13 @@ const StatsCounter = () => {
               margin: '0 auto',
               fontSize: isMobile ? '1rem' : '1.1rem',
               lineHeight: 1.6,
-              padding: isMobile ? '0 1rem' : '0'
+              padding: isMobile ? '0 1rem' : '0',
+              display: 'block',
+              clear: 'both'
             }}
           >
             Join thousands of creatives who are already making their mark
-          </motion.p>
+          </motion.p> */}
 
           {/* Decorative animated line */}
           <motion.div

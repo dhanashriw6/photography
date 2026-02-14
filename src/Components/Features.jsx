@@ -52,10 +52,11 @@ const Features = () => {
       overflow: 'hidden'
     }}>
       <SectionSeparator flip={true} fill="var(--color-black)" />
-      <div className="container" style={{ 
+      <div style={{ 
         maxWidth: '1600px', 
         margin: '0 auto',
-        padding: isMobile ? '0' : '0 1rem'
+        padding: isMobile ? '0' : '0 1rem',
+        width: '100%'
       }}>
         {/* Header */}
         <motion.div
@@ -91,28 +92,31 @@ const Features = () => {
               ? 'clamp(2rem, 8vw, 3rem)' 
               : isTablet 
                 ? 'clamp(3rem, 8vw, 5rem)' 
-                : '150px',
+                : 'clamp(3.5rem, 6vw, 6rem)',
             color: 'var(--color-soft-black)',
-            marginBottom: '1rem',
+            marginBottom: '2rem',
             lineHeight: 1.2,
             letterSpacing: '-0.02em',
             perspective: '1000px',
             fontFamily: 'var(--font-heading)',
             fontWeight: 700,
+            whiteSpace: isMobile || isTablet ? 'normal' : 'nowrap',
+            overflow: 'visible',
+            display: 'block',
+            width: '100%'
           }}>
             {isMobile ? (
-              // Simple fade for mobile
               <motion.span
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
+                style={{ display: 'block' }}
               >
                 Your Journey to Perfect Imagery
               </motion.span>
             ) : (
-              // Animated text for desktop
-              <AnimatedText text="Your Journey to Perfect Imagery" delay={0.2} />
+              <AnimatedText text="Your Journey to Perfect Imagery" delay={0.2} display="block" />
             )}
           </h2>
         </motion.div>
@@ -348,13 +352,14 @@ const Features = () => {
             })}
           </div>
         ) : (
-          // Desktop: Horizontal Accordion
+          // Desktop: Horizontal Accordion - FIXED FOR RESPONSIVENESS
           <div style={{
             display: 'flex',
             gap: '1.5rem',
             position: 'relative',
-            height: '500px',
-            alignItems: 'center'
+            height: 'clamp(450px, 50vh, 550px)',
+            alignItems: 'center',
+            width: '100%'
           }}>
             {steps.map((step, index) => {
               const isHovered = hoveredIndex === index;
@@ -387,6 +392,7 @@ const Features = () => {
                       ? '0 30px 80px rgba(0,0,0,0.5)'
                       : '0 10px 40px rgba(0,0,0,0.3)',
                     transition: 'box-shadow 0.4s ease',
+                    minWidth: '80px'
                   }}
                 >
                   {/* Background Image */}
@@ -423,7 +429,7 @@ const Features = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'flex-end',
-                    padding: isHovered ? '3rem' : '2rem',
+                    padding: isHovered ? 'clamp(2rem, 3vw, 3rem)' : '2rem',
                     transition: 'padding 0.4s ease'
                   }}>
                     {/* Title - Always Visible */}
@@ -432,7 +438,9 @@ const Features = () => {
                         fontFamily: isHovered
                           ? "'Freckle Face'"
                           : "'Oswald', sans-serif",
-                        fontSize: isHovered ? '4.5rem' : '2rem',
+                        fontSize: isHovered 
+                          ? 'clamp(2.5rem, 4vw, 4.5rem)' 
+                          : 'clamp(1.5rem, 2vw, 2rem)',
                         marginBottom: isHovered ? '1.5rem' : '0.5rem'
                       }}
                       transition={{ duration: 0.4 }}
@@ -445,7 +453,9 @@ const Features = () => {
                         textShadow: '0 2px 20px rgba(0,0,0,0.5)',
                         writingMode: isHovered ? 'horizontal-tb' : (isAnyHovered ? 'vertical-rl' : 'horizontal-tb'),
                         transform: isHovered ? 'none' : (isAnyHovered ? 'rotate(180deg)' : 'none'),
-                        transition: 'all 0.4s ease'
+                        transition: 'all 0.4s ease',
+                        wordBreak: 'keep-all',
+                        whiteSpace: isHovered ? 'normal' : 'nowrap'
                       }}
                     >
                       {step.title}
@@ -468,7 +478,7 @@ const Features = () => {
                         transition={{ duration: 0.4, delay: isHovered ? 0.1 : 0 }}
                       >
                         <p style={{
-                          fontSize: '1.3rem',
+                          fontSize: 'clamp(1rem, 1.5vw, 1.3rem)',
                           lineHeight: 1.6,
                           color: 'rgba(255,255,255,0.9)',
                           marginBottom: '2rem',
