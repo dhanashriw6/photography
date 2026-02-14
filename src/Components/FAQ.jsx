@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Minus, HelpCircle, MessageCircle, Sparkles } from 'lucide-react';
 import SectionSeparator from './SectionSeparator';
+import { AnimatedText } from './AnimatedTest';
 
 const FAQ = () => {
   const [openIndex, setOpenIndex] = useState(0);
@@ -130,21 +131,18 @@ const FAQ = () => {
             </span>
           </motion.div>
 
-          <motion.h2
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3 }}
-            style={{
-               fontSize: '160px',
-              color: 'var(--color-khaki)',
-              marginBottom: '1.5rem',
-              lineHeight: 1.1,
-              fontFamily: "Oswald", 
-            }}
-          >
-            We Have Answers
-          </motion.h2>
+          <h2 style={{
+            fontSize: '150px',
+            color: 'var(--color-khaki)',
+            marginBottom: '1rem',
+            lineHeight: 1.2,
+            letterSpacing: '-0.02em',
+            perspective: '1000px',
+            fontFamily: 'var(--font-heading)',
+            fontWeight: 700,
+          }}>
+            <AnimatedText text="We Have Answers" delay={0.2} />
+          </h2>
 
           <motion.p
             initial={{ opacity: 0 }}
@@ -237,7 +235,7 @@ const FAQ = () => {
                           fontSize: 'clamp(1.1rem, 2vw, 1.4rem)',
                           fontWeight: isOpen ? '700' : '500',
                           display: 'block',
-                          fontFamily: "Oswald", 
+                          fontFamily: "Oswald",
                         }}
                       >
                         {faq.question}
@@ -254,7 +252,7 @@ const FAQ = () => {
                         fontSize: '0.85rem',
                         color: isOpen ? 'var(--color-khaki)' : 'rgba(247, 244, 233, 0.5)',
                         fontWeight: '700',
-                        fontFamily: "Oswald", 
+                        fontFamily: "Oswald",
                       }}
                     >
                       {String(index + 1).padStart(2, '0')}
@@ -302,7 +300,7 @@ const FAQ = () => {
                   transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
                   style={{
                     fontSize: '8rem',
-                    fontFamily: "Oswald", 
+                    fontFamily: "Oswald",
                     fontWeight: 'bold',
                     color: 'var(--color-khaki)',
                     lineHeight: 1,
@@ -321,7 +319,7 @@ const FAQ = () => {
                     fontSize: 'clamp(1.5rem, 3vw, 2rem)',
                     color: 'var(--color-old-lace)',
                     marginBottom: '2rem',
-                    fontFamily: "Oswald", 
+                    fontFamily: "Oswald",
                     lineHeight: 1.3
                   }}
                 >
@@ -337,7 +335,7 @@ const FAQ = () => {
                     fontSize: '1.15rem',
                     lineHeight: 1.8,
                     color: 'var(--color-old-lace)',
-                    fontFamily: "Oswald", 
+                    fontFamily: "Oswald",
                   }}
                 >
                   {faqs[openIndex].answer}

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { motion, useInView, useMotionValue, useSpring } from 'framer-motion';
 import SectionSeparator from './SectionSeparator';
+import { AnimatedText } from './AnimatedTest';
 
 const StatCard = ({ value, suffix, label, image, index }) => {
   const ref = useRef(null);
@@ -114,64 +115,6 @@ const StatCard = ({ value, suffix, label, image, index }) => {
   );
 };
 
-export const AnimatedText = ({ text, delay = 0 }) => {
-  const characters = text.split('');
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.03,
-        delayChildren: delay
-      }
-    }
-  };
-
-  const charVariants = {
-    hidden: {
-      opacity: 0,
-      y: 20,
-      rotateX: -90,
-      filter: 'blur(8px)'
-    },
-    visible: {
-      opacity: 1,
-      y: 0,
-      rotateX: 0,
-      filter: 'blur(0px)',
-      transition: {
-        type: 'spring',
-        damping: 12,
-        stiffness: 100
-      }
-    }
-  };
-
-  return (
-    <motion.span
-      variants={containerVariants}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-100px" }}
-      style={{ display: 'inline-block' }}
-    >
-      {characters.map((char, index) => (
-        <motion.span
-          key={`${char}-${index}`}
-          variants={charVariants}
-          style={{
-            display: 'inline-block',
-            transformOrigin: '50% 100%',
-            whiteSpace: char === ' ' ? 'pre' : 'normal'
-          }}
-        >
-          {char}
-        </motion.span>
-      ))}
-    </motion.span>
-  );
-};
 
 const StatsCounter = () => {
   const stats = [
@@ -238,7 +181,7 @@ const StatsCounter = () => {
             letterSpacing: '-0.02em',
             perspective: '1000px',
             fontFamily: 'var(--font-heading)',
-            fontWeight: 700,  
+            fontWeight: 700,
           }}>
             <AnimatedText text="Our Impact in Numbers" delay={0.2} />
           </h2>
@@ -249,7 +192,7 @@ const StatsCounter = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 1.2 }}
             style={{
-              fontFamily: 'system-ui, -apple-system, sans-serif',
+              fontFamily: 'Oswald',
               color: '#f5f1e8',
               opacity: 0.7,
               maxWidth: '600px',

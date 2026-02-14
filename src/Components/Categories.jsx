@@ -120,8 +120,8 @@ const Categories = () => {
                         }}
                         style={{
                             position: 'absolute',
-                            top: '40%',
-                            right: '10%',
+                            top: '38%',
+                            right: '6%',
                             zIndex: 5,
                             pointerEvents: 'none'
                         }}
@@ -147,23 +147,7 @@ const Categories = () => {
                         zIndex: 2
                     }}>
 
-                        {/* <motion.span
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            style={{
-                                color: 'var(--color-orange)',
-                                fontFamily: 'var(--font-body)',
-                                fontSize: '0.85rem',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.3em',
-                                display: 'block',
-                                marginBottom: '2rem',
-                                fontWeight: '600'
-                            }}
-                        >
-                            CATEGORIES
-                        </motion.span> */}
+
 
                         <motion.h2
                             initial={{ opacity: 0, y: 30 }}

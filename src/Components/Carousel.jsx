@@ -1,195 +1,275 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 
-const Carousel3D = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isAutoPlay, setIsAutoPlay] = useState(true);
+const ScrollSwirl = () => {
+  const containerRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
 
-  const slides = [
+  const projects = [
     {
       id: 1,
-      name: "Alex Chen",
-      role: "Software Engineer",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop",
-      bg: "from-purple-100 to-purple-200"
+      title: "UI/UX",
+      subtitle: "Probieze",
+      category: "Design",
+      image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=600&fit=crop",
+      gradient: "from-purple-600 to-purple-800"
     },
     {
       id: 2,
-      name: "Marcus Johnson",
-      role: "Product Designer",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=500&fit=crop",
-      bg: "from-teal-700 to-teal-800"
+      title: "WordPress",
+      subtitle: "BlackBox",
+      category: "Development",
+      image: "https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?w=800&h=600&fit=crop",
+      gradient: "from-teal-600 to-teal-800"
     },
     {
       id: 3,
-      name: "Sarah Williams",
-      role: "Marketing Lead",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=500&fit=crop",
-      bg: "from-slate-600 to-slate-700"
+      title: "Framer",
+      subtitle: "RxGStudios",
+      category: "Animation",
+      image: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&h=600&fit=crop",
+      gradient: "from-orange-500 to-orange-700"
     },
     {
       id: 4,
-      name: "Emma Rodriguez",
-      role: "UX Researcher",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=500&fit=crop",
-      bg: "from-orange-400 to-orange-500"
+      title: "React",
+      subtitle: "CodeFlow",
+      category: "Frontend",
+      image: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop",
+      gradient: "from-indigo-600 to-indigo-800"
     },
     {
       id: 5,
-      name: "David Kim",
-      role: "Frontend Developer",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=500&fit=crop",
-      bg: "from-indigo-600 to-indigo-700"
+      title: "Design",
+      subtitle: "Studio",
+      category: "Creative",
+      image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800&h=600&fit=crop",
+      gradient: "from-slate-600 to-slate-800"
     },
     {
       id: 6,
-      name: "James Brown",
-      role: "Data Scientist",
-      image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=500&fit=crop",
-      bg: "from-slate-700 to-slate-800"
+      title: "Mobile",
+      subtitle: "AppForge",
+      category: "Apps",
+      image: "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&h=600&fit=crop",
+      gradient: "from-pink-600 to-pink-800"
     },
     {
       id: 7,
-      name: "Lisa Park",
-      role: "Business Analyst",
-      image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&h=500&fit=crop",
-      bg: "from-teal-100 to-teal-200"
+      title: "Brand",
+      subtitle: "Identity",
+      category: "Branding",
+      image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=600&fit=crop",
+      gradient: "from-amber-600 to-amber-800"
     }
   ];
 
-  useEffect(() => {
-    if (!isAutoPlay) return;
+  const createTransforms = (index) => {
+    const totalProjects = projects.length;
+    const progressPerItem = 1 / totalProjects;
+    const startProgress = index * progressPerItem;
+    const endProgress = (index + 1) * progressPerItem;
     
-    const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % slides.length);
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [isAutoPlay, slides.length]);
-
-  const nextSlide = () => {
-    setActiveIndex((prev) => (prev + 1) % slides.length);
-    setIsAutoPlay(false);
-  };
-
-  const prevSlide = () => {
-    setActiveIndex((prev) => (prev - 1 + slides.length) % slides.length);
-    setIsAutoPlay(false);
-  };
-
-  const getSlidePosition = (index) => {
-    const diff = index - activeIndex;
-    const total = slides.length;
+    // Determine side - creates S-shape by alternating
+    const isLeftSide = index % 2 === 0;
     
-    let position = diff;
-    if (diff > total / 2) position = diff - total;
-    if (diff < -total / 2) position = diff + total;
+    // Y position - each card moves from top to its position
+    const yStart = -200 - (index * 100);
+    const yEnd = index * 200;
+    const y = useTransform(
+      scrollYProgress,
+      [Math.max(0, startProgress - 0.1), startProgress, endProgress, Math.min(1, endProgress + 0.1)],
+      [yStart, yEnd, yEnd, yEnd + 100]
+    );
     
-    return position;
-  };
-
-  const getSlideStyle = (index) => {
-    const position = getSlidePosition(index);
-    const absPos = Math.abs(position);
+    // X position - creates the S-curve swirl
+    const xStart = 0;
+    const xPeak = isLeftSide ? -350 : 350;
+    const xEnd = isLeftSide ? -380 : 380;
+    const x = useTransform(
+      scrollYProgress,
+      [Math.max(0, startProgress - 0.1), startProgress, startProgress + 0.05, endProgress],
+      [xStart, xStart, xPeak, xEnd]
+    );
     
-    if (absPos > 3) {
-      return {
-        opacity: 0,
-        transform: 'translateX(0) translateZ(-1000px) rotateY(0deg)',
-        zIndex: 0,
-        pointerEvents: 'none'
-      };
-    }
+    // Opacity - fade in as it comes into view
+    const opacity = useTransform(
+      scrollYProgress,
+      [
+        Math.max(0, startProgress - 0.15),
+        startProgress - 0.05,
+        startProgress + 0.05,
+        endProgress,
+        Math.min(1, endProgress + 0.15)
+      ],
+      [0, 0.3, 1, 1, 0.6]
+    );
+    
+    // Scale - grows as it comes into view
+    const scale = useTransform(
+      scrollYProgress,
+      [
+        Math.max(0, startProgress - 0.1),
+        startProgress,
+        startProgress + 0.05,
+        endProgress
+      ],
+      [0.7, 0.85, 1, 0.95]
+    );
+    
+    // Rotation - adds dynamic tilt
+    const rotateStart = isLeftSide ? -15 : 15;
+    const rotatePeak = isLeftSide ? -8 : 8;
+    const rotateEnd = isLeftSide ? -4 : 4;
+    const rotate = useTransform(
+      scrollYProgress,
+      [startProgress - 0.05, startProgress, endProgress],
+      [rotateStart, rotatePeak, rotateEnd]
+    );
 
-    // Inward curve calculation
-    const angle = position * 35; // Rotation angle
-    const radius = 550; // Radius of the curve
-    const translateX = Math.sin(angle * Math.PI / 180) * radius;
-    const translateZ = radius - Math.cos(angle * Math.PI / 180) * radius - 200;
-    const rotateY = -angle; // Negative for inward curve
-    const scale = 0.85 + (1 - absPos * 0.15);
-    const opacity = 1 - absPos * 0.2;
-    const zIndex = 10 - absPos;
-
-    return {
-      transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
-      opacity: opacity,
-      zIndex: zIndex,
-      pointerEvents: absPos === 0 ? 'auto' : 'none'
-    };
+    return { x, y, opacity, scale, rotate };
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 flex flex-col items-center justify-center p-8 overflow-hidden">
-    
+    <div className="relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute w-[800px] h-[800px] -top-80 -left-80 bg-purple-600/10 rounded-full blur-[100px] animate-pulse" 
+             style={{ animationDuration: '8s' }} />
+        <div className="absolute w-[700px] h-[700px] top-1/4 -right-64 bg-teal-500/10 rounded-full blur-[100px] animate-pulse" 
+             style={{ animationDuration: '10s', animationDelay: '-3s' }} />
+        <div className="absolute w-[600px] h-[600px] bottom-0 left-1/3 bg-indigo-500/10 rounded-full blur-[100px] animate-pulse" 
+             style={{ animationDuration: '12s', animationDelay: '-6s' }} />
+        <div className="absolute w-[500px] h-[500px] top-2/3 right-1/4 bg-orange-500/10 rounded-full blur-[100px] animate-pulse" 
+             style={{ animationDuration: '9s', animationDelay: '-4s' }} />
+      </div>
 
-      {/* Carousel Container */}
-      <div className="relative w-full max-w-7xl h-[550px] flex items-center justify-center mb-8">
-        <div 
-          className="relative w-full h-full flex items-center justify-center"
-          style={{ 
-            perspective: '600px',
-            perspectiveOrigin: 'center center'
-          }}
+      {/* Hero Section */}
+      <div className="relative z-10 pt-32 pb-20 px-8 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: "easeOut" }}
         >
-          <div className="relative w-full h-full" style={{ transformStyle: 'preserve-3d' }}>
-            {slides.map((slide, index) => {
-              const position = getSlidePosition(index);
-              const isActive = position === 0;
+          <h1 className="text-8xl md:text-9xl font-black mb-6 tracking-tighter">
+            <span className="bg-gradient-to-r from-white via-white to-gray-500 bg-clip-text text-transparent">
+              Our Work
+            </span>
+          </h1>
+          <p className="text-gray-400 text-sm tracking-[0.4em] uppercase font-bold">
+            Scroll Down
+          </p>
+        </motion.div>
+      </div>
+
+      {/* Scroll Container */}
+      <div ref={containerRef} style={{ height: '600vh' }}>
+        <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
+          <div className="relative w-full h-full">
+            {projects.map((project, index) => {
+              const transforms = createTransforms(index);
               
               return (
-                <div
-                  key={slide.id}
-                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-700 ease-out"
+                <motion.div
+                  key={project.id}
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
                   style={{
-                    ...getSlideStyle(index),
-                    transformStyle: 'preserve-3d'
+                    x: transforms.x,
+                    y: transforms.y,
+                    opacity: transforms.opacity,
+                    scale: transforms.scale,
+                    rotate: transforms.rotate,
+                    zIndex: projects.length - index
                   }}
                 >
-                  <div className={`w-45 h-50 rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br ${slide.bg} ${isActive ? 'ring-4 ring-white' : ''}`}>
+                  <motion.div
+                    className="relative w-[500px] h-[350px] md:w-[550px] md:h-[380px] rounded-3xl overflow-hidden shadow-[0_30px_90px_-20px_rgba(0,0,0,0.9)] cursor-pointer"
+                    whileHover={{ 
+                      scale: 1.05,
+                      boxShadow: '0 40px 100px -25px rgba(0,0,0,0.95)'
+                    }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                  >
+                    {/* Image */}
                     <img
-                      src={slide.image}
-                      alt={slide.name}
-                      className="w-full h-full object-cover"
+                      src={project.image}
+                      alt={project.title}
+                      className="absolute inset-0 w-full h-full object-cover transition-all duration-700"
+                      style={{ 
+                        filter: 'brightness(0.7) contrast(1.15) saturate(1.1)'
+                      }}
                     />
-                    {/* <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
-                      <h3 className="text-white font-bold text-xl mb-1">{slide.name}</h3>
-                      <p className="text-white/90 text-sm">{slide.role}</p>
-                    </div> */}
-                  </div>
-                </div>
+                    
+                    {/* Gradient Overlay */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${project.gradient} opacity-40 mix-blend-multiply`} />
+                    
+                    {/* Vignette */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/90" />
+                    
+                    {/* Content */}
+                    <div className="absolute inset-0 flex flex-col justify-end p-10">
+                      <div className="text-[10px] uppercase tracking-[4px] text-white/60 font-black mb-3 letter-spacing-widest">
+                        {project.category}
+                      </div>
+                      <h3 className="text-6xl font-black text-white leading-[0.9] mb-3 drop-shadow-2xl">
+                        {project.title}
+                      </h3>
+                      <p className="text-2xl font-light text-white/95 tracking-wide drop-shadow-lg">
+                        {project.subtitle}
+                      </p>
+                    </div>
+
+                    {/* Border Glow */}
+                    <div className="absolute inset-0 rounded-3xl ring-1 ring-white/10" />
+                  </motion.div>
+                </motion.div>
               );
             })}
           </div>
         </div>
-
-        {/* Navigation Buttons */}
-        {/* <button
-          onClick={prevSlide}
-          className="absolute left-8 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg transition-all hover:scale-110"
-          aria-label="Previous slide"
-        >
-          <ChevronLeft className="w-6 h-6 text-gray-800" />
-        </button>
-        
-        <button
-          onClick={nextSlide}
-          className="absolute right-8 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg transition-all hover:scale-110"
-          aria-label="Next slide"
-        >
-          <ChevronRight className="w-6 h-6 text-gray-800" />
-        </button> */}
       </div>
 
-       <button
-        onClick={() => setIsAutoPlay(!isAutoPlay)}
-        className="mt-6 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+      {/* Scroll Indicator */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5, duration: 1 }}
+        className="fixed bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 z-20 pointer-events-none"
       >
-        {isAutoPlay ? '⏸ Pause' : '▶ Play'} Auto-scroll
-      </button>
-      
+        <span className="text-[10px] tracking-[4px] uppercase text-gray-600 font-black">
+          Scroll
+        </span>
+        <motion.div
+          animate={{ y: [0, 12, 0] }}
+          transition={{ 
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        >
+          <svg 
+            className="w-6 h-6 text-gray-600" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          >
+            <path d="M12 5v14M19 12l-7 7-7-7"/>
+          </svg>
+        </motion.div>
+      </motion.div>
+
+      {/* Progress Bar */}
+      <motion.div 
+        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 via-teal-500 to-orange-500 origin-left z-50"
+        style={{ scaleX: scrollYProgress }}
+      />
     </div>
   );
 };
 
-export default Carousel3D;
+export default ScrollSwirl;

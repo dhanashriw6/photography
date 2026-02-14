@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Search, Calendar, UserCheck, Star } from "lucide-react";
 import SectionSeparator from "./SectionSeparator";
+import { AnimatedText } from "./AnimatedTest";
 
 const Features = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -63,22 +64,18 @@ const Features = () => {
           >
             How It Works
           </motion.span>
-          <motion.h2
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            style={{
-              fontSize: '150px',
-              color: 'var(--color-black)',
-              fontFamily: 'Oswald',
-              marginBottom: '1rem',
-              width: '70%',
-              margin: 'auto'
-            }}
-          >
-            Your Journey to Perfect Imagery
-          </motion.h2>
+          <h2 style={{
+            fontSize: '150px',
+            color: 'var(--color-soft-black)',
+            marginBottom: '1rem',
+            lineHeight: 1.2,
+            letterSpacing: '-0.02em',
+            perspective: '1000px',
+            fontFamily: 'var(--font-heading)',
+            fontWeight: 700,
+          }}>
+            <AnimatedText text="Your Journey to Perfect Imagery" delay={0.2} />
+          </h2>
         </motion.div>
 
         {/* Horizontal Cards Container */}

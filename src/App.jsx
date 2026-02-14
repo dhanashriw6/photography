@@ -20,7 +20,8 @@ import {
   Categories
 } from './Components';
 import Hero2 from './Components/Hero2';
-import Carousel from './Components/Carousel';
+// import Carousel from './Components/Carousel';
+import ScrollSwirl from './Components/Carousel';
 
 function App() {
   return (
@@ -28,7 +29,8 @@ function App() {
 
       <Routes>
         <Route path="/" element={<Hero2 />} />
-        <Route path="/v1" element={<Carousel />} />
+        <Route path="/v1" element={<ScrollSwirl />} />
+
       </Routes>
 
       <Categories />

@@ -273,7 +273,7 @@ const Hero2 = () => {
         {/* Badge 9 - Sunburst Shape - "Bold" */}
         <motion.div
           animate={{
-            x: [-300, -350, -300],
+            x: [-100, -150, -100],
             y: [0, 12, 0],
             rotate: [0, 360],
           }}
@@ -343,7 +343,7 @@ const Hero2 = () => {
         {/* Badge 10 - Flower Shape - "Fresh" */}
         <motion.div
           animate={{
-            x: [300, 350, 300],
+            x: [200, 250, 200],
             y: [0, -12, 0],
             rotate: [0, 10, -10, 0],
           }}
@@ -844,7 +844,7 @@ const Hero2 = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         style={{
                           position: 'absolute',
-                          bottom: '15px',
+                          bottom: '16px',
                           left: '50%',
                           transform: 'translateX(-50%)',
                           width: '40px',

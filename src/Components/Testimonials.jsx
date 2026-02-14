@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Star } from 'lucide-react';
 import SectionSeparator from './SectionSeparator';
+import { AnimatedText } from './AnimatedTest';
 
 const testimonials = [
   {
@@ -207,7 +208,7 @@ const Testimonials = () => {
         overflow: 'hidden'
       }}
     >
-      <SectionSeparator flip={true}  />
+      <SectionSeparator flip={true} />
       {/* Background Decor */}
       <motion.div style={{
         position: 'absolute', inset: 0, y: yBg, pointerEvents: 'none',
@@ -218,18 +219,19 @@ const Testimonials = () => {
 
       <div className="container" style={{ textAlign: 'center', marginBottom: '4rem', position: 'relative', zIndex: 2 }}>
         <h2 style={{
-          fontSize: '160px',
-          color: 'var(--color-black)',
-          fontWeight: 400, // Thinner, more elegant
-          marginBottom: '1.5rem',
-          lineHeight: 1,
-          fontFamily: "Oswald",
+          fontSize: '140px',
+          color: 'var(--color-soft-black)',
+          marginBottom: '1rem',
+          lineHeight: 1.2,
           letterSpacing: '-0.02em',
+          perspective: '1000px',
+          fontFamily: 'var(--font-heading)',
+          fontWeight: 700,
         }}>
-          Voice of the Community
+          <AnimatedText text="Voice of the Community" delay={0.2} />
         </h2>
         <p style={{
-         fontFamily: "Oswald",
+          fontFamily: "Oswald",
           color: 'var(--color-gray)',
           maxWidth: '600px',
           margin: '0 auto',

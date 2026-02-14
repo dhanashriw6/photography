@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
 import { Search, Camera, ArrowRight, Sparkles, Zap } from 'lucide-react';
 import SectionSeparator from './SectionSeparator';
+import { AnimatedText } from './AnimatedTest';
 
 const Hero = () => {
   const containerRef = useRef(null);
@@ -168,24 +169,18 @@ const Hero = () => {
             </span>
           </motion.div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            style={{
-              fontSize: '160px',
-              color: 'var(--color-khaki)',
-              fontWeight: 400, // Thinner, more elegant
-              marginBottom: '1.5rem',
-              lineHeight: 1,
-              fontFamily: "Oswald",
-              letterSpacing: '-0.02em',
-              textShadow: '0 20px 40px rgba(0,0,0,0.5)'
-            }}
-          >
-            {/* Start Your <span style={{ color: 'var(--color-khaki)', fontStyle: 'italic' }}>Journey</span> */}
-            Start Your Journey
-          </motion.h1>
+           <h2 style={{
+                     fontSize: '140px',
+                     color: 'var(--color-khaki)',
+                     marginBottom: '1rem',
+                     lineHeight: 1.2,
+                     letterSpacing: '-0.02em',
+                     perspective: '1000px',
+                     fontFamily: 'var(--font-heading)',
+                     fontWeight: 700,  
+                   }}>
+                     <AnimatedText text="Start Your Journey" delay={0.2} />
+                   </h2>
 
           <motion.p
             initial={{ opacity: 0 }}
