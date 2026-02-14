@@ -49,7 +49,7 @@ const FAQ = () => {
   ];
 
   return (
-    <section style={{
+    <section id="faqs" style={{
       padding: isMobile ? '4rem 1.5rem' : isTablet ? '6rem 2rem' : '10rem 2rem',
       background: 'linear-gradient(135deg, var(--color-dark-slate-gray) 0%, #1a1816 100%)',
       position: 'relative',
@@ -106,10 +106,10 @@ const FAQ = () => {
         }}
       />
 
-      <div style={{ 
+      <div style={{
         maxWidth: '1400px',
         margin: '0 auto',
-        position: 'relative', 
+        position: 'relative',
         zIndex: 1,
         padding: isMobile ? '0' : '0 2rem',
         width: '100%'
@@ -120,9 +120,9 @@ const FAQ = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          style={{ 
-            textAlign: 'center', 
-            marginBottom: isMobile ? '3rem' : isTablet ? '4rem' : '6rem' 
+          style={{
+            textAlign: 'center',
+            marginBottom: isMobile ? '3rem' : isTablet ? '4rem' : '6rem'
           }}
         >
           <motion.div
@@ -154,10 +154,10 @@ const FAQ = () => {
           </motion.div>
 
           <h2 style={{
-            fontSize: isMobile 
-              ? 'clamp(2.5rem, 10vw, 4rem)' 
-              : isTablet 
-                ? 'clamp(4rem, 10vw, 6rem)' 
+            fontSize: isMobile
+              ? 'clamp(2.5rem, 10vw, 4rem)'
+              : isTablet
+                ? 'clamp(4rem, 10vw, 6rem)'
                 : 'clamp(4rem, 8vw, 9rem)',
             color: 'var(--color-khaki)',
             marginBottom: '2rem',
@@ -206,9 +206,9 @@ const FAQ = () => {
         {/* Layout - Stack on mobile/tablet, split on desktop */}
         {isMobile || isTablet ? (
           // Mobile/Tablet: Single column accordion
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
             gap: isMobile ? '1rem' : '1.5rem',
             maxWidth: '800px',
             margin: '0 auto'

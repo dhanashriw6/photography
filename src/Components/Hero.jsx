@@ -88,6 +88,7 @@ const Hero = () => {
 
   return (
     <div
+      id="chooseYourPath"
       ref={containerRef}
       style={{
         position: 'relative',
@@ -140,7 +141,7 @@ const Hero = () => {
       <div style={{
         position: 'absolute',
         inset: 0,
-        background: isMobile 
+        background: isMobile
           ? 'linear-gradient(to bottom, rgba(13, 13, 13, 0.7) 0%, rgba(10, 10, 10, 0.85) 100%)'
           : 'linear-gradient(to bottom, rgba(13, 13, 13, 0.4) 0%, rgba(10, 10, 10, 0.6) 100%)',
         zIndex: 2,
@@ -386,15 +387,15 @@ const PathCard = ({ item, isActive, setActive, isMobile, isTablet }) => {
               color: (isActive || isExpanded) ? '#fff' : 'var(--color-cream)'
             }}
           >
-            {React.createElement(item.icon, { 
-              size: isMobile ? 28 : 32, 
-              strokeWidth: 1.5 
+            {React.createElement(item.icon, {
+              size: isMobile ? 28 : 32,
+              strokeWidth: 1.5
             })}
           </div>
 
           <h3 style={{
             fontFamily: "Oswald",
-            fontSize: isMobile 
+            fontSize: isMobile
               ? (isExpanded ? 'clamp(2rem, 6vw, 2.5rem)' : 'clamp(1.8rem, 5vw, 2.2rem)')
               : (isActive ? 'clamp(2.5rem, 4vw, 3rem)' : 'clamp(2rem, 3vw, 2.5rem)'),
             fontWeight: 'bold',

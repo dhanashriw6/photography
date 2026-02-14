@@ -146,11 +146,11 @@ const TestimonialCard = ({ item, index, isMobile }) => {
           marginTop: '0.5rem'
         }}>
           {/* Rating */}
-          <div style={{ 
-            display: 'flex', 
-            gap: '2px', 
-            marginBottom: isMobile ? '0.4rem' : '0.5rem', 
-            opacity: 0.8 
+          <div style={{
+            display: 'flex',
+            gap: '2px',
+            marginBottom: isMobile ? '0.4rem' : '0.5rem',
+            opacity: 0.8
           }}>
             {[...Array(item.rating)].map((_, i) => (
               <Star key={i} size={isMobile ? 12 : 14} fill="var(--color-orange)" stroke="none" />
@@ -201,7 +201,7 @@ const Testimonials = () => {
   const containerRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
-  
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"]
@@ -222,6 +222,7 @@ const Testimonials = () => {
 
   return (
     <section
+      id="testimonials"
       ref={containerRef}
       style={{
         padding: isMobile ? '4rem 0 0 0' : isTablet ? '6rem 0 0 0' : '8rem 0 0 0',
@@ -231,33 +232,33 @@ const Testimonials = () => {
       }}
     >
       <SectionSeparator flip={true} />
-      
+
       {/* Background Decor */}
       <motion.div style={{
-        position: 'absolute', 
-        inset: 0, 
-        y: isMobile ? 0 : yBg, 
+        position: 'absolute',
+        inset: 0,
+        y: isMobile ? 0 : yBg,
         pointerEvents: 'none',
         background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.8) 0%, transparent 60%)',
         opacity: 0.6,
         fontFamily: 'Oswald'
       }} />
 
-      <div 
-        className="container" 
-        style={{ 
-          textAlign: 'center', 
-          marginBottom: isMobile ? '2.5rem' : isTablet ? '3rem' : '4rem', 
-          position: 'relative', 
+      <div
+        className="container"
+        style={{
+          textAlign: 'center',
+          marginBottom: isMobile ? '2.5rem' : isTablet ? '3rem' : '4rem',
+          position: 'relative',
           zIndex: 2,
           padding: isMobile ? '0 1.5rem' : '0 2rem'
         }}
       >
         <h2 style={{
-          fontSize: isMobile 
-            ? 'clamp(2rem, 8vw, 3rem)' 
-            : isTablet 
-              ? 'clamp(3rem, 8vw, 5rem)' 
+          fontSize: isMobile
+            ? 'clamp(2rem, 8vw, 3rem)'
+            : isTablet
+              ? 'clamp(3rem, 8vw, 5rem)'
               : '140px',
           color: 'var(--color-soft-black)',
           marginBottom: '1rem',
@@ -321,9 +322,9 @@ const Testimonials = () => {
         >
           {/* Duplicate list multiple times for seamless loop */}
           {[...testimonials, ...testimonials, ...testimonials, ...testimonials].map((item, index) => (
-            <TestimonialCard 
-              key={`${item.id}-${index}`} 
-              item={item} 
+            <TestimonialCard
+              key={`${item.id}-${index}`}
+              item={item}
               index={index}
               isMobile={isMobile}
             />
@@ -332,23 +333,23 @@ const Testimonials = () => {
 
         {/* Vignette / Fade Edges */}
         <div style={{
-          position: 'absolute', 
-          top: 0, 
-          left: 0, 
-          width: isMobile ? '60px' : '100px', 
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: isMobile ? '60px' : '100px',
           height: '100%',
           background: 'linear-gradient(to right, var(--color-pale), transparent)',
-          zIndex: 20, 
+          zIndex: 20,
           pointerEvents: 'none'
         }} />
         <div style={{
-          position: 'absolute', 
-          top: 0, 
-          right: 0, 
-          width: isMobile ? '60px' : '100px', 
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          width: isMobile ? '60px' : '100px',
           height: '100%',
           background: 'linear-gradient(to left, var(--color-pale), transparent)',
-          zIndex: 20, 
+          zIndex: 20,
           pointerEvents: 'none'
         }} />
       </div>

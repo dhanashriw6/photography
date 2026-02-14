@@ -160,7 +160,7 @@ const StatsCounter = () => {
   ];
 
   return (
-    <section style={{
+    <section id="statsCounter" style={{
       position: 'relative',
       padding: isMobile ? '4rem 1.5rem' : isTablet ? '6rem 2rem' : '8rem 2rem',
       background: '#0a0a0a',

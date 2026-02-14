@@ -66,7 +66,7 @@ const Footer = () => {
   };
 
   return (
-    <footer style={{
+    <footer id="footer" style={{
       position: 'relative',
       padding: isMobile ? '4rem 1.5rem 2rem' : isTablet ? '5rem 2rem 2rem' : '6rem 2rem 2rem',
       backgroundColor: 'var(--color-soft-black)',
@@ -177,10 +177,10 @@ const Footer = () => {
             alignItems: 'center'
           }}
         >
-          <div style={{ 
-            textAlign: 'center', 
-            marginBottom: isMobile ? '2rem' : '3rem', 
-            maxWidth: '700px' 
+          <div style={{
+            textAlign: 'center',
+            marginBottom: isMobile ? '2rem' : '3rem',
+            maxWidth: '700px'
           }}>
             <h3 style={{
               fontFamily: 'var(--font-heading)',
@@ -210,19 +210,19 @@ const Footer = () => {
             width: '100%',
             maxWidth: '900px'
           }}>
-            <div style={{ 
-              position: 'relative', 
-              gridColumn: isMobile ? 'span 1' : 'span 1' 
+            <div style={{
+              position: 'relative',
+              gridColumn: isMobile ? 'span 1' : 'span 1'
             }}>
-              <User 
-                size={isMobile ? 16 : 18} 
-                color="rgba(255,255,255,0.4)" 
-                style={{ 
-                  position: 'absolute', 
-                  left: isMobile ? '0.9rem' : '1rem', 
-                  top: '50%', 
-                  transform: 'translateY(-50%)' 
-                }} 
+              <User
+                size={isMobile ? 16 : 18}
+                color="rgba(255,255,255,0.4)"
+                style={{
+                  position: 'absolute',
+                  left: isMobile ? '0.9rem' : '1rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)'
+                }}
               />
               <input
                 type="text"
@@ -230,28 +230,28 @@ const Footer = () => {
                 placeholder="Your Name"
                 value={formData.name}
                 onChange={handleChange}
-                style={{ 
-                  ...inputStyle, 
-                  paddingLeft: isMobile ? '2.7rem' : '3rem' 
+                style={{
+                  ...inputStyle,
+                  paddingLeft: isMobile ? '2.7rem' : '3rem'
                 }}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
               />
             </div>
 
-            <div style={{ 
-              position: 'relative', 
-              gridColumn: isMobile ? 'span 1' : 'span 1' 
+            <div style={{
+              position: 'relative',
+              gridColumn: isMobile ? 'span 1' : 'span 1'
             }}>
-              <Phone 
-                size={isMobile ? 16 : 18} 
-                color="rgba(255,255,255,0.4)" 
-                style={{ 
-                  position: 'absolute', 
-                  left: isMobile ? '0.9rem' : '1rem', 
-                  top: '50%', 
-                  transform: 'translateY(-50%)' 
-                }} 
+              <Phone
+                size={isMobile ? 16 : 18}
+                color="rgba(255,255,255,0.4)"
+                style={{
+                  position: 'absolute',
+                  left: isMobile ? '0.9rem' : '1rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)'
+                }}
               />
               <input
                 type="text"
@@ -259,9 +259,9 @@ const Footer = () => {
                 placeholder="Contact Number"
                 value={formData.contact}
                 onChange={handleChange}
-                style={{ 
-                  ...inputStyle, 
-                  paddingLeft: isMobile ? '2.7rem' : '3rem' 
+                style={{
+                  ...inputStyle,
+                  paddingLeft: isMobile ? '2.7rem' : '3rem'
                 }}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
@@ -269,15 +269,15 @@ const Footer = () => {
             </div>
 
             <div style={{ position: 'relative', gridColumn: isMobile ? 'span 1' : 'span 2' }}>
-              <Mail 
-                size={isMobile ? 16 : 18} 
-                color="rgba(255,255,255,0.4)" 
-                style={{ 
-                  position: 'absolute', 
-                  left: isMobile ? '0.9rem' : '1rem', 
-                  top: '50%', 
-                  transform: 'translateY(-50%)' 
-                }} 
+              <Mail
+                size={isMobile ? 16 : 18}
+                color="rgba(255,255,255,0.4)"
+                style={{
+                  position: 'absolute',
+                  left: isMobile ? '0.9rem' : '1rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)'
+                }}
               />
               <input
                 type="email"
@@ -285,9 +285,9 @@ const Footer = () => {
                 placeholder="Email Address"
                 value={formData.email}
                 onChange={handleChange}
-                style={{ 
-                  ...inputStyle, 
-                  paddingLeft: isMobile ? '2.7rem' : '3rem' 
+                style={{
+                  ...inputStyle,
+                  paddingLeft: isMobile ? '2.7rem' : '3rem'
                 }}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
@@ -295,14 +295,14 @@ const Footer = () => {
             </div>
 
             <div style={{ position: 'relative', gridColumn: isMobile ? 'span 1' : 'span 2' }}>
-              <MessageSquare 
-                size={isMobile ? 16 : 18} 
-                color="rgba(255,255,255,0.4)" 
-                style={{ 
-                  position: 'absolute', 
-                  left: isMobile ? '0.9rem' : '1rem', 
-                  top: isMobile ? '1rem' : '1.2rem' 
-                }} 
+              <MessageSquare
+                size={isMobile ? 16 : 18}
+                color="rgba(255,255,255,0.4)"
+                style={{
+                  position: 'absolute',
+                  left: isMobile ? '0.9rem' : '1rem',
+                  top: isMobile ? '1rem' : '1.2rem'
+                }}
               />
               <textarea
                 name="message"
@@ -310,21 +310,21 @@ const Footer = () => {
                 rows={isMobile ? "3" : "4"}
                 value={formData.message}
                 onChange={handleChange}
-                style={{ 
-                  ...inputStyle, 
-                  paddingLeft: isMobile ? '2.7rem' : '3rem', 
-                  resize: 'vertical' 
+                style={{
+                  ...inputStyle,
+                  paddingLeft: isMobile ? '2.7rem' : '3rem',
+                  resize: 'vertical'
                 }}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
               />
             </div>
 
-            <div style={{ 
-              gridColumn: isMobile ? 'span 1' : 'span 2', 
-              display: 'flex', 
-              justifyContent: 'center', 
-              marginTop: isMobile ? '0.5rem' : '1rem' 
+            <div style={{
+              gridColumn: isMobile ? 'span 1' : 'span 2',
+              display: 'flex',
+              justifyContent: 'center',
+              marginTop: isMobile ? '0.5rem' : '1rem'
             }}>
               <motion.button
                 whileHover={!isMobile ? { scale: 1.02, boxShadow: '0 10px 30px rgba(255, 174, 0, 0.3)' } : {}}
@@ -363,10 +363,10 @@ const Footer = () => {
           transition={{ duration: 0.8, delay: 0.2 }}
           style={{
             display: 'grid',
-            gridTemplateColumns: isMobile 
-              ? '1fr' 
-              : isTablet 
-                ? 'repeat(2, 1fr)' 
+            gridTemplateColumns: isMobile
+              ? '1fr'
+              : isTablet
+                ? 'repeat(2, 1fr)'
                 : 'repeat(auto-fit, minmax(200px, 1fr))',
             gap: isMobile ? '2rem' : '3rem',
             textAlign: 'left',
@@ -393,11 +393,11 @@ const Footer = () => {
               }}>
                 {section.title}
               </h4>
-              <ul style={{ 
-                listStyle: 'none', 
-                padding: 0, 
-                marginTop: isMobile ? '0.75rem' : '1rem', 
-                margin: 0 
+              <ul style={{
+                listStyle: 'none',
+                padding: 0,
+                marginTop: isMobile ? '0.75rem' : '1rem',
+                margin: 0
               }}>
                 {section.links.map((link, linkIdx) => (
                   <motion.li

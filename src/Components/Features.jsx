@@ -45,15 +45,15 @@ const Features = () => {
   ];
 
   return (
-    <section style={{
+    <section id="process" style={{
       padding: isMobile ? '4rem 1.5rem' : isTablet ? '6rem 2rem' : '8rem 2rem',
       background: 'var(--color-pale)',
       position: 'relative',
       overflow: 'hidden'
     }}>
       <SectionSeparator flip={true} fill="var(--color-black)" />
-      <div style={{ 
-        maxWidth: '1600px', 
+      <div style={{
+        maxWidth: '1600px',
         margin: '0 auto',
         padding: isMobile ? '0' : '0 1rem',
         width: '100%'
@@ -64,10 +64,10 @@ const Features = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          style={{ 
-            textAlign: 'center', 
-            marginBottom: isMobile ? '3rem' : isTablet ? '3.5rem' : '4rem', 
-            position: 'relative' 
+          style={{
+            textAlign: 'center',
+            marginBottom: isMobile ? '3rem' : isTablet ? '3.5rem' : '4rem',
+            position: 'relative'
           }}
         >
           <motion.span
@@ -88,10 +88,10 @@ const Features = () => {
             How It Works
           </motion.span>
           <h2 style={{
-            fontSize: isMobile 
-              ? 'clamp(2rem, 8vw, 3rem)' 
-              : isTablet 
-                ? 'clamp(3rem, 8vw, 5rem)' 
+            fontSize: isMobile
+              ? 'clamp(2rem, 8vw, 3rem)'
+              : isTablet
+                ? 'clamp(3rem, 8vw, 5rem)'
                 : 'clamp(3.5rem, 6vw, 6rem)',
             color: 'var(--color-soft-black)',
             marginBottom: '2rem',
@@ -438,8 +438,8 @@ const Features = () => {
                         fontFamily: isHovered
                           ? "'Freckle Face'"
                           : "'Oswald', sans-serif",
-                        fontSize: isHovered 
-                          ? 'clamp(2.5rem, 4vw, 4.5rem)' 
+                        fontSize: isHovered
+                          ? 'clamp(2.5rem, 4vw, 4.5rem)'
                           : 'clamp(1.5rem, 2vw, 2rem)',
                         marginBottom: isHovered ? '1.5rem' : '0.5rem'
                       }}

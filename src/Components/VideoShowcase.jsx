@@ -20,7 +20,7 @@ const VideoShowcase = () => {
     };
 
     return (
-        <section className="video-showcase-section">
+        <section id="aboutUs" className="video-showcase-section">
             {/* Animated Doodles */}
 
 

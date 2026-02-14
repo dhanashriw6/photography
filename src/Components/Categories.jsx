@@ -37,7 +37,7 @@ const CategoryCard = ({ category, index, categoryCount, scrollYProgress }) => {
             style={{
                 position: 'absolute',
                 width: '100%',
-                maxWidth: '450px',
+                maxWidth: 'min(450px, 35vw)',
                 opacity,
                 y,
                 scale
@@ -51,7 +51,7 @@ const CategoryCard = ({ category, index, categoryCount, scrollYProgress }) => {
                 border: '1px solid rgba(0,0,0,0.05)',
                 position: 'relative',
                 overflow: 'hidden',
-                height: '600px',
+                height: 'clamp(500px, 50vh, 600px)',
                 display: 'flex',
                 flexDirection: 'column'
             }}>
@@ -81,10 +81,10 @@ const CategoryCard = ({ category, index, categoryCount, scrollYProgress }) => {
                 {/* Icon */}
                 <div style={{
                     position: 'absolute',
-                    top: '2.5rem',
-                    left: '2.5rem',
-                    width: '70px',
-                    height: '70px',
+                    top: 'clamp(1.5rem, 4vh, 2.5rem)',
+                    left: 'clamp(1.5rem, 4vh, 2.5rem)',
+                    width: 'clamp(60px, 6vw, 70px)',
+                    height: 'clamp(60px, 6vw, 70px)',
                     borderRadius: '18px',
                     background: 'rgba(255,255,255,0.95)',
                     backdropFilter: 'blur(10px)',
@@ -104,8 +104,8 @@ const CategoryCard = ({ category, index, categoryCount, scrollYProgress }) => {
                 {/* Decorative Dots */}
                 <div style={{
                     position: 'absolute',
-                    top: '3rem',
-                    right: '3rem',
+                    top: 'clamp(2rem, 4vh, 3rem)',
+                    right: 'clamp(2rem, 4vh, 3rem)',
                     display: 'flex',
                     gap: '8px',
                     zIndex: 1
@@ -132,11 +132,11 @@ const CategoryCard = ({ category, index, categoryCount, scrollYProgress }) => {
                     zIndex: 1,
                     marginTop: 'auto',
                     marginBottom: '8%',
-                    padding: '2.5rem 3rem 3rem',
+                    padding: 'clamp(2rem, 3vh, 2.5rem) clamp(2rem, 3vw, 3rem) clamp(2.5rem, 4vh, 3rem)',
                     background: 'white'
                 }}>
                     <h3 style={{
-                        fontSize: '2.2rem',
+                        fontSize: 'clamp(1.5rem, 2vw, 2.2rem)',
                         color: 'var(--color-black)',
                         fontFamily: "'Oswald', sans-serif",
                         marginBottom: '1rem',
@@ -147,7 +147,7 @@ const CategoryCard = ({ category, index, categoryCount, scrollYProgress }) => {
                         {category.title}
                     </h3>
                     <p style={{
-                        fontSize: '1.05rem',
+                        fontSize: 'clamp(0.95rem, 1vw, 1.05rem)',
                         lineHeight: 1.6,
                         color: 'var(--color-coffee)',
                         opacity: 0.7
@@ -257,6 +257,7 @@ const Categories = () => {
     if (isMobile || isTablet) {
         return (
             <section
+                id="categories"
                 style={{
                     padding: isMobile ? '4rem 1.5rem' : '6rem 2rem',
                     background: 'var(--color-cream)',
@@ -472,9 +473,10 @@ const Categories = () => {
         );
     }
 
-    // Desktop: Original scroll-based animation
+    // Desktop: Original scroll-based animation with responsive fixes
     return (
         <section
+            id="categories"
             ref={containerRef}
             style={{
                 height: `${categoryCount * 100}vh`,
@@ -494,11 +496,11 @@ const Categories = () => {
                 <div className="container" style={{
                     maxWidth: '1400px',
                     margin: '0 auto',
-                    padding: '0 4rem',
+                    padding: '0 clamp(2rem, 4vw, 4rem)',
                     width: '100%',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '8rem'
+                    gap: 'clamp(4rem, 8vw, 8rem)'
                 }}>
                     <motion.div
                         animate={{
@@ -515,7 +517,7 @@ const Categories = () => {
                         style={{
                             position: 'absolute',
                             top: '38%',
-                            right: '6%',
+                            right: 'clamp(2%, 6vw, 6%)',
                             zIndex: 5,
                             pointerEvents: 'none'
                         }}
@@ -526,7 +528,7 @@ const Categories = () => {
                             borderRadius: '20% 70% 30% 70% / 30% 30% 80% 40%',
                             padding: '1rem 1.8rem',
                             fontWeight: '700',
-                            fontSize: '1rem',
+                            fontSize: 'clamp(0.85rem, 1vw, 1rem)',
                             color: '#111212',
                             boxShadow: '0 0 25px rgba(255,174,0,0.4)',
                             transform: 'rotate(8deg)'
@@ -535,11 +537,12 @@ const Categories = () => {
                         </div>
                     </motion.div>
 
-                    {/* Left Side - Fixed Content */}
+                    {/* Left Side - Fixed Content (Title and Subtitle stacked) */}
                     <div style={{
                         flex: '0 0 45%',
                         position: 'relative',
-                        zIndex: 2
+                        zIndex: 2,
+                        minWidth: 0
                     }}>
                         <motion.h2
                             initial={{ opacity: 0, y: 30 }}
@@ -547,10 +550,10 @@ const Categories = () => {
                             viewport={{ once: true }}
                             transition={{ delay: 0.1 }}
                             style={{
-                                fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+                                fontSize: 'clamp(2rem, 4vw, 4rem)',
                                 color: 'var(--color-black)',
                                 fontFamily: "'Oswald', sans-serif",
-                                marginBottom: '1.5rem',
+                                marginBottom: 'clamp(1rem, 2vh, 1.5rem)',
                                 fontWeight: '700',
                                 lineHeight: 1.1,
                                 letterSpacing: '-0.02em'
@@ -559,30 +562,31 @@ const Categories = () => {
                             Find photographers for every moment.
                         </motion.h2>
 
-                        <motion.p
+                        {/* <motion.p
                             initial={{ opacity: 0 }}
                             whileInView={{ opacity: 0.7 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.2 }}
                             style={{
-                                fontSize: '1rem',
+                                fontSize: 'clamp(0.95rem, 1vw, 1rem)',
                                 color: 'var(--color-coffee)',
                                 lineHeight: 1.7,
-                                maxWidth: '500px'
+                                maxWidth: '90%'
                             }}
                         >
                             Scroll to reveal categories — each one curated and verified for the highest quality work.
-                        </motion.p>
+                        </motion.p> */}
                     </div>
 
                     {/* Right Side - Animated Categories */}
                     <div style={{
                         flex: '0 0 45%',
                         position: 'relative',
-                        height: '650px',
+                        height: 'clamp(550px, 60vh, 650px)',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        minWidth: 0
                     }}>
                         {categories.map((category, index) => (
                             <CategoryCard
