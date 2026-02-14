@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, useInView, useMotionValue, useSpring } from 'framer-motion';
 import SectionSeparator from './SectionSeparator';
 import { AnimatedText } from './AnimatedTest';
 
-const StatCard = ({ value, suffix, label, image, index }) => {
+const StatCard = ({ value, suffix, label, image, index, isMobile }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
   const motionValue = useMotionValue(0);
@@ -32,15 +32,16 @@ const StatCard = ({ value, suffix, label, image, index }) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.1, duration: 0.6 }}
-      whileHover={{ y: -5, scale: 1.02 }}
+      whileHover={!isMobile ? { y: -5, scale: 1.02 } : {}}
       style={{
         position: 'relative',
-        borderRadius: '24px',
+        borderRadius: isMobile ? '20px' : '24px',
         overflow: 'hidden',
-        minWidth: '21%',
-        height: '180px',
+        minWidth: isMobile ? '280px' : '21%',
+        height: isMobile ? '160px' : '180px',
         cursor: 'pointer',
-        boxShadow: '0 10px 40px rgba(0,0,0,0.15)'
+        boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
+        flexShrink: 0
       }}
     >
       <div style={{
@@ -64,7 +65,7 @@ const StatCard = ({ value, suffix, label, image, index }) => {
       <div style={{
         position: 'relative',
         zIndex: 2,
-        padding: '2rem',
+        padding: isMobile ? '1.5rem' : '2rem',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
@@ -72,7 +73,7 @@ const StatCard = ({ value, suffix, label, image, index }) => {
       }}>
         <div>
           <h3 style={{
-            fontSize: '3.5rem',
+            fontSize: isMobile ? '2.5rem' : '3.5rem',
             fontFamily: 'var(--font-heading)',
             color: '#fff',
             margin: 0,
@@ -84,7 +85,7 @@ const StatCard = ({ value, suffix, label, image, index }) => {
           }}>
             <span ref={displayValue}>0</span>
             <span style={{
-              fontSize: '2.5rem',
+              fontSize: isMobile ? '1.8rem' : '2.5rem',
               color: 'var(--color-orange)',
               fontWeight: 'bold'
             }}>
@@ -96,7 +97,7 @@ const StatCard = ({ value, suffix, label, image, index }) => {
         <p style={{
           fontFamily: 'var(--font-body)',
           color: 'rgba(255, 255, 255, 0.9)',
-          fontSize: '0.95rem',
+          fontSize: isMobile ? '0.85rem' : '0.95rem',
           margin: 0,
           fontWeight: 500,
           letterSpacing: '0.02em'
@@ -117,6 +118,20 @@ const StatCard = ({ value, suffix, label, image, index }) => {
 
 
 const StatsCounter = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+
+  // Detect screen size
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+      setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024);
+    };
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
   const stats = [
     {
       value: 1200,
@@ -147,10 +162,10 @@ const StatsCounter = () => {
   return (
     <section style={{
       position: 'relative',
-      padding: '8rem 2rem',
+      padding: isMobile ? '4rem 1.5rem' : isTablet ? '6rem 2rem' : '8rem 2rem',
       background: '#0a0a0a',
       overflow: 'hidden',
-      minHeight: '100vh'
+      minHeight: isMobile ? 'auto' : '100vh'
     }}>
       <div style={{
         position: 'absolute',
@@ -166,15 +181,15 @@ const StatsCounter = () => {
         maxWidth: '1400px',
         margin: '0 auto'
       }}>
-        {/* Animated Header with character-by-character reveal */}
+        {/* Animated Header */}
         <motion.div
           style={{
             textAlign: 'center',
-            marginBottom: '4rem'
+            marginBottom: isMobile ? '3rem' : '4rem'
           }}
         >
           <h2 style={{
-            fontSize: '150px',
+            fontSize: isMobile ? 'clamp(2rem, 8vw, 3.5rem)' : isTablet ? 'clamp(3rem, 8vw, 5rem)' : '150px',
             color: 'var(--color-khaki)',
             marginBottom: '1rem',
             lineHeight: 1.2,
@@ -182,23 +197,38 @@ const StatsCounter = () => {
             perspective: '1000px',
             fontFamily: 'var(--font-heading)',
             fontWeight: 700,
+            padding: isMobile ? '0 1rem' : '0'
           }}>
-            <AnimatedText text="Our Impact in Numbers" delay={0.2} />
+            {isMobile ? (
+              // Simple fade-in for mobile (better performance)
+              <motion.span
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+              >
+                Our Impact in Numbers
+              </motion.span>
+            ) : (
+              // Animated text for desktop
+              <AnimatedText text="Our Impact in Numbers" delay={0.2} />
+            )}
           </h2>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 0.7, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 1.2 }}
+            transition={{ duration: 0.8, delay: isMobile ? 0.3 : 1.2 }}
             style={{
               fontFamily: 'Oswald',
               color: '#f5f1e8',
               opacity: 0.7,
-              maxWidth: '600px',
+              maxWidth: isMobile ? '100%' : '600px',
               margin: '0 auto',
-              fontSize: '1.1rem',
-              lineHeight: 1.6
+              fontSize: isMobile ? '1rem' : '1.1rem',
+              lineHeight: 1.6,
+              padding: isMobile ? '0 1rem' : '0'
             }}
           >
             Join thousands of creatives who are already making their mark
@@ -209,12 +239,12 @@ const StatsCounter = () => {
             initial={{ scaleX: 0, opacity: 0 }}
             whileInView={{ scaleX: 1, opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 1, delay: 1.5, ease: "easeInOut" }}
+            transition={{ duration: 1, delay: isMobile ? 0.5 : 1.5, ease: "easeInOut" }}
             style={{
               height: '2px',
-              width: '120px',
+              width: isMobile ? '80px' : '120px',
               background: 'linear-gradient(90deg, transparent, #ff6b35, transparent)',
-              margin: '2rem auto',
+              margin: isMobile ? '1.5rem auto' : '2rem auto',
               transformOrigin: 'center',
               borderRadius: '2px'
             }}
@@ -222,25 +252,107 @@ const StatsCounter = () => {
         </motion.div>
 
         {/* Stats Cards */}
-        <div style={{
-          display: 'flex',
-          gap: '3.5rem',
-          overflowX: 'auto',
-          overflowY: 'hidden',
-          scrollbarWidth: 'thin',
-          scrollbarColor: '#ff6b35 transparent'
-        }}>
-          {stats.map((stat, index) => (
-            <StatCard
-              key={index}
-              value={stat.value}
-              suffix={stat.suffix}
-              label={stat.label}
-              image={stat.image}
-              index={index}
-            />
-          ))}
-        </div>
+        {isMobile ? (
+          // Mobile: Horizontal scroll
+          <div style={{
+            display: 'flex',
+            gap: '1.5rem',
+            overflowX: 'auto',
+            overflowY: 'hidden',
+            scrollbarWidth: 'thin',
+            scrollbarColor: '#ff6b35 transparent',
+            paddingBottom: '1rem',
+            paddingLeft: '0.5rem',
+            paddingRight: '0.5rem',
+            scrollSnapType: 'x mandatory',
+            WebkitOverflowScrolling: 'touch'
+          }}>
+            {stats.map((stat, index) => (
+              <div
+                key={index}
+                style={{
+                  scrollSnapAlign: 'start',
+                  scrollSnapStop: 'always'
+                }}
+              >
+                <StatCard
+                  value={stat.value}
+                  suffix={stat.suffix}
+                  label={stat.label}
+                  image={stat.image}
+                  index={index}
+                  isMobile={isMobile}
+                />
+              </div>
+            ))}
+          </div>
+        ) : isTablet ? (
+          // Tablet: 2x2 Grid
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: '2rem',
+            maxWidth: '800px',
+            margin: '0 auto'
+          }}>
+            {stats.map((stat, index) => (
+              <StatCard
+                key={index}
+                value={stat.value}
+                suffix={stat.suffix}
+                label={stat.label}
+                image={stat.image}
+                index={index}
+                isMobile={false}
+              />
+            ))}
+          </div>
+        ) : (
+          // Desktop: Original 4-column layout
+          <div style={{
+            display: 'flex',
+            gap: '3.5rem',
+            overflowX: 'auto',
+            overflowY: 'hidden',
+            scrollbarWidth: 'thin',
+            scrollbarColor: '#ff6b35 transparent'
+          }}>
+            {stats.map((stat, index) => (
+              <StatCard
+                key={index}
+                value={stat.value}
+                suffix={stat.suffix}
+                label={stat.label}
+                image={stat.image}
+                index={index}
+                isMobile={false}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Mobile scroll indicator */}
+        {isMobile && (
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: [0.5, 1, 0.5], x: [0, 10, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            style={{
+              textAlign: 'center',
+              marginTop: '2rem',
+              color: 'var(--color-orange)',
+              fontSize: '0.85rem',
+              fontFamily: 'var(--font-body)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem'
+            }}
+          >
+            <span>Swipe to explore</span>
+            <span style={{ fontSize: '1.2rem' }}>→</span>
+          </motion.div>
+        )}
       </div>
 
       <style>{`
@@ -251,28 +363,58 @@ const StatsCounter = () => {
           --color-orange: #ff6b35;
           --color-red: #d64933;
           --color-black: #0a0a0a;
+          --color-khaki: #FFE24F;
         }
 
-        .container > div:last-child::-webkit-scrollbar {
-          height: 8px;
+        /* Scrollbar styling for mobile and desktop */
+        .container > div::-webkit-scrollbar {
+          height: 6px;
         }
-        .container > div:last-child::-webkit-scrollbar-track {
+        .container > div::-webkit-scrollbar-track {
           background: rgba(0,0,0,0.05);
           border-radius: 10px;
         }
-        .container > div:last-child::-webkit-scrollbar-thumb {
+        .container > div::-webkit-scrollbar-thumb {
           background: var(--color-orange);
           border-radius: 10px;
         }
-        .container > div:last-child::-webkit-scrollbar-thumb:hover {
+        .container > div::-webkit-scrollbar-thumb:hover {
           background: var(--color-red);
         }
 
+        /* Desktop: Grid layout */
         @media (min-width: 1200px) {
-          .container > div:last-child {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            overflow: visible;
+          .container > div:not(.mobile-scroll-indicator) {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
+            overflow: visible !important;
+            gap: 2rem !important;
+          }
+          
+          .container > div:not(.mobile-scroll-indicator) > * {
+            min-width: auto !important;
+          }
+        }
+
+        /* Smooth scrolling for mobile */
+        @media (max-width: 767px) {
+          .container > div {
+            scroll-padding: 0 1.5rem;
+            -webkit-overflow-scrolling: touch;
+          }
+        }
+
+        /* Hide scrollbar on mobile for cleaner look */
+        @media (max-width: 767px) {
+          .container > div::-webkit-scrollbar {
+            display: none;
+          }
+        }
+
+        /* Tablet specific adjustments */
+        @media (min-width: 768px) and (max-width: 1023px) {
+          .container > div {
+            grid-template-columns: repeat(2, 1fr) !important;
           }
         }
       `}</style>

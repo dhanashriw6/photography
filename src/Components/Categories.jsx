@@ -3,7 +3,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { Camera, Film, Video, Image, Sparkles, Clapperboard, Users, Award } from 'lucide-react';
 import SectionSeparator from './SectionSeparator';
 
-const CategoryItem = ({ category, index, categoryCount, scrollYProgress }) => {
+const CategoryCard = ({ category, index, categoryCount, scrollYProgress }) => {
     const start = index / categoryCount;
     const end = (index + 1) / categoryCount;
     const isLast = index === categoryCount - 1;
@@ -585,7 +585,7 @@ const Categories = () => {
                         justifyContent: 'center'
                     }}>
                         {categories.map((category, index) => (
-                            <CategoryItem
+                            <CategoryCard
                                 key={index}
                                 category={category}
                                 index={index}

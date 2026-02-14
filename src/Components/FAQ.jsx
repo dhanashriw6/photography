@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Minus, HelpCircle, MessageCircle, Sparkles } from 'lucide-react';
 import SectionSeparator from './SectionSeparator';
@@ -6,6 +6,19 @@ import { AnimatedText } from './AnimatedTest';
 
 const FAQ = () => {
   const [openIndex, setOpenIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+
+  // Detect screen size
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+      setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024);
+    };
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   const faqs = [
     {
@@ -37,7 +50,7 @@ const FAQ = () => {
 
   return (
     <section style={{
-      padding: '10rem 2rem',
+      padding: isMobile ? '4rem 1.5rem' : isTablet ? '6rem 2rem' : '10rem 2rem',
       background: 'linear-gradient(135deg, var(--color-dark-slate-gray) 0%, #1a1816 100%)',
       position: 'relative',
       overflow: 'hidden'
@@ -53,7 +66,7 @@ const FAQ = () => {
         opacity: 0.3
       }} />
 
-      {/* Floating Orbs */}
+      {/* Floating Orbs - Reduced on mobile */}
       <motion.div
         animate={{
           y: [0, -40, 0],
@@ -64,9 +77,9 @@ const FAQ = () => {
         style={{
           position: 'absolute',
           top: '10%',
-          left: '5%',
-          width: '400px',
-          height: '400px',
+          left: isMobile ? '-10%' : '5%',
+          width: isMobile ? '250px' : '400px',
+          height: isMobile ? '250px' : '400px',
           borderRadius: '50%',
           background: 'radial-gradient(circle, rgba(255, 174, 0, 0.15) 0%, transparent 70%)',
           pointerEvents: 'none',
@@ -83,9 +96,9 @@ const FAQ = () => {
         style={{
           position: 'absolute',
           bottom: '5%',
-          right: '10%',
-          width: '500px',
-          height: '500px',
+          right: isMobile ? '-10%' : '10%',
+          width: isMobile ? '300px' : '500px',
+          height: isMobile ? '300px' : '500px',
           borderRadius: '50%',
           background: 'radial-gradient(circle, rgba(255, 174, 0, 0.12) 0%, transparent 70%)',
           pointerEvents: 'none',
@@ -93,14 +106,22 @@ const FAQ = () => {
         }}
       />
 
-      <div className="container" style={{ maxWidth: '1400px', position: 'relative', zIndex: 1 }}>
+      <div className="container" style={{ 
+        maxWidth: '1400px', 
+        position: 'relative', 
+        zIndex: 1,
+        padding: isMobile ? '0' : '0 2rem'
+      }}>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          style={{ textAlign: 'center', marginBottom: '6rem' }}
+          style={{ 
+            textAlign: 'center', 
+            marginBottom: isMobile ? '3rem' : isTablet ? '4rem' : '6rem' 
+          }}
         >
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
@@ -110,10 +131,9 @@ const FAQ = () => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.75rem',
-              marginBottom: '2rem',
-              padding: '0.5rem 1.25rem',
-
-              background: 'rgba(255, 226, 79, 0.25)', // #FFE24F with transparency
+              marginBottom: isMobile ? '1.5rem' : '2rem',
+              padding: isMobile ? '0.4rem 1rem' : '0.5rem 1.25rem',
+              background: 'rgba(255, 226, 79, 0.25)',
               borderRadius: '100px',
               border: '1px solid rgba(255, 226, 79, 0.4)',
               color: '#FFE24F',
@@ -122,7 +142,7 @@ const FAQ = () => {
           >
             <span style={{
               color: 'var(--color-khaki)',
-              fontSize: '0.9rem',
+              fontSize: isMobile ? '0.75rem' : '0.9rem',
               textTransform: 'uppercase',
               letterSpacing: '0.2em',
               fontWeight: '600'
@@ -132,7 +152,11 @@ const FAQ = () => {
           </motion.div>
 
           <h2 style={{
-            fontSize: '150px',
+            fontSize: isMobile 
+              ? 'clamp(2.5rem, 10vw, 4rem)' 
+              : isTablet 
+                ? 'clamp(4rem, 10vw, 6rem)' 
+                : '150px',
             color: 'var(--color-khaki)',
             marginBottom: '1rem',
             lineHeight: 1.2,
@@ -141,7 +165,20 @@ const FAQ = () => {
             fontFamily: 'var(--font-heading)',
             fontWeight: 700,
           }}>
-            <AnimatedText text="We Have Answers" delay={0.2} />
+            {isMobile ? (
+              // Simple fade for mobile
+              <motion.span
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+              >
+                We Have Answers
+              </motion.span>
+            ) : (
+              // Animated text for desktop
+              <AnimatedText text="We Have Answers" delay={0.2} />
+            )}
           </h2>
 
           <motion.p
@@ -150,67 +187,73 @@ const FAQ = () => {
             viewport={{ once: true }}
             transition={{ delay: 0.4 }}
             style={{
-              fontSize: '1.2rem',
+              fontSize: isMobile ? '1rem' : '1.2rem',
               color: 'var(--color-old-lace)',
-              maxWidth: '700px',
-              margin: '0 auto'
+              maxWidth: isMobile ? '100%' : '700px',
+              margin: '0 auto',
+              lineHeight: 1.6
             }}
           >
             Everything you need to know to get started with Film Frame Studio
           </motion.p>
         </motion.div>
 
-        {/* Split Layout */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))',
-          gap: '4rem',
-          alignItems: 'start'
-        }}>
-          {/* Left Side - Questions */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        {/* Layout - Stack on mobile, split on desktop */}
+        {isMobile || isTablet ? (
+          // Mobile/Tablet: Single column accordion
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: isMobile ? '1rem' : '1.5rem',
+            maxWidth: '800px',
+            margin: '0 auto'
+          }}>
             {faqs.map((faq, index) => {
               const isOpen = openIndex === index;
 
               return (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, x: -50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  style={{ position: 'relative' }}
+                  style={{
+                    background: isOpen
+                      ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.4), rgba(26, 26, 26, 0.2))'
+                      : 'rgba(255,255,255,0.03)',
+                    border: `2px solid ${isOpen ? 'var(--color-khaki)' : 'rgba(247, 244, 233, 0.1)'}`,
+                    borderRadius: isMobile ? '16px' : '20px',
+                    overflow: 'hidden',
+                    backdropFilter: 'blur(10px)',
+                    transition: 'all 0.4s ease'
+                  }}
                 >
-                  <motion.button
-                    onClick={() => setOpenIndex(index)}
-                    whileHover={{ x: 10 }}
+                  {/* Question Button */}
+                  <button
+                    onClick={() => setOpenIndex(openIndex === index ? -1 : index)}
                     style={{
                       width: '100%',
-                      padding: '2rem',
-                      background: isOpen
-                        ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.3), rgba(26, 26, 26, 0.1))'
-                        : 'rgba(255,255,255,0.03)',
-                      border: `2px solid ${isOpen ? 'var(--color-khaki)' : 'rgba(247, 244, 233, 0.1)'}`,
-                      borderRadius: '20px',
+                      padding: isMobile ? '1.25rem' : '1.5rem',
+                      background: 'transparent',
+                      border: 'none',
                       cursor: 'pointer',
                       textAlign: 'left',
-                      transition: 'all 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
-                      backdropFilter: 'blur(10px)',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '1.5rem'
+                      gap: isMobile ? '0.75rem' : '1rem'
                     }}
                   >
                     {/* Icon */}
                     <motion.div
                       animate={{
                         scale: isOpen ? 1.1 : 1,
-                        rotate: isOpen ? 360 : 0
+                        rotate: isOpen ? 180 : 0
                       }}
-                      transition={{ duration: 0.5 }}
+                      transition={{ duration: 0.3 }}
                       style={{
-                        minWidth: '50px',
-                        height: '50px',
+                        minWidth: isMobile ? '40px' : '45px',
+                        height: isMobile ? '40px' : '45px',
                         borderRadius: '50%',
                         background: isOpen
                           ? 'var(--color-khaki)'
@@ -218,10 +261,11 @@ const FAQ = () => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: isOpen ? 'var(--color-black)' : 'var(--color-khaki)'
+                        color: isOpen ? 'var(--color-black)' : 'var(--color-khaki)',
+                        flexShrink: 0
                       }}
                     >
-                      {isOpen ? <Minus size={24} /> : <Plus size={24} />}
+                      {isOpen ? <Minus size={isMobile ? 18 : 20} /> : <Plus size={isMobile ? 18 : 20} />}
                     </motion.div>
 
                     {/* Question Text */}
@@ -231,11 +275,11 @@ const FAQ = () => {
                           color: isOpen ? 'var(--color-khaki)' : 'var(--color-old-lace)'
                         }}
                         style={{
-
-                          fontSize: 'clamp(1.1rem, 2vw, 1.4rem)',
+                          fontSize: isMobile ? 'clamp(0.95rem, 4vw, 1.1rem)' : 'clamp(1.1rem, 2vw, 1.3rem)',
                           fontWeight: isOpen ? '700' : '500',
                           display: 'block',
                           fontFamily: "Oswald",
+                          lineHeight: 1.3
                         }}
                       >
                         {faq.question}
@@ -245,173 +289,263 @@ const FAQ = () => {
                     {/* Number Badge */}
                     <motion.div
                       animate={{
-                        scale: isOpen ? 1.2 : 1,
+                        scale: isOpen ? 1.15 : 1,
                         opacity: isOpen ? 1 : 0.5
                       }}
                       style={{
-                        fontSize: '0.85rem',
+                        fontSize: isMobile ? '0.75rem' : '0.85rem',
                         color: isOpen ? 'var(--color-khaki)' : 'rgba(247, 244, 233, 0.5)',
                         fontWeight: '700',
                         fontFamily: "Oswald",
+                        flexShrink: 0
                       }}
                     >
                       {String(index + 1).padStart(2, '0')}
                     </motion.div>
-                  </motion.button>
+                  </button>
 
+                  {/* Answer - Expandable */}
+                  <AnimatePresence>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        style={{ overflow: 'hidden' }}
+                      >
+                        <div style={{
+                          padding: isMobile ? '1rem 1.25rem 1.5rem' : '1.5rem 1.5rem 2rem',
+                          paddingLeft: isMobile ? '4.5rem' : '5rem'
+                        }}>
+                          <p style={{
+                            fontSize: isMobile ? '0.9rem' : '1rem',
+                            lineHeight: 1.7,
+                            color: 'var(--color-old-lace)',
+                            opacity: 0.9,
+                            fontFamily: "Oswald",
+                            margin: 0
+                          }}>
+                            {faq.answer}
+                          </p>
+
+                          {/* Decorative line */}
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: '60px' }}
+                            transition={{ delay: 0.2, duration: 0.5 }}
+                            style={{
+                              height: '2px',
+                              background: 'linear-gradient(90deg, var(--color-khaki), transparent)',
+                              marginTop: '1rem',
+                              borderRadius: '2px'
+                            }}
+                          />
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </motion.div>
               );
             })}
           </div>
+        ) : (
+          // Desktop: Split layout with sticky answer panel
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))',
+            gap: '4rem',
+            alignItems: 'start'
+          }}>
+            {/* Left Side - Questions */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              {faqs.map((faq, index) => {
+                const isOpen = openIndex === index;
 
-          {/* Right Side - Answer Display */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3 }}
-            style={{
-              position: 'sticky',
-              top: '100px',
-              background: 'rgba(255,255,255,0.05)',
-              backdropFilter: 'blur(30px)',
-              borderRadius: '30px',
-              padding: '4rem',
-              border: '1px solid rgba(255, 174, 0, 0.2)',
-              minHeight: '500px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              marginTop: "5rem"
-            }}
-          >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={openIndex}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -30 }}
-                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              >
-                {/* Large Number */}
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -50 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                    style={{ position: 'relative' }}
+                  >
+                    <motion.button
+                      onClick={() => setOpenIndex(index)}
+                      whileHover={{ x: 10 }}
+                      style={{
+                        width: '100%',
+                        padding: '2rem',
+                        background: isOpen
+                          ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.3), rgba(26, 26, 26, 0.1))'
+                          : 'rgba(255,255,255,0.03)',
+                        border: `2px solid ${isOpen ? 'var(--color-khaki)' : 'rgba(247, 244, 233, 0.1)'}`,
+                        borderRadius: '20px',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'all 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
+                        backdropFilter: 'blur(10px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '1.5rem'
+                      }}
+                    >
+                      {/* Icon */}
+                      <motion.div
+                        animate={{
+                          scale: isOpen ? 1.1 : 1,
+                          rotate: isOpen ? 360 : 0
+                        }}
+                        transition={{ duration: 0.5 }}
+                        style={{
+                          minWidth: '50px',
+                          height: '50px',
+                          borderRadius: '50%',
+                          background: isOpen
+                            ? 'var(--color-khaki)'
+                            : 'rgba(255, 174, 0, 0.2)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: isOpen ? 'var(--color-black)' : 'var(--color-khaki)'
+                        }}
+                      >
+                        {isOpen ? <Minus size={24} /> : <Plus size={24} />}
+                      </motion.div>
+
+                      {/* Question Text */}
+                      <div style={{ flex: 1 }}>
+                        <motion.span
+                          animate={{
+                            color: isOpen ? 'var(--color-khaki)' : 'var(--color-old-lace)'
+                          }}
+                          style={{
+                            fontSize: 'clamp(1.1rem, 2vw, 1.4rem)',
+                            fontWeight: isOpen ? '700' : '500',
+                            display: 'block',
+                            fontFamily: "Oswald",
+                          }}
+                        >
+                          {faq.question}
+                        </motion.span>
+                      </div>
+
+                      {/* Number Badge */}
+                      <motion.div
+                        animate={{
+                          scale: isOpen ? 1.2 : 1,
+                          opacity: isOpen ? 1 : 0.5
+                        }}
+                        style={{
+                          fontSize: '0.85rem',
+                          color: isOpen ? 'var(--color-khaki)' : 'rgba(247, 244, 233, 0.5)',
+                          fontWeight: '700',
+                          fontFamily: "Oswald",
+                        }}
+                      >
+                        {String(index + 1).padStart(2, '0')}
+                      </motion.div>
+                    </motion.button>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* Right Side - Answer Display */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              style={{
+                position: 'sticky',
+                top: '100px',
+                background: 'rgba(255,255,255,0.05)',
+                backdropFilter: 'blur(30px)',
+                borderRadius: '30px',
+                padding: '4rem',
+                border: '1px solid rgba(255, 174, 0, 0.2)',
+                minHeight: '500px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                marginTop: "5rem"
+              }}
+            >
+              <AnimatePresence mode="wait">
                 <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                  style={{
-                    fontSize: '8rem',
-                    fontFamily: "Oswald",
-                    fontWeight: 'bold',
-                    color: 'var(--color-khaki)',
-                    lineHeight: 1,
-                    marginBottom: '2rem'
-                  }}
+                  key={openIndex}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -30 }}
+                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  {String(openIndex + 1).padStart(2, '0')}
+                  {/* Large Number */}
+                  <motion.div
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+                    style={{
+                      fontSize: '8rem',
+                      fontFamily: "Oswald",
+                      fontWeight: 'bold',
+                      color: 'var(--color-khaki)',
+                      lineHeight: 1,
+                      marginBottom: '2rem'
+                    }}
+                  >
+                    {String(openIndex + 1).padStart(2, '0')}
+                  </motion.div>
+
+                  {/* Answer Title */}
+                  <motion.h3
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 }}
+                    style={{
+                      fontSize: 'clamp(1.5rem, 3vw, 2rem)',
+                      color: 'var(--color-old-lace)',
+                      marginBottom: '2rem',
+                      fontFamily: "Oswald",
+                      lineHeight: 1.3
+                    }}
+                  >
+                    {faqs[openIndex].question}
+                  </motion.h3>
+
+                  {/* Answer Text */}
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 0.9 }}
+                    transition={{ delay: 0.4 }}
+                    style={{
+                      fontSize: '1.15rem',
+                      lineHeight: 1.8,
+                      color: 'var(--color-old-lace)',
+                      fontFamily: "Oswald",
+                    }}
+                  >
+                    {faqs[openIndex].answer}
+                  </motion.p>
+
+                  {/* Decorative Element */}
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: '100px' }}
+                    transition={{ delay: 0.6, duration: 0.8 }}
+                    style={{
+                      height: '3px',
+                      background: 'linear-gradient(90deg, var(--color-khaki), transparent)',
+                      marginTop: '2rem',
+                      borderRadius: '2px'
+                    }}
+                  />
                 </motion.div>
-
-                {/* Answer Title */}
-                <motion.h3
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 }}
-                  style={{
-                    fontSize: 'clamp(1.5rem, 3vw, 2rem)',
-                    color: 'var(--color-old-lace)',
-                    marginBottom: '2rem',
-                    fontFamily: "Oswald",
-                    lineHeight: 1.3
-                  }}
-                >
-                  {faqs[openIndex].question}
-                </motion.h3>
-
-                {/* Answer Text */}
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 0.9 }}
-                  transition={{ delay: 0.4 }}
-                  style={{
-                    fontSize: '1.15rem',
-                    lineHeight: 1.8,
-                    color: 'var(--color-old-lace)',
-                    fontFamily: "Oswald",
-                  }}
-                >
-                  {faqs[openIndex].answer}
-                </motion.p>
-
-                {/* Decorative Element */}
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: '100px' }}
-                  transition={{ delay: 0.6, duration: 0.8 }}
-                  style={{
-                    height: '3px',
-                    background: 'linear-gradient(90deg, var(--color-khaki), transparent)',
-                    marginTop: '2rem',
-                    borderRadius: '2px'
-                  }}
-                />
-              </motion.div>
-            </AnimatePresence>
-          </motion.div>
-        </div>
-
-        {/* Bottom CTA */}
-        {/* <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.5 }}
-          style={{
-            marginTop: '8rem',
-            textAlign: 'center',
-            padding: '4rem',
-            background: 'rgba(193,154,107,0.1)',
-            borderRadius: '30px',
-            border: '1px solid rgba(193,154,107,0.2)',
-            backdropFilter: 'blur(20px)'
-          }}
-        >
-          <h3 style={{
-            fontSize: 'clamp(2rem, 4vw, 3rem)',
-            color: 'var(--color-beige)',
-            marginBottom: '1rem',
-            fontFamily: 'var(--font-heading)'
-          }}>
-            Still Need Help?
-          </h3>
-          <p style={{
-            color: 'var(--color-beige)',
-            opacity: 0.8,
-            marginBottom: '2.5rem',
-            fontSize: '1.1rem',
-            maxWidth: '600px',
-            margin: '0 auto 2.5rem'
-          }}>
-            Our dedicated support team is available 24/7 to assist you
-          </p>
-          <motion.button
-            whileHover={{ 
-              scale: 1.05,
-              boxShadow: '0 20px 60px rgba(193,154,107,0.4)'
-            }}
-            whileTap={{ scale: 0.95 }}
-            className="btn"
-            style={{
-              background: 'var(--color-caramel)',
-              color: 'var(--color-mocha)',
-              borderColor: 'var(--color-caramel)',
-              padding: '1.3rem 3rem',
-              fontSize: '1.1rem',
-              fontWeight: '600',
-              borderRadius: '50px'
-            }}
-          >
-            Contact Support Team
-          </motion.button>
-        </motion.div> */}
+              </AnimatePresence>
+            </motion.div>
+          </div>
+        )}
       </div>
     </section>
   );

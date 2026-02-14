@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Instagram, Twitter, Linkedin, Mail, Send, Camera, Film, Heart, User, Phone, MessageSquare } from 'lucide-react';
 import SectionSeparator from './SectionSeparator';
@@ -11,6 +11,19 @@ const Footer = () => {
     message: ''
   });
   const [isHovered, setIsHovered] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+
+  // Detect screen size
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+      setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024);
+    };
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   const socialLinks = [
     { icon: Instagram, label: 'Instagram', color: '#E4405F', delay: 0 },
@@ -31,13 +44,13 @@ const Footer = () => {
 
   const inputStyle = {
     width: '100%',
-    padding: '1rem 1.5rem',
-    borderRadius: '12px',
+    padding: isMobile ? '0.9rem 1.2rem' : '1rem 1.5rem',
+    borderRadius: isMobile ? '10px' : '12px',
     border: '1px solid rgba(255, 254, 250, 0.2)',
     background: 'rgba(255, 254, 250, 0.05)',
     color: 'var(--color-paper-beige)',
     fontFamily: 'var(--font-body)',
-    fontSize: '1rem',
+    fontSize: isMobile ? '0.95rem' : '1rem',
     outline: 'none',
     transition: 'all 0.3s ease'
   };
@@ -55,7 +68,7 @@ const Footer = () => {
   return (
     <footer style={{
       position: 'relative',
-      padding: '6rem 2rem 2rem',
+      padding: isMobile ? '4rem 1.5rem 2rem' : isTablet ? '5rem 2rem 2rem' : '6rem 2rem 2rem',
       backgroundColor: 'var(--color-soft-black)',
       backgroundImage: `url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 4L14 10L20 12L14 14L12 20L10 14L4 12L10 10z' fill='%23FFE24F'/%3E%3C/svg%3E")`,
       backgroundSize: '12px 12px',
@@ -75,8 +88,8 @@ const Footer = () => {
           position: 'absolute',
           top: '-20%',
           left: '-10%',
-          width: '500px',
-          height: '500px',
+          width: isMobile ? '300px' : '500px',
+          height: isMobile ? '300px' : '500px',
           borderRadius: '50%',
           background: 'radial-gradient(circle, rgba(255,174,0,0.2) 0%, transparent 70%)',
           filter: 'blur(100px)',
@@ -93,8 +106,8 @@ const Footer = () => {
           position: 'absolute',
           bottom: '-15%',
           right: '-10%',
-          width: '600px',
-          height: '600px',
+          width: isMobile ? '350px' : '600px',
+          height: isMobile ? '350px' : '600px',
           borderRadius: '50%',
           background: 'radial-gradient(circle, rgba(255,226,79,0.15) 0%, transparent 70%)',
           filter: 'blur(120px)',
@@ -102,37 +115,40 @@ const Footer = () => {
         }}
       />
 
-      {/* Floating Decorative Elements */}
-      <motion.div
-        animate={{ y: [0, -15, 0], rotate: [0, 5, 0] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        style={{
-          position: 'absolute',
-          top: '20%',
-          left: '15%',
-          zIndex: 15,
-          pointerEvents: 'none',
-          opacity: 0.8
-        }}
-      >
-        <Film size={40} color="var(--color-khaki)" strokeWidth={1} />
-      </motion.div>
+      {/* Floating Decorative Elements - Hidden on mobile */}
+      {!isMobile && (
+        <>
+          <motion.div
+            animate={{ y: [0, -15, 0], rotate: [0, 5, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            style={{
+              position: 'absolute',
+              top: '20%',
+              left: '15%',
+              zIndex: 15,
+              pointerEvents: 'none',
+              opacity: 0.8
+            }}
+          >
+            <Film size={isTablet ? 32 : 40} color="var(--color-khaki)" strokeWidth={1} />
+          </motion.div>
 
-      <motion.div
-        animate={{ y: [0, 20, 0], rotate: [0, -10, 0] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        style={{
-          position: 'absolute',
-          bottom: '20%',
-          right: '10%',
-          zIndex: 15,
-          pointerEvents: 'none',
-          opacity: 0.6
-        }}
-      >
-        <Camera size={48} color="var(--color-khaki)" strokeWidth={1} />
-      </motion.div>
-
+          <motion.div
+            animate={{ y: [0, 20, 0], rotate: [0, -10, 0] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            style={{
+              position: 'absolute',
+              bottom: '20%',
+              right: '10%',
+              zIndex: 15,
+              pointerEvents: 'none',
+              opacity: 0.6
+            }}
+          >
+            <Camera size={isTablet ? 40 : 48} color="var(--color-khaki)" strokeWidth={1} />
+          </motion.div>
+        </>
+      )}
 
       {/* Main Footer Content */}
       <div style={{
@@ -149,10 +165,10 @@ const Footer = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
           style={{
-            marginBottom: '6rem',
-            padding: '4rem 2rem',
+            marginBottom: isMobile ? '4rem' : isTablet ? '5rem' : '6rem',
+            padding: isMobile ? '2.5rem 1.5rem' : isTablet ? '3rem 2rem' : '4rem 2rem',
             background: 'rgba(17, 18, 18, 0.7)',
-            borderRadius: '24px',
+            borderRadius: isMobile ? '20px' : '24px',
             border: '1px solid rgba(255, 226, 79, 0.2)',
             backdropFilter: 'blur(12px)',
             boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
@@ -161,10 +177,14 @@ const Footer = () => {
             alignItems: 'center'
           }}
         >
-          <div style={{ textAlign: 'center', marginBottom: '3rem', maxWidth: '700px' }}>
+          <div style={{ 
+            textAlign: 'center', 
+            marginBottom: isMobile ? '2rem' : '3rem', 
+            maxWidth: '700px' 
+          }}>
             <h3 style={{
               fontFamily: 'var(--font-heading)',
-              fontSize: 'clamp(2rem, 4vw, 3rem)',
+              fontSize: isMobile ? 'clamp(1.8rem, 6vw, 2.5rem)' : 'clamp(2rem, 4vw, 3rem)',
               marginBottom: '1rem',
               color: 'var(--color-paper-beige)',
               letterSpacing: '0.02em',
@@ -174,7 +194,7 @@ const Footer = () => {
             </h3>
             <p style={{
               fontFamily: 'var(--font-body)',
-              fontSize: '1.1rem',
+              fontSize: isMobile ? '0.95rem' : '1.1rem',
               color: 'var(--color-pale)',
               opacity: 0.8,
               lineHeight: 1.6
@@ -185,90 +205,151 @@ const Footer = () => {
 
           <form style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '1.5rem',
+            gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+            gap: isMobile ? '1rem' : '1.5rem',
             width: '100%',
             maxWidth: '900px'
           }}>
-            <div style={{ position: 'relative', gridColumn: window.innerWidth < 768 ? 'span 2' : 'span 1' }}>
-              <User size={18} color="rgba(255,255,255,0.4)" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
+            <div style={{ 
+              position: 'relative', 
+              gridColumn: isMobile ? 'span 1' : 'span 1' 
+            }}>
+              <User 
+                size={isMobile ? 16 : 18} 
+                color="rgba(255,255,255,0.4)" 
+                style={{ 
+                  position: 'absolute', 
+                  left: isMobile ? '0.9rem' : '1rem', 
+                  top: '50%', 
+                  transform: 'translateY(-50%)' 
+                }} 
+              />
               <input
                 type="text"
                 name="name"
                 placeholder="Your Name"
                 value={formData.name}
                 onChange={handleChange}
-                style={{ ...inputStyle, paddingLeft: '3rem' }}
+                style={{ 
+                  ...inputStyle, 
+                  paddingLeft: isMobile ? '2.7rem' : '3rem' 
+                }}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
               />
             </div>
 
-            <div style={{ position: 'relative', gridColumn: window.innerWidth < 768 ? 'span 2' : 'span 1' }}>
-              <Phone size={18} color="rgba(255,255,255,0.4)" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
+            <div style={{ 
+              position: 'relative', 
+              gridColumn: isMobile ? 'span 1' : 'span 1' 
+            }}>
+              <Phone 
+                size={isMobile ? 16 : 18} 
+                color="rgba(255,255,255,0.4)" 
+                style={{ 
+                  position: 'absolute', 
+                  left: isMobile ? '0.9rem' : '1rem', 
+                  top: '50%', 
+                  transform: 'translateY(-50%)' 
+                }} 
+              />
               <input
                 type="text"
                 name="contact"
                 placeholder="Contact Number"
                 value={formData.contact}
                 onChange={handleChange}
-                style={{ ...inputStyle, paddingLeft: '3rem' }}
+                style={{ 
+                  ...inputStyle, 
+                  paddingLeft: isMobile ? '2.7rem' : '3rem' 
+                }}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
               />
             </div>
 
-            <div style={{ position: 'relative', gridColumn: 'span 2' }}>
-              <Mail size={18} color="rgba(255,255,255,0.4)" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
+            <div style={{ position: 'relative', gridColumn: isMobile ? 'span 1' : 'span 2' }}>
+              <Mail 
+                size={isMobile ? 16 : 18} 
+                color="rgba(255,255,255,0.4)" 
+                style={{ 
+                  position: 'absolute', 
+                  left: isMobile ? '0.9rem' : '1rem', 
+                  top: '50%', 
+                  transform: 'translateY(-50%)' 
+                }} 
+              />
               <input
                 type="email"
                 name="email"
                 placeholder="Email Address"
                 value={formData.email}
                 onChange={handleChange}
-                style={{ ...inputStyle, paddingLeft: '3rem' }}
+                style={{ 
+                  ...inputStyle, 
+                  paddingLeft: isMobile ? '2.7rem' : '3rem' 
+                }}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
               />
             </div>
 
-            <div style={{ position: 'relative', gridColumn: 'span 2' }}>
-              <MessageSquare size={18} color="rgba(255,255,255,0.4)" style={{ position: 'absolute', left: '1rem', top: '1.2rem' }} />
+            <div style={{ position: 'relative', gridColumn: isMobile ? 'span 1' : 'span 2' }}>
+              <MessageSquare 
+                size={isMobile ? 16 : 18} 
+                color="rgba(255,255,255,0.4)" 
+                style={{ 
+                  position: 'absolute', 
+                  left: isMobile ? '0.9rem' : '1rem', 
+                  top: isMobile ? '1rem' : '1.2rem' 
+                }} 
+              />
               <textarea
                 name="message"
                 placeholder="Your Message..."
-                rows="4"
+                rows={isMobile ? "3" : "4"}
                 value={formData.message}
                 onChange={handleChange}
-                style={{ ...inputStyle, paddingLeft: '3rem', resize: 'vertical' }}
+                style={{ 
+                  ...inputStyle, 
+                  paddingLeft: isMobile ? '2.7rem' : '3rem', 
+                  resize: 'vertical' 
+                }}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
               />
             </div>
 
-            <div style={{ gridColumn: 'span 2', display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+            <div style={{ 
+              gridColumn: isMobile ? 'span 1' : 'span 2', 
+              display: 'flex', 
+              justifyContent: 'center', 
+              marginTop: isMobile ? '0.5rem' : '1rem' 
+            }}>
               <motion.button
-                whileHover={{ scale: 1.02, boxShadow: '0 10px 30px rgba(255, 174, 0, 0.3)' }}
+                whileHover={!isMobile ? { scale: 1.02, boxShadow: '0 10px 30px rgba(255, 174, 0, 0.3)' } : {}}
                 whileTap={{ scale: 0.98 }}
                 style={{
-                  padding: '1rem 3rem',
-                  borderRadius: '12px',
+                  padding: isMobile ? '0.9rem 2.5rem' : '1rem 3rem',
+                  borderRadius: isMobile ? '10px' : '12px',
                   border: 'none',
                   background: 'var(--color-khaki)',
                   color: 'var(--color-soft-black)',
                   fontFamily: 'var(--font-heading)',
-                  fontSize: '1.1rem',
+                  fontSize: isMobile ? '1rem' : '1.1rem',
                   fontWeight: '600',
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.8rem'
+                  gap: '0.8rem',
+                  width: isMobile ? '100%' : 'auto',
+                  justifyContent: 'center'
                 }}
               >
                 Send Message
-                <Send size={18} />
+                <Send size={isMobile ? 16 : 18} />
               </motion.button>
             </div>
           </form>
@@ -282,12 +363,16 @@ const Footer = () => {
           transition={{ duration: 0.8, delay: 0.2 }}
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '3rem',
+            gridTemplateColumns: isMobile 
+              ? '1fr' 
+              : isTablet 
+                ? 'repeat(2, 1fr)' 
+                : 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: isMobile ? '2rem' : '3rem',
             textAlign: 'left',
             backgroundColor: 'var(--color-soft-black)',
-            padding: '2rem 2rem',
-            borderRadius: '12px',
+            padding: isMobile ? '1.5rem 1rem' : '2rem 2rem',
+            borderRadius: isMobile ? '10px' : '12px',
           }}
         >
           {footerLinks.map((section, idx) => (
@@ -300,7 +385,7 @@ const Footer = () => {
             >
               <h4 style={{
                 fontFamily: 'var(--font-heading)',
-                fontSize: '1.3rem',
+                fontSize: isMobile ? '1.15rem' : '1.3rem',
                 color: 'var(--color-khaki)',
                 borderBottom: '2px solid rgba(255, 226, 79, 0.3)',
                 paddingBottom: '0.5rem',
@@ -308,30 +393,39 @@ const Footer = () => {
               }}>
                 {section.title}
               </h4>
-              <ul style={{ listStyle: 'none', padding: 0, marginTop: '1rem', margin: 0 }}>
+              <ul style={{ 
+                listStyle: 'none', 
+                padding: 0, 
+                marginTop: isMobile ? '0.75rem' : '1rem', 
+                margin: 0 
+              }}>
                 {section.links.map((link, linkIdx) => (
                   <motion.li
                     key={linkIdx}
-                    whileHover={{ x: 5 }}
-                    style={{ marginBottom: '0.8rem' }}
+                    whileHover={!isMobile ? { x: 5 } : {}}
+                    style={{ marginBottom: isMobile ? '0.6rem' : '0.8rem' }}
                   >
                     <a
                       href="#"
                       style={{
                         fontFamily: 'var(--font-body)',
-                        fontSize: '1rem',
+                        fontSize: isMobile ? '0.9rem' : '1rem',
                         color: 'var(--color-paper-beige)',
                         textDecoration: 'none',
                         opacity: 0.7,
                         transition: 'all 0.3s ease',
                       }}
                       onMouseEnter={(e) => {
-                        e.target.style.opacity = '1';
-                        e.target.style.color = 'var(--color-khaki)';
+                        if (!isMobile) {
+                          e.target.style.opacity = '1';
+                          e.target.style.color = 'var(--color-khaki)';
+                        }
                       }}
                       onMouseLeave={(e) => {
-                        e.target.style.opacity = '0.7';
-                        e.target.style.color = 'var(--color-paper-beige)';
+                        if (!isMobile) {
+                          e.target.style.opacity = '0.7';
+                          e.target.style.color = 'var(--color-paper-beige)';
+                        }
                       }}
                     >
                       {link}
@@ -347,39 +441,43 @@ const Footer = () => {
         <div style={{
           height: '3px',
           background: 'linear-gradient(90deg, transparent, rgba(233, 212, 58, 0.1), transparent)',
-
+          margin: isMobile ? '2rem 0' : '3rem 0'
         }} />
-        <motion.div
-          animate={{
-            rotate: [0, 360],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-          style={{
-            position: 'absolute',
-            bottom: '8%',
-            left: '10%',
-            zIndex: 5,
-            pointerEvents: 'none'
-          }}
-        >
-          <div style={{
-            background: 'var(--color-earth-brown)',
-            border: '3px solid var(--color-paper-beige)',
-            clipPath: 'polygon(50% 0%, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0% 50%, 40% 40%)',
-            width: '80px',
-            height: '80px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '4px 4px 0px rgba(247,243,233,0.3)'
-          }}>
-            <Heart size={24} color="var(--color-paper-beige)" fill="var(--color-paper-beige)" />
-          </div>
-        </motion.div>
+
+        {/* Decorative Heart - Hidden on mobile */}
+        {!isMobile && (
+          <motion.div
+            animate={{
+              rotate: [0, 360],
+            }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+            style={{
+              position: 'absolute',
+              bottom: '8%',
+              left: '10%',
+              zIndex: 5,
+              pointerEvents: 'none'
+            }}
+          >
+            <div style={{
+              background: 'var(--color-earth-brown)',
+              border: '3px solid var(--color-paper-beige)',
+              clipPath: 'polygon(50% 0%, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0% 50%, 40% 40%)',
+              width: isTablet ? '65px' : '80px',
+              height: isTablet ? '65px' : '80px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '4px 4px 0px rgba(247,243,233,0.3)'
+            }}>
+              <Heart size={isTablet ? 20 : 24} color="var(--color-paper-beige)" fill="var(--color-paper-beige)" />
+            </div>
+          </motion.div>
+        )}
 
         {/* Bottom Section */}
         <motion.div
@@ -389,20 +487,21 @@ const Footer = () => {
           transition={{ duration: 0.8, delay: 0.4 }}
           style={{
             display: 'flex',
+            flexDirection: isMobile ? 'column' : 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '2rem',
-            padding: '2rem',
-            borderRadius: '12px',
+            gap: isMobile ? '1.5rem' : '2rem',
+            padding: isMobile ? '1.5rem 1rem' : '2rem',
+            borderRadius: isMobile ? '10px' : '12px',
             backgroundColor: 'var(--color-soft-black)',
+            textAlign: isMobile ? 'center' : 'left'
           }}
         >
           {/* Brand */}
           <div>
             <h2 style={{
               fontFamily: 'var(--font-heading)',
-              fontSize: '1.8rem',
+              fontSize: isMobile ? '1.5rem' : '1.8rem',
               color: 'var(--color-paper-beige)',
               margin: '0 0 0.5rem 0',
               cursor: 'pointer',
@@ -412,7 +511,7 @@ const Footer = () => {
             </h2>
             <p style={{
               fontFamily: 'var(--font-body)',
-              fontSize: '0.9rem',
+              fontSize: isMobile ? '0.85rem' : '0.9rem',
               color: 'rgba(255, 255, 255, 0.5)',
               margin: 0
             }}>
@@ -423,24 +522,26 @@ const Footer = () => {
           {/* Social Links */}
           <div style={{
             display: 'flex',
-            gap: '1rem',
-            alignItems: 'center'
+            gap: isMobile ? '0.75rem' : '1rem',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}>
             {socialLinks.map((social, idx) => (
               <motion.a
                 key={idx}
                 href="#"
-                whileHover={{
+                whileHover={!isMobile ? {
                   y: -5,
                   scale: 1.1,
                   backgroundColor: social.color,
                   borderColor: social.color
-                }}
-                onMouseEnter={() => setIsHovered(idx)}
-                onMouseLeave={() => setIsHovered(null)}
+                } : {}}
+                whileTap={{ scale: 0.95 }}
+                onMouseEnter={() => !isMobile && setIsHovered(idx)}
+                onMouseLeave={() => !isMobile && setIsHovered(null)}
                 style={{
-                  width: '40px',
-                  height: '40px',
+                  width: isMobile ? '38px' : '40px',
+                  height: isMobile ? '38px' : '40px',
                   borderRadius: '50%',
                   background: 'rgba(255, 255, 255, 0.05)',
                   border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -452,7 +553,7 @@ const Footer = () => {
                 }}
               >
                 <social.icon
-                  size={18}
+                  size={isMobile ? 16 : 18}
                   color={isHovered === idx ? '#fff' : 'rgba(255, 255, 255, 0.6)'}
                 />
               </motion.a>
