@@ -1,7 +1,175 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Camera, Film, Video, Image, Sparkles, Clapperboard, Users, Award } from 'lucide-react';
 import SectionSeparator from './SectionSeparator';
+
+const CategoryItem = ({ category, index, categoryCount, scrollYProgress }) => {
+    const start = index / categoryCount;
+    const end = (index + 1) / categoryCount;
+    const isLast = index === categoryCount - 1;
+
+    const opacity = useTransform(
+        scrollYProgress,
+        isLast
+            ? [Math.max(0, start - 0.05), start, end]
+            : [Math.max(0, start - 0.05), start, end, Math.min(1, end + 0.05)],
+        isLast ? [0, 1, 1] : [0, 1, 1, 0]
+    );
+
+    const y = useTransform(
+        scrollYProgress,
+        isLast
+            ? [Math.max(0, start - 0.05), start, end]
+            : [Math.max(0, start - 0.05), start, end, Math.min(1, end + 0.05)],
+        isLast ? [100, 0, 0] : [100, 0, 0, -100]
+    );
+
+    const scale = useTransform(
+        scrollYProgress,
+        isLast
+            ? [Math.max(0, start - 0.05), start, end]
+            : [Math.max(0, start - 0.05), start, end, Math.min(1, end + 0.05)],
+        isLast ? [0.8, 1, 1] : [0.8, 1, 1, 0.8]
+    );
+
+    return (
+        <motion.div
+            style={{
+                position: 'absolute',
+                width: '100%',
+                maxWidth: '450px',
+                opacity,
+                y,
+                scale
+            }}
+        >
+            <div style={{
+                background: 'white',
+                borderRadius: '32px',
+                padding: '0',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
+                border: '1px solid rgba(0,0,0,0.05)',
+                position: 'relative',
+                overflow: 'hidden',
+                height: '600px',
+                display: 'flex',
+                flexDirection: 'column'
+            }}>
+                {/* Background Image */}
+                <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '60%',
+                    backgroundImage: `url(${category.image})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    filter: 'brightness(0.9)'
+                }} />
+
+                {/* Gradient Overlay */}
+                <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '60%',
+                    background: `linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.95) 100%)`
+                }} />
+
+                {/* Icon */}
+                <div style={{
+                    position: 'absolute',
+                    top: '2.5rem',
+                    left: '2.5rem',
+                    width: '70px',
+                    height: '70px',
+                    borderRadius: '18px',
+                    background: 'rgba(255,255,255,0.95)',
+                    backdropFilter: 'blur(10px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                    zIndex: 2
+                }}>
+                    {React.cloneElement(category.icon, {
+                        size: 32,
+                        color: category.color,
+                        strokeWidth: 2.5
+                    })}
+                </div>
+
+                {/* Decorative Dots */}
+                <div style={{
+                    position: 'absolute',
+                    top: '3rem',
+                    right: '3rem',
+                    display: 'flex',
+                    gap: '8px',
+                    zIndex: 1
+                }}>
+                    <div style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        background: category.color,
+                        opacity: 0.6
+                    }} />
+                    <div style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        background: category.color,
+                        opacity: 0.3
+                    }} />
+                </div>
+
+                {/* Content */}
+                <div style={{
+                    position: 'relative',
+                    zIndex: 1,
+                    marginTop: 'auto',
+                    marginBottom: '8%',
+                    padding: '2.5rem 3rem 3rem',
+                    background: 'white'
+                }}>
+                    <h3 style={{
+                        fontSize: '2.2rem',
+                        color: 'var(--color-black)',
+                        fontFamily: "'Oswald', sans-serif",
+                        marginBottom: '1rem',
+                        fontWeight: '700',
+                        letterSpacing: '-0.01em',
+                        lineHeight: 1.2
+                    }}>
+                        {category.title}
+                    </h3>
+                    <p style={{
+                        fontSize: '1.05rem',
+                        lineHeight: 1.6,
+                        color: 'var(--color-coffee)',
+                        opacity: 0.7
+                    }}>
+                        {category.description}
+                    </p>
+                </div>
+
+                {/* Bottom Accent Line */}
+                <div style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: '4px',
+                    background: `linear-gradient(90deg, ${category.color}, transparent)`,
+                    borderRadius: '0 0 32px 32px'
+                }} />
+            </div>
+        </motion.div>
+    );
+};
 
 const Categories = () => {
     const containerRef = useRef(null);
@@ -9,6 +177,20 @@ const Categories = () => {
         target: containerRef,
         offset: ["start start", "end end"]
     });
+
+    const [isMobile, setIsMobile] = useState(false);
+    const [isTablet, setIsTablet] = useState(false);
+
+    // Detect screen size
+    useEffect(() => {
+        const checkScreenSize = () => {
+            setIsMobile(window.innerWidth < 768);
+            setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024);
+        };
+        checkScreenSize();
+        window.addEventListener('resize', checkScreenSize);
+        return () => window.removeEventListener('resize', checkScreenSize);
+    }, []);
 
     const categories = [
         {
@@ -69,21 +251,234 @@ const Categories = () => {
         }
     ];
 
-    // Calculate which category should be visible based on scroll
     const categoryCount = categories.length;
-    const activeIndex = useTransform(
-        scrollYProgress,
-        [0, 1],
-        [0, categoryCount - 1]
-    );
 
+    // Mobile/Tablet: Simple grid layout, no scroll animation
+    if (isMobile || isTablet) {
+        return (
+            <section
+                style={{
+                    padding: isMobile ? '4rem 1.5rem' : '6rem 2rem',
+                    background: 'var(--color-cream)',
+                }}
+                className='categories'
+            >
+                <div className="container" style={{
+                    maxWidth: '1400px',
+                    margin: '0 auto',
+                    width: '100%'
+                }}>
+                    {/* Header */}
+                    <div style={{
+                        marginBottom: isMobile ? '3rem' : '4rem',
+                        textAlign: isMobile ? 'center' : 'left'
+                    }}>
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            style={{
+                                display: 'inline-block',
+                                background: '#FEEFA3',
+                                border: '2px solid #FFAE00',
+                                borderRadius: '20% 70% 30% 70% / 30% 30% 80% 40%',
+                                padding: '0.75rem 1.5rem',
+                                fontWeight: '700',
+                                fontSize: '0.9rem',
+                                color: '#111212',
+                                boxShadow: '0 0 25px rgba(255,174,0,0.4)',
+                                marginBottom: '2rem'
+                            }}
+                        >
+                            Categories
+                        </motion.div>
+
+                        <motion.h2
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.1 }}
+                            style={{
+                                fontSize: isMobile ? 'clamp(2rem, 8vw, 3rem)' : 'clamp(2.5rem, 5vw, 4rem)',
+                                color: 'var(--color-black)',
+                                fontFamily: "'Oswald', sans-serif",
+                                marginBottom: '1.5rem',
+                                fontWeight: '700',
+                                lineHeight: 1.1,
+                                letterSpacing: '-0.02em'
+                            }}
+                        >
+                            Find photographers for every moment.
+                        </motion.h2>
+
+                        <motion.p
+                            initial={{ opacity: 0 }}
+                            whileInView={{ opacity: 0.7 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2 }}
+                            style={{
+                                fontSize: isMobile ? '0.95rem' : '1rem',
+                                color: 'var(--color-coffee)',
+                                lineHeight: 1.7,
+                                maxWidth: isMobile ? '100%' : '500px',
+                                margin: isMobile ? '0 auto' : '0'
+                            }}
+                        >
+                            Browse our curated categories — each verified for the highest quality work.
+                        </motion.p>
+                    </div>
+
+                    {/* Categories Grid */}
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+                        gap: isMobile ? '2rem' : '2.5rem',
+                        width: '100%'
+                    }}>
+                        {categories.map((category, index) => (
+                            <motion.div
+                                key={index}
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, margin: "-50px" }}
+                                transition={{ delay: index * 0.1 }}
+                                style={{
+                                    background: 'white',
+                                    borderRadius: isMobile ? '24px' : '28px',
+                                    overflow: 'hidden',
+                                    boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+                                    border: '1px solid rgba(0,0,0,0.05)',
+                                    position: 'relative',
+                                    height: isMobile ? '400px' : '450px',
+                                    display: 'flex',
+                                    flexDirection: 'column'
+                                }}
+                            >
+                                {/* Background Image */}
+                                <div style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    right: 0,
+                                    height: '55%',
+                                    backgroundImage: `url(${category.image})`,
+                                    backgroundSize: 'cover',
+                                    backgroundPosition: 'center',
+                                    filter: 'brightness(0.9)'
+                                }} />
+
+                                {/* Gradient Overlay */}
+                                <div style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    right: 0,
+                                    height: '55%',
+                                    background: `linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.95) 100%)`
+                                }} />
+
+                                {/* Icon */}
+                                <div style={{
+                                    position: 'absolute',
+                                    top: isMobile ? '1.5rem' : '2rem',
+                                    left: isMobile ? '1.5rem' : '2rem',
+                                    width: isMobile ? '60px' : '70px',
+                                    height: isMobile ? '60px' : '70px',
+                                    borderRadius: '16px',
+                                    background: 'rgba(255,255,255,0.95)',
+                                    backdropFilter: 'blur(10px)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                                    zIndex: 2
+                                }}>
+                                    {React.cloneElement(category.icon, {
+                                        size: isMobile ? 28 : 32,
+                                        color: category.color,
+                                        strokeWidth: 2.5
+                                    })}
+                                </div>
+
+                                {/* Decorative Dots */}
+                                <div style={{
+                                    position: 'absolute',
+                                    top: isMobile ? '1.75rem' : '2.5rem',
+                                    right: isMobile ? '1.75rem' : '2.5rem',
+                                    display: 'flex',
+                                    gap: '6px',
+                                    zIndex: 1
+                                }}>
+                                    <div style={{
+                                        width: '6px',
+                                        height: '6px',
+                                        borderRadius: '50%',
+                                        background: category.color,
+                                        opacity: 0.6
+                                    }} />
+                                    <div style={{
+                                        width: '6px',
+                                        height: '6px',
+                                        borderRadius: '50%',
+                                        background: category.color,
+                                        opacity: 0.3
+                                    }} />
+                                </div>
+
+                                {/* Content */}
+                                <div style={{
+                                    position: 'relative',
+                                    zIndex: 1,
+                                    marginTop: 'auto',
+                                    padding: isMobile ? '2rem 1.75rem 2.5rem' : '2.5rem 2.5rem 3rem',
+                                    background: 'white'
+                                }}>
+                                    <h3 style={{
+                                        fontSize: isMobile ? '1.6rem' : '2rem',
+                                        color: 'var(--color-black)',
+                                        fontFamily: "'Oswald', sans-serif",
+                                        marginBottom: '0.75rem',
+                                        fontWeight: '700',
+                                        letterSpacing: '-0.01em',
+                                        lineHeight: 1.2
+                                    }}>
+                                        {category.title}
+                                    </h3>
+                                    <p style={{
+                                        fontSize: isMobile ? '0.95rem' : '1rem',
+                                        lineHeight: 1.6,
+                                        color: 'var(--color-coffee)',
+                                        opacity: 0.7
+                                    }}>
+                                        {category.description}
+                                    </p>
+                                </div>
+
+                                {/* Bottom Accent Line */}
+                                <div style={{
+                                    position: 'absolute',
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    height: '3px',
+                                    background: `linear-gradient(90deg, ${category.color}, transparent)`,
+                                    borderRadius: isMobile ? '0 0 24px 24px' : '0 0 28px 28px'
+                                }} />
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    // Desktop: Original scroll-based animation
     return (
         <section
             ref={containerRef}
             style={{
-                height: `${categoryCount * 100}vh`, // Make section tall enough for all categories
+                height: `${categoryCount * 100}vh`,
                 position: 'relative',
-                // background: 'var(--color-cream)',
             }}
             className='categories'
         >
@@ -96,7 +491,6 @@ const Categories = () => {
                 alignItems: 'center',
                 overflow: 'hidden'
             }}>
-
                 <div className="container" style={{
                     maxWidth: '1400px',
                     margin: '0 auto',
@@ -140,15 +534,13 @@ const Categories = () => {
                             Categories
                         </div>
                     </motion.div>
+
                     {/* Left Side - Fixed Content */}
                     <div style={{
                         flex: '0 0 45%',
                         position: 'relative',
                         zIndex: 2
                     }}>
-
-
-
                         <motion.h2
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -192,179 +584,18 @@ const Categories = () => {
                         alignItems: 'center',
                         justifyContent: 'center'
                     }}>
-                        {categories.map((category, index) => {
-                            // Calculate opacity and position for each card based on scroll
-                            const start = index / categoryCount;
-                            const end = (index + 1) / categoryCount;
-
-                            const isLast = index === categoryCount - 1;
-
-                            const opacity = useTransform(
-                                scrollYProgress,
-                                isLast
-                                    ? [Math.max(0, start - 0.05), start, end]
-                                    : [Math.max(0, start - 0.05), start, end, Math.min(1, end + 0.05)],
-                                isLast ? [0, 1, 1] : [0, 1, 1, 0]
-                            );
-
-                            const y = useTransform(
-                                scrollYProgress,
-                                isLast
-                                    ? [Math.max(0, start - 0.05), start, end]
-                                    : [Math.max(0, start - 0.05), start, end, Math.min(1, end + 0.05)],
-                                isLast ? [100, 0, 0] : [100, 0, 0, -100]
-                            );
-
-                            const scale = useTransform(
-                                scrollYProgress,
-                                isLast
-                                    ? [Math.max(0, start - 0.05), start, end]
-                                    : [Math.max(0, start - 0.05), start, end, Math.min(1, end + 0.05)],
-                                isLast ? [0.8, 1, 1] : [0.8, 1, 1, 0.8]
-                            );
-
-                            return (
-                                <motion.div
-                                    key={index}
-                                    style={{
-                                        position: 'absolute',
-                                        width: '100%',
-                                        maxWidth: '450px',
-                                        opacity,
-                                        y,
-                                        scale
-                                    }}
-                                >
-                                    <div style={{
-                                        background: 'white',
-                                        borderRadius: '32px',
-                                        padding: '0',
-                                        boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
-                                        border: '1px solid rgba(0,0,0,0.05)',
-                                        position: 'relative',
-                                        overflow: 'hidden',
-                                        height: '600px',
-                                        display: 'flex',
-                                        flexDirection: 'column'
-                                    }}>
-                                        {/* Background Image */}
-                                        <div style={{
-                                            position: 'absolute',
-                                            top: 0,
-                                            left: 0,
-                                            right: 0,
-                                            height: '60%',
-                                            backgroundImage: `url(${category.image})`,
-                                            backgroundSize: 'cover',
-                                            backgroundPosition: 'center',
-                                            filter: 'brightness(0.9)'
-                                        }} />
-
-                                        {/* Gradient Overlay */}
-                                        <div style={{
-                                            position: 'absolute',
-                                            top: 0,
-                                            left: 0,
-                                            right: 0,
-                                            height: '60%',
-                                            background: `linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.95) 100%)`
-                                        }} />
-                                        {/* Icon - Positioned over image */}
-                                        <div style={{
-                                            position: 'absolute',
-                                            top: '2.5rem',
-                                            left: '2.5rem',
-                                            width: '70px',
-                                            height: '70px',
-                                            borderRadius: '18px',
-                                            background: 'rgba(255,255,255,0.95)',
-                                            backdropFilter: 'blur(10px)',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-                                            zIndex: 2
-                                        }}>
-                                            {React.cloneElement(category.icon, {
-                                                size: 32,
-                                                color: category.color,
-                                                strokeWidth: 2.5
-                                            })}
-                                        </div>
-
-                                        {/* Decorative Dots */}
-                                        <div style={{
-                                            position: 'absolute',
-                                            top: '3rem',
-                                            right: '3rem',
-                                            display: 'flex',
-                                            gap: '8px',
-                                            zIndex: 1
-                                        }}>
-                                            <div style={{
-                                                width: '8px',
-                                                height: '8px',
-                                                borderRadius: '50%',
-                                                background: category.color,
-                                                opacity: 0.6
-                                            }} />
-                                            <div style={{
-                                                width: '8px',
-                                                height: '8px',
-                                                borderRadius: '50%',
-                                                background: category.color,
-                                                opacity: 0.3
-                                            }} />
-                                        </div>
-
-                                        {/* Content - Bottom Section */}
-                                        <div style={{
-                                            position: 'relative',
-                                            zIndex: 1,
-                                            marginTop: 'auto',
-                                            marginBottom: '8%',
-                                            padding: '2.5rem 3rem 3rem',
-                                            background: 'white'
-                                        }}>
-                                            <h3 style={{
-                                                fontSize: '2.2rem',
-                                                color: 'var(--color-black)',
-                                                fontFamily: "'Oswald', sans-serif",
-                                                marginBottom: '1rem',
-                                                fontWeight: '700',
-                                                letterSpacing: '-0.01em',
-                                                lineHeight: 1.2
-                                            }}>
-                                                {category.title}
-                                            </h3>
-                                            <p style={{
-                                                fontSize: '1.05rem',
-                                                lineHeight: 1.6,
-                                                color: 'var(--color-coffee)',
-                                                opacity: 0.7
-                                            }}>
-                                                {category.description}
-                                            </p>
-                                        </div>
-
-                                        {/* Bottom Accent Line */}
-                                        <div style={{
-                                            position: 'absolute',
-                                            bottom: 0,
-                                            left: 0,
-                                            right: 0,
-                                            height: '4px',
-                                            background: `linear-gradient(90deg, ${category.color}, transparent)`,
-                                            borderRadius: '0 0 32px 32px'
-                                        }} />
-                                    </div>
-                                </motion.div>
-                            );
-                        })}
+                        {categories.map((category, index) => (
+                            <CategoryItem
+                                key={index}
+                                category={category}
+                                index={index}
+                                categoryCount={categoryCount}
+                                scrollYProgress={scrollYProgress}
+                            />
+                        ))}
                     </div>
                 </div>
             </div>
-
         </section>
     );
 };
