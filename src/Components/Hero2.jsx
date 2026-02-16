@@ -2,10 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, ArrowDown, ArrowLeft } from 'lucide-react';
 import SectionSeparator from './SectionSeparator';
-import { useCursor } from './CustomCursor';
+
 
 const Hero2 = () => {
-  const { setCursorVariant } = useCursor();
+ 
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 500], [0, 100]);
   const opacity = useTransform(scrollY, [0, 1000], [1, 0]);
@@ -459,8 +459,8 @@ const Hero2 = () => {
           />
 
           <h1
-            onMouseEnter={() => setCursorVariant('camera')}
-            onMouseLeave={() => setCursorVariant('default')}
+            // onMouseEnter={() => setCursorVariant('camera')}
+            // onMouseLeave={() => setCursorVariant('default')}
             style={{
               margin: '1.5rem 0',
               display: 'flex',

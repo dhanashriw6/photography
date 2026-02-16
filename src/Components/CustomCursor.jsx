@@ -3,26 +3,26 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const CursorContext = createContext();
 
-export const useCursor = () => {
-  const context = useContext(CursorContext);
-  if (!context) {
-    throw new Error('useCursor must be used within a CursorProvider');
-  }
-  return context;
-};
+// export const useCursor = () => {
+//   const context = useContext(CursorContext);
+//   if (!context) {
+//     throw new Error('useCursor must be used within a CursorProvider');
+//   }
+//   return context;
+// };
 
-export const CursorProvider = ({ children }) => {
-  const [cursorVariant, setCursorVariant] = useState('default');
+// export const CursorProvider = ({ children }) => {
+//   const [cursorVariant, setCursorVariant] = useState('default');
 
-  return (
-    <CursorContext.Provider value={{ cursorVariant, setCursorVariant }}>
-      {children}
-    </CursorContext.Provider>
-  );
-};
+//   return (
+//     <CursorContext.Provider value={{ cursorVariant, setCursorVariant }}>
+//       {children}
+//     </CursorContext.Provider>
+//   );
+// };
 
 const CustomCursor = () => {
-  const { cursorVariant } = useCursor();
+  // const { cursorVariant } = useCursor();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isPointer, setIsPointer] = useState(false);
 
@@ -70,14 +70,14 @@ const CustomCursor = () => {
     }
   };
 
-  const currentVariant = cursorVariant === 'camera' ? 'camera' : (isPointer ? 'pointer' : 'default');
+  // const currentVariant = cursorVariant === 'camera' ? 'camera' : (isPointer ? 'pointer' : 'default');
 
   return (
     <>
       <motion.div
         className="custom-cursor"
         variants={variants}
-        animate={currentVariant}
+        // animate={currentVariant}
         style={{
           position: 'fixed',
           top: 0,
@@ -93,7 +93,7 @@ const CustomCursor = () => {
         transition={{ type: 'spring', stiffness: 500, damping: 28 }}
       >
         <AnimatePresence mode="wait">
-          {cursorVariant === 'camera' && (
+          {/* {cursorVariant === 'camera' && (
             <motion.div
               key="camera-icon"
               initial={{ scale: 0, opacity: 0 }}
@@ -102,13 +102,13 @@ const CustomCursor = () => {
               transition={{ duration: 0.2 }}
               style={{ width: '60%', height: '60%', color: '#000' }}
             >
-              {/* Camera Icon SVG */}
+          
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
                 <circle cx="12" cy="13" r="3" />
               </svg>
             </motion.div>
-          )}
+          )} */}
         </AnimatePresence>
       </motion.div>
     </>
