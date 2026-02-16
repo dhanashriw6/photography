@@ -697,8 +697,18 @@ html {
 }
 
 @media (max-width: 600px) {
+  .pinterest-grid-section {
+    padding: var(--spacing-lg) var(--spacing-xs);
+  }
+
   .pinterest-grid-container {
-    column-count: 1;
+    column-count: 2;
+    column-gap: 0.5rem;
+  }
+
+  .pinterest-item {
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
   }
 }
 

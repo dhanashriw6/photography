@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, ArrowDown, ArrowLeft } from 'lucide-react';
 import SectionSeparator from './SectionSeparator';
+import { useCursor } from './CustomCursor';
 
 const Hero2 = () => {
+  const { setCursorVariant } = useCursor();
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 500], [0, 100]);
   const opacity = useTransform(scrollY, [0, 1000], [1, 0]);
@@ -57,7 +59,7 @@ const Hero2 = () => {
   // Responsive badge component
   const FloatingBadge = ({ children, style, animate, transition, clipPath, rays, petals }) => {
     if (isMobile) return null; // Hide badges on mobile
-    
+
     return (
       <motion.div
         animate={animate}
@@ -433,11 +435,11 @@ const Hero2 = () => {
         <SectionSeparator />
 
         {/* Main Content */}
-        <motion.div style={{ 
-          y: isMobile ? 0 : y, 
-          opacity: isMobile ? 1 : opacity, 
-          textAlign: 'center', 
-          zIndex: 10, 
+        <motion.div style={{
+          y: isMobile ? 0 : y,
+          opacity: isMobile ? 1 : opacity,
+          textAlign: 'center',
+          zIndex: 10,
           position: 'relative',
           padding: isMobile ? '0 1rem' : '0'
         }}>
@@ -456,18 +458,21 @@ const Hero2 = () => {
             }}
           />
 
-          <h1 style={{
-            margin: '1.5rem 0',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            position: 'relative',
-            fontWeight: '900'
-          }}>
+          <h1
+            onMouseEnter={() => setCursorVariant('camera')}
+            onMouseLeave={() => setCursorVariant('default')}
+            style={{
+              margin: '1.5rem 0',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              position: 'relative',
+              fontWeight: '900'
+            }}>
             {/* Mobile: Stack all words vertically */}
             {/* Desktop: Two rows */}
-            <div style={{ 
-              display: 'flex', 
+            <div style={{
+              display: 'flex',
               flexDirection: isMobile ? 'column' : 'row',
               textTransform: 'capitalize',
               alignItems: 'center',
@@ -475,9 +480,9 @@ const Hero2 = () => {
               gap: isMobile ? '0.5rem' : '0'
             }}>
               {/* Shoot. */}
-              <div style={{ 
-                display: 'flex', 
-                overflow: 'visible', 
+              <div style={{
+                display: 'flex',
+                overflow: 'visible',
                 padding: isMobile ? '0.25rem 0' : '0.5rem 2rem',
                 justifyContent: 'center'
               }}>
@@ -547,8 +552,8 @@ const Hero2 = () => {
               </div>
             </div>
 
-            <div style={{ 
-              display: 'flex', 
+            <div style={{
+              display: 'flex',
               flexDirection: isMobile ? 'column' : 'row',
               textTransform: 'capitalize',
               alignItems: 'center',
@@ -594,9 +599,9 @@ const Hero2 = () => {
               </div>
 
               {/* Repeat. */}
-              <div style={{ 
-                display: 'flex', 
-                overflow: 'visible', 
+              <div style={{
+                display: 'flex',
+                overflow: 'visible',
                 padding: isMobile ? '0.25rem 0' : '0.5rem 2rem',
                 justifyContent: 'center'
               }}>
@@ -802,7 +807,7 @@ const Hero2 = () => {
                   background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 100%)'
                 }} />
               </motion.div>
-              
+
               {/* Navigation dots */}
               <div style={{
                 position: 'absolute',
