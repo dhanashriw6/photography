@@ -2,10 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, ArrowDown, ArrowLeft } from 'lucide-react';
 import SectionSeparator from './SectionSeparator';
-
+import { useCursor } from './CustomCursor';
 
 const Hero2 = () => {
- 
+  const { setCursorVariant } = useCursor();
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 500], [0, 100]);
   const opacity = useTransform(scrollY, [0, 1000], [1, 0]);
@@ -459,8 +459,8 @@ const Hero2 = () => {
           />
 
           <h1
-            // onMouseEnter={() => setCursorVariant('camera')}
-            // onMouseLeave={() => setCursorVariant('default')}
+            onMouseEnter={() => setCursorVariant('camera')}
+            onMouseLeave={() => setCursorVariant('default')}
             style={{
               margin: '1.5rem 0',
               display: 'flex',
@@ -473,7 +473,7 @@ const Hero2 = () => {
             {/* Desktop: Two rows */}
             <div style={{
               display: 'flex',
-              flexDirection: isMobile ? 'column' : 'row',
+              flexDirection: isMobile ? 'row' : 'row',
               textTransform: 'capitalize',
               alignItems: 'center',
               justifyContent: 'center',
@@ -554,7 +554,7 @@ const Hero2 = () => {
 
             <div style={{
               display: 'flex',
-              flexDirection: isMobile ? 'column' : 'row',
+              flexDirection: isMobile ? 'row' : 'row',
               textTransform: 'capitalize',
               alignItems: 'center',
               justifyContent: 'center',
@@ -673,11 +673,16 @@ const Hero2 = () => {
               display: 'flex',
               flexDirection: isMobile ? 'column' : 'row',
               gap: '1.5rem',
-              marginTop: '3rem',
+              marginTop: '5rem',
               justifyContent: 'center',
               alignItems: 'center',
               flexWrap: 'wrap',
-              padding: isMobile ? '0 1rem' : '0'
+              padding: isMobile ? '0 1rem' : '0',
+              width: isMobile?"80%":"100%",
+              justifyContent:'center',
+              alignItems:'center',
+              margin:'auto'
+             
             }}
           >
             <motion.button
@@ -756,7 +761,7 @@ const Hero2 = () => {
               position: 'relative',
               width: '100%',
               maxWidth: '300px',
-              height: '350px',
+              height: '300px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
@@ -769,7 +774,7 @@ const Hero2 = () => {
                 transition={{ duration: 0.5 }}
                 style={{
                   width: '250px',
-                  height: '300px',
+                  height: '250px',
                   borderRadius: '24px',
                   overflow: 'hidden',
                   background: '#fff',

@@ -363,7 +363,7 @@ html {
 /* Video Showcase Section */
 .video-showcase-section {
   position: relative;
-  padding: var(--spacing-xl) var(--spacing-sm);
+  padding: 3rem var(--spacing-sm);
   background-color: var(--color-beige);
   overflow: hidden;
   display: flex;

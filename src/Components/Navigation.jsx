@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Camera, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const lastScrollY = useRef(0);
 
   // Detect screen size
   useEffect(() => {
@@ -17,16 +18,33 @@ const Navigation = () => {
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
+  // Hide on scroll down, show on scroll up
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY < 10) {
+        // Always show at the very top
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY.current) {
+        // Scrolling down → hide
+        setIsVisible(false);
+      } else {
+        // Scrolling up → show
+        setIsVisible(true);
+      }
+
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // Prevent body scroll when menu is open
   useEffect(() => {
-    if (isMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
+    document.body.style.overflow = isMenuOpen ? 'hidden' : 'unset';
+    return () => { document.body.style.overflow = 'unset'; };
   }, [isMenuOpen]);
 
   const menuItems = [
@@ -34,7 +52,7 @@ const Navigation = () => {
     { name: 'StatsCounter', href: '#statsCounter' },
     { name: 'AboutUs', href: '#aboutUs' },
     { name: 'ChooseYourPath', href: '#chooseYourPath' },
-    {name:"Portfolio",href:"#portfolio"},
+    { name: 'Portfolio', href: '#portfolio' },
     { name: 'Testimonials', href: '#testimonials' },
     { name: 'FAQs', href: '#faqs' },
     { name: 'Process', href: '#process' },
@@ -43,40 +61,42 @@ const Navigation = () => {
 
   const handleMenuItemClick = (href) => {
     setIsMenuOpen(false);
-    // Smooth scroll to section
     const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+    if (element) element.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
     <>
-      <nav style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        padding: isMobile ? '1.5rem' : '2rem',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        zIndex: 50,
-        color: 'var(--color-beige)',
-        background: 'rgba(0, 0, 0, 0.3)',
-        backdropFilter: 'blur(1px)',
-      }}>
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
+      <motion.nav
+        initial={{ y: 0 }}
+        animate={{ y: isVisible ? 0 : '-120%' }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          padding: isMobile ? '1.5rem' : '2rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          zIndex: 50,
+          color: 'var(--color-beige)',
+          background: 'var(--color-black)',
+          backdropFilter: 'blur(1px)',
+        }}
+      >
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
           gap: '0.5rem',
           cursor: 'pointer'
         }}>
           <Camera size={isMobile ? 20 : 24} />
-          <span style={{ 
-            fontFamily: 'var(--font-heading)', 
-            fontSize: isMobile ? '1.2rem' : '1.5rem', 
-            fontWeight: 'bold' 
+          <span style={{
+            fontFamily: 'var(--font-heading)',
+            fontSize: isMobile ? '1.2rem' : '1.5rem',
+            fontWeight: 'bold'
           }}>
             Online Photographer
           </span>
@@ -110,13 +130,12 @@ const Navigation = () => {
         >
           MENU
         </motion.button>
-      </nav>
+      </motion.nav>
 
       {/* Full Screen Menu */}
       <AnimatePresence>
         {isMenuOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -132,17 +151,11 @@ const Navigation = () => {
               }}
             />
 
-            {/* Menu Panel */}
             <motion.div
               initial={{ x: '100%', opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: '100%', opacity: 0 }}
-              transition={{ 
-                type: 'spring', 
-                damping: 25, 
-                stiffness: 200,
-                duration: 0.5 
-              }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200, duration: 0.5 }}
               style={{
                 position: 'fixed',
                 top: isMobile ? '1.5rem' : '2rem',
@@ -150,7 +163,7 @@ const Navigation = () => {
                 bottom: isMobile ? '1.5rem' : '2rem',
                 width: isMobile ? 'calc(100% - 3rem)' : '350px',
                 maxWidth: '90vw',
-                background: 'var(--color-khaki',
+                background: 'var(--color-khaki)',
                 borderRadius: isMobile ? '32px' : '40px',
                 zIndex: 100,
                 display: 'flex',
@@ -160,7 +173,6 @@ const Navigation = () => {
                 overflow: 'hidden'
               }}
             >
-              {/* Close Button */}
               <motion.button
                 whileHover={{ scale: 1.1, rotate: 90 }}
                 whileTap={{ scale: 0.9 }}
@@ -179,13 +191,11 @@ const Navigation = () => {
                   justifyContent: 'center',
                   cursor: 'pointer',
                   color: '#111212',
-                  transition: 'all 0.2s ease'
                 }}
               >
                 <X size={isMobile ? 20 : 24} strokeWidth={3} />
               </motion.button>
 
-              {/* Decorative Element */}
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
@@ -201,7 +211,6 @@ const Navigation = () => {
                 }}
               />
 
-              {/* Menu Items */}
               <nav style={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -221,11 +230,7 @@ const Navigation = () => {
                     initial={{ opacity: 0, x: 50 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.1 + index * 0.05, duration: 0.4 }}
-                    whileHover={{ 
-                      x: 10, 
-                      color: '#FFf',
-                      transition: { duration: 0.2 }
-                    }}
+                    whileHover={{ x: 10, color: '#fff', transition: { duration: 0.2 } }}
                     style={{
                       fontFamily: "'Oswald', sans-serif",
                       fontSize: isMobile ? 'clamp(1rem, 8vw, 1.3rem)' : 'clamp(1rem, 4vw, 1.3rem)',
@@ -235,7 +240,6 @@ const Navigation = () => {
                       borderBottom: '2px solid rgba(17, 18, 18, 0.2)',
                       paddingBottom: isMobile ? '0.75rem' : '1rem',
                       cursor: 'pointer',
-                      transition: 'all 0.3s ease',
                       textTransform: 'capitalize',
                       lineHeight: 1.2
                     }}
@@ -244,8 +248,6 @@ const Navigation = () => {
                   </motion.a>
                 ))}
               </nav>
-
-             
             </motion.div>
           </>
         )}

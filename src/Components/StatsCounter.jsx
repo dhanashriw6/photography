@@ -219,7 +219,7 @@ const StatsCounter = () => {
               </motion.span>
             ) : (
               // Animated text for desktop - with block display
-              <AnimatedText text="Our Impact in Numbers" delay={0.2} display="block" />
+              <AnimatedText text="Our Impact In Numbers" delay={0.2} display="block" />
             )}
           </h2>
 

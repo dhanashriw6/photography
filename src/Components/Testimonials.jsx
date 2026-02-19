@@ -285,7 +285,7 @@ const Testimonials = () => {
         </h2>
         <p style={{
           fontFamily: "Oswald",
-          color: 'var(--color-gray)',
+          color: 'var(--color-black)',
           maxWidth: isMobile ? '100%' : '600px',
           margin: '0 auto',
           fontSize: isMobile ? '1rem' : '1.1rem',
@@ -363,9 +363,9 @@ const Testimonials = () => {
           style={{
             textAlign: 'center',
             paddingBottom: '2rem',
-            color: 'var(--color-gray)',
+            color: 'var(--color-black)',
             fontSize: '0.85rem',
-            fontFamily: 'var(--font-body)',
+            fontFamily: 'Oswald',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

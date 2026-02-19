@@ -259,7 +259,7 @@ const Categories = () => {
             <section
                 id="categories"
                 style={{
-                    padding: isMobile ? '4rem 1.5rem' : '6rem 2rem',
+                    padding: isMobile ? '0 1.5rem' : '6rem 2rem',
                     background: 'var(--color-cream)',
                 }}
                 className='categories'
