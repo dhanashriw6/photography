@@ -1,55 +1,27 @@
 import React from 'react';
 import './App.css';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-// Import all components
-import {
-  Navigation,
-  Hero,
-  CustomCursor,
-  ScrollProgress,
-  MarqueeStrip,
-  Features,
-  ImageGallery,
-  FAQ,
-  CTASection,
-  Footer,
-  VideoShowcase,
-  PinterestGrid,
-  StatsCounter,
-  Testimonials,
-  Categories
-} from './Components';
-import Hero2 from './Components/Hero2';
-// import Carousel from './Components/Carousel';
+import { Routes, Route } from 'react-router-dom';
 import ScrollSwirl from './Components/Carousel';
+import CustomCursor from './Components/CustomCursor';
+import Home from './views/Home';
+import SignUp from './views/findPhotographer/signUp';
+import Login from './views/findPhotographer/login';
+import StylePrefer from './views/findPhotographer/stylePrefer';
 
 function App() {
   return (
-    <div className="App">
+    <>
+      {/* Global custom cursor for all routes */}
+      <CustomCursor />
 
       <Routes>
-        <Route path="/" element={<Hero2 />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/find-photographer" element={<SignUp />} />
         <Route path="/v1" element={<ScrollSwirl />} />
-
+        <Route path="/login" element={<Login />} /> 
+        <Route path="/style-prefer" element={<StylePrefer />} />
       </Routes>
-
-      <Categories />
-      <ScrollProgress />
-      <CustomCursor />
-      <div className="grain-overlay" />
-      <Navigation />
-      <MarqueeStrip />
-      <StatsCounter />
-      <VideoShowcase />
-      <Hero />
-      {/* <ImageGallery /> */}
-      <PinterestGrid />
-      <Testimonials />
-      <FAQ />
-      <Features />
-      {/* <CTASection /> */}
-      <Footer />
-    </div>
+    </>
   );
 }
 

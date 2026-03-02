@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useMotionValue } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useCursor } from './CustomCursor';
 
 // ─── Curved Image Scroll ────────────────────────────────────────────────────
@@ -155,6 +156,7 @@ function CurvedImageScroll() {
 
 const Hero2 = () => {
   const { setCursorVariant } = useCursor();
+  const navigate = useNavigate();
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 500], [0, 100]);
   const opacity = useTransform(scrollY, [0, 1000], [1, 0]);
@@ -322,10 +324,11 @@ const Hero2 = () => {
 
           {/* CTA Buttons */}
           <motion.div initial={{ opacity:0, y:30 }} animate={{ opacity:1, y:0 }} transition={{ delay:1.8, duration:0.8 }}
-            style={{ display:'flex', flexDirection: isMobile?'column':'row', gap:'1.5rem', marginTop:'5rem', justifyContent:'center', alignItems:'center', flexWrap:'wrap', padding: isMobile?'0 1rem':'0', width: isMobile?"80%":"100%", margin:'auto' }}>
+            style={{ display:'flex', flexDirection: isMobile?'column':'row', gap:'1.5rem', marginTop:'5.2rem', justifyContent:'center', alignItems:'center', flexWrap:'wrap', padding: isMobile?'0 1rem':'0', width: isMobile?"80%":"100%", margin:'auto' }}>
             <motion.button
               whileHover={!isMobile?{ scale:1.05, boxShadow:'0 0 40px rgba(255,174,0,0.6)', background:'linear-gradient(135deg, #FFAE00, #FFE24F)' }:{}}
               whileTap={{ scale:0.95 }}
+              onClick={() => navigate('/find-photographer')}
               style={{ background:'#FFAE00', color:'#111212', fontSize: isMobile?'1.1rem':'1.5rem', padding: isMobile?'1rem 2rem':'1.2rem 2.5rem', border:'none', borderRadius:'50px', fontWeight:'700', cursor:'pointer', display:'flex', alignItems:'center', gap:'10px', boxShadow:'0 0 20px rgba(255,174,0,0.3)', width: isMobile?'100%':'auto', justifyContent:'center' }}>
               Find a Photographer <ArrowRight size={isMobile?18:20} />
             </motion.button>
