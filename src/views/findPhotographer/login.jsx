@@ -13,8 +13,8 @@ const login = () => {
 
           <h1 style={{
             textAlign: 'center',
-            fontSize: '26px',
-            fontWeight: 800,
+            fontSize: '36px',
+            fontWeight: 700,
             color: '#1a1a1a',
             marginBottom: '28px',
             letterSpacing: '-0.01em',

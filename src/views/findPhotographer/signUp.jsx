@@ -10,15 +10,14 @@ const SignUp = () => {
     <ViewsLayout>
       <div className="w-full" style={{ maxWidth: '640px' }}>
 
-        {/* Page title */}
-
+     
 
         {/* Card */}
         <div className="views-card">
           <h1 style={{
             textAlign: 'center',
-            fontSize: '26px',
-            fontWeight: 800,
+            fontSize: '36px',
+            fontWeight: 700,
             color: '#1a1a1a',
             marginBottom: '28px',
             letterSpacing: '-0.01em',
