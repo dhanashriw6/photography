@@ -10,6 +10,8 @@ import StylePrefer from './views/findPhotographer/stylePrefer';
 import TellUs from './views/findPhotographer/tellUs';
 import FindBest from './views/findPhotographer/findBest';
 import PhotographerDetail from './views/findPhotographer/photographerDetail';
+import RequestBook from './views/findPhotographer/requestBook';
+import ThankYou from './views/findPhotographer/thankYou';
 
 function App() {
   return (
@@ -25,7 +27,9 @@ function App() {
         <Route path="/style-prefer" element={<StylePrefer />} />
         <Route path="/tell-us" element={<TellUs />} />
         <Route path="/find-best" element={<FindBest />} />
-        {/* <Route path="/photographer/:id" element={<PhotographerDetail />} /> */}
+        <Route path="/photographer/:id" element={<PhotographerDetail />} />
+        <Route path="/requestBook" element={<RequestBook />} />
+        <Route path="/thank-you" element={<ThankYou />} />
       </Routes>
     </>
   );

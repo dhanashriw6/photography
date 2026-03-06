@@ -5,6 +5,7 @@ import { FiArrowLeft, FiCamera, FiMapPin, FiCalendar, FiAward, FiPhone, FiMail }
 import { MdOutlinePhotoCamera } from 'react-icons/md';
 import ViewsLayout from '../Layout';
 
+
 /* ─── full catalogue keyed by id ─── */
 const PHOTOGRAPHER_DATA = {
     1: {
@@ -184,273 +185,111 @@ const InfoRow = ({ label, value }) => (
 const EXPERTISE_ITEMS = [
     {
         label: "Portrait Photography",
-        sub: "Capturing the soul behind the eyes",
         img: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=900&h=700&fit=crop",
-        tag: "01",
-        color: "#c9845a",
     },
     {
         label: "Landscape & Nature",
-        sub: "Where light meets the wild earth",
         img: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900&h=700&fit=crop",
-        tag: "02",
-        color: "#5a8fc9",
     },
     {
         label: "Street Photography",
-        sub: "Frozen moments in the urban rush",
         img: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=900&h=700&fit=crop",
-        tag: "03",
-        color: "#b0b0b0",
     },
     {
         label: "Fashion & Editorial",
-        sub: "Where vision becomes statement",
         img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=900&h=700&fit=crop",
-        tag: "04",
-        color: "#c9a85a",
     },
     {
         label: "Architecture",
-        sub: "Lines, shadows, and geometry",
         img: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=900&h=700&fit=crop",
-        tag: "05",
-        color: "#7a9c8a",
     },
 ];
 
-const INTERVAL = 4000;
+const INTERVAL = 3500;
 
-const ExpertiseCarousel = ({ data }) => {
-   const [active, setActive] = useState(0);
-  const [prevIdx, setPrevIdx] = useState(null);
-  const [paused, setPaused] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [animKey, setAnimKey] = useState(0);
-  const progressRef = useRef(null);
-  const startTimeRef = useRef(null);
-  const items = EXPERTISE_ITEMS;
+const ExpertiseCarousel = () => {
+    const [active, setActive] = useState(0);
 
-  const goTo = useCallback((idx) => {
-    setPrevIdx((cur) => cur === idx ? cur : active);
-    setActive(idx);
-    setProgress(0);
-    setAnimKey((k) => k + 1);
-    startTimeRef.current = null;
-  }, [active]);
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setActive(a => (a + 1) % EXPERTISE_ITEMS.length);
+        }, INTERVAL);
+        return () => clearInterval(timer);
+    }, []);
 
-  const goNext = useCallback(() => {
-    goTo((active + 1) % items.length);
-  }, [active, goTo, items.length]);
-
-  useEffect(() => {
-    if (paused) {
-      cancelAnimationFrame(progressRef.current);
-      return;
-    }
-    const tick = (ts) => {
-      if (!startTimeRef.current) startTimeRef.current = ts;
-      const elapsed = ts - startTimeRef.current;
-      const p = Math.min(elapsed / INTERVAL, 1);
-      setProgress(p);
-      if (p >= 1) {
-        goNext();
-      } else {
-        progressRef.current = requestAnimationFrame(tick);
-      }
-    };
-    progressRef.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(progressRef.current);
-  }, [paused, animKey, goNext]);
-
-  const circumference = 2 * Math.PI * 20;
-
-  return (
-    <>
-    <h2 style={{
-                textAlign: 'center',
-                fontSize: '40px',
+    return (
+        <section style={{ padding: "60px 40px", background: "#f5f4f0" }}>
+            <h2 style={{
+                textAlign: "center",
+                fontSize: "40px",
                 fontWeight: 900,
-                color: '#1a1a1a',
-                margin: '0 0 48px',
-            }}>My Expertise</h2>
-    <section
-      style={{
-        position: "relative",
-        width: "90%",
-        height: "100vh",
-        minHeight: "560px",
-        overflow: "hidden",
-        background: "#111",
-        margin:"auto"
-      }}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-    >
-        
-      {/* Slides */}
-      {items.map((item, i) => {
-        const isActive = i === active;
-        const isPrev = i === prevIdx;
-        return (
-          <div key={i} style={{ position: "absolute", inset: 0, zIndex: isActive ? 2 : isPrev ? 1 : 0, pointerEvents: "none" }}>
-            <div style={{
-              position: "absolute", inset: 0,
-              backgroundImage: `url(${item.img})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              opacity: isActive ? 1 : isPrev ? 0 : 0,
-              transform: isActive ? "scale(1.05)" : "scale(1.0)",
-              transition: "opacity 0.8s ease, transform 5s ease-out",
-              filter: "brightness(0.52)",
-            }} />
-            {/* Wipe curtain */}
-            {isActive && (
-              <div key={`wipe-${animKey}`} style={{
-                position: "absolute", inset: 0,
-                background: "#111",
-                animation: "wipeRight 0.8s cubic-bezier(0.77,0,0.18,1) forwards",
-              }} />
-            )}
-          </div>
-        );
-      })}
-
-    
-
- 
-
-      {/* Main text content */}
-      <div style={{
-        position: "absolute", inset: 0, zIndex: 5,
-        display: "flex", alignItems: "flex-end",
-        padding: "0 60px 80px",
-        pointerEvents: "none",
-      }}>
-        <div>
-          <div key={`tag-${active}`} style={{
-            color: items[active].color, fontSize: "11px", letterSpacing: "0.3em",
-            textTransform: "uppercase", fontFamily: "sans-serif", marginBottom: "14px",
-            animation: "riseIn 0.55s 0.3s both ease",
-          }}>
-            {items[active].tag} &nbsp;/&nbsp; {String(items.length).padStart(2, "0")}
-          </div>
-
-          <h2 key={`h2-${active}`} style={{
-            color: "#fff",
-            fontSize: "clamp(38px, 6vw, 80px)",
-            fontWeight: 400,
-            margin: "0 0 16px",
-            lineHeight: 1,
-            letterSpacing: "-0.025em",
-            animation: "riseIn 0.55s 0.1s both ease",
-          }}>
-            {items[active].label}
-          </h2>
-
-          <p key={`p-${active}`} style={{
-            color: "rgba(255,255,255,0.45)",
-            fontSize: "15px", margin: 0,
-            fontStyle: "italic", letterSpacing: "0.03em",
-            animation: "riseIn 0.55s 0.4s both ease",
-          }}>
-            {items[active].sub}
-          </p>
-        </div>
-      </div>
-
-      {/* Right side dot + ring nav */}
-      <div style={{
-        position: "absolute", right: "44px", top: "50%", transform: "translateY(-50%)",
-        zIndex: 10, display: "flex", flexDirection: "column", alignItems: "center", gap: "12px",
-      }}>
-        {items.map((item, i) => {
-          const isActive = i === active;
-          return (
-            <button key={i} onClick={() => goTo(i)} style={{
-              position: "relative", width: "48px", height: "48px",
-              background: "transparent", border: "none", cursor: "pointer", padding: 0,
-              display: "flex", alignItems: "center", justifyContent: "center",
+                color: "#1a1a1a",
+                margin: "0 0 40px",
             }}>
-              {isActive && (
-                <svg width="48" height="48" style={{ position: "absolute", inset: 0, transform: "rotate(-90deg)" }}>
-                  <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="1.5" />
-                  <circle
-                    cx="24" cy="24" r="20" fill="none"
-                    stroke={item.color} strokeWidth="1.5"
-                    strokeDasharray={circumference}
-                    strokeDashoffset={circumference * (1 - progress)}
-                    strokeLinecap="round"
-                  />
-                </svg>
-              )}
-              <div style={{
-                width: isActive ? "9px" : "4px",
-                height: isActive ? "9px" : "4px",
-                borderRadius: "50%",
-                background: isActive ? item.color : "rgba(255,255,255,0.25)",
-                transition: "all 0.3s ease",
-                boxShadow: isActive ? `0 0 10px ${item.color}88` : "none",
-              }} />
-            </button>
-          );
-        })}
-      </div>
+                My Expertise
+            </h2>
 
-      {/* Thumbnail strip bottom-right */}
-      <div style={{
-        position: "absolute", bottom: "28px", right: "100px",
-        zIndex: 10, display: "flex", gap: "10px", alignItems: "center",
-      }}>
-        {items.map((item, i) => {
-          const isActive = i === active;
-          return (
-            <div
-              key={i}
-              onClick={() => goTo(i)}
-              style={{
-                width: isActive ? "64px" : "44px",
-                height: isActive ? "44px" : "30px",
-                borderRadius: "4px",
+            {/* Image container */}
+            <div style={{
+                position: "relative",
+                width: "90%",
+                maxWidth: "900px",
+                height: "520px",
+                margin: "0 auto",
+                borderRadius: "16px",
                 overflow: "hidden",
-                cursor: "pointer",
-                opacity: isActive ? 1 : 0.45,
-                transition: "all 0.4s cubic-bezier(0.23,1,0.32,1)",
-                border: isActive ? `1.5px solid ${item.color}` : "1.5px solid transparent",
-                flexShrink: 0,
-              }}
-            >
-              <img src={item.img} alt={item.label} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                background: "#111",
+            }}>
+                {EXPERTISE_ITEMS.map((item, i) => (
+                    <div key={i} style={{
+                        position: "absolute", inset: 0,
+                        opacity: i === active ? 1 : 0,
+                        transition: "opacity 0.9s ease",
+                        zIndex: i === active ? 1 : 0,
+                    }}>
+                        <img
+                            src={item.img}
+                            alt={item.label}
+                            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                        />
+                        <div style={{
+                            position: "absolute", bottom: 0, left: 0, right: 0,
+                            padding: "48px 32px 28px",
+                            background: "linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%)",
+                        }}>
+                            <div style={{
+                                color: "#fff", fontSize: "22px", fontWeight: 600,
+                                fontFamily: "Georgia, serif",
+                            }}>
+                                {item.label}
+                            </div>
+                        </div>
+                    </div>
+                ))}
             </div>
-          );
-        })}
-      </div>
 
-      {/* Bottom color bar */}
-      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 10, display: "flex", height: "3px" }}>
-        {items.map((item, i) => (
-          <div key={i} style={{
-            flex: 1,
-            background: i === active ? item.color : "rgba(255,255,255,0.08)",
-            transition: "background 0.5s ease",
-          }} />
-        ))}
-      </div>
-
-      <style>{`
-        @keyframes wipeRight {
-          0%   { transform: translateX(0); }
-          100% { transform: translateX(101%); }
-        }
-        @keyframes riseIn {
-          from { opacity: 0; transform: translateY(18px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
-    </section>
-    </>
-  );
+            {/* Dots */}
+            <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginTop: "20px" }}>
+                {EXPERTISE_ITEMS.map((_, i) => (
+                    <button
+                        key={i}
+                        onClick={() => setActive(i)}
+                        style={{
+                            width: i === active ? "24px" : "8px",
+                            height: "8px",
+                            borderRadius: "4px",
+                            background: i === active ? "#E8A317" : "#ccc",
+                            border: "none", cursor: "pointer", padding: 0,
+                            transition: "all 0.3s ease",
+                        }}
+                    />
+                ))}
+            </div>
+        </section>
+    );
 };
+
+
 /* ─── Portfolio Masonry Grid Component ─── */
 const PortfolioGrid = ({ data }) => {
     const [showAll, setShowAll] = useState(false);
@@ -575,6 +414,7 @@ const packages = [
 
 const PackagePricing = ({data})=>{
      const [hovered, setHovered] = useState(null);
+     const navigate = useNavigate();
 
   return (
     <section style={{
@@ -700,7 +540,7 @@ const PackagePricing = ({data})=>{
               </div>
 
               {/* CTA */}
-              <div style={{ textAlign: "center" }}>
+              <div style={{ textAlign: "center" }} >
                 <button className="book-btn" style={{
                   background: "#E8A317",
                   color: "#fff",
@@ -712,7 +552,7 @@ const PackagePricing = ({data})=>{
                   fontWeight: 500,
                   cursor: "pointer",
                   letterSpacing: "0.03em",
-                }}>
+                }} onClick={() => navigate('/requestBook')}>
                   Book Now
                 </button>
               </div>
@@ -879,7 +719,6 @@ const PhotographerDetail = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [portfolioHover, setPortfolioHover] = useState(null);
-
     const person = location.state?.person || PHOTOGRAPHER_DATA[Number(id)];
 
     if (!person) {
