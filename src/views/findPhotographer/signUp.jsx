@@ -110,7 +110,7 @@ const SignUp = () => {
 
             {/* Submit */}
             <div style={{ gridColumn: 'span 2', marginTop: '4px' }}>
-              <button type="submit" className="su-btn-primary" onClick={() => navigate('/style-prefer')}>Sign Up</button>
+              <button type="submit" className="su-btn-primary" style={{width:"100%"}} onClick={() => navigate('/style-prefer')}>Sign Up</button>
             </div>
 
           </div>

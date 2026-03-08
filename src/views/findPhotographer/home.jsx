@@ -134,7 +134,7 @@ const ExpertiseCarousel = () => {
                             {/* Polaroid shell */}
                             <div style={{
                                 width: "100%", height: "100%",
-                                background: "#FFAE00",
+                                background: "var(--color-orange)",
                                 borderRadius: "10px",
                                 padding: "7px 7px 0",
                                 boxShadow: isCenter
@@ -334,22 +334,9 @@ const Home = () => {
 
                     {/* CTA Button */}
                     <button
-                        className="hero-book-btn"
+                        className="su-btn-primary"
                         onClick={() => navigate('/find-best')}
-                        style={{
-                            background: '#E8A317',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '50px',
-                            padding: '16px 52px',
-                            fontSize: '16px',
-                            fontWeight: 700,
-                            cursor: 'pointer',
-                            letterSpacing: '0.02em',
-                            boxShadow: '0 8px 24px rgba(232,163,23,0.35)',
-                            transition: 'background 0.2s, transform 0.2s, box-shadow 0.2s',
-                            fontFamily: 'inherit',
-                        }}
+                    
                     >
                         Book Now
                     </button>
@@ -363,8 +350,8 @@ const Home = () => {
                 width: '100vw',
                 marginLeft: 'calc(-50vw + 50%)',
                 background: '#FFF3D6',
-                borderTop: '1px solid #f0e0b0',
-                borderBottom: '1px solid #f0e0b0',
+                // borderTop: '1px solid #f0e0b0',
+                // borderBottom: '1px solid #f0e0b0',
                 padding: '18px 0',
                 overflow: 'hidden',
                 position: 'relative',
@@ -475,7 +462,7 @@ const Home = () => {
                             <div key={copy} style={{ display: 'flex', alignItems: 'center', gap: '0' }}>
                                 {photographers.map((person, index) => {
                                     const tilt = TILTS[index % TILTS.length];
-                                    const borderColor = person.highlight ? '#F5A623' : '#1a1a1a';
+                                    const borderColor = person.highlight ? 'var(--color-orange)' : '#000';
                                     return (
                                         <div
                                             key={`${copy}-${person.id}`}
@@ -547,21 +534,9 @@ const Home = () => {
                 <div style={{ textAlign: 'center', marginTop: '56px' }}>
                     <button
                         onClick={() => navigate('/find-best')}
-                        style={{
-                            background: '#E8A317',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '50px',
-                            padding: '16px 48px',
-                            fontSize: '15px',
-                            fontWeight: 700,
-                            cursor: 'pointer',
-                            fontFamily: 'inherit',
-                            boxShadow: '0 8px 24px rgba(232,163,23,0.35)',
-                            transition: 'background 0.2s, transform 0.2s',
-                        }}
-                        onMouseEnter={e => { e.currentTarget.style.background = '#c98f10'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = '#E8A317'; e.currentTarget.style.transform = 'translateY(0)'; }}
+                        className='su-btn-primary'
+                       
+                      
                     >
                         Explor our Team
                     </button>

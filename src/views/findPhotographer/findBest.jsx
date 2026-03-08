@@ -31,7 +31,7 @@ const Stars = ({ count }) => (
 const PolaroidCard = ({ person, index, onClick }) => {
     const { name, rating, highlight, img } = person;
     const tilt = TILTS[index % TILTS.length];
-    const borderColor = highlight ? '#F5A623' : '#1a1a1a';
+    const borderColor = highlight ? 'var(--color-orange)' : '#000';
     const shadowColor = highlight ? '#b87800' : '#000';
 
     return (
@@ -41,7 +41,7 @@ const PolaroidCard = ({ person, index, onClick }) => {
                     position: 'relative',
                     border: `12px solid ${borderColor}`,
                     borderBottom: `52px solid ${borderColor}`,
-                    background: highlight ? '#F5A623' : '#1a1a1a',
+                    background: highlight ? 'var(--color-orange)' : '#000',
                     transform: `rotate(${tilt}deg)`,
                     transition: 'transform 0.25s ease, box-shadow 0.25s ease',
                     cursor: 'pointer',

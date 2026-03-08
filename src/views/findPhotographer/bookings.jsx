@@ -36,7 +36,7 @@ const Bookings = () => {
                         padding: '8px 20px', borderRadius: '50px', border: 'none',
                         fontSize: '13px', fontWeight: 600, cursor: 'pointer',
                         fontFamily: 'inherit', transition: 'all 0.2s',
-                        background: tab === t ? '#E8A317' : '#f5f5f5',
+                        background: tab === t ? 'var(--color-orange)' : '#f5f5f5',
                         color: tab === t ? '#fff' : '#555',
                     }}>{t}</button>
                 ))}
@@ -84,29 +84,13 @@ const Bookings = () => {
                             {b.status !== 'cancelled' && (
                                 <button
                                     onClick={() => navigate('/booking-summary')}
-                                    style={{
-                                        background: '#fff', border: '1.5px solid #E8A317',
-                                        color: '#E8A317', borderRadius: '50px',
-                                        padding: '8px 16px', fontSize: '12px', fontWeight: 700,
-                                        cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap',
-                                        transition: 'background 0.2s',
-                                    }}
-                                    onMouseEnter={e => e.currentTarget.style.background = '#FFF3D6'}
-                                    onMouseLeave={e => e.currentTarget.style.background = '#fff'}
+                                    className='su-btn-primary-outline'
                                 >View</button>
                             )}
                             {b.status === "completed" && (
                                 <button
                                     onClick={() => navigate('/review')}
-                                    style={{
-                                        background: '#fff', border: '1.5px solid #E8A317',
-                                        color: '#E8A317', borderRadius: '50px',
-                                        padding: '8px 16px', fontSize: '12px', fontWeight: 700,
-                                        cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap',
-                                        transition: 'background 0.2s',
-                                    }}
-                                    onMouseEnter={e => e.currentTarget.style.background = '#FFF3D6'}
-                                    onMouseLeave={e => e.currentTarget.style.background = '#fff'}
+                                    className='su-btn-primary-outline'
                                 >Review</button>
                             )}
                         </div>

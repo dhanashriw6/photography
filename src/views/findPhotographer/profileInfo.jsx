@@ -190,24 +190,8 @@ const ProfileInformation = ({ onSave, onCancel }) => {
 
             {/* Action buttons */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-                <button onClick={onCancel} style={{
-                    background: '#fff', color: '#E8A317',
-                    border: '2px solid #E8A317', borderRadius: '50px',
-                    padding: '11px 28px', fontSize: '14px', fontWeight: 700,
-                    cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.2s',
-                }}
-                    onMouseEnter={e => e.currentTarget.style.background = '#FFF3D6'}
-                    onMouseLeave={e => e.currentTarget.style.background = '#fff'}
-                >Cancel</button>
-                <button onClick={onSave} style={{
-                    background: '#E8A317', color: '#fff',
-                    border: '2px solid #E8A317', borderRadius: '50px',
-                    padding: '11px 28px', fontSize: '14px', fontWeight: 700,
-                    cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.2s',
-                }}
-                    onMouseEnter={e => e.currentTarget.style.background = '#c98f10'}
-                    onMouseLeave={e => e.currentTarget.style.background = '#E8A317'}
-                >Save</button>
+                <button onClick={onCancel} className='su-btn-primary-outline'>Cancel</button>
+                <button className='su-btn-primary' onClick={onSave}>Save</button>
             </div>
         </div>
     );

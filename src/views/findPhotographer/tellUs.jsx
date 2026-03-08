@@ -221,7 +221,7 @@ const TellUs = () => {
 
             {/* Book Now CTA */}
             <div style={{ gridColumn: 'span 2', marginTop: '4px' }}>
-              <button type="submit" className="su-btn-primary" onClick={() => navigate('/find-best')}>Book Now</button>
+              <button type="submit" className="su-btn-primary" style={{width:"100%"}} onClick={() => navigate('/find-best')}>Book Now</button>
             </div>
           </div>
         </div>

@@ -191,7 +191,7 @@ const RequestBook = () => {
                         }}>
                             {/* Orange banner */}
                             <div style={{
-                                background: 'linear-gradient(135deg, #E8A317 0%, #f5b93a 100%)',
+                                background: 'var(--color-orange)',
                                 height: '80px',
                             }} />
 
@@ -241,11 +241,11 @@ const RequestBook = () => {
                                     <div style={{
                                         display: 'inline-flex', alignItems: 'center', gap: '4px',
                                         background: '#FFF3D6',
-                                        border: '1px solid #E8A317',
+                                        border: '1px solid var(--color-orange)',
                                         borderRadius: '50px', padding: '4px 12px',
-                                        fontSize: '12px', fontWeight: 700, color: '#c98f10',
+                                        fontSize: '12px', fontWeight: 700, color: 'var(--color-orange)',
                                     }}>
-                                        <MdVerified size={13} color="#E8A317" />
+                                        <MdVerified size={13} color="var(--color-orange)" />
                                         Verified photographer
                                     </div>
                                     <span style={{ fontSize: '12px', color: '#999', fontWeight: 500 }}>
@@ -283,7 +283,7 @@ const RequestBook = () => {
                                 </div>
 
                                 {/* Contact — reuses .su-btn-primary from index.css */}
-                                <button className="su-btn-primary rb-btn-contact" style={{
+                                <button className="su-btn-primary" style={{
                                     display: 'flex', alignItems: 'center',
                                     justifyContent: 'center', gap: '8px',
                                 }}>

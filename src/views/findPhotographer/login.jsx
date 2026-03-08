@@ -47,7 +47,7 @@ const login = () => {
               </label>
             </div>
             <div style={{ gridColumn: 'span 2', marginTop: '4px' }}>
-              <button type="submit" className="su-btn-primary">Login</button>
+              <button type="submit" className="su-btn-primary" style={{width:"100%"}}>Login</button>
             </div>
 
 

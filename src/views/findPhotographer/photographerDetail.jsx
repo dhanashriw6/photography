@@ -250,7 +250,7 @@ const ExpertiseCarousel = () => {
                             {/* Polaroid shell */}
                             <div style={{
                                 width: "100%", height: "100%",
-                                background: "#FFAE00",
+                                background: "var(--color-orange)",
                                 borderRadius: "10px",
                                 padding: "7px 7px 0",
                                 boxShadow: isCenter
@@ -374,20 +374,8 @@ const PortfolioGrid = ({ data }) => {
 
             <div style={{ textAlign: 'center', marginTop: '40px' }}>
                 <button
+                    className="su-btn-primary"
                     onClick={() => setShowAll(v => !v)}
-                    style={{
-                        background: '#E8A317',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '50px',
-                        padding: '14px 36px',
-                        fontSize: '15px',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        transition: 'background 0.2s, transform 0.2s',
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.background = '#c98f10'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = '#E8A317'; e.currentTarget.style.transform = 'translateY(0)'; }}
                 >
                     {showAll ? 'Show Less' : 'See More'}
                 </button>
@@ -469,7 +457,7 @@ const PackagePricing = ({data})=>{
             style={{
               background: "#fefce8",
               borderRadius: "16px",
-              border: pkg.popular ? "2px solid #E8A317" : "2px solid #e8e0a0",
+              border: pkg.popular ? "2px solid var(--color-orange)" : "2px solid #e8e0a0",
               overflow: "hidden",
               boxShadow: "0 8px 28px rgba(0,0,0,0.07)",
               position: "relative",
@@ -479,7 +467,7 @@ const PackagePricing = ({data})=>{
             {pkg.popular && (
               <div style={{
                 position: "absolute", top: "16px", right: "16px",
-                background: "#E8A317", color: "#fff",
+                background: "var(--color-orange)", color: "#fff",
                 fontSize: "10px", fontFamily: "'DM Sans', sans-serif",
                 fontWeight: 500, letterSpacing: "0.12em",
                 textTransform: "uppercase",
@@ -555,18 +543,7 @@ const PackagePricing = ({data})=>{
 
               {/* CTA */}
               <div style={{ textAlign: "center" }} >
-                <button className="book-btn" style={{
-                  background: "#E8A317",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "40px",
-                  padding: "14px 44px",
-                  fontSize: "15px",
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontWeight: 500,
-                  cursor: "pointer",
-                  letterSpacing: "0.03em",
-                }} onClick={() => navigate('/requestBook')}>
+                <button className="su-btn-primary"  onClick={() => navigate('/requestBook')}>
                   Book Now
                 </button>
               </div>
@@ -772,7 +749,7 @@ const PhotographerDetail = () => {
                 }}>
                     {/* Left panel — white info */}
                     <div className="pd-animate pd-animate-1" style={{
-                        background: '#f0ede6',
+                        background: '#F8F8F8',
                         padding: '60px 48px 60px 48px',
                         display: 'flex',
                         flexDirection: 'column',
@@ -979,20 +956,8 @@ const PhotographerDetail = () => {
                         ))}
 
                         <button
-                            className="pd-contact-btn"
-                            style={{
-                                marginTop: '12px',
-                                background: '#E8A317',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: '50px',
-                                padding: '14px 34px',
-                                fontSize: '14px',
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                letterSpacing: '0.02em',
-                                transition: 'background 0.2s, color 0.2s',
-                            }}
+                            className="su-btn-primary"
+                      
                         >
                             Contact us
                         </button>

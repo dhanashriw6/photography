@@ -46,7 +46,7 @@ const EditProfile = () => {
 
                         {/* Progress card */}
                         <div style={{
-                            background: 'linear-gradient(135deg, #E8A317 0%, #f5b93a 100%)',
+                            background: 'var(--color-orange)',
                             borderRadius: '16px',
                             padding: '18px 20px',
                             display: 'flex',
@@ -99,12 +99,12 @@ const EditProfile = () => {
                                             padding: '15px 18px',
                                             background: isActive ? '#FFF3D6' : 'transparent',
                                             border: 'none',
-                                            borderLeft: isActive ? '3px solid #E8A317' : '3px solid transparent',
+                                            borderLeft: isActive ? '3px solid var(--color-orange)' : '3px solid transparent',
                                             borderBottom: i < MENU.length - 1 ? '1px solid #f5f5f5' : 'none',
                                             cursor: 'pointer',
                                             fontSize: '14px',
                                             fontWeight: isActive ? 700 : 500,
-                                            color: isActive ? '#E8A317' : '#555',
+                                            color: isActive ? 'var(--color-orange)' : '#555',
                                             fontFamily: 'inherit',
                                             textAlign: 'left',
                                             transition: 'all 0.18s ease',
@@ -112,7 +112,7 @@ const EditProfile = () => {
                                         onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = '#fafafa'; }}
                                         onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
                                     >
-                                        <span style={{ color: isActive ? '#E8A317' : '#bbb', display: 'flex', flexShrink: 0 }}>{item.icon}</span>
+                                        <span style={{ color: isActive ? 'var(--color-orange)' : '#bbb', display: 'flex', flexShrink: 0 }}>{item.icon}</span>
                                         {item.label}
                                     </button>
                                 );

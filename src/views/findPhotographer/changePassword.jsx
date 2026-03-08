@@ -126,22 +126,8 @@ const ChangePassword = () => {
                 {error && <p style={{ margin: 0, fontSize: '12px', color: '#ef4444', fontWeight: 600 }}>{error}</p>}
 
                 <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-                    <button onClick={() => { setFields({ current: '', newPwd: '', confirm: '' }); setError(''); setSuccess(false); }} style={{
-                        background: '#fff', color: '#E8A317', border: '2px solid #E8A317',
-                        borderRadius: '50px', padding: '11px 28px', fontSize: '14px',
-                        fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.2s',
-                    }}
-                        onMouseEnter={e => e.currentTarget.style.background = '#FFF3D6'}
-                        onMouseLeave={e => e.currentTarget.style.background = '#fff'}
-                    >Cancel</button>
-                    <button onClick={handleSave} style={{
-                        background: '#E8A317', color: '#fff', border: '2px solid #E8A317',
-                        borderRadius: '50px', padding: '11px 28px', fontSize: '14px',
-                        fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.2s',
-                    }}
-                        onMouseEnter={e => e.currentTarget.style.background = '#c98f10'}
-                        onMouseLeave={e => e.currentTarget.style.background = '#E8A317'}
-                    >Update Password</button>
+                    <button onClick={() => { setFields({ current: '', newPwd: '', confirm: '' }); setError(''); setSuccess(false); }} className='su-btn-primary-outline'>Cancel</button>
+                    <button onClick={handleSave} className='su-btn-primary'>Update Password</button>
                 </div>
             </div>
         </div>
