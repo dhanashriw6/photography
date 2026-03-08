@@ -81,8 +81,8 @@ const RequestBook = () => {
                     display: 'grid',
                     gridTemplateColumns: '560px 560px',
                     gap: '20px',
-                    alignItems: 'start',
-                    maxWidth: '1100px',
+                    // alignItems: 'start',
+                    // maxWidth: '1100px',
                     margin: '0 auto',
                     padding: '0 40px',
                 }}>

@@ -4,6 +4,8 @@ import { BsStarFill, BsInstagram, BsFacebook, BsPinterest, BsTelegram } from 're
 import { FiArrowLeft, FiCamera, FiMapPin, FiCalendar, FiAward, FiPhone, FiMail } from 'react-icons/fi';
 import { MdOutlinePhotoCamera } from 'react-icons/md';
 import ViewsLayout from '../Layout';
+import VideoPlayer from './youtubePlayer';
+import HinduCalendar from './hinduCalendar';
 
 
 /* ─── full catalogue keyed by id ─── */
@@ -183,111 +185,123 @@ const InfoRow = ({ label, value }) => (
     </div>
 );
 const EXPERTISE_ITEMS = [
-    {
-        label: "Portrait Photography",
-        img: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=900&h=700&fit=crop",
-    },
-    {
-        label: "Landscape & Nature",
-        img: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900&h=700&fit=crop",
-    },
-    {
-        label: "Street Photography",
-        img: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=900&h=700&fit=crop",
-    },
-    {
-        label: "Fashion & Editorial",
-        img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=900&h=700&fit=crop",
-    },
-    {
-        label: "Architecture",
-        img: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=900&h=700&fit=crop",
-    },
+    { label: "Portrait Photography", img: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&h=520&fit=crop" },
+    { label: "Landscape & Nature",   img: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=520&fit=crop" },
+    { label: "Street Photography",   img: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=400&h=520&fit=crop" },
+    { label: "Fashion & Editorial",  img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=520&fit=crop" },
+    { label: "Architecture",         img: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&h=520&fit=crop" },
 ];
 
-const INTERVAL = 3500;
+const INTERVAL = 3000;
+const total = EXPERTISE_ITEMS.length;
 
 const ExpertiseCarousel = () => {
     const [active, setActive] = useState(0);
 
     useEffect(() => {
-        const timer = setInterval(() => {
-            setActive(a => (a + 1) % EXPERTISE_ITEMS.length);
-        }, INTERVAL);
-        return () => clearInterval(timer);
+        const t = setInterval(() => setActive(a => (a + 1) % total), INTERVAL);
+        return () => clearInterval(t);
     }, []);
 
-    return (
-        <section style={{ padding: "60px 40px", background: "#f5f4f0" }}>
-            <h2 style={{
-                textAlign: "center",
-                fontSize: "40px",
-                fontWeight: 900,
-                color: "#1a1a1a",
-                margin: "0 0 40px",
-            }}>
-                My Expertise
-            </h2>
+    const getOffset = (i) => {
+        let o = i - active;
+        if (o > Math.floor(total / 2)) o -= total;
+        if (o < -Math.floor(total / 2)) o += total;
+        return o;
+    };
 
-            {/* Image container */}
-            <div style={{
-                position: "relative",
-                width: "90%",
-                maxWidth: "900px",
-                height: "520px",
-                margin: "0 auto",
-                borderRadius: "16px",
-                overflow: "hidden",
-                background: "#111",
-            }}>
-                {EXPERTISE_ITEMS.map((item, i) => (
-                    <div key={i} style={{
-                        position: "absolute", inset: 0,
-                        opacity: i === active ? 1 : 0,
-                        transition: "opacity 0.9s ease",
-                        zIndex: i === active ? 1 : 0,
-                    }}>
-                        <img
-                            src={item.img}
-                            alt={item.label}
-                            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                        />
-                        <div style={{
-                            position: "absolute", bottom: 0, left: 0, right: 0,
-                            padding: "48px 32px 28px",
-                            background: "linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%)",
-                        }}>
+    return (
+        <section style={{ padding: "60px 40px 70px", background: "#f5f4f0" }}>
+            <h2 style={{
+                textAlign: "center", fontSize: "40px", fontWeight: 900,
+                color: "#1a1a1a", margin: "0 0 16px", fontFamily: "Georgia, serif",
+            }}>My Expertise</h2>
+
+            {/* Fan */}
+            <div style={{ position: "relative", height: "360px", width: "100%", maxWidth: "860px", margin: "0 auto" }}>
+                {EXPERTISE_ITEMS.map((item, i) => {
+                    const o = getOffset(i);
+                    const abs = Math.abs(o);
+                    if (abs > 2) return null;
+
+                    const isCenter = o === 0;
+                    const w = isCenter ? 290 : 220;
+                    const h = isCenter ? 295 : 205;
+                    const spreadX = o * 145;
+                    const rotate  = o * 18;
+                    const dropY   = abs * abs * 16;
+
+                    return (
+                        <div
+                            key={i}
+                            onClick={() => !isCenter && setActive(i)}
+                            style={{
+                                position: "absolute",
+                                left: "50%", top: "50%",
+                                width: `${w}px`,
+                                height: `${h + 38}px`,
+                                transform: `translate(-50%,-50%) translateX(${spreadX}px) translateY(${dropY}px) rotate(${rotate}deg)`,
+                                zIndex: 10 - abs,
+                                opacity: abs === 2 ? 0.72 : 1,
+                                cursor: isCenter ? "default" : "pointer",
+                                transition: "all 0.52s cubic-bezier(0.34,1.2,0.64,1)",
+                            }}
+                        >
+                            {/* Polaroid shell */}
                             <div style={{
-                                color: "#fff", fontSize: "22px", fontWeight: 600,
-                                fontFamily: "Georgia, serif",
+                                width: "100%", height: "100%",
+                                background: "#FFAE00",
+                                borderRadius: "10px",
+                                padding: "7px 7px 0",
+                                boxShadow: isCenter
+                                    ? "0 22px 52px rgba(0,0,0,0.28)"
+                                    : "0 8px 22px rgba(0,0,0,0.18)",
+                                display: "flex", flexDirection: "column",
                             }}>
-                                {item.label}
+                                {/* Photo */}
+                                <div style={{ flex: 1, borderRadius: "6px", overflow: "hidden" }}>
+                                    <img src={item.img} alt={item.label}
+                                        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                                </div>
+
+                                {/* Bottom caption strip */}
+                                <div style={{
+                                    height: "38px",
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                }}>
+                                    {isCenter && (
+                                        <span style={{
+                                            fontSize: "12px", fontWeight: 800,
+                                            color: "#1a1a1a", fontFamily: "Georgia, serif",
+                                            letterSpacing: "0.02em",
+                                        }}>
+                                            {item.label}
+                                        </span>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             {/* Dots */}
-            <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginTop: "20px" }}>
+            <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginTop: "14px" }}>
                 {EXPERTISE_ITEMS.map((_, i) => (
-                    <button
-                        key={i}
-                        onClick={() => setActive(i)}
-                        style={{
-                            width: i === active ? "24px" : "8px",
-                            height: "8px",
-                            borderRadius: "4px",
-                            background: i === active ? "#E8A317" : "#ccc",
-                            border: "none", cursor: "pointer", padding: 0,
-                            transition: "all 0.3s ease",
-                        }}
-                    />
+                    <button key={i} onClick={() => setActive(i)} style={{
+                        width: i === active ? "24px" : "8px", height: "8px",
+                        borderRadius: "4px",
+                        background: i === active ? "#E8A317" : "#ccc",
+                        border: "none", cursor: "pointer", padding: 0,
+                        transition: "all 0.3s ease",
+                    }} />
                 ))}
             </div>
         </section>
     );
 };
+
+
 
 
 /* ─── Portfolio Masonry Grid Component ─── */
@@ -990,6 +1004,8 @@ const PhotographerDetail = () => {
                 ══════════════════════════════ */}
                 <ExpertiseCarousel data={data} />
 
+                <VideoPlayer />
+
                 {/* ══════════════════════════════
                     PORTFOLIO MASONRY
                 ══════════════════════════════ */}
@@ -997,6 +1013,7 @@ const PhotographerDetail = () => {
 
                 <PackagePricing data={data} />
                 <Testimonials data={data} />
+                <HinduCalendar />
 
 
 

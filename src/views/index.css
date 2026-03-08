@@ -1,4 +1,9 @@
 @import "tailwindcss";
+
+:root {
+  --color-orange: #FFAE00;
+}
+
 /* ── Base ── */
 .views-shell {
   min-height: 100vh;
@@ -21,7 +26,7 @@
 .views-nav-link {
   font-size: 13px;
   font-weight: 600;
-  color: #888;
+  color: #000;
   transition: color 150ms ease;
   background: none;
   border: none;
@@ -29,12 +34,15 @@
   padding: 0;
   position: relative;
 }
+
 .views-nav-link:hover {
   color: #111;
 }
+
 .views-nav-link--active {
   color: #111;
 }
+
 .views-nav-link--active::after {
   content: '';
   position: absolute;
@@ -60,6 +68,7 @@
 .su-field {
   position: relative;
 }
+
 .su-field label {
   position: absolute;
   top: -8px;
@@ -74,6 +83,7 @@
   z-index: 1;
   white-space: nowrap;
 }
+
 .su-field input,
 .su-field select,
 .su-field textarea {
@@ -91,22 +101,26 @@
   appearance: none;
   -webkit-appearance: none;
 }
+
 .su-field select {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding-right: 32px;
 }
+
 .su-field input:focus,
 .su-field select:focus,
 .su-field textarea:focus {
   border-color: #f5a623;
   box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.15);
 }
+
 .su-field input::placeholder,
 .su-field textarea::placeholder {
   color: #bbb;
 }
+
 .su-field-hint {
   font-size: 10.5px;
   color: #9ca3af;
@@ -119,10 +133,12 @@
   display: flex;
   gap: 8px;
 }
+
 .su-phone-row .su-country {
   flex-shrink: 0;
   width: 95px;
 }
+
 .su-phone-row .su-number {
   flex: 1;
 }
@@ -135,6 +151,7 @@
   cursor: pointer;
   width: auto;
 }
+
 .su-checkbox-row input[type='checkbox'] {
   width: 16px;
   height: 16px;
@@ -142,10 +159,12 @@
   flex-shrink: 0;
   cursor: pointer;
 }
+
 .su-checkbox-row span {
   font-size: 13px;
   color: #555;
 }
+
 .su-checkbox-row a {
   color: #111;
   font-weight: 700;
@@ -169,6 +188,7 @@
   transition: filter 0.15s, transform 0.15s;
   box-shadow: 0 8px 24px rgba(245, 166, 35, 0.35);
 }
+
 .su-btn-primary:hover {
   filter: brightness(1.05);
   transform: translateY(-1px);
@@ -179,6 +199,7 @@
   background: #fff;
   border-top: 1px solid #ebebeb;
 }
+
 .views-footer-top {
   max-width: 900px;
   margin: 0 auto;
@@ -188,18 +209,21 @@
   gap: 24px;
   align-items: start;
 }
+
 .views-footer-brand .tagline {
   font-size: 12px;
   color: #888;
   margin-top: 8px;
   font-weight: 500;
 }
+
 .views-footer-col h4 {
   font-size: 13px;
   font-weight: 800;
   color: #1a1a1a;
   margin: 0 0 12px;
 }
+
 .views-footer-col a {
   display: block;
   font-size: 12.5px;
@@ -209,15 +233,18 @@
   font-weight: 500;
   transition: color 0.15s;
 }
+
 .views-footer-col a:hover {
   color: #111;
 }
+
 .views-footer-social {
   display: flex;
   gap: 10px;
   align-items: center;
   margin-top: 2px;
 }
+
 .su-social-icon {
   width: 36px;
   height: 36px;
@@ -232,13 +259,23 @@
   transition: transform 0.15s, opacity 0.15s;
   text-decoration: none;
 }
+
 .su-social-icon:hover {
   transform: translateY(-2px);
   opacity: 0.9;
 }
-.su-social-icon.li { background: #0077b5; }
-.su-social-icon.ig { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
-.su-social-icon.fb { background: #1877f2; }
+
+.su-social-icon.li {
+  background: #0077b5;
+}
+
+.su-social-icon.ig {
+  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+}
+
+.su-social-icon.fb {
+  background: #1877f2;
+}
 
 .views-footer-bottom {
   border-top: 1px solid #ebebeb;
@@ -248,103 +285,124 @@
   color: #aaa;
   font-weight: 500;
 }
+
 .views-footer-bottom span {
   color: #f5a623;
   font-weight: 700;
 }
+
 .views-accent-bar {
   height: 4px;
   background: linear-gradient(90deg, #f5a623, #f0b429, #f5a623);
 }
 
- .rb-card { transition: box-shadow 0.2s; }
-                .rb-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.09) !important; }
+.rb-card {
+  transition: box-shadow 0.2s;
+}
 
-                /* Display-only field rows (non-input fields like dates, package) */
-                .rb-field-display {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    padding: 12px 13px;
-                    border: 1.5px solid #d1d5db;
-                    border-radius: 8px;
-                    background: #fff;
-                    min-height: 46px;
-                    box-sizing: border-box;
-                    cursor: pointer;
-                    transition: border-color 0.2s, box-shadow 0.2s;
-                }
-                .rb-field-display:hover {
-                    border-color: #f5a623;
-                }
+.rb-card:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.09) !important;
+}
 
-                /* Bare inputs inside rb-field-display (time fields) */
-                .rb-inline-input {
-                    border: none !important;
-                    outline: none !important;
-                    background: transparent !important;
-                    font-size: 14px;
-                    font-weight: 500;
-                    color: #1a1a1a;
-                    width: 90px;
-                    font-family: inherit;
-                    padding: 0 !important;
-                    box-shadow: none !important;
-                }
+/* Display-only field rows (non-input fields like dates, package) */
+.rb-field-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 13px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  min-height: 46px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
 
-                /* Textarea inside display field */
-                .rb-inline-textarea {
-                    border: none !important;
-                    outline: none !important;
-                    background: transparent !important;
-                    font-size: 13px;
-                    font-weight: 400;
-                    color: #1a1a1a;
-                    width: 100%;
-                    font-family: inherit;
-                    resize: none;
-                    height: 56px;
-                    padding: 0 !important;
-                    line-height: 1.5;
-                    box-shadow: none !important;
-                }
-                .rb-inline-textarea::placeholder { color: #bbb; }
+.rb-field-display:hover {
+  border-color: #f5a623;
+}
 
-                /* Event name input wrapper */
-                .rb-event-input-wrap { position: relative; }
-                .rb-event-input-wrap input {
-                    width: 100%;
-                    padding: 12px 36px 12px 13px;
-                    border: 1.5px solid #d1d5db;
-                    border-radius: 8px;
-                    background: #fff;
-                    font-size: 14px;
-                    font-weight: 500;
-                    color: #1a1a1a;
-                    font-family: inherit;
-                    outline: none;
-                    box-sizing: border-box;
-                    transition: border-color 0.2s, box-shadow 0.2s;
-                }
-                .rb-event-input-wrap input:focus {
-                    border-color: #f5a623;
-                    box-shadow: 0 0 0 3px rgba(245,166,35,0.15);
-                }
-                .rb-event-input-wrap .rb-chevron {
-                    position: absolute;
-                    right: 12px; top: 50%;
-                    transform: translateY(-50%);
-                    pointer-events: none;
-                }
+/* Bare inputs inside rb-field-display (time fields) */
+.rb-inline-input {
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a1a;
+  width: 90px;
+  font-family: inherit;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
 
-                /* Contact btn hover */
-                .rb-btn-contact:hover { opacity: 0.88 !important; }
+/* Textarea inside display field */
+.rb-inline-textarea {
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  font-size: 13px;
+  font-weight: 400;
+  color: #1a1a1a;
+  width: 100%;
+  font-family: inherit;
+  resize: none;
+  height: 56px;
+  padding: 0 !important;
+  line-height: 1.5;
+  box-shadow: none !important;
+}
+
+.rb-inline-textarea::placeholder {
+  color: #bbb;
+}
+
+/* Event name input wrapper */
+.rb-event-input-wrap {
+  position: relative;
+}
+
+.rb-event-input-wrap input {
+  width: 100%;
+  padding: 12px 36px 12px 13px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a1a;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.rb-event-input-wrap input:focus {
+  border-color: #f5a623;
+  box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.15);
+}
+
+.rb-event-input-wrap .rb-chevron {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* Contact btn hover */
+.rb-btn-contact:hover {
+  opacity: 0.88 !important;
+}
 
 /* ── Responsive ── */
 @media (max-width: 700px) {
   .views-footer-top {
     grid-template-columns: 1fr 1fr;
   }
-  .views-nav { display: none; }
-}
 
+  .views-nav {
+    display: none;
+  }
+}

@@ -1,26 +1,20 @@
 import React from 'react';
 import ViewsLayout from '../Layout';
 import thankyoubadge from '../../assets/Images/thankyoubadge.png';
+import { useNavigate } from 'react-router-dom';
 
 const ThankYou = () => {
+    const navigate = useNavigate()
     return (
         <ViewsLayout>
-            <div style={{
-                background: '#f7f7f5',
-                minHeight: '100vh',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-
-                
-            }}>
+            <div>
                 {/* Card */}
-                <div style={{
+                <div className='views-card' style={{
                     background: '#fff',
                     borderRadius: '20px',
                     boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
                     padding: '48px 56px',
-                    maxWidth: '760px',
+                    maxWidth: '860px',
                     width: '100%',
                     textAlign: 'center',
                     animation: 'ty-fadeIn 0.5s ease both',
@@ -91,7 +85,7 @@ const ThankYou = () => {
                             Download invoice
                         </a>
                         <a
-                            href="#"
+                            href="/booking-summary"
                             style={{
                                 fontSize: '13px',
                                 fontWeight: 600,
@@ -104,7 +98,7 @@ const ThankYou = () => {
                             onMouseEnter={e => e.target.style.color = '#E8A317'}
                             onMouseLeave={e => e.target.style.color = '#1a1a1a'}
                         >
-                            Message Your photographer
+                            View Summary
                         </a>
                     </div>
                 </div>

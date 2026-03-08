@@ -12,6 +12,12 @@ import FindBest from './views/findPhotographer/findBest';
 import PhotographerDetail from './views/findPhotographer/photographerDetail';
 import RequestBook from './views/findPhotographer/requestBook';
 import ThankYou from './views/findPhotographer/thankYou';
+import BookingSummary from './views/findPhotographer/bookingSummary';
+import FindHomePage from './views/findPhotographer/home';
+import EditProfile from './views/findPhotographer/editProfile';
+import Review from './views/findPhotographer/review';
+import Dispute from './views/findPhotographer/dispute';
+
 
 function App() {
   return (
@@ -30,6 +36,11 @@ function App() {
         <Route path="/photographer/:id" element={<PhotographerDetail />} />
         <Route path="/requestBook" element={<RequestBook />} />
         <Route path="/thank-you" element={<ThankYou />} />
+        <Route path="/booking-summary" element={<BookingSummary />} />
+        <Route path="/home" element={<FindHomePage />} />
+        <Route path="/edit-profile" element={<EditProfile />} />
+        <Route path="/review" element={<Review />} />
+        <Route path="/dispute" element={<Dispute />} />
       </Routes>
     </>
   );
