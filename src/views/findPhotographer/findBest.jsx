@@ -100,7 +100,7 @@ const FindBest = () => {
 
     return (
         <ViewsLayout>
-            <div style={{ width: '100%', maxWidth: '80%', margin: '0 auto' }}>
+            <div style={{ width: '100%', maxWidth: '100%', margin: '0 auto' }}>
 
                 {/* Hero */}
                 <div style={{ width: '100%', height: '304px', overflow: 'hidden', position: 'relative', marginBottom: '28px' }}>
@@ -117,7 +117,7 @@ const FindBest = () => {
                 </div>
 
                 {/* Search + Filter */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', gap: '12px' }}>
+                <div style={{ display: 'flex',padding: '0 100px', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', gap: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#fff', border: '1.5px solid #e5e7eb', borderRadius: '50px', padding: '10px 18px', flex: 1, maxWidth: '260px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
                         <input
                             type="text"
@@ -135,9 +135,9 @@ const FindBest = () => {
                 </div>
 
                 {/* Grid */}
-                <div style={{ position: 'relative' }}>
+                <div style={{ position: 'relative',padding: '0 100px' }}>
                     <FaStar size={22} color="#ccc" style={{ position: 'absolute', left: '-32px', top: '8px' }} />
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px 30px', padding: '0 12px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '40px 30px', padding: '0 12px' }}>
                         {filtered.map((person, index) => (
                             <PolaroidCard
                                 key={person.id}

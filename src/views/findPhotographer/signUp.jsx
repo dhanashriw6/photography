@@ -21,6 +21,7 @@ const SignUp = () => {
             color: '#1a1a1a',
             marginBottom: '28px',
             letterSpacing: '-0.01em',
+            fontFamily: 'inherit',
           }}>
             Sign Up
           </h1>
@@ -109,7 +110,7 @@ const SignUp = () => {
             </div>
 
             {/* Submit */}
-            <div style={{ gridColumn: 'span 2', marginTop: '4px' }}>
+            <div style={{ gridColumn: 'span 2', marginTop: '4px',  }}>
               <button type="submit" className="su-btn-primary" style={{width:"100%"}} onClick={() => navigate('/style-prefer')}>Sign Up</button>
             </div>
 
@@ -123,7 +124,7 @@ const SignUp = () => {
             marginTop: '20px',
           }}>
             Already have an account?{' '}
-            <a href="/login" style={{ color: '#111', fontWeight: 800, textDecoration: 'none', cursor: 'pointer' }}>
+            <a href="/login" style={{ color: '#111', fontWeight: 700, textDecoration: 'none', cursor: 'pointer' }}>
               Login
             </a>
           </p>

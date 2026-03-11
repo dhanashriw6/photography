@@ -1,9 +1,16 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Freckle+Face&family=Quicksand:wght@300..700&display=swap');
 
 :root {
   --color-orange: #FFAE00;
 }
-
+*{
+  font-family: 'Quicksand', sans-serif;
+}
+h1,h2,h3,h4,h5,h6{
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 700;
+}
 /* ── Base ── */
 .views-shell {
   min-height: 100vh;
@@ -93,7 +100,7 @@
   border-radius: 8px;
   background: #fff;
   font-size: 14px;
-  font-family: inherit;
+  /* font-family: inherit; */
   color: #111;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -182,7 +189,7 @@
   color: #fff;
   font-size: 16px;
   font-weight: 800;
-  font-family: inherit;
+  /* font-family: inherit; */
   cursor: pointer;
   letter-spacing: 0.02em;
   transition: filter 0.15s, transform 0.15s;
@@ -203,7 +210,7 @@
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  font-family: inherit;
+  /* font-family: inherit; */
   transition: background 0.2s;
 }
 
@@ -216,7 +223,7 @@
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  font-family: inherit;
+  /* font-family: inherit; */
   transition: background 0.2s;
 }
 
@@ -358,7 +365,7 @@
   font-weight: 500;
   color: #1a1a1a;
   width: 90px;
-  font-family: inherit;
+  /* font-family: inherit; */
   padding: 0 !important;
   box-shadow: none !important;
 }
@@ -372,7 +379,7 @@
   font-weight: 400;
   color: #1a1a1a;
   width: 100%;
-  font-family: inherit;
+  /* font-family: inherit;  */
   resize: none;
   height: 56px;
   padding: 0 !important;
@@ -398,7 +405,7 @@
   font-size: 14px;
   font-weight: 500;
   color: #1a1a1a;
-  font-family: inherit;
+  /* font-family: inherit; */
   outline: none;
   box-sizing: border-box;
   transition: border-color 0.2s, box-shadow 0.2s;
