@@ -32,6 +32,7 @@ const AvatarDropdown = () => {
 
   const menuItems = [
     { icon: <FiEdit2 size={15} />, label: 'Edit Profile', action: () => navigate('/edit-profile') },
+    // { icon: <FiCalendar size={15} />, label: 'My Bookings', action: () => navigate('/my-bookings') },
     { icon: <FiAlertCircle size={15} />, label: 'Raise a Dispute', action: () => navigate('/dispute'), danger: true },
     { divider: true },
     { icon: <FiLogOut size={15} />, label: 'Logout', action: () => navigate('/'), danger: true },
@@ -227,53 +228,86 @@ const ViewsLayout = ({ children }) => {
       </motion.main>
 
       {/* ── Footer ── */}
-      <footer className="views-footer">
-        <div className="views-footer-top">
+      <footer style={{ background: '#fff', borderTop: '1px solid #ebebeb' }}>
+        <div style={{
+          margin: '0 auto',
+          padding: '36px 48px 0px',
+          display: 'grid',
+          gridTemplateColumns: '220px 1fr auto',
+          gap: '40px',
+          alignItems: 'start',
+        }}>
+
           {/* Brand */}
-          <div className="views-footer-brand">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <img src={logo} alt="logo" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} />
-              <div style={{ lineHeight: 1.1 }}>
-                <span style={{ display: 'block', fontSize: '9px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#f5a623' }}>Online</span>
-                <span style={{ display: 'block', fontSize: '13px', fontWeight: 800, color: '#1a1a1a', letterSpacing: '0.06em' }}>
-                  PHOT<span style={{ color: '#f5a623' }}>O</span>GRAPHER
-                </span>
-              </div>
+          <div style={{marginTop:"-60px"}}>
+            <img
+              src={logo}
+              alt="Online Photographer logo"
+              style={{ width: '200px', height: 'auto', display: 'block' }}
+            />           
+             {/* <p style={{ fontSize: '12px', color: '#888', marginTop: '10px', fontWeight: 500 }}>
+              A community for photographer
+            </p> */}
+          </div>
+
+          {/* Links — shared "Useful Links" heading + 3 columns */}
+          <div>
+            <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#1a1a1a', margin: '0 0 16px' }}>
+              Useful Links
+            </h4>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, auto)', gap: '0 48px' }}>
+              {[
+                ['FAQs', 'Customer Care'],
+                ['About', 'Blog'],
+                ['Privacy Policy', 'Terms'],
+              ].map((col, ci) => (
+                <div key={ci} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {col.map(link => (
+                    <a key={link} href="#" style={{
+                      fontSize: '13px', color: '#555', textDecoration: 'none',
+                      fontWeight: 500, transition: 'color 0.15s',
+                    }}
+                      onMouseEnter={e => e.currentTarget.style.color = '#1a1a1a'}
+                      onMouseLeave={e => e.currentTarget.style.color = '#555'}
+                    >{link}</a>
+                  ))}
+                </div>
+              ))}
             </div>
-            <p className="tagline">A community for photographer</p>
           </div>
-
-          {/* Useful Links */}
-          <div className="views-footer-col">
-            <h4>Useful Links</h4>
-            <a href="#">FAQs</a>
-            <a href="#">Customer Care</a>
-            <a href="#">Blog</a>
-          </div>
-
-          {/* More links */}
-          <div className="views-footer-col">
-            <h4>&nbsp;</h4>
-            <a href="#">About</a>
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms</a>
-          </div>
-
-          {/* Empty spacer */}
-          <div />
 
           {/* Social icons */}
-          <div>
-            <div className="views-footer-social">
-              <div className="su-social-icon li">in</div>
-              <div className="su-social-icon ig"><BsInstagram size={17} /></div>
-              <div className="su-social-icon fb">f</div>
-            </div>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', paddingTop: '4px' }}>
+            {[
+              { content: <span style={{ fontSize: '16px', fontWeight: 700 }}>in</span>, bg: '#FFAE00' },
+              { content: <BsInstagram size={19} />, bg: '#FFAE00' },
+              { content: <span style={{ fontSize: '16px', fontWeight: 700 }}>f</span>, bg: '#FFAE00' },
+            ].map((s, i) => (
+              <div key={i} style={{
+                width: '42px', height: '42px', borderRadius: '10px',
+                background: s.bg, color: '#fff',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', transition: 'opacity 0.2s, transform 0.2s',
+              }}
+    
+              >
+                {s.content}
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="views-footer-bottom">
-          © 2025 online photographer | All rights reserved by <span>DIGI- Trend.</span>
+        {/* Bottom bar */}
+        <div style={{
+          borderTop: '1px solid #ebebeb',
+          padding: '14px 48px',
+          textAlign: 'center',
+          fontSize: '12px',
+          color: '#999',
+          fontWeight: 500,
+        }}>
+          © 2025 online photographer | All rights reserved by{' '}
+          <span style={{ color: '#1a1a1a', fontWeight: 700 }}>DIGI- Trend.</span>
         </div>
       </footer>
 

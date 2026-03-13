@@ -1,43 +1,6 @@
 import React, { useState } from 'react';
 import { FiEye, FiEyeOff, FiLock } from 'react-icons/fi';
 
-const PasswordField = ({ label, value, onChange, show, onToggle, hint }) => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-        <div style={{
-            border: '1.5px solid #e0e0e0', borderRadius: '8px',
-            padding: '10px 14px 8px', position: 'relative', background: '#fff',
-            transition: 'border-color 0.2s',
-        }}
-            onFocusCapture={e => e.currentTarget.style.borderColor = '#E8A317'}
-            onBlurCapture={e => e.currentTarget.style.borderColor = '#e0e0e0'}
-        >
-            <label style={{
-                position: 'absolute', top: '-9px', left: '12px',
-                background: '#fff', padding: '0 4px',
-                fontSize: '11px', fontWeight: 600, color: '#999', letterSpacing: '0.03em',
-            }}>{label}</label>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <FiLock size={14} color="#E8A317" />
-                <input
-                    type={show ? 'text' : 'password'}
-                    value={value}
-                    onChange={onChange}
-                    style={{
-                        border: 'none', outline: 'none', background: 'transparent',
-                        fontSize: '14px', fontWeight: 500, color: '#1a1a1a',
-                        flex: 1, fontFamily: 'inherit', padding: '2px 0',
-                    }}
-                    placeholder="••••••••"
-                />
-                <button type="button" onClick={onToggle} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#aaa', padding: 0, display: 'flex' }}>
-                    {show ? <FiEyeOff size={15} /> : <FiEye size={15} />}
-                </button>
-            </div>
-        </div>
-        {hint && <p style={{ margin: 0, fontSize: '11px', color: '#aaa', paddingLeft: '4px' }}>{hint}</p>}
-    </div>
-);
-
 const ChangePassword = () => {
     const [fields, setFields] = useState({ current: '', newPwd: '', confirm: '' });
     const [show, setShow] = useState({ current: false, newPwd: false, confirm: false });
@@ -72,7 +35,7 @@ const ChangePassword = () => {
 
     return (
         <div>
-            <h2 style={{ margin: '0 0 6px', fontSize: '26px', fontWeight: 900, color: '#1a1a1a', letterSpacing: '-0.02em' }}>Change Password</h2>
+            <h2 style={{ margin: '0 0 6px', fontSize: '36px', fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.02em' }}>Change Password</h2>
             <p style={{ margin: '0 0 32px', fontSize: '13px', color: '#888' }}>Keep your account secure by using a strong password.</p>
 
             {success && (
@@ -82,26 +45,47 @@ const ChangePassword = () => {
             )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '480px' }}>
-                <PasswordField
-                    label="Current Password"
-                    value={fields.current}
-                    onChange={set('current')}
-                    show={show.current}
-                    onToggle={() => toggle('current')}
-                />
 
-                <PasswordField
-                    label="New Password"
-                    value={fields.newPwd}
-                    onChange={set('newPwd')}
-                    show={show.newPwd}
-                    onToggle={() => toggle('newPwd')}
-                    hint="At least 8 characters with uppercase, number and symbol."
-                />
+                {/* Current Password */}
+                <div className="su-field">
+                    <label>Current Password</label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <FiLock size={14} color="#f5a623" style={{ flexShrink: 0 }} />
+                        <input
+                            type={show.current ? 'text' : 'password'}
+                            value={fields.current}
+                            onChange={set('current')}
+                            placeholder="••••••••"
+                            style={{ flex: 1 }}
+                        />
+                        <button type="button" onClick={() => toggle('current')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#aaa', padding: 0, display: 'flex', flexShrink: 0 }}>
+                            {show.current ? <FiEyeOff size={15} /> : <FiEye size={15} />}
+                        </button>
+                    </div>
+                </div>
+
+                {/* New Password */}
+                <div className="su-field">
+                    <label>New Password</label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <FiLock size={14} color="#f5a623" style={{ flexShrink: 0 }} />
+                        <input
+                            type={show.newPwd ? 'text' : 'password'}
+                            value={fields.newPwd}
+                            onChange={set('newPwd')}
+                            placeholder="••••••••"
+                            style={{ flex: 1 }}
+                        />
+                        <button type="button" onClick={() => toggle('newPwd')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#aaa', padding: 0, display: 'flex', flexShrink: 0 }}>
+                            {show.newPwd ? <FiEyeOff size={15} /> : <FiEye size={15} />}
+                        </button>
+                    </div>
+                    <p className="su-field-hint">At least 8 characters with uppercase, number and symbol.</p>
+                </div>
 
                 {/* Strength bar */}
                 {fields.newPwd && (
-                    <div>
+                    <div style={{ marginTop: '-8px' }}>
                         <div style={{ display: 'flex', gap: '4px', marginBottom: '4px' }}>
                             {[1, 2, 3, 4].map(i => (
                                 <div key={i} style={{
@@ -115,19 +99,29 @@ const ChangePassword = () => {
                     </div>
                 )}
 
-                <PasswordField
-                    label="Confirm New Password"
-                    value={fields.confirm}
-                    onChange={set('confirm')}
-                    show={show.confirm}
-                    onToggle={() => toggle('confirm')}
-                />
+                {/* Confirm Password */}
+                <div className="su-field">
+                    <label>Confirm New Password</label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <FiLock size={14} color="#f5a623" style={{ flexShrink: 0 }} />
+                        <input
+                            type={show.confirm ? 'text' : 'password'}
+                            value={fields.confirm}
+                            onChange={set('confirm')}
+                            placeholder="••••••••"
+                            style={{ flex: 1 }}
+                        />
+                        <button type="button" onClick={() => toggle('confirm')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#aaa', padding: 0, display: 'flex', flexShrink: 0 }}>
+                            {show.confirm ? <FiEyeOff size={15} /> : <FiEye size={15} />}
+                        </button>
+                    </div>
+                </div>
 
                 {error && <p style={{ margin: 0, fontSize: '12px', color: '#ef4444', fontWeight: 600 }}>{error}</p>}
 
                 <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-                    <button onClick={() => { setFields({ current: '', newPwd: '', confirm: '' }); setError(''); setSuccess(false); }} className='su-btn-primary-outline'>Cancel</button>
-                    <button onClick={handleSave} className='su-btn-primary'>Update Password</button>
+                    <button onClick={() => { setFields({ current: '', newPwd: '', confirm: '' }); setError(''); setSuccess(false); }} className="su-btn-primary-outline">Cancel</button>
+                    <button onClick={handleSave} className="su-btn-primary">Update Password</button>
                 </div>
             </div>
         </div>

@@ -213,8 +213,9 @@ const ExpertiseCarousel = () => {
     return (
         <section style={{ padding: "60px 40px 70px", background: "#f5f4f0" }}>
             <h2 style={{
-                textAlign: "center", fontSize: "40px", fontWeight: 900,
-                color: "#1a1a1a", margin: "0 0 16px", fontFamily: "Georgia, serif",
+                textAlign: "center", fontSize: '60px',
+                fontWeight: 700,
+                color: "#1a1a1a", margin: "0 0 16px", 
             }}>My Expertise</h2>
 
             {/* Fan */}
@@ -271,7 +272,7 @@ const ExpertiseCarousel = () => {
                                 }}>
                                     {isCenter && (
                                         <span style={{
-                                            fontSize: "12px", fontWeight: 800,
+                                            fontSize: "12px", fontWeight: 700,
                                             color: "#1a1a1a", fontFamily: "Georgia, serif",
                                             letterSpacing: "0.02em",
                                         }}>
@@ -327,8 +328,8 @@ const PortfolioGrid = ({ data }) => {
         <section style={{ padding: '80px 40px 100px', background: '#fff' }}>
             <h2 style={{
                 textAlign: 'center',
-                fontSize: '40px',
-                fontWeight: 900,
+                  fontSize: '60px',
+                            fontWeight: 700,
                 color: '#1a1a1a',
                 margin: '0 0 48px',
             }}>Portfolio</h2>
@@ -432,9 +433,8 @@ const PackagePricing = ({data})=>{
 
       {/* Heading */}
       <h2 style={{
-        fontSize: "clamp(32px, 5vw, 52px)",
-        fontWeight: 900,
-        color: "#1a1a1a",
+        fontSize: '60px',
+        fontWeight: 700,
         margin: "0 0 56px",
         textAlign: "center",
         letterSpacing: "-0.01em",
@@ -601,8 +601,8 @@ const Testimonials  = ({data})=>{
 
       {/* Heading */}
       <h2 style={{
-        fontSize: "clamp(28px, 4vw, 48px)",
-        fontWeight: 900,
+         fontSize: '60px',
+                            fontWeight: 700,
         color: "#1a1a1a",
         margin: "0 0 52px",
         textAlign: "center",
@@ -757,8 +757,8 @@ const PhotographerDetail = () => {
                         gap: '6px',
                     }}>
                         <h1 style={{
-                            fontSize: '48px',
-                            fontWeight: 900,
+                            fontSize: '60px',
+                            fontWeight: 700,
                             color: '#1a1a1a',
                             margin: '0 0 28px',
                             lineHeight: 1.1,
@@ -938,8 +938,8 @@ const PhotographerDetail = () => {
 
 
                         <h2 style={{
-                            fontSize: '40px',
-                            fontWeight: 900,
+                              fontSize: '60px',
+                            fontWeight: 700,
                             color: '#1a1a1a',
                             margin: '0 0 24px',
                             lineHeight: 1.15,

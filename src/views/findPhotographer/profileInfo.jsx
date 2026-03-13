@@ -1,42 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { LuCamera } from 'react-icons/lu';
 
-const FieldBox = ({ label, children, hint }) => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-        <div style={{
-            border: '1.5px solid #e0e0e0',
-            borderRadius: '8px',
-            padding: '10px 14px 8px',
-            position: 'relative',
-            background: '#fff',
-            transition: 'border-color 0.2s',
-        }}
-            onFocusCapture={e => e.currentTarget.style.borderColor = '#E8A317'}
-            onBlurCapture={e => e.currentTarget.style.borderColor = '#e0e0e0'}
-        >
-            <label style={{
-                position: 'absolute', top: '-9px', left: '12px',
-                background: '#fff', padding: '0 4px',
-                fontSize: '11px', fontWeight: 600, color: '#999',
-                letterSpacing: '0.03em',
-            }}>{label}</label>
-            {children}
-        </div>
-        {hint && <p style={{ margin: 0, fontSize: '11px', color: '#aaa', paddingLeft: '4px' }}>{hint}</p>}
-    </div>
-);
-
-const inputStyle = {
-    border: 'none', outline: 'none', background: 'transparent',
-    fontSize: '14px', fontWeight: 500, color: '#1a1a1a',
-    width: '100%', fontFamily: 'inherit', padding: '2px 0',
-};
-
-const selectStyle = {
-    ...{ border: 'none', outline: 'none', background: 'transparent', fontSize: '14px', fontWeight: 500, color: '#1a1a1a', width: '100%', fontFamily: 'inherit', padding: '2px 0' },
-    appearance: 'none', cursor: 'pointer',
-};
-
 const ProfileInformation = ({ onSave, onCancel }) => {
     const fileRef = useRef();
     const [photo, setPhoto] = useState(null);
@@ -58,7 +22,7 @@ const ProfileInformation = ({ onSave, onCancel }) => {
     return (
         <div>
             {/* ── Personal Information ── */}
-            <h2 style={{ margin: '0 0 6px', fontSize: '26px', fontWeight: 900, color: '#1a1a1a', letterSpacing: '-0.02em' }}>
+            <h2 style={{ margin: '0 0 6px', fontSize: '36px', fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.02em' }}>
                 Personal Information
             </h2>
             <p style={{ margin: '0 0 24px', fontSize: '13px', fontWeight: 600, color: '#555' }}>
@@ -79,7 +43,7 @@ const ProfileInformation = ({ onSave, onCancel }) => {
                         justifyContent: 'center', gap: '4px', overflow: 'hidden',
                         background: '#fafafa', transition: 'border-color 0.2s',
                     }}
-                    onMouseEnter={e => e.currentTarget.style.borderColor = '#E8A317'}
+                    onMouseEnter={e => e.currentTarget.style.borderColor = '#f5a623'}
                     onMouseLeave={e => e.currentTarget.style.borderColor = '#ccc'}
                 >
                     {photo
@@ -95,103 +59,110 @@ const ProfileInformation = ({ onSave, onCancel }) => {
             </div>
 
             {/* Name row */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '8px' }}>
-                <FieldBox label="First Name" hint="Must match identification documents.">
-                    <input style={inputStyle} value={form.firstName} onChange={set('firstName')} placeholder="John" />
-                </FieldBox>
-                <FieldBox label="Last Name" hint="Must match identification documents.">
-                    <input style={inputStyle} value={form.lastName} onChange={set('lastName')} placeholder="Doe" />
-                </FieldBox>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px 20px', marginBottom: '24px' }}>
+                <div className="su-field">
+                    <label>First Name</label>
+                    <input type="text" value={form.firstName} onChange={set('firstName')} placeholder="John" />
+                    <p className="su-field-hint">Must match identification documents.</p>
+                </div>
+                <div className="su-field">
+                    <label>Last Name</label>
+                    <input type="text" value={form.lastName} onChange={set('lastName')} placeholder="Doe" />
+                    <p className="su-field-hint">Must match identification documents.</p>
+                </div>
             </div>
 
             {/* Email + Phone */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-                <FieldBox label="Email">
-                    <input style={inputStyle} value={form.email} onChange={set('email')} type="email" placeholder="email@example.com" />
-                </FieldBox>
-                <FieldBox label="Phone Number" hint="Enter a valid phone number to receive OTPs">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '14px' }}>🇮🇳</span>
-                        <span style={{ fontSize: '13px', color: '#555', fontWeight: 600 }}>+91</span>
-                        <input style={{ ...inputStyle, flex: 1 }} value={form.phone} onChange={set('phone')} placeholder="00000 00000" />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px 20px', marginBottom: '24px' }}>
+                <div className="su-field">
+                    <label>Email</label>
+                    <input type="email" value={form.email} onChange={set('email')} placeholder="email@example.com" />
+                </div>
+                <div className="su-field">
+                    <label>Phone Number</label>
+                    <div className="su-phone-row">
+                        <select className="su-country" defaultValue="+91">
+                            <option value="+91">🇮🇳 +91</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+44">🇬🇧 +44</option>
+                        </select>
+                        <input className="su-number" type="tel" value={form.phone} onChange={set('phone')} placeholder="00000 00000" />
                     </div>
-                </FieldBox>
+                    <p className="su-field-hint">Enter a valid phone number to receive OTPs</p>
+                </div>
             </div>
 
             {/* Cast + Gender */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '40px' }}>
-                <FieldBox label="Cast">
-                    <input style={inputStyle} value={form.cast} onChange={set('cast')} placeholder="Cast" />
-                </FieldBox>
-                <FieldBox label="Gender">
-                    <div style={{ position: 'relative' }}>
-                        <select style={selectStyle} value={form.gender} onChange={set('gender')}>
-                            <option value="">Choose Gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
-                        </select>
-                        <span style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#aaa' }}>▾</span>
-                    </div>
-                </FieldBox>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px 20px', marginBottom: '40px' }}>
+                <div className="su-field">
+                    <label>Cast</label>
+                    <input type="text" value={form.cast} onChange={set('cast')} placeholder="Cast" />
+                </div>
+                <div className="su-field">
+                    <label>Gender</label>
+                    <select value={form.gender} onChange={set('gender')}>
+                        <option value="">Choose Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
             </div>
 
             {/* ── Address ── */}
-            <h2 style={{ margin: '0 0 20px', fontSize: '26px', fontWeight: 900, color: '#1a1a1a', letterSpacing: '-0.02em' }}>Address</h2>
+            <h2 style={{ margin: '0 0 24px', fontSize: '36px', fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.02em' }}>Address</h2>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' }}>
-                <FieldBox label="Pincode">
-                    <input style={inputStyle} value={form.pincode} onChange={set('pincode')} placeholder="360001" />
-                </FieldBox>
-                <FieldBox label="Flat, House no., Building, Company, Apartment">
-                    <input style={inputStyle} value={form.flat} onChange={set('flat')} placeholder="Enter Flat, House no., Building, Company, Apartment" />
-                </FieldBox>
-                <FieldBox label="Area, Street, Village">
-                    <input style={inputStyle} value={form.area} onChange={set('area')} placeholder="Enter Area, Street, Village" />
-                </FieldBox>
-                <FieldBox label="Landmark">
-                    <input style={inputStyle} value={form.landmark} onChange={set('landmark')} placeholder="Landmark" />
-                </FieldBox>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                    <FieldBox label="Town / City">
-                        <div style={{ position: 'relative' }}>
-                            <select style={selectStyle} value={form.city} onChange={set('city')}>
-                                <option value="">Select City</option>
-                                <option>Rajkot</option>
-                                <option>Ahmedabad</option>
-                                <option>Surat</option>
-                            </select>
-                            <span style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#aaa' }}>▾</span>
-                        </div>
-                    </FieldBox>
-                    <FieldBox label="State">
-                        <div style={{ position: 'relative' }}>
-                            <select style={selectStyle} value={form.state} onChange={set('state')}>
-                                <option value="">Select State</option>
-                                <option>Gujarat</option>
-                                <option>Maharashtra</option>
-                                <option>Rajasthan</option>
-                            </select>
-                            <span style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#aaa' }}>▾</span>
-                        </div>
-                    </FieldBox>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginBottom: '32px' }}>
+                <div className="su-field">
+                    <label>Pincode</label>
+                    <input type="text" value={form.pincode} onChange={set('pincode')} placeholder="360001" />
                 </div>
-                <FieldBox label="Country / Region">
-                    <div style={{ position: 'relative' }}>
-                        <select style={selectStyle} value={form.country} onChange={set('country')}>
-                            <option>India</option>
-                            <option>USA</option>
-                            <option>UK</option>
+                <div className="su-field">
+                    <label>Flat, House no., Building, Company, Apartment</label>
+                    <input type="text" value={form.flat} onChange={set('flat')} placeholder="Enter Flat, House no., Building, Company, Apartment" />
+                </div>
+                <div className="su-field">
+                    <label>Area, Street, Village</label>
+                    <input type="text" value={form.area} onChange={set('area')} placeholder="Enter Area, Street, Village" />
+                </div>
+                <div className="su-field">
+                    <label>Landmark</label>
+                    <input type="text" value={form.landmark} onChange={set('landmark')} placeholder="Landmark" />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px 20px' }}>
+                    <div className="su-field">
+                        <label>Town / City</label>
+                        <select value={form.city} onChange={set('city')}>
+                            <option value="">Select City</option>
+                            <option>Rajkot</option>
+                            <option>Ahmedabad</option>
+                            <option>Surat</option>
                         </select>
-                        <span style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#aaa' }}>▾</span>
                     </div>
-                </FieldBox>
+                    <div className="su-field">
+                        <label>State</label>
+                        <select value={form.state} onChange={set('state')}>
+                            <option value="">Select State</option>
+                            <option>Gujarat</option>
+                            <option>Maharashtra</option>
+                            <option>Rajasthan</option>
+                        </select>
+                    </div>
+                </div>
+                <div className="su-field">
+                    <label>Country / Region</label>
+                    <select value={form.country} onChange={set('country')}>
+                        <option>India</option>
+                        <option>USA</option>
+                        <option>UK</option>
+                    </select>
+                </div>
             </div>
 
             {/* Action buttons */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-                <button onClick={onCancel} className='su-btn-primary-outline'>Cancel</button>
-                <button className='su-btn-primary' onClick={onSave}>Save</button>
+                <button onClick={onCancel} className="su-btn-primary-outline">Cancel</button>
+                <button className="su-btn-primary" onClick={onSave}>Save</button>
             </div>
         </div>
     );

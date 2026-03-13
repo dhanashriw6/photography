@@ -30,11 +30,11 @@ const VideoPlayer = () => {
         }}>
             <h2 style={{
                 textAlign: "center",
-                fontSize: "40px",
-                fontWeight: 900,
+                fontSize: '60px',
+                fontWeight: 700,
                 color: "#1a1a1a",
                 margin: "0 0 40px",
-                fontFamily: "Georgia, serif",
+
             }}>
                 Behind The Lens
             </h2>

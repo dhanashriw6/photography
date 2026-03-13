@@ -26,7 +26,7 @@ const Bookings = () => {
 
     return (
         <div>
-            <h2 style={{ margin: '0 0 6px', fontSize: '26px', fontWeight: 900, color: '#1a1a1a', letterSpacing: '-0.02em' }}>My Bookings</h2>
+            <h2 style={{ margin: '0 0 6px', fontSize: '36px', fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.02em' }}>My Bookings</h2>
             <p style={{ margin: '0 0 24px', fontSize: '13px', color: '#888' }}>Manage and review all your photography bookings.</p>
 
             {/* Tabs */}

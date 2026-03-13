@@ -167,8 +167,8 @@ const StylePrefer = () => {
             {/* Heading */}
             <h2
               style={{
-                fontSize: '30px',
-                fontWeight: 800,
+                fontSize: '36px',
+                fontWeight: 700,
                 color: '#111',
                 margin:'auto',
                 marginTop:'15%',

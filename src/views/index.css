@@ -188,7 +188,7 @@ h1,h2,h3,h4,h5,h6{
   background: linear-gradient(90deg, #f5a623 0%, #f0b429 100%);
   color: #fff;
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
   /* font-family: inherit; */
   cursor: pointer;
   letter-spacing: 0.02em;
@@ -234,7 +234,7 @@ h1,h2,h3,h4,h5,h6{
 }
 
 .views-footer-top {
-  max-width: 900px;
+  /* max-width: 900px; */
   margin: 0 auto;
   padding: 36px 24px 28px;
   display: grid;
@@ -252,7 +252,7 @@ h1,h2,h3,h4,h5,h6{
 
 .views-footer-col h4 {
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
   color: #1a1a1a;
   margin: 0 0 12px;
 }
@@ -287,7 +287,7 @@ h1,h2,h3,h4,h5,h6{
   justify-content: center;
   color: #fff;
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 700;
   cursor: pointer;
   transition: transform 0.15s, opacity 0.15s;
   text-decoration: none;

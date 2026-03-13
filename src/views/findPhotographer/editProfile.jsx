@@ -66,11 +66,11 @@ const EditProfile = () => {
                                         strokeDashoffset={`${2 * Math.PI * 22 * (1 - completion / 100)}`}
                                         transform="rotate(-90 28 28)"
                                     />
-                                    <text x="28" y="33" textAnchor="middle" fontSize="13" fontWeight="800" fill="#fff" fontFamily="inherit">{completion}%</text>
+                                    <text x="28" y="33" textAnchor="middle" fontSize="13" fontWeight="700" fill="#fff" fontFamily="inherit">{completion}%</text>
                                 </svg>
                             </div>
                             <div>
-                                <p style={{ margin: '0 0 3px', fontSize: '14px', fontWeight: 800, color: '#fff' }}>Complete Profile</p>
+                                <p style={{ margin: '0 0 3px', fontSize: '14px', fontWeight: 700, color: '#fff' }}>Complete Profile</p>
                                 <p style={{ margin: 0, fontSize: '12px', color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>
                                     Your profile is {completion}% completed.
                                 </p>

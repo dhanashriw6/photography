@@ -112,7 +112,8 @@ export default function HinduCalendar() {
         <div style={{ fontSize: "11px", letterSpacing: "0.3em", color: "#E8A317", textTransform: "uppercase", fontFamily: "sans-serif", marginBottom: "8px" }}>
           🕉 Hindu Calendar
         </div>
-        <h2 style={{ fontSize: "38px", fontWeight: 900, color: "#1a1a1a", margin: "0 0 4px" }}>
+        <h2 style={{   fontSize: '60px',
+                            fontWeight: 700, color: "#1a1a1a", margin: "0 0 4px" }}>
           Monthly Panchang
         </h2>
         <p style={{ color: "#999", fontSize: "13px", margin: 0, fontFamily: "sans-serif" }}>

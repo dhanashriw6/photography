@@ -110,7 +110,7 @@ const FindBest = () => {
                         style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.45)' }}
                     />
                     <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <h1 style={{ color: '#fff', fontSize: '28px', fontWeight: 800, textAlign: 'center', letterSpacing: '-0.01em', margin: 0, textShadow: '0 2px 12px rgba(0,0,0,0.5)' }}>
+                        <h1 style={{ color: '#fff', fontSize: '36px', fontWeight: 700, textAlign: 'center', letterSpacing: '-0.01em', margin: 0, textShadow: '0 2px 12px rgba(0,0,0,0.5)' }}>
                             Find A Best One For You
                         </h1>
                     </div>

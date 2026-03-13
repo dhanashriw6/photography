@@ -56,7 +56,7 @@ const login = () => {
             textAlign: 'center',
             fontSize: '13px',
             color: '#111',
-            fontWeight: 800,
+            fontWeight: 700,
             textDecoration: 'none',
             cursor: 'pointer',
             marginTop: '20px',
@@ -72,7 +72,7 @@ const login = () => {
             marginTop: '20px',
           }}>
             Don't have an account?{' '}
-            <a href="/find-photographer" style={{ color: '#111', fontWeight: 800, textDecoration: 'none', cursor: 'pointer' }}>
+            <a href="/find-photographer" style={{ color: '#111', fontWeight: 700, textDecoration: 'none', cursor: 'pointer' }}>
               Sign Up
             </a>
           </p>

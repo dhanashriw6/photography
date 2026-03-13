@@ -36,8 +36,8 @@ const ThankYou = () => {
 
                     {/* Heading */}
                     <h1 style={{
-                        fontSize: '22px',
-                        fontWeight: 800,
+                        fontSize: '36px',
+                        fontWeight: 700,
                         color: 'var(--color-orange)',
                         margin: '0 0 12px',
                         letterSpacing: '-0.01em',

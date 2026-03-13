@@ -68,8 +68,8 @@ const RequestBook = () => {
                 {/* ── Page Title ── */}
                 <h1 style={{
                     textAlign: 'center',
-                    fontSize: '26px',
-                    fontWeight: 800,
+                    fontSize: '36px',
+                    fontWeight: 700,
                     color: '#1a1a1a',
                     margin: '0 0 32px',
                     letterSpacing: '-0.02em',

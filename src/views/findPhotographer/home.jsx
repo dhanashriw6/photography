@@ -97,7 +97,7 @@ const ExpertiseCarousel = () => {
     return (
         <section style={{ padding: "60px 40px 70px", background: "#f5f4f0" }}>
             <h2 style={{
-                textAlign: "center", fontSize: "40px", fontWeight: 900,
+                textAlign: "center", fontSize: "60px", fontWeight: 700,
                 color: "#1a1a1a", margin: "0 0 16px",
             }}>My Expertise</h2>
 
@@ -304,8 +304,8 @@ const Home = () => {
                     {/* Headline */}
                     <h1 style={{
                         margin: '0 0 22px',
-                        fontSize: 'clamp(36px, 5vw, 56px)',
-                        fontWeight: 900,
+                        fontSize: '60px',
+                        fontWeight: 700,
                         lineHeight: 1.15,
                         color: '#1a1a1a',
                         letterSpacing: '-0.02em',
@@ -447,8 +447,8 @@ const Home = () => {
                 {/* Title */}
                 <h2 style={{
                     textAlign: 'center',
-                    fontSize: '48px',
-                    fontWeight: 900,
+                    fontSize: '60px',
+                    fontWeight: 700,
                     color: '#1a1a1a',
                     margin: '0 0 52px',
                     letterSpacing: '-0.02em',
