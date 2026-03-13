@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform, useMotionValue } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCursor } from './CustomCursor';
+import "../index.css"
 
 // ─── Curved Image Scroll ────────────────────────────────────────────────────
 
@@ -203,7 +204,7 @@ const Hero2 = () => {
   };
 
   return (
-    <div style={{ minHeight:'100vh', background:'#111212', color:'#FFFEFA', fontFamily:'system-ui, -apple-system, sans-serif' }}>
+    <div style={{ minHeight:'100vh', background:'#111212', color:'#FFFEFA', fontFamily:"'Oswald', sans-serif"}}>
       <header style={{
         minHeight:'100vh', display:'flex', flexDirection:'column', alignItems:'center',
         position:'relative', overflow:'hidden',

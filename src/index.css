@@ -62,7 +62,7 @@
 }
 
 body {
-  font-family: var(--font-body);
+  font-family: 'Oswald', sans-serif;
   background-color: var(--color-beige);
   color: var(--color-mocha);
   overflow-x: hidden;
@@ -75,7 +75,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-heading);
+  font-family: 'Oswald', sans-serif;
   font-weight: 600;
   line-height: 1.1;
 }
