@@ -336,6 +336,7 @@ const Hero2 = () => {
             <motion.button
               whileHover={!isMobile?{ scale:1.05, borderColor:'#FFAE00', background:'#FFAE00', color:'#111212', boxShadow:'0 0 30px rgba(255,174,0,0.4)' }:{}}
               whileTap={{ scale:0.95 }}
+              onClick={() => navigate('/join-as-photographer')}
               style={{ fontSize: isMobile?'1.1rem':'1.5rem', padding: isMobile?'1rem 2rem':'1.2rem 2.5rem', border:'2px solid #FEEFA3', background:'transparent', color:'#FEEFA3', borderRadius:'50px', fontWeight:'600', cursor:'pointer', width: isMobile?'100%':'auto', justifyContent:'center', display:'flex', alignItems:'center' }}>
               Join as Photographer
             </motion.button>

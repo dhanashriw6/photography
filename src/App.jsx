@@ -17,8 +17,12 @@ import FindHomePage from './views/findPhotographer/home';
 import EditProfile from './views/findPhotographer/editProfile';
 import Review from './views/findPhotographer/review';
 import Dispute from './views/findPhotographer/dispute';
-
-
+import SignUpPhotographer from './views/joinAsPhotographer/signUp';
+import LoginPhotographer from './views/joinAsPhotographer/login';
+import OTPVerification from './views/joinAsPhotographer/otpVerification';
+import KYCVerification from './views/joinAsPhotographer/kycVerification';
+import VerificationIP from './views/joinAsPhotographer/verificationIP';
+import Dashboard from './views/joinAsPhotographer/dashboard';
 function App() {
   return (
     <>
@@ -41,6 +45,12 @@ function App() {
         <Route path="/edit-profile" element={<EditProfile />} />
         <Route path="/review" element={<Review />} />
         <Route path="/dispute" element={<Dispute />} />
+        <Route path="/join-as-photographer" element={<SignUpPhotographer />} />
+        <Route path="/join-as-photographer/login" element={<LoginPhotographer />} />
+        <Route path="/join-as-photographer/otp-verification" element={<OTPVerification />} />
+        <Route path="/join-as-photographer/kyc-verification" element={<KYCVerification />} />
+        <Route path="/join-as-photographer/verification-ip" element={<VerificationIP />} />
+        <Route path="/join-as-photographer/dashboard" element={<Dashboard />} />
       </Routes>
     </>
   );
