@@ -3,6 +3,7 @@ import '../index.css';
 import ViewsLayout from '../Layout';
 import { useNavigate } from 'react-router-dom';
 import { FiUploadCloud, FiX, FiFile } from 'react-icons/fi';
+import PhotographerLayout from './PhotographerLayout';
 
 const KYCVerification = () => {
   const [docType, setDocType] = useState('Aadhaar Card');
@@ -32,7 +33,7 @@ const KYCVerification = () => {
   const removeFile = (i) => setFiles(prev => prev.filter((_, idx) => idx !== i));
 
   return (
-    <ViewsLayout>
+    <PhotographerLayout>
       <div className="w-full" style={{ maxWidth: '640px' }}>
         <div className="views-card">
 
@@ -161,7 +162,7 @@ const KYCVerification = () => {
           </div>
         </div>
       </div>
-    </ViewsLayout>
+    </PhotographerLayout>
   );
 };
 

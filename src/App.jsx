@@ -23,6 +23,7 @@ import OTPVerification from './views/joinAsPhotographer/otpVerification';
 import KYCVerification from './views/joinAsPhotographer/kycVerification';
 import VerificationIP from './views/joinAsPhotographer/verificationIP';
 import Dashboard from './views/joinAsPhotographer/dashboard';
+import PhotographerEditProfile from './views/joinAsPhotographer/photographerEditProfile';
 function App() {
   return (
     <>
@@ -51,6 +52,7 @@ function App() {
         <Route path="/join-as-photographer/kyc-verification" element={<KYCVerification />} />
         <Route path="/join-as-photographer/verification-ip" element={<VerificationIP />} />
         <Route path="/join-as-photographer/dashboard" element={<Dashboard />} />
+        <Route path="/join-as-photographer/edit-profile" element={<PhotographerEditProfile />} />
       </Routes>
     </>
   );

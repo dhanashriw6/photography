@@ -1,13 +1,14 @@
 import React, { useState } from 'react'
 import ViewsLayout from '../Layout'
 import { useNavigate } from 'react-router-dom'
+import PhotographerLayout from './PhotographerLayout';
 
 const LoginPhotographer = () => {
     const navigate = useNavigate();
  const [agreed, setAgreed] = useState(false);
 
   return (
-    <ViewsLayout>
+    <PhotographerLayout>
       <div className="w-full" style={{ maxWidth: '640px' }}>
         <div className="views-card">
 
@@ -85,7 +86,7 @@ const LoginPhotographer = () => {
 
 
       </div>
-    </ViewsLayout>
+    </PhotographerLayout>
   )
 }
 

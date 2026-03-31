@@ -2,11 +2,12 @@ import React from 'react';
 import ViewsLayout from '../Layout';
 import thankyoubadge from '../../assets/Images/thankyoubadge.png';
 import { useNavigate } from 'react-router-dom';
+import PhotographerLayout from './PhotographerLayout';
 
 const VerificationIP = () => {
     const navigate = useNavigate()
     return (
-        <ViewsLayout>
+        <PhotographerLayout>
             <div>
                 {/* Card */}
                 <div className='views-card' style={{
@@ -100,7 +101,7 @@ const VerificationIP = () => {
           }
         `}</style>
             </div>
-        </ViewsLayout>
+        </PhotographerLayout>
     );
 };
 

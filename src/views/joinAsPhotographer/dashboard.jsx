@@ -1,9 +1,10 @@
 import React from 'react'
 import ViewsLayout from '../Layout'
+import PhotographerLayout from './PhotographerLayout'
 
 const Dashboard = () => {
     return (
-    <ViewsLayout>
+    <PhotographerLayout>
             <div className='views-card' style={{
                 background: '#fff',
                 borderRadius: '20px',
@@ -18,7 +19,7 @@ const Dashboard = () => {
 
 
             </div>
-    </ViewsLayout>
+    </PhotographerLayout>
     )
 }
 

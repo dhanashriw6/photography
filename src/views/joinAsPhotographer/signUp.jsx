@@ -3,6 +3,7 @@ import '../index.css';
 import ViewsLayout from '../Layout';
 import { useNavigate } from 'react-router-dom';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
+import PhotographerLayout from './PhotographerLayout';
 
 /* ── Tag Input ── */
 const TagInput = ({ label, tags, setTags, placeholder }) => {
@@ -82,7 +83,7 @@ const SignUpPhotographer = () => {
   const navigate = useNavigate();
 
   return (
-    <ViewsLayout>
+    <PhotographerLayout>
       <div className="w-full" style={{ maxWidth: '640px' }}>
         <div className="views-card">
           <h1 style={{
@@ -219,7 +220,7 @@ const SignUpPhotographer = () => {
 
             {/* Submit */}
             <div style={{ gridColumn: 'span 2', marginTop: '4px' }}>
-              <button type="submit" className="su-btn-primary" style={{ width: '100%' }} onClick={() => navigate('/style-prefer')}>
+              <button type="submit" className="su-btn-primary" style={{ width: '100%' }} onClick={() => navigate('/join-as-photographer/login')}>
                 Sign Up
               </button>
             </div>
@@ -235,7 +236,7 @@ const SignUpPhotographer = () => {
           </p>
         </div>
       </div>
-    </ViewsLayout>
+    </PhotographerLayout>
   );
 };
 

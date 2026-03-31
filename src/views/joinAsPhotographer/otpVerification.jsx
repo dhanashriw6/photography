@@ -3,6 +3,7 @@ import '../index.css';
 import ViewsLayout from '../Layout';
 import { useNavigate } from 'react-router-dom';
 import { FiSend } from 'react-icons/fi';
+import PhotographerLayout from './PhotographerLayout';
 
 const OTPVerification = () => {
   const [otpSent, setOtpSent] = useState(false);
@@ -37,7 +38,7 @@ const OTPVerification = () => {
   const formatTime = (s) => `00:${String(s).padStart(2, '0')}`;
 
   return (
-    <ViewsLayout>
+    <PhotographerLayout>
       <div className="w-full" style={{ maxWidth: '640px' }}>
         <div className="views-card">
           <h1 style={{
@@ -143,7 +144,7 @@ const OTPVerification = () => {
           </p>
         </div>
       </div>
-    </ViewsLayout>
+    </PhotographerLayout>
   );
 };
 
