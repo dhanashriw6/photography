@@ -1,47 +1,64 @@
 import React, { useRef, useState } from 'react';
+import '../index.css';
 import { LuCamera } from 'react-icons/lu';
 import { FiX, FiUpload } from 'react-icons/fi';
 
-/* ─── Tag Input ─────────────────────────────────────────────────────────── */
-const TagInput = ({ tags, setTags, placeholder, suggestions = [] }) => {
+/* ─── Tag Input — matches SignUp's TagInput style exactly ─────────────────── */
+const TagInput = ({ label, tags, setTags, placeholder, suggestions = [] }) => {
     const [input, setInput] = useState('');
     const [showSug, setShowSug] = useState(false);
 
     const addTag = (val) => {
-        const v = val.trim();
+        const v = val.trim().replace(/,$/, '');
         if (v && !tags.includes(v)) setTags([...tags, v]);
         setInput('');
         setShowSug(false);
     };
 
-    const removeTag = (t) => setTags(tags.filter(x => x !== t));
+    const removeTag = (i) => setTags(tags.filter((_, idx) => idx !== i));
 
     const filtered = suggestions.filter(
         s => s.toLowerCase().includes(input.toLowerCase()) && !tags.includes(s)
     );
 
     return (
-        <div style={{ position: 'relative' }}>
-            <div style={{
-                display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center',
-                border: '1.5px solid #e8e8e8', borderRadius: '10px',
-                padding: '8px 12px', background: '#fff', minHeight: '44px',
-                cursor: 'text', transition: 'border-color 0.2s',
-            }}
+        <div className="su-field" style={{ position: 'relative' }}>
+            {label && <label>{label}</label>}
+            <div
+                style={{
+                    display: 'flex', flexWrap: 'wrap', alignItems: 'center',
+                    gap: '6px', padding: '8px 13px', minHeight: '46px',
+                    border: '1.5px solid #d1d5db', borderRadius: '8px',
+                    background: '#fff', cursor: 'text', boxSizing: 'border-box',
+                    transition: 'border-color 0.2s, box-shadow 0.2s',
+                }}
                 onClick={e => e.currentTarget.querySelector('input')?.focus()}
+                onFocusCapture={e => {
+                    e.currentTarget.style.borderColor = '#f5a623';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(245,166,35,0.15)';
+                }}
+                onBlurCapture={e => {
+                    e.currentTarget.style.borderColor = '#d1d5db';
+                    e.currentTarget.style.boxShadow = 'none';
+                }}
             >
-                {tags.map(t => (
-                    <span key={t} style={{
-                        display: 'inline-flex', alignItems: 'center', gap: '5px',
-                        background: '#FFF3D6', color: 'var(--color-orange)',
-                        borderRadius: '6px', padding: '3px 10px',
-                        fontSize: '12px', fontWeight: 600,
+                {tags.map((tag, i) => (
+                    <span key={i} style={{
+                        display: 'inline-flex', alignItems: 'center', gap: '4px',
+                        background: '#FFF3D6', color: '#1a1a1a',
+                        borderRadius: '6px', padding: '2px 8px',
+                        fontSize: '13px', fontWeight: 600,
                     }}>
-                        {t}
-                        <FiX
-                            size={11} style={{ cursor: 'pointer' }}
-                            onClick={() => removeTag(t)}
-                        />
+                        {tag}
+                        <button
+                            type="button"
+                            onClick={() => removeTag(i)}
+                            style={{
+                                background: 'none', border: 'none', cursor: 'pointer',
+                                color: '#888', padding: 0, lineHeight: 1, fontSize: '14px',
+                                display: 'flex', alignItems: 'center',
+                            }}
+                        >×</button>
                     </span>
                 ))}
                 <input
@@ -58,18 +75,19 @@ const TagInput = ({ tags, setTags, placeholder, suggestions = [] }) => {
                     onBlur={() => setTimeout(() => setShowSug(false), 150)}
                     placeholder={tags.length === 0 ? placeholder : ''}
                     style={{
-                        border: 'none', outline: 'none', fontSize: '13px',
-                        color: '#333', background: 'transparent',
-                        flexGrow: 1, minWidth: '80px', padding: '2px 0',
-                        fontFamily: 'inherit',
+                        border: 'none', outline: 'none', background: 'transparent',
+                        fontSize: '14px', color: '#111', minWidth: '80px', flex: 1,
+                        padding: '2px 0', fontFamily: 'inherit',
                     }}
                 />
             </div>
+
+            {/* Suggestions dropdown */}
             {showSug && filtered.length > 0 && (
                 <div style={{
                     position: 'absolute', top: '100%', left: 0, right: 0,
-                    background: '#fff', border: '1.5px solid #e8e8e8',
-                    borderTop: 'none', borderRadius: '0 0 10px 10px',
+                    background: '#fff', border: '1.5px solid #d1d5db',
+                    borderTop: 'none', borderRadius: '0 0 8px 8px',
                     zIndex: 10, maxHeight: '160px', overflowY: 'auto',
                     boxShadow: '0 6px 16px rgba(0,0,0,0.08)',
                 }}>
@@ -89,16 +107,18 @@ const TagInput = ({ tags, setTags, placeholder, suggestions = [] }) => {
                     ))}
                 </div>
             )}
+
+            <p className="su-field-hint">Type and press Enter to add</p>
         </div>
     );
 };
 
 /* ─── Main Component ────────────────────────────────────────────────────── */
 const PhotographerProfileInfo = ({ onSave, onCancel }) => {
-    const fileRef   = useRef();
-    const idRef     = useRef();
-    const [photo, setPhoto]     = useState(null);
-    const [idFile, setIdFile]   = useState(null);
+    const fileRef = useRef();
+    const idRef   = useRef();
+    const [photo,  setPhoto]  = useState(null);
+    const [idFile, setIdFile] = useState(null);
 
     const [form, setForm] = useState({
         firstName: 'John', lastName: 'Doe',
@@ -124,25 +144,6 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
         if (file) setIdFile(file.name);
     };
 
-    const fieldStyle = {
-        display: 'flex', flexDirection: 'column', gap: '6px',
-    };
-    const labelStyle = {
-        fontSize: '12px', fontWeight: 600, color: '#666', letterSpacing: '0.01em',
-    };
-    const inputStyle = {
-        border: '1.5px solid #e8e8e8', borderRadius: '10px',
-        padding: '11px 14px', fontSize: '13px', color: '#333',
-        fontFamily: 'inherit', outline: 'none', background: '#fff',
-        transition: 'border-color 0.2s',
-    };
-    const hintStyle = {
-        fontSize: '11px', color: '#aaa', margin: '2px 0 0',
-    };
-
-    const onFocus = e => e.target.style.borderColor = 'var(--color-orange)';
-    const onBlur  = e => e.target.style.borderColor = '#e8e8e8';
-
     return (
         <div>
             {/* ── Personal Information ── */}
@@ -167,7 +168,7 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
                         justifyContent: 'center', gap: '4px', overflow: 'hidden',
                         background: '#fafafa', transition: 'border-color 0.2s',
                     }}
-                    onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--color-orange)'}
+                    onMouseEnter={e => e.currentTarget.style.borderColor = '#f5a623'}
                     onMouseLeave={e => e.currentTarget.style.borderColor = '#ccc'}
                 >
                     {photo
@@ -175,7 +176,7 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
                         : <>
                             <LuCamera size={22} color="#bbb" />
                             <span style={{ fontSize: '10px', color: '#bbb', fontWeight: 600 }}>Add Photo</span>
-                        </>
+                          </>
                     }
                 </div>
                 <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handlePhoto} />
@@ -183,191 +184,208 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
             </div>
 
             {/* Name row */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-                <div style={fieldStyle}>
-                    <label style={labelStyle}>First Name</label>
-                    <input style={inputStyle} type="text" value={form.firstName} onChange={set('firstName')} placeholder="John" onFocus={onFocus} onBlur={onBlur} />
-                    <p style={hintStyle}>Must match identification documents.</p>
-                </div>
-                <div style={fieldStyle}>
-                    <label style={labelStyle}>Last Name</label>
-                    <input style={inputStyle} type="text" value={form.lastName} onChange={set('lastName')} placeholder="Doe" onFocus={onFocus} onBlur={onBlur} />
-                    <p style={hintStyle}>Must match identification documents.</p>
-                </div>
-            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '24px 20px' }}>
 
-            {/* Email + Phone */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-                <div style={fieldStyle}>
-                    <label style={labelStyle}>Email</label>
-                    <input style={inputStyle} type="email" value={form.email} onChange={set('email')} placeholder="email@example.com" onFocus={onFocus} onBlur={onBlur} />
+                {/* First Name */}
+                <div className="su-field">
+                    <label>First Name</label>
+                    <input type="text" value={form.firstName} onChange={set('firstName')} placeholder="John" />
+                    <p className="su-field-hint">Must match identification documents.</p>
                 </div>
-                <div style={fieldStyle}>
-                    <label style={labelStyle}>Phone Number</label>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                        <select style={{ ...inputStyle, width: '100px', flexShrink: 0 }} defaultValue="+91" onFocus={onFocus} onBlur={onBlur}>
+
+                {/* Last Name */}
+                <div className="su-field">
+                    <label>Last Name</label>
+                    <input type="text" value={form.lastName} onChange={set('lastName')} placeholder="Doe" />
+                    <p className="su-field-hint">Must match identification documents.</p>
+                </div>
+
+                {/* Email */}
+                <div className="su-field">
+                    <label>Email</label>
+                    <input type="email" value={form.email} onChange={set('email')} placeholder="email@example.com" />
+                </div>
+
+                {/* Phone */}
+                <div className="su-field">
+                    <label>Phone Number<sup style={{ color: '#ef4444' }}>*</sup></label>
+                    <div className="su-phone-row">
+                        <select className="su-country" defaultValue="+91">
                             <option value="+91">🇮🇳 +91</option>
                             <option value="+1">🇺🇸 +1</option>
                             <option value="+44">🇬🇧 +44</option>
                         </select>
-                        <input style={{ ...inputStyle, flex: 1 }} type="tel" value={form.phone} onChange={set('phone')} placeholder="00000 00000" onFocus={onFocus} onBlur={onBlur} />
+                        <input
+                            className="su-number"
+                            type="tel"
+                            value={form.phone}
+                            onChange={set('phone')}
+                            placeholder="00000 00000"
+                        />
                     </div>
-                    <p style={hintStyle}>Enter a valid phone number to receive OTPs</p>
+                    <p className="su-field-hint">Enter a valid phone number to receive OTPs</p>
                 </div>
-            </div>
 
-            {/* Experience + Gender */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-                <div style={fieldStyle}>
-                    <label style={labelStyle}>Years Of Experience</label>
-                    <input style={inputStyle} type="text" value={form.experience} onChange={set('experience')} placeholder="e.g. 2 Years" onFocus={onFocus} onBlur={onBlur} />
+                {/* Experience */}
+                <div className="su-field">
+                    <label>Years Of Experience</label>
+                    <input type="text" value={form.experience} onChange={set('experience')} placeholder="e.g. 2 Years" />
                 </div>
-                <div style={fieldStyle}>
-                    <label style={labelStyle}>Gender</label>
-                    <input style={inputStyle} type="text" value={form.gender} onChange={set('gender')} placeholder="Add Gender" onFocus={onFocus} onBlur={onBlur} />
+
+                {/* Gender */}
+                <div className="su-field">
+                    <label>Gender</label>
+                    <input type="text" value={form.gender} onChange={set('gender')} placeholder="Add Gender" />
                 </div>
-            </div>
 
-            {/* Which cast you can't shoot */}
-            <div style={{ ...fieldStyle, marginBottom: '20px' }}>
-                <label style={labelStyle}>Which cast you can't shoot</label>
-                <TagInput
-                    tags={cantShootCasts}
-                    setTags={setCantShootCasts}
-                    placeholder="Type and press Enter…"
-                    suggestions={['Patel', 'Aditi', 'Shah', 'Mehta', 'Joshi', 'Rao', 'Sharma']}
-                />
-            </div>
+                {/* Which cast you can't shoot — full width, matches SignUp exactly */}
+                <div style={{ gridColumn: 'span 2' }}>
+                    <TagInput
+                        label="Which cast you can't shoot"
+                        tags={cantShootCasts}
+                        setTags={setCantShootCasts}
+                        placeholder="e.g. Patel, Aditi..."
+                        suggestions={['Patel', 'Aditi', 'Shah', 'Mehta', 'Joshi', 'Rao', 'Sharma']}
+                    />
+                </div>
 
-            {/* Specialization */}
-            <div style={{ ...fieldStyle, marginBottom: '20px' }}>
-                <label style={labelStyle}>Specialization</label>
-                <TagInput
-                    tags={specializations}
-                    setTags={setSpecializations}
-                    placeholder="e.g. Wedding, Portrait…"
-                    suggestions={['Photography', 'Wedding', 'Portrait', 'Fashion', 'Wildlife', 'Sports', 'Travel', 'Product']}
-                />
-            </div>
+                {/* Specialization — full width */}
+                <div style={{ gridColumn: 'span 2' }}>
+                    <TagInput
+                        label="Specialization"
+                        tags={specializations}
+                        setTags={setSpecializations}
+                        placeholder="e.g. Wedding, Portrait…"
+                        suggestions={['Photography', 'Wedding', 'Portrait', 'Fashion', 'Wildlife', 'Sports', 'Travel', 'Product']}
+                    />
+                </div>
 
-            {/* Languages Spoken */}
-            <div style={{ ...fieldStyle, marginBottom: '20px' }}>
-                <label style={labelStyle}>Languages Spoken</label>
-                <TagInput
-                    tags={languages}
-                    setTags={setLanguages}
-                    placeholder="e.g. English, Hindi…"
-                    suggestions={['English', 'Hindi', 'Gujarati', 'Marathi', 'Tamil', 'Telugu', 'Bengali', 'Punjabi']}
-                />
-            </div>
+                {/* Languages — full width */}
+                <div style={{ gridColumn: 'span 2' }}>
+                    <TagInput
+                        label="Languages Spoken"
+                        tags={languages}
+                        setTags={setLanguages}
+                        placeholder="e.g. English, Hindi…"
+                        suggestions={['English', 'Hindi', 'Gujarati', 'Marathi', 'Tamil', 'Telugu', 'Bengali', 'Punjabi']}
+                    />
+                </div>
 
-            {/* Upload Photo ID Proof */}
-            <div style={{ ...fieldStyle, marginBottom: '40px' }}>
-                <label style={labelStyle}>Upload Your Photo ID Proof</label>
-                <div
-                    onClick={() => idRef.current.click()}
-                    style={{
-                        border: '1.5px dashed #d0d0d0', borderRadius: '10px',
-                        padding: '20px', display: 'flex', flexDirection: 'column',
-                        alignItems: 'center', justifyContent: 'center', gap: '8px',
-                        cursor: 'pointer', background: '#fafafa',
-                        transition: 'border-color 0.2s, background 0.2s',
-                        minHeight: '80px',
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--color-orange)'; e.currentTarget.style.background = '#FFFAF0'; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = '#d0d0d0'; e.currentTarget.style.background = '#fafafa'; }}
-                >
-                    {idFile ? (
-                        <p style={{ margin: 0, fontSize: '13px', color: 'var(--color-orange)', fontWeight: 600 }}>
-                            ✓ {idFile}
-                        </p>
-                    ) : (
-                        <>
-                            <FiUpload size={20} color="#ccc" />
-                            <p style={{ margin: 0, fontSize: '12px', color: '#aaa', textAlign: 'center' }}>
-                                Click to upload your document (JPG, JPEG, PNG or PDF)
+                {/* Upload Photo ID Proof — full width */}
+                <div className="su-field" style={{ gridColumn: 'span 2' }}>
+                    <label>Upload Your Photo ID Proof</label>
+                    <div
+                        onClick={() => idRef.current.click()}
+                        style={{
+                            border: '1.5px dashed #d1d5db', borderRadius: '8px',
+                            padding: '20px', display: 'flex', flexDirection: 'column',
+                            alignItems: 'center', justifyContent: 'center', gap: '8px',
+                            cursor: 'pointer', background: '#fafafa',
+                            transition: 'border-color 0.2s, background 0.2s, box-shadow 0.2s',
+                            minHeight: '80px',
+                        }}
+                        onMouseEnter={e => {
+                            e.currentTarget.style.borderColor = '#f5a623';
+                            e.currentTarget.style.background = '#FFFAF0';
+                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(245,166,35,0.15)';
+                        }}
+                        onMouseLeave={e => {
+                            e.currentTarget.style.borderColor = '#d1d5db';
+                            e.currentTarget.style.background = '#fafafa';
+                            e.currentTarget.style.boxShadow = 'none';
+                        }}
+                    >
+                        {idFile ? (
+                            <p style={{ margin: 0, fontSize: '13px', color: '#f5a623', fontWeight: 600 }}>
+                                ✓ {idFile}
                             </p>
-                        </>
-                    )}
+                        ) : (
+                            <>
+                                <FiUpload size={20} color="#ccc" />
+                                <p style={{ margin: 0, fontSize: '12px', color: '#aaa', textAlign: 'center' }}>
+                                    Click to upload your document (JPG, JPEG, PNG or PDF)
+                                </p>
+                            </>
+                        )}
+                    </div>
+                    <input ref={idRef} type="file" accept="image/*,.pdf" style={{ display: 'none' }} onChange={handleId} />
                 </div>
-                <input ref={idRef} type="file" accept="image/*,.pdf" style={{ display: 'none' }} onChange={handleId} />
+
             </div>
 
             {/* ── Address ── */}
-            <h2 style={{ margin: '0 0 20px', fontSize: '28px', fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.02em' }}>Address</h2>
+            <h2 style={{ margin: '40px 0 20px', fontSize: '28px', fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.02em' }}>
+                Address
+            </h2>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '32px' }}>
-                <div style={fieldStyle}>
-                    <label style={labelStyle}>Pincode</label>
-                    <input style={inputStyle} type="text" value={form.pincode} onChange={set('pincode')} placeholder="360001" onFocus={onFocus} onBlur={onBlur} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '24px 20px' }}>
+
+                {/* Pincode — full width */}
+                <div className="su-field" style={{ gridColumn: 'span 2' }}>
+                    <label>Pincode / Zipcode</label>
+                    <input type="text" value={form.pincode} onChange={set('pincode')} placeholder="360001" />
                 </div>
-                <div style={fieldStyle}>
-                    <label style={labelStyle}>Flat, House no., Building, Company, Apartment</label>
-                    <input style={inputStyle} type="text" value={form.flat} onChange={set('flat')} placeholder="Enter Flat, House no., Building, Company, Apartment" onFocus={onFocus} onBlur={onBlur} />
+
+                {/* Flat — full width */}
+                <div className="su-field" style={{ gridColumn: 'span 2' }}>
+                    <label>Flat, House no., Building, Company, Apartment</label>
+                    <input type="text" value={form.flat} onChange={set('flat')} placeholder="Enter Flat, House no., Building, Company, Apartment" />
                 </div>
-                <div style={fieldStyle}>
-                    <label style={labelStyle}>Area, Street, Village</label>
-                    <input style={inputStyle} type="text" value={form.area} onChange={set('area')} placeholder="Enter Area, Street, Village" onFocus={onFocus} onBlur={onBlur} />
+
+                {/* Area — full width */}
+                <div className="su-field" style={{ gridColumn: 'span 2' }}>
+                    <label>Area, Street, Village</label>
+                    <input type="text" value={form.area} onChange={set('area')} placeholder="Enter Area, Street, Village" />
                 </div>
-                <div style={fieldStyle}>
-                    <label style={labelStyle}>Landmark</label>
-                    <input style={inputStyle} type="text" value={form.landmark} onChange={set('landmark')} placeholder="Landmark" onFocus={onFocus} onBlur={onBlur} />
+
+                {/* Landmark — full width */}
+                <div className="su-field" style={{ gridColumn: 'span 2' }}>
+                    <label>Landmark</label>
+                    <input type="text" value={form.landmark} onChange={set('landmark')} placeholder="Landmark" />
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                    <div style={fieldStyle}>
-                        <label style={labelStyle}>Town / City</label>
-                        <select style={inputStyle} value={form.city} onChange={set('city')} onFocus={onFocus} onBlur={onBlur}>
-                            <option value="">Select City</option>
-                            <option>Rajkot</option>
-                            <option>Ahmedabad</option>
-                            <option>Surat</option>
-                        </select>
-                    </div>
-                    <div style={fieldStyle}>
-                        <label style={labelStyle}>State</label>
-                        <select style={inputStyle} value={form.state} onChange={set('state')} onFocus={onFocus} onBlur={onBlur}>
-                            <option value="">Select State</option>
-                            <option>Gujarat</option>
-                            <option>Maharashtra</option>
-                            <option>Rajasthan</option>
-                        </select>
-                    </div>
+
+                {/* City */}
+                <div className="su-field">
+                    <label>Town / City</label>
+                    <select value={form.city} onChange={set('city')}>
+                        <option value="">Select City</option>
+                        <option>Rajkot</option>
+                        <option>Ahmedabad</option>
+                        <option>Surat</option>
+                    </select>
                 </div>
-                <div style={fieldStyle}>
-                    <label style={labelStyle}>Country / Region</label>
-                    <select style={inputStyle} value={form.country} onChange={set('country')} onFocus={onFocus} onBlur={onBlur}>
+
+                {/* State */}
+                <div className="su-field">
+                    <label>State</label>
+                    <select value={form.state} onChange={set('state')}>
+                        <option value="">Select State</option>
+                        <option>Gujarat</option>
+                        <option>Maharashtra</option>
+                        <option>Rajasthan</option>
+                    </select>
+                </div>
+
+                {/* Country — full width */}
+                <div className="su-field" style={{ gridColumn: 'span 2' }}>
+                    <label>Country / Region</label>
+                    <select value={form.country} onChange={set('country')}>
                         <option>India</option>
                         <option>USA</option>
                         <option>UK</option>
                     </select>
                 </div>
+
             </div>
 
-            {/* Action buttons */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+            {/* Action buttons — match SignUp's su-btn-primary */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '32px' }}>
+             <button onClick={onCancel} className="su-btn-primary-outline">Cancel</button>
                 <button
-                    onClick={onCancel}
-                    style={{
-                        padding: '11px 28px', borderRadius: '10px', fontSize: '13px',
-                        fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer',
-                        background: 'transparent', color: '#888',
-                        border: '1.5px solid #e0e0e0', transition: 'all 0.18s',
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = '#bbb'; e.currentTarget.style.color = '#555'; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.color = '#888'; }}
-                >
-                    Cancel
-                </button>
-                <button
+                    type="button"
                     onClick={onSave}
-                    style={{
-                        padding: '11px 28px', borderRadius: '10px', fontSize: '13px',
-                        fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer',
-                        background: 'var(--color-orange)', color: '#fff',
-                        border: 'none', transition: 'opacity 0.18s',
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
-                    onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+                    className="su-btn-primary"
+                    style={{ padding: '11px 28px' }}
                 >
                     Save
                 </button>

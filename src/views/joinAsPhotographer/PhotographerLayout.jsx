@@ -7,7 +7,7 @@ import { BsInstagram } from 'react-icons/bs';
 import { FiUser, FiEdit2, FiCalendar, FiLogOut, FiAlertCircle } from 'react-icons/fi';
 
 const navItems = [
-  { label: 'Home', to: '/home' },
+  { label: 'Home', to: '/join-as-photographer/home' },
   { label: 'About Us', to: '/about-us' },
   { label: 'FAQs', to: '/faqs' },
   { label: 'Blog', to: '/blog' },
@@ -182,7 +182,7 @@ const PhotographerLayout = ({ children }) => {
           {/* Logo */}
           <button
             type="button"
-            onClick={() => navigate('/home')}
+            onClick={() => navigate('/join-as-photographer/home')}
             className="flex items-center"
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginTop: "10px" }}
           >

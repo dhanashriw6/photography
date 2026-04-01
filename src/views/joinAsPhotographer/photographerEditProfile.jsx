@@ -12,12 +12,14 @@ import Orders             from './orders';
 import Wallet             from './wallet';
 import ReviewsDisputes    from './reviewsDisputes';
 import ChangePassword     from './changePassword';
+import AddBankDetails from './bankDetails';
 
 const MENU = [
     { key: 'profile',   label: 'Profile Information', icon: <FiUser      size={17} /> },
     { key: 'portfolio', label: 'Portfolio',            icon: <FiImage     size={17} /> },
     { key: 'package',   label: 'Package',              icon: <FiPackage   size={17} /> },
     { key: 'orders',    label: 'Orders',               icon: <FiShoppingBag size={17} /> },
+    {key : 'bankDetails', label : 'Bank Details', icon : <FiCreditCard size={17} />},
     { key: 'wallet',    label: 'Wallet',               icon: <FiCreditCard size={17} /> },
     { key: 'reviews',   label: 'Reviews & Disputes',   icon: <FiStar      size={17} /> },
     { key: 'password',  label: 'Change Password',      icon: <FiLock      size={17} /> },
@@ -34,6 +36,7 @@ const PhotographerEditProfile = () => {
             case 'portfolio': return <Portfolio />;
             case 'package':   return <Package />;
             case 'orders':    return <Orders />;
+            case 'bankDetails': return <AddBankDetails />;
             case 'wallet':    return <Wallet />;
             case 'reviews':   return <ReviewsDisputes />;
             case 'password':  return <ChangePassword />;
