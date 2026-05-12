@@ -12,6 +12,8 @@
   "dependencies": {
     "@ishubhamx/panchangam-js": "^2.2.2",
     "@tailwindcss/vite": "^4.1.18",
+    "axios": "^1.16.0",
+    "crypto-js": "^4.2.0",
     "framer-motion": "^12.23.26",
     "lucide-react": "^0.562.0",
     "react": "^19.2.0",

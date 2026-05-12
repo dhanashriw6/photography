@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PhotographerLayout from './PhotographerLayout';
 import headerBgImage from '../../assets/Images/headerBgImage.jpg';
+import { getProfile } from '../../services/profile';
 
 /* ─── Circular Progress ────────────────────────────────────────────────────── */
 const CircularProgress = ({ pct = 64, size = 110, stroke = 9 }) => {
@@ -180,6 +181,23 @@ const NotifItem = ({ avatar, title, subtitle, time }) => (
 
 /* ─── Main Dashboard ───────────────────────────────────────────────────────── */
 const PhotographerDashboard = () => {
+    const [profileName, setProfileName] = useState('');
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const res = await getProfile();
+                const data = res?.data;
+                // Adjust the field name below to match your API response shape
+                const name = data?.name || data?.full_name || data?.firstName || '';
+                setProfileName(name);
+            } catch (err) {
+                console.error('Failed to fetch profile:', err);
+            }
+        };
+        fetchProfile();
+    }, []);
+
     const recentEvents = [
         { orderDate: '00/00/0000', details: 'Full Day (wedding)', eventDate: '00/00/0000' },
         { orderDate: '00/00/0000', details: 'Full Day (wedding)', eventDate: '00/00/0000' },
@@ -228,7 +246,7 @@ const PhotographerDashboard = () => {
 
                         {/* Greeting */}
                         <h1 style={{ margin: '0 0 4px', fontSize: '32px', fontWeight: 800, color: '#1a1a1a', letterSpacing: '-0.02em' }}>
-                            Hello John
+                            Hello {profileName || 'John'}
                         </h1>
                         <p style={{ margin: '0 0 24px', fontSize: '13px', color: '#555', fontWeight: 500 }}>
                             welcome to your Dashboard

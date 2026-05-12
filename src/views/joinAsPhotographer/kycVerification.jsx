@@ -4,10 +4,15 @@ import ViewsLayout from '../Layout';
 import { useNavigate } from 'react-router-dom';
 import { FiUploadCloud, FiX, FiFile } from 'react-icons/fi';
 import PhotographerLayout from './PhotographerLayout';
+import { submitKyc } from '../../services/kyc';
 
 const KYCVerification = () => {
   const [docType, setDocType] = useState('Aadhaar Card');
+  const [documentNo, setDocumentNo] = useState('');
   const [files, setFiles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const fileRef = useRef();
   const navigate = useNavigate();
 
@@ -16,6 +21,7 @@ const KYCVerification = () => {
       name: f.name,
       url: f.type.startsWith('image/') ? URL.createObjectURL(f) : null,
       type: f.type,
+      rawFile: f, // Keeping the raw file for future actual upload
     }));
     setFiles(prev => [...prev, ...newFiles]);
   };
@@ -26,11 +32,64 @@ const KYCVerification = () => {
       name: f.name,
       url: f.type.startsWith('image/') ? URL.createObjectURL(f) : null,
       type: f.type,
+      rawFile: f,
     }));
     setFiles(prev => [...prev, ...newFiles]);
   };
 
   const removeFile = (i) => setFiles(prev => prev.filter((_, idx) => idx !== i));
+
+  // Map the dropdown value to the API enum format
+  const getDocTypeEnum = (type) => {
+    switch (type) {
+      case 'Aadhaar Card': return 'aadhar';
+      case 'PAN Card': return 'pan';
+      case 'Passport': return 'passport';
+      case 'Driving Licence': return 'driving_license';
+      case 'Voter ID': return 'voter_id';
+      default: return 'aadhar';
+    }
+  };
+
+  const handleSubmit = async () => {
+    setError('');
+    setSuccess('');
+
+    if (!documentNo.trim()) {
+      setError('Please enter your document number.');
+      return;
+    }
+
+    if (files.length === 0) {
+      setError('Please upload at least the front side of the document.');
+      return;
+    }
+
+    // Prepare the payload
+    const payload = {
+      kyc_doc_type: getDocTypeEnum(docType),
+      document_no: documentNo,
+      // Note: Since we don't have an endpoint for uploading files directly to S3/backend yet,
+      // we are mocking the document keys. In a real scenario, you'd upload the `files[i].rawFile` 
+      // first, get the 'key' back from your server, and then pass it here.
+      document_keys: files.map((f, i) => ({
+        key: `private/kyc_document/1/placeholder-${i}-${f.name}`,
+        side: i === 0 ? "front" : "back"
+      }))
+    };
+
+    try {
+      setLoading(true);
+      await submitKyc(payload);
+      setSuccess('KYC details submitted successfully!');
+      setTimeout(() => navigate('/join-as-photographer/verification-ip'), 1500);
+    } catch (err) {
+      const msg = err?.response?.data?.error?.message || err?.response?.data?.message || 'Failed to submit KYC. Please try again.';
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <PhotographerLayout>
@@ -47,22 +106,52 @@ const KYCVerification = () => {
             Complete Your KYC
           </h1>
 
+          {/* Error / Success banners */}
+          {error && (
+            <div style={{
+              marginBottom: '16px', padding: '10px 14px', borderRadius: '8px',
+              background: '#fee2e2', color: '#b91c1c', fontSize: '13px',
+            }}>
+              {error}
+            </div>
+          )}
+          {success && (
+            <div style={{
+              marginBottom: '16px', padding: '10px 14px', borderRadius: '8px',
+              background: '#dcfce7', color: '#15803d', fontSize: '13px',
+            }}>
+              {success}
+            </div>
+          )}
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
             {/* Document type select */}
-            <div>
-              <div className="su-field">
-                <label>Please Complete Your KYC</label>
-                <select value={docType} onChange={e => { setDocType(e.target.value); setFiles([]); }}>
-                  <option>Aadhaar Card</option>
-                  <option>PAN Card</option>
-                  <option>Passport</option>
-                  <option>Driving Licence</option>
-                  <option>Voter ID</option>
-                </select>
-              </div>
-              <p className="su-field-hint">This helps build a safer, more trusted space.</p>
+            <div className="su-field">
+              <label>Please Complete Your KYC</label>
+              <select value={docType} onChange={e => { setDocType(e.target.value); setFiles([]); }}>
+                <option>Aadhaar Card</option>
+                <option>PAN Card</option>
+                <option>Passport</option>
+                <option>Driving Licence</option>
+                <option>Voter ID</option>
+              </select>
             </div>
+
+            {/* Document Number */}
+            <div className="su-field">
+              <label>Document Number</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap:"5px" }}>
+                <input
+                  type="text"
+                  value={documentNo}
+                  onChange={e => setDocumentNo(e.target.value)}
+                  placeholder="Enter Document Number"
+                  style={{ flex: 1 }}
+                />
+              </div>
+            </div>
+            <p className="su-field-hint" style={{ marginTop: '-15px' }}>This helps build a safer, more trusted space.</p>
 
             {/* Upload area */}
             <div className="su-field">
@@ -155,8 +244,10 @@ const KYCVerification = () => {
 
             {/* Action buttons */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '4px' }}>
-              <button onClick={() => navigate(-1)} className="su-btn-primary-outline">Cancel</button>
-              <button onClick={() => navigate('/join-as-photographer/verification-ip')} className="su-btn-primary">Save</button>
+              <button onClick={() => navigate(-1)} className="su-btn-primary-outline" disabled={loading}>Cancel</button>
+              <button onClick={handleSubmit} className="su-btn-primary" disabled={loading}>
+                {loading ? 'Saving...' : 'Save'}
+              </button>
             </div>
 
           </div>

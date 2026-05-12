@@ -26,6 +26,9 @@ import Dashboard from './views/joinAsPhotographer/dashboard';
 import PhotographerEditProfile from './views/joinAsPhotographer/photographerEditProfile';
 import OrderSummary from './views/joinAsPhotographer/orderSummary';
 import JoinHomePage from './views/joinAsPhotographer/joinHomePage';
+import ProtectedRoute from './Components/ProtectedRoute';
+import PublicRoute from './Components/PublicRoute';
+import ResetPassword from './views/joinAsPhotographer/resetPassword';
 function App() {
   return (
     <>
@@ -48,15 +51,25 @@ function App() {
         <Route path="/edit-profile" element={<EditProfile />} />
         <Route path="/review" element={<Review />} />
         <Route path="/dispute" element={<Dispute />} />
-        <Route path="/join-as-photographer" element={<SignUpPhotographer />} />
-        <Route path="/join-as-photographer/login" element={<LoginPhotographer />} />
-        <Route path="/join-as-photographer/otp-verification" element={<OTPVerification />} />
-        <Route path="/join-as-photographer/kyc-verification" element={<KYCVerification />} />
-        <Route path="/join-as-photographer/verification-ip" element={<VerificationIP />} />
-        <Route path="/join-as-photographer/dashboard" element={<Dashboard />} />
-        <Route path="/join-as-photographer/edit-profile" element={<PhotographerEditProfile />} />
+        {/* Public auth pages — already logged-in users go straight to dashboard */}
+        <Route element={<PublicRoute />}>
+          <Route path="/join-as-photographer" element={<SignUpPhotographer />} />
+          <Route path="/join-as-photographer/login" element={<LoginPhotographer />} />
+          <Route path="/join-as-photographer/otp-verification" element={<OTPVerification />} />
+          <Route path="/join-as-photographer/reset-password" element={<ResetPassword />} />
+        </Route>
+
+        {/* Protected pages — no token sends user back to signup */}
+        <Route element={<ProtectedRoute />}>
+          
+          <Route path="/join-as-photographer/kyc-verification" element={<KYCVerification />} />
+          <Route path="/join-as-photographer/verification-ip" element={<VerificationIP />} />
+          <Route path="/join-as-photographer/dashboard" element={<Dashboard />} />
+          <Route path="/join-as-photographer/edit-profile" element={<PhotographerEditProfile />} />
+          <Route path="/join-as-photographer/home" element={<JoinHomePage />} />
+        </Route>
+
         <Route path="/order-summary" element={<OrderSummary />} />
-        <Route path="/join-as-photographer/home" element={<JoinHomePage />} />
       </Routes>
     </>
   );

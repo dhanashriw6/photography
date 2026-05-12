@@ -4,6 +4,7 @@ import ViewsLayout from '../Layout';
 import { useNavigate } from 'react-router-dom';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import PhotographerLayout from './PhotographerLayout';
+import { signUpAsPhotographer } from '../../services/auth';
 
 /* ── Tag Input ── */
 const TagInput = ({ label, tags, setTags, placeholder }) => {
@@ -75,12 +76,68 @@ const TagInput = ({ label, tags, setTags, placeholder }) => {
 };
 
 const SignUpPhotographer = () => {
-  const [agreed, setAgreed] = useState(false);
-  const [shootOutside, setShootOutside] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [cantShootTags, setCantShootTags] = useState(['Patel', 'Aahir', 'brahman']);
-  const [cityTags, setCityTags] = useState(['Rajkot', 'Ahmedabad', 'Morbi']);
   const navigate = useNavigate();
+
+  // ── Form state ──────────────────────────────────────────────────────────────
+  const [firstName, setFirstName]     = useState('');
+  const [lastName, setLastName]       = useState('');
+  const [email, setEmail]             = useState('');
+  const [password, setPassword]       = useState('');
+  const [phoneCode, setPhoneCode]     = useState('+91');
+  const [phoneNo, setPhoneNo]         = useState('');
+  const [skill, setSkill]             = useState('photographer');
+  const [showPassword, setShowPassword] = useState(false);
+
+  // ── UI state ────────────────────────────────────────────────────────────────
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState('');
+  const [success, setSuccess]   = useState('');
+
+  // ── Submit ──────────────────────────────────────────────────────────────────
+  const handleSignup = async (e) => {
+    e?.preventDefault();
+    setError('');
+    setSuccess('');
+
+    // Basic client-side validation
+    if (!firstName.trim() || !lastName.trim() || !email.trim() ||
+        !password.trim() || !phoneNo.trim()) {
+      setError('Please fill in all required fields.');
+      return;
+    }
+
+    const payload = {
+      first_name: firstName.trim(),
+      last_name:  lastName.trim(),
+      email:      email.trim(),
+      password,
+      phone_code: phoneCode,
+      phone_no:   phoneNo.trim(),
+      user_type:  'service_provider',
+      skills:     [skill],
+    };
+
+    try {
+      setLoading(true);
+      const res = await signUpAsPhotographer(payload);
+
+      // Save tokens so all subsequent API calls are authenticated
+      const { access_token, refresh_token } = res?.data?.data || {};
+      if (access_token)  localStorage.setItem('authToken',     access_token);
+      if (refresh_token) localStorage.setItem('refreshToken',  refresh_token);
+
+      setSuccess('Account created! Redirecting…');
+      setTimeout(() => navigate('/join-as-photographer/login'), 1500);
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error   ||
+        'Signup failed. Please try again.';
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <PhotographerLayout>
@@ -93,139 +150,136 @@ const SignUpPhotographer = () => {
             Sign Up
           </h1>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '24px 20px' }}>
-
-            {/* First Name */}
-            <div className="su-field">
-              <label>First Name</label>
-              <input type="text" placeholder="John" />
-              <p className="su-field-hint">Must match identification documents.</p>
+          {/* Error / Success banners */}
+          {error && (
+            <div style={{
+              marginBottom: '16px', padding: '10px 14px', borderRadius: '8px',
+              background: '#fee2e2', color: '#b91c1c', fontSize: '13px',
+            }}>
+              {error}
             </div>
-
-            {/* Last Name */}
-            <div className="su-field">
-              <label>Last Name</label>
-              <input type="text" placeholder="Doe" />
-              <p className="su-field-hint">Must match identification documents.</p>
+          )}
+          {success && (
+            <div style={{
+              marginBottom: '16px', padding: '10px 14px', borderRadius: '8px',
+              background: '#dcfce7', color: '#15803d', fontSize: '13px',
+            }}>
+              {success}
             </div>
+          )}
 
-            {/* Email */}
-            <div className="su-field">
-              <label>Email</label>
-              <input type="email" placeholder="johndoe@gmail.com" />
-            </div>
+          <form onSubmit={handleSignup}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '24px 20px' }}>
 
-            {/* Password */}
-            <div className="su-field">
-              <label>Password</label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {/* First Name */}
+              <div className="su-field">
+                <label>First Name</label>
                 <input
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  style={{ flex: 1 }}
+                  type="text"
+                  placeholder="John"
+                  value={firstName}
+                  onChange={e => setFirstName(e.target.value)}
                 />
-                <button type="button" onClick={() => setShowPassword(v => !v)} style={{
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  color: '#aaa', padding: 0, display: 'flex', flexShrink: 0,
-                }}>
-                  {showPassword ? <FiEyeOff size={17} /> : <FiEye size={17} />}
+                <p className="su-field-hint">Must match identification documents.</p>
+              </div>
+
+              {/* Last Name */}
+              <div className="su-field">
+                <label>Last Name</label>
+                <input
+                  type="text"
+                  placeholder="Doe"
+                  value={lastName}
+                  onChange={e => setLastName(e.target.value)}
+                />
+                <p className="su-field-hint">Must match identification documents.</p>
+              </div>
+
+              {/* Email */}
+              <div className="su-field">
+                <label>Email</label>
+                <input
+                  type="email"
+                  placeholder="johndoe@gmail.com"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                />
+              </div>
+
+              {/* Password */}
+              <div className="su-field">
+                <label>Password</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    style={{ flex: 1 }}
+                    maxLength={16}
+                    minLength={8}
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                  />
+                  <button type="button" onClick={() => setShowPassword(v => !v)} style={{
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    color: '#aaa', padding: 0, display: 'flex', flexShrink: 0,
+                  }}>
+                    {showPassword ? <FiEyeOff size={17} /> : <FiEye size={17} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Phone — full width */}
+              <div className="su-field" style={{ gridColumn: 'span 2' }}>
+                <label>Phone Number<sup style={{ color: '#ef4444' }}>*</sup></label>
+                <div className="su-phone-row">
+                  <select
+                    className="su-country"
+                    value={phoneCode}
+                    onChange={e => setPhoneCode(e.target.value)}
+                  >
+                    <option value="+91">🇮🇳 +91</option>
+                    <option value="+1">🇺🇸 +1</option>
+                    <option value="+44">🇬🇧 +44</option>
+                  </select>
+                  <input
+                    className="su-number"
+                    type="tel"
+                    placeholder="12345 67890"
+                    value={phoneNo}
+                    onChange={e => setPhoneNo(e.target.value)}
+                  />
+                </div>
+                <p className="su-field-hint">Enter valid number for OTP verification</p>
+              </div>
+
+              {/* Skills */}
+              <div className="su-field">
+                <label>Skills<sup style={{ color: '#ef4444' }}>*</sup></label>
+                <select
+                  className="su-country"
+                  value={skill}
+                  onChange={e => setSkill(e.target.value)}
+                >
+                  <option value="photographer">Photographer</option>
+                  <option value="videographer">Videographer</option>
+                  <option value="drone_photographer">Drone Photographer</option>
+                  <option value="drone_videographer">Drone Videographer</option>
+                </select>
+              </div>
+
+              {/* Submit */}
+              <div style={{ gridColumn: 'span 2', marginTop: '4px' }}>
+                <button
+                  type="submit"
+                  className="su-btn-primary"
+                  style={{ width: '100%', opacity: loading ? 0.7 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
+                  disabled={loading}
+                >
+                  {loading ? 'Creating account…' : 'Sign Up'}
                 </button>
               </div>
             </div>
-
-            {/* Phone — full width */}
-            <div className="su-field" style={{ gridColumn: 'span 2' }}>
-              <label>Phone Number<sup style={{ color: '#ef4444' }}>*</sup></label>
-              <div className="su-phone-row">
-                <select className="su-country" defaultValue="+91">
-                  <option value="+91">🇮🇳 +91</option>
-                  <option value="+1">🇺🇸 +1</option>
-                  <option value="+44">🇬🇧 +44</option>
-                </select>
-                <input className="su-number" type="tel" placeholder="12345 67890" />
-              </div>
-              <p className="su-field-hint">Enter valid number for OTP verification</p>
-            </div>
-
-            {/* Where you can't shoot — tag input, full width */}
-            <div style={{ gridColumn: 'span 2' }}>
-              <TagInput
-                label="Which caste you can't shoot"
-                tags={cantShootTags}
-                setTags={setCantShootTags}
-                placeholder="e.g. Patel, Aahir..."
-              />
-            </div>
-
-            {/* Current Address */}
-            <div className="su-field" style={{ gridColumn: 'span 2' }}>
-              <label>Current Address</label>
-              <input type="text" placeholder="Gujrat, India" />
-            </div>
-
-            {/* Pincode */}
-            <div className="su-field" style={{ gridColumn: 'span 2' }}>
-              <label>Pincode / Zipcode</label>
-              <input type="text" placeholder="360003" />
-            </div>
-
-            {/* Permanent Address */}
-            <div className="su-field" style={{ gridColumn: 'span 2' }}>
-              <label>Permanent Address</label>
-              <input type="text" placeholder="Gujrat, India" />
-            </div>
-
-            {/* Permanent Pincode */}
-            <div className="su-field" style={{ gridColumn: 'span 2' }}>
-              <label>Pincode / Zipcode</label>
-              <input type="text" placeholder="360003" />
-            </div>
-
-            {/* Shoot outside checkbox */}
-            <div style={{ gridColumn: 'span 2', display: 'flex' }}>
-              <label className="su-checkbox-row">
-                <input
-                  type="checkbox"
-                  checked={shootOutside}
-                  onChange={e => setShootOutside(e.target.checked)}
-                />
-                <span>You agree to shoot outside your city</span>
-              </label>
-            </div>
-
-            {/* In which city you can shoot — tag input, full width */}
-            <div style={{ gridColumn: 'span 2' }}>
-              <TagInput
-                label="In Which city you can shoot"
-                tags={cityTags}
-                setTags={setCityTags}
-                placeholder="e.g. Rajkot, Surat..."
-              />
-            </div>
-
-            {/* Terms */}
-            <div style={{ gridColumn: 'span 2', marginTop: '4px', display: 'flex' }}>
-              <label className="su-checkbox-row">
-                <input
-                  type="checkbox"
-                  checked={agreed}
-                  onChange={e => setAgreed(e.target.checked)}
-                />
-                <span>
-                  I agree to the{' '}
-                  <a>terms &amp; conditions</a>
-                </span>
-              </label>
-            </div>
-
-            {/* Submit */}
-            <div style={{ gridColumn: 'span 2', marginTop: '4px' }}>
-              <button type="submit" className="su-btn-primary" style={{ width: '100%' }} onClick={() => navigate('/join-as-photographer/login')}>
-                Sign Up
-              </button>
-            </div>
-
-          </div>
+          </form>
 
           {/* Login link */}
           <p style={{ textAlign: 'center', fontSize: '13px', color: '#666', marginTop: '20px' }}>

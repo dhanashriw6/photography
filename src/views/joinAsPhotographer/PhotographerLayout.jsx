@@ -30,12 +30,19 @@ const AvatarDropdown = () => {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  const handleLogout = () => {
+    // Clear all auth tokens from storage
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('refreshToken');
+    navigate('/');
+  };
+
   const menuItems = [
     { icon: <FiEdit2 size={15} />, label: 'Edit Profile', action: () => navigate('/join-as-photographer/edit-profile') },
     // { icon: <FiCalendar size={15} />, label: 'My Bookings', action: () => navigate('/my-bookings') },
     // { icon: <FiAlertCircle size={15} />, label: 'Raise a Dispute', action: () => navigate('/dispute'), danger: true },
     { divider: true },
-    { icon: <FiLogOut size={15} />, label: 'Logout', action: () => navigate('/'), danger: true },
+    { icon: <FiLogOut size={15} />, label: 'Logout', action: handleLogout, danger: true },
   ];
 
   return (
