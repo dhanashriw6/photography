@@ -1,37 +1,50 @@
 import React, { useState } from 'react';
 import { FiEye, FiEyeOff, FiLock } from 'react-icons/fi';
+import { changePassword } from '../../services/profile';
 
 const ChangePassword = () => {
     const [fields, setFields] = useState({ current: '', newPwd: '', confirm: '' });
     const [show, setShow] = useState({ current: false, newPwd: false, confirm: false });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [showCurrent, setShowCurrent] = useState(false);
+    const [showNew, setShowNew] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-    const toggle = (k) => setShow(s => ({ ...s, [k]: !s[k] }));
-    const set = (k) => (e) => setFields(f => ({ ...f, [k]: e.target.value }));
+    const toggleCurrent = () => setShowCurrent(s => !s);
+    const toggleNew = () => setShowNew(s => !s);
+    const toggleConfirm = () => setShowConfirm(s => !s);
 
-    const handleSave = () => {
-        setError('');
-        if (!fields.current) return setError('Please enter your current password.');
-        if (fields.newPwd.length < 8) return setError('New password must be at least 8 characters.');
-        if (fields.newPwd !== fields.confirm) return setError('Passwords do not match.');
-        setSuccess(true);
-        setFields({ current: '', newPwd: '', confirm: '' });
+    const handleSave = async () => {
+
+         setError('');       // ← clear at START (before validation), not at end
+    setSuccess(false);
+        if (!currentPassword) return setError('Please enter your current password.');
+        if (newPassword.length < 8) return setError('New password must be at least 8 characters.');
+        if (newPassword !== confirmPassword) return setError('Passwords do not match.');
+
+        const payload = {
+            current_password: currentPassword,
+            new_password: newPassword,
+          
+        };
+        try {
+            setLoading(true);
+            const res = await changePassword(payload);
+            setSuccess(true);
+        } catch (error) {
+            const msg = error?.response?.data?.error?.message || error?.response?.data?.message || error?.message || "Something went wrong";
+            setError(msg);
+        } finally {
+            setLoading(false);
+        }
+       
     };
 
-    /* Strength indicator */
-    const strength = (() => {
-        const p = fields.newPwd;
-        if (!p) return 0;
-        let s = 0;
-        if (p.length >= 8) s++;
-        if (/[A-Z]/.test(p)) s++;
-        if (/[0-9]/.test(p)) s++;
-        if (/[^a-zA-Z0-9]/.test(p)) s++;
-        return s;
-    })();
-    const strengthLabel = ['', 'Weak', 'Fair', 'Good', 'Strong'][strength];
-    const strengthColor = ['', '#ef4444', '#f59e0b', '#3b82f6', '#22c55e'][strength];
 
     return (
         <div>
@@ -43,6 +56,15 @@ const ChangePassword = () => {
                     ✓ Password updated successfully!
                 </div>
             )}
+             {error && (
+            <div style={{
+              marginBottom: '16px', padding: '10px 14px', borderRadius: '8px',
+              background: '#fee2e2', color: '#b91c1c', fontSize: '13px',
+            }}>
+              {error}
+            </div>
+          )}
+
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '480px' }}>
 
@@ -52,14 +74,14 @@ const ChangePassword = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <FiLock size={14} color="#f5a623" style={{ flexShrink: 0 }} />
                         <input
-                            type={show.current ? 'text' : 'password'}
-                            value={fields.current}
-                            onChange={set('current')}
+                            type={showCurrent ? 'text' : 'password'}
+                            value={currentPassword}
+                            onChange={(e) => setCurrentPassword(e.target.value)}
                             placeholder="••••••••"
                             style={{ flex: 1 }}
                         />
-                        <button type="button" onClick={() => toggle('current')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#aaa', padding: 0, display: 'flex', flexShrink: 0 }}>
-                            {show.current ? <FiEyeOff size={15} /> : <FiEye size={15} />}
+                        <button type="button" onClick={toggleCurrent} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#aaa', padding: 0, display: 'flex', flexShrink: 0 }}>
+                            {showCurrent ? <FiEye size={15} /> : <FiEyeOff size={15} />}
                         </button>
                     </div>
                 </div>
@@ -70,34 +92,20 @@ const ChangePassword = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <FiLock size={14} color="#f5a623" style={{ flexShrink: 0 }} />
                         <input
-                            type={show.newPwd ? 'text' : 'password'}
-                            value={fields.newPwd}
-                            onChange={set('newPwd')}
+                            type={showNew ? 'text' : 'password'}
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
                             placeholder="••••••••"
                             style={{ flex: 1 }}
                         />
-                        <button type="button" onClick={() => toggle('newPwd')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#aaa', padding: 0, display: 'flex', flexShrink: 0 }}>
-                            {show.newPwd ? <FiEyeOff size={15} /> : <FiEye size={15} />}
+                        <button type="button" onClick={toggleNew} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#aaa', padding: 0, display: 'flex', flexShrink: 0 }}>
+                            {showNew ? <FiEye size={15} /> : <FiEyeOff size={15} />}
                         </button>
                     </div>
-                    <p className="su-field-hint">At least 8 characters with uppercase, number and symbol.</p>
+                    <p className="su-field-hint">At least 8 characters</p>
                 </div>
 
-                {/* Strength bar */}
-                {fields.newPwd && (
-                    <div style={{ marginTop: '-8px' }}>
-                        <div style={{ display: 'flex', gap: '4px', marginBottom: '4px' }}>
-                            {[1, 2, 3, 4].map(i => (
-                                <div key={i} style={{
-                                    flex: 1, height: '4px', borderRadius: '2px',
-                                    background: i <= strength ? strengthColor : '#e5e7eb',
-                                    transition: 'background 0.3s',
-                                }} />
-                            ))}
-                        </div>
-                        <p style={{ margin: 0, fontSize: '11px', fontWeight: 600, color: strengthColor }}>{strengthLabel}</p>
-                    </div>
-                )}
+
 
                 {/* Confirm Password */}
                 <div className="su-field">
@@ -105,19 +113,18 @@ const ChangePassword = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <FiLock size={14} color="#f5a623" style={{ flexShrink: 0 }} />
                         <input
-                            type={show.confirm ? 'text' : 'password'}
-                            value={fields.confirm}
-                            onChange={set('confirm')}
+                            type={showConfirm ? 'text' : 'password'}
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
                             placeholder="••••••••"
                             style={{ flex: 1 }}
                         />
-                        <button type="button" onClick={() => toggle('confirm')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#aaa', padding: 0, display: 'flex', flexShrink: 0 }}>
-                            {show.confirm ? <FiEyeOff size={15} /> : <FiEye size={15} />}
+                        <button type="button" onClick={toggleConfirm} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#aaa', padding: 0, display: 'flex', flexShrink: 0 }}>
+                            {showConfirm ? <FiEye size={15} /> : <FiEyeOff size={15} />}
                         </button>
                     </div>
                 </div>
 
-                {error && <p style={{ margin: 0, fontSize: '12px', color: '#ef4444', fontWeight: 600 }}>{error}</p>}
 
                 <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
                     <button onClick={() => { setFields({ current: '', newPwd: '', confirm: '' }); setError(''); setSuccess(false); }} className="su-btn-primary-outline">Cancel</button>

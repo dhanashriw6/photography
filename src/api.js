@@ -18,5 +18,14 @@ export const profileEndpoint = {
   getProfile: `${baseUrl}/user/profile_info`,
   updateProfile: `${baseUrl}/user/update_profile`,
   changePassword: `${baseUrl}/user/change_password`,
-  
+
 };
+
+export const commonEndpoint = {
+  getCasteList: `${baseUrl}/common/casts`,
+  getLanguagesList: `${baseUrl}/common/languages`,
+  getCategory: `${baseUrl}/common/event-categories`,
+  getUploadLink: `${baseUrl}/document/upload_url`,
+  uploadtoAWS: `${baseUrl}/document/upload`,
+  
+}

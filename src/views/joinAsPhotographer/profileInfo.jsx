@@ -1,7 +1,9 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import '../index.css';
 import { LuCamera } from 'react-icons/lu';
 import { FiX, FiUpload } from 'react-icons/fi';
+import { getProfile } from '../../services/profile';
+import { getCasteList, getLanguagesList, getCategory } from '../../services/common';
 
 /* ─── Tag Input — matches SignUp's TagInput style exactly ─────────────────── */
 const TagInput = ({ label, tags, setTags, placeholder, suggestions = [] }) => {
@@ -64,13 +66,7 @@ const TagInput = ({ label, tags, setTags, placeholder, suggestions = [] }) => {
                 <input
                     value={input}
                     onChange={e => { setInput(e.target.value); setShowSug(true); }}
-                    onKeyDown={e => {
-                        if ((e.key === 'Enter' || e.key === ',') && input.trim()) {
-                            e.preventDefault(); addTag(input);
-                        }
-                        if (e.key === 'Backspace' && !input && tags.length)
-                            setTags(tags.slice(0, -1));
-                    }}
+                  
                     onFocus={() => setShowSug(true)}
                     onBlur={() => setTimeout(() => setShowSug(false), 150)}
                     placeholder={tags.length === 0 ? placeholder : ''}
@@ -116,21 +112,24 @@ const TagInput = ({ label, tags, setTags, placeholder, suggestions = [] }) => {
 /* ─── Main Component ────────────────────────────────────────────────────── */
 const PhotographerProfileInfo = ({ onSave, onCancel }) => {
     const fileRef = useRef();
-    const idRef   = useRef();
-    const [photo,  setPhoto]  = useState(null);
+    const idRef = useRef();
+    const [photo, setPhoto] = useState(null);
     const [idFile, setIdFile] = useState(null);
 
     const [form, setForm] = useState({
-        firstName: 'John', lastName: 'Doe',
-        email: 'johndoe@gmail.com', phone: '12345 67890',
-        experience: '2 Years', gender: '',
-        pincode: '360001', flat: '', area: '',
-        landmark: '', city: '', state: '', country: 'India',
+        firstName: '', lastName: '',
+        email: '', phone: '',
+        experience: '', gender: '',
+        pincode: '', flat: '', area: '',
+        landmark: '', city: '', state: '', country: '',
     });
 
-    const [cantShootCasts,  setCantShootCasts]  = useState(['Patel', 'Aditi']);
-    const [specializations, setSpecializations] = useState(['Photography', 'Wedding']);
-    const [languages,       setLanguages]       = useState(['English', 'Hindi']);
+    const [cantShootCasts, setCantShootCasts] = useState([]);
+    const [specializations, setSpecializations] = useState([]);
+    const [languages, setLanguages] = useState([]);
+    const [casteSuggestions, setCasteSuggestions] = useState([]);
+    const [languageSuggestions, setLanguageSuggestions] = useState([]);
+    const [categorySuggestions, setCategorySuggestions] = useState([]);
 
     const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
 
@@ -143,6 +142,70 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
         const file = e.target.files[0];
         if (file) setIdFile(file.name);
     };
+
+    useEffect(() => {
+        const fetchAll = async () => {
+            try {
+                // Profile
+                const res = await getProfile();
+                const user = res?.data?.data?.user;
+                if (user) {
+                    setForm(f => ({
+                        ...f,
+                        firstName: user.first_name || '',
+                        lastName: user.last_name || '',
+                        email: user.email || '',
+                        phone: user.phone_no || '',
+                        experience: user.years_of_exp ? `${user.years_of_exp} Years` : '',
+                        country: 'India',
+                    }));
+
+                    // Pre-fill tags from profile if API returns them
+                    if (user.casts?.length) setCantShootCasts(user.casts.map(c => c.name || c));
+                    if (user.event_categories?.length) setSpecializations(user.event_categories.map(c => c.name || c));
+                    if (user.user_languages?.length) setLanguages(user.user_languages.map(l => l.name || l));
+                }
+            } catch (err) {
+                console.error('Failed to fetch profile:', err);
+            }
+
+            try {
+                // Caste list
+                const casteRes = await getCasteList();
+                const casteData = casteRes?.data?.data?.casts;
+                
+                if (Array.isArray(casteData)) {
+                    setCasteSuggestions(casteData.map(c => c.name || c));
+                }
+            } catch (err) {
+                console.error('Failed to fetch caste list:', err);
+            }
+
+            try {
+                // Languages list
+                const langRes = await getLanguagesList();
+                const langData = langRes?.data?.data?.languages;
+                if (Array.isArray(langData)) {
+                    setLanguageSuggestions(langData.map(l => l.name || l));
+                }
+            } catch (err) {
+                console.error('Failed to fetch languages:', err);
+            }
+
+            try {
+                // Category / Specialization list
+                const catRes = await getCategory();
+                const catData = catRes?.data?.data?.event_categories;
+                if (Array.isArray(catData)) {
+                    setCategorySuggestions(catData.map(c => c.name || c));
+                }
+            } catch (err) {
+                console.error('Failed to fetch categories:', err);
+            }
+        };
+
+        fetchAll();
+    }, []);
 
     return (
         <div>
@@ -176,7 +239,7 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
                         : <>
                             <LuCamera size={22} color="#bbb" />
                             <span style={{ fontSize: '10px', color: '#bbb', fontWeight: 600 }}>Add Photo</span>
-                          </>
+                        </>
                     }
                 </div>
                 <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handlePhoto} />
@@ -189,7 +252,7 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
                 {/* First Name */}
                 <div className="su-field">
                     <label>First Name</label>
-                    <input type="text" value={form.firstName} onChange={set('firstName')} placeholder="John" />
+                    <input type="text" value={form.firstName} onChange={set('firstName')} />
                     <p className="su-field-hint">Must match identification documents.</p>
                 </div>
 
@@ -245,7 +308,7 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
                         tags={cantShootCasts}
                         setTags={setCantShootCasts}
                         placeholder="e.g. Patel, Aditi..."
-                        suggestions={['Patel', 'Aditi', 'Shah', 'Mehta', 'Joshi', 'Rao', 'Sharma']}
+                        suggestions={casteSuggestions}
                     />
                 </div>
 
@@ -256,8 +319,7 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
                         tags={specializations}
                         setTags={setSpecializations}
                         placeholder="e.g. Wedding, Portrait…"
-                        suggestions={['Photography', 'Wedding', 'Portrait', 'Fashion', 'Wildlife', 'Sports', 'Travel', 'Product']}
-                    />
+                        suggestions={categorySuggestions} />
                 </div>
 
                 {/* Languages — full width */}
@@ -267,7 +329,7 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
                         tags={languages}
                         setTags={setLanguages}
                         placeholder="e.g. English, Hindi…"
-                        suggestions={['English', 'Hindi', 'Gujarati', 'Marathi', 'Tamil', 'Telugu', 'Bengali', 'Punjabi']}
+                        suggestions={languageSuggestions}
                     />
                 </div>
 
@@ -380,7 +442,7 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
 
             {/* Action buttons — match SignUp's su-btn-primary */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '32px' }}>
-             <button onClick={onCancel} className="su-btn-primary-outline">Cancel</button>
+                <button onClick={onCancel} className="su-btn-primary-outline">Cancel</button>
                 <button
                     type="button"
                     onClick={onSave}

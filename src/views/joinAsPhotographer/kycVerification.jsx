@@ -1,14 +1,15 @@
 import React, { useState, useRef } from 'react';
 import '../index.css';
-import ViewsLayout from '../Layout';
 import { useNavigate } from 'react-router-dom';
-import { FiUploadCloud, FiX, FiFile } from 'react-icons/fi';
+import { FiUploadCloud, FiX, FiFile, FiLoader } from 'react-icons/fi';
 import PhotographerLayout from './PhotographerLayout';
 import { submitKyc } from '../../services/kyc';
+import { getUploadLink, uploadtoAWS } from '../../services/common'; // adjust import path as needed
 
 const KYCVerification = () => {
   const [docType, setDocType] = useState('Aadhaar Card');
   const [documentNo, setDocumentNo] = useState('');
+  // Each file entry: { name, url, type, rawFile, key, uploading, uploadError }
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -16,30 +17,6 @@ const KYCVerification = () => {
   const fileRef = useRef();
   const navigate = useNavigate();
 
-  const handleFiles = (e) => {
-    const newFiles = Array.from(e.target.files).map(f => ({
-      name: f.name,
-      url: f.type.startsWith('image/') ? URL.createObjectURL(f) : null,
-      type: f.type,
-      rawFile: f, // Keeping the raw file for future actual upload
-    }));
-    setFiles(prev => [...prev, ...newFiles]);
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    const newFiles = Array.from(e.dataTransfer.files).map(f => ({
-      name: f.name,
-      url: f.type.startsWith('image/') ? URL.createObjectURL(f) : null,
-      type: f.type,
-      rawFile: f,
-    }));
-    setFiles(prev => [...prev, ...newFiles]);
-  };
-
-  const removeFile = (i) => setFiles(prev => prev.filter((_, idx) => idx !== i));
-
-  // Map the dropdown value to the API enum format
   const getDocTypeEnum = (type) => {
     switch (type) {
       case 'Aadhaar Card': return 'aadhar';
@@ -50,6 +27,86 @@ const KYCVerification = () => {
       default: return 'aadhar';
     }
   };
+
+  /**
+   * For each new file:
+   * 1. Add it to state immediately with uploading: true
+   * 2. Call getUploadLink to get { url, key } (adjust request body per your API contract)
+   * 3. PUT the raw file binary to the AWS pre-signed URL
+   * 4. Store the key on the file entry; set uploading: false
+   */
+  const processAndUploadFile = async (f, index) => {
+    const tempId = `${Date.now()}-${index}`;
+
+    // Add placeholder entry immediately so user sees progress
+    const entry = {
+      id: tempId,
+      name: f.name,
+      url: f.type.startsWith('image/') ? URL.createObjectURL(f) : null,
+      type: f.type,
+      rawFile: f,
+      key: null,
+      uploading: true,
+      uploadError: null,
+    };
+
+    setFiles(prev => [...prev, entry]);
+
+    try {
+      // Step 1: Get pre-signed upload link from your backend
+      const linkRes = await getUploadLink({
+        document_for: 'kyc_document',
+        document_type: f.type === 'application/pdf' ? 'pdf' : 'image',
+        mimetype: f.type,         // e.g. "image/jpeg", "application/pdf"
+        side: index === 0 ? 'front' : 'back',
+      });
+
+      const { presignedUrl: awsUploadUrl, key } = linkRes.data.data;
+
+      // Step 2: Upload binary to AWS S3 pre-signed URL
+      await fetch(awsUploadUrl, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': f.type,
+          'x-amz-checksum-algorithm': 'CRC32',
+        },
+        body: f,
+      });
+
+      // Step 3: Mark upload done, store key
+      setFiles(prev =>
+        prev.map(item =>
+          item.id === tempId
+            ? { ...item, key, uploading: false }
+            : item
+        )
+      );
+    } catch (err) {
+      console.error('Upload failed for', f.name, err);
+      setFiles(prev =>
+        prev.map(item =>
+          item.id === tempId
+            ? { ...item, uploading: false, uploadError: 'Upload failed' }
+            : item
+        )
+      );
+    }
+  };
+
+  const handleFiles = (e) => {
+    const newFiles = Array.from(e.target.files);
+    newFiles.forEach((f, i) => processAndUploadFile(f, i));
+    // Reset input so same file can be re-selected if needed
+    e.target.value = '';
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const newFiles = Array.from(e.dataTransfer.files);
+    newFiles.forEach((f, i) => processAndUploadFile(f, i));
+  };
+
+  const removeFile = (id) => setFiles(prev => prev.filter(f => f.id !== id));
 
   const handleSubmit = async () => {
     setError('');
@@ -65,17 +122,31 @@ const KYCVerification = () => {
       return;
     }
 
-    // Prepare the payload
+    const stillUploading = files.some(f => f.uploading);
+    if (stillUploading) {
+      setError('Please wait for all files to finish uploading.');
+      return;
+    }
+
+    const hasErrors = files.some(f => f.uploadError);
+    if (hasErrors) {
+      setError('One or more files failed to upload. Please remove them and try again.');
+      return;
+    }
+
+    const missingKeys = files.some(f => !f.key);
+    if (missingKeys) {
+      setError('Some files are missing upload keys. Please re-upload them.');
+      return;
+    }
+
     const payload = {
       kyc_doc_type: getDocTypeEnum(docType),
       document_no: documentNo,
-      // Note: Since we don't have an endpoint for uploading files directly to S3/backend yet,
-      // we are mocking the document keys. In a real scenario, you'd upload the `files[i].rawFile` 
-      // first, get the 'key' back from your server, and then pass it here.
       document_keys: files.map((f, i) => ({
-        key: `private/kyc_document/1/placeholder-${i}-${f.name}`,
-        side: i === 0 ? "front" : "back"
-      }))
+        key: f.key,
+        side: i === 0 ? 'front' : 'back',
+      })),
     };
 
     try {
@@ -84,7 +155,10 @@ const KYCVerification = () => {
       setSuccess('KYC details submitted successfully!');
       setTimeout(() => navigate('/join-as-photographer/verification-ip'), 1500);
     } catch (err) {
-      const msg = err?.response?.data?.error?.message || err?.response?.data?.message || 'Failed to submit KYC. Please try again.';
+      const msg =
+        err?.response?.data?.error?.message ||
+        err?.response?.data?.message ||
+        'Failed to submit KYC. Please try again.';
       setError(msg);
     } finally {
       setLoading(false);
@@ -106,7 +180,6 @@ const KYCVerification = () => {
             Complete Your KYC
           </h1>
 
-          {/* Error / Success banners */}
           {error && (
             <div style={{
               marginBottom: '16px', padding: '10px 14px', borderRadius: '8px',
@@ -126,10 +199,16 @@ const KYCVerification = () => {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-            {/* Document type select */}
+            {/* Document type */}
             <div className="su-field">
               <label>Please Complete Your KYC</label>
-              <select value={docType} onChange={e => { setDocType(e.target.value); setFiles([]); }}>
+              <select
+                value={docType}
+                onChange={e => {
+                  setDocType(e.target.value);
+                  setFiles([]); // clear files when doc type changes
+                }}
+              >
                 <option>Aadhaar Card</option>
                 <option>PAN Card</option>
                 <option>Passport</option>
@@ -141,7 +220,7 @@ const KYCVerification = () => {
             {/* Document Number */}
             <div className="su-field">
               <label>Document Number</label>
-              <div style={{ display: 'flex', alignItems: 'center', gap:"5px" }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                 <input
                   type="text"
                   value={documentNo}
@@ -169,8 +248,14 @@ const KYCVerification = () => {
                   transition: 'border-color 0.2s, background 0.2s',
                   boxSizing: 'border-box',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = '#f5a623'; e.currentTarget.style.background = '#FFF9EE'; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = '#d1d5db'; e.currentTarget.style.background = '#fafafa'; }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.borderColor = '#f5a623';
+                  e.currentTarget.style.background = '#FFF9EE';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.borderColor = '#d1d5db';
+                  e.currentTarget.style.background = '#fafafa';
+                }}
               >
                 {files.length === 0 ? (
                   <>
@@ -184,20 +269,29 @@ const KYCVerification = () => {
                   </>
                 ) : (
                   <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
-                    {files.map((f, i) => (
-                      <div key={i} style={{ position: 'relative', flexShrink: 0 }}>
+                    {files.map((f) => (
+                      <div key={f.id} style={{ position: 'relative', flexShrink: 0 }}>
+                        {/* Thumbnail */}
                         {f.url ? (
                           <img
                             src={f.url}
                             alt={f.name}
-                            style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: '2px solid #f5a623', display: 'block' }}
+                            style={{
+                              width: '80px', height: '80px', objectFit: 'cover',
+                              borderRadius: '8px',
+                              border: f.uploadError ? '2px solid #ef4444' : '2px solid #f5a623',
+                              display: 'block',
+                              opacity: f.uploading ? 0.5 : 1,
+                            }}
                           />
                         ) : (
                           <div style={{
                             width: '80px', height: '80px', borderRadius: '8px',
-                            border: '2px solid #f5a623', background: '#FFF3D6',
+                            border: f.uploadError ? '2px solid #ef4444' : '2px solid #f5a623',
+                            background: '#FFF3D6',
                             display: 'flex', flexDirection: 'column',
                             alignItems: 'center', justifyContent: 'center', gap: '4px',
+                            opacity: f.uploading ? 0.5 : 1,
                           }}>
                             <FiFile size={24} color="#f5a623" />
                             <span style={{ fontSize: '9px', color: '#888', textAlign: 'center', padding: '0 4px', wordBreak: 'break-all', lineHeight: 1.3 }}>
@@ -205,9 +299,36 @@ const KYCVerification = () => {
                             </span>
                           </div>
                         )}
+
+                        {/* Uploading spinner overlay */}
+                        {f.uploading && (
+                          <div style={{
+                            position: 'absolute', inset: 0,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            borderRadius: '8px', background: 'rgba(255,255,255,0.6)',
+                          }}>
+                            <div style={{
+                              width: '20px', height: '20px', border: '2px solid #f5a623',
+                              borderTopColor: 'transparent', borderRadius: '50%',
+                              animation: 'spin 0.7s linear infinite',
+                            }} />
+                          </div>
+                        )}
+
+                        {/* Error indicator */}
+                        {f.uploadError && !f.uploading && (
+                          <div style={{
+                            position: 'absolute', bottom: '-18px', left: 0, right: 0,
+                            fontSize: '9px', color: '#ef4444', textAlign: 'center',
+                          }}>
+                            Failed
+                          </div>
+                        )}
+
+                        {/* Remove button */}
                         <button
                           type="button"
-                          onClick={ev => { ev.stopPropagation(); removeFile(i); }}
+                          onClick={ev => { ev.stopPropagation(); removeFile(f.id); }}
                           style={{
                             position: 'absolute', top: '-7px', right: '-7px',
                             width: '20px', height: '20px', borderRadius: '50%',
@@ -220,6 +341,8 @@ const KYCVerification = () => {
                         </button>
                       </div>
                     ))}
+
+                    {/* Add more button */}
                     <div style={{
                       width: '80px', height: '80px', border: '2px dashed #f5a623',
                       borderRadius: '8px', display: 'flex', alignItems: 'center',
@@ -242,11 +365,18 @@ const KYCVerification = () => {
               <p className="su-field-hint">Upload front &amp; back of your {docType} if applicable.</p>
             </div>
 
+            {/* Spinner keyframe (inline style tag via a style element rendered once) */}
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+
             {/* Action buttons */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '4px' }}>
               <button onClick={() => navigate(-1)} className="su-btn-primary-outline" disabled={loading}>Cancel</button>
-              <button onClick={handleSubmit} className="su-btn-primary" disabled={loading}>
-                {loading ? 'Saving...' : 'Save'}
+              <button
+                onClick={handleSubmit}
+                className="su-btn-primary"
+                disabled={loading || files.some(f => f.uploading)}
+              >
+                {loading ? 'Saving...' : files.some(f => f.uploading) ? 'Uploading...' : 'Save'}
               </button>
             </div>
 
