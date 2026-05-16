@@ -29,3 +29,11 @@ export const commonEndpoint = {
   uploadtoAWS: `${baseUrl}/document/upload`,
   
 }
+
+export const packagesEndpoint = {
+   createPackage: `${baseUrl}/user/packages`,
+   updatePackage: (id) => `${baseUrl}/user/packages/${id}`,
+   deletePackage: (id) => `${baseUrl}/user/packages/${id}`,
+   getAllPackages: `${baseUrl}/user/packages`,
+   
+}
