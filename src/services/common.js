@@ -24,4 +24,6 @@ export const uploadtoAWS = async (uploadUrl) => {
   return await httpServices.put(uploadUrl);
 }
 
-
+export const uploadAddress = async (data)=>{
+  return await httpServices.post(commonEndpoint.getAddress, data);
+} 

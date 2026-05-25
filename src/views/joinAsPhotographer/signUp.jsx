@@ -1,108 +1,164 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import '../index.css';
-import ViewsLayout from '../Layout';
 import { useNavigate } from 'react-router-dom';
-import { FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiEye, FiEyeOff, FiChevronDown, FiX, FiCheck } from 'react-icons/fi';
 import PhotographerLayout from './PhotographerLayout';
 import { signUpAsPhotographer } from '../../services/auth';
 
-/* ── Tag Input ── */
-const TagInput = ({ label, tags, setTags, placeholder }) => {
-  const [input, setInput] = useState('');
+/* ─────────────────────────────────────────────────────────────
+   Multi-Select Skills Dropdown
+───────────────────────────────────────────────────────────── */
+const SKILL_OPTIONS = [
+  { value: 'photographer',       label: 'Photographer' },
+  { value: 'videographer',       label: 'Videographer' },
+  { value: 'drone_photographer', label: 'Drone Photographer' },
+  { value: 'drone_videographer', label: 'Drone Videographer' },
+];
 
-  const handleKeyDown = (e) => {
-    if ((e.key === 'Enter' || e.key === ',') && input.trim()) {
-      e.preventDefault();
-      const val = input.trim().replace(/,$/, '');
-      if (val && !tags.includes(val)) setTags([...tags, val]);
-      setInput('');
-    }
-    if (e.key === 'Backspace' && !input && tags.length) {
-      setTags(tags.slice(0, -1));
-    }
+const MultiSkillSelect = ({ selected, onChange }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const toggle = (value) => {
+    onChange(
+      selected.includes(value)
+        ? selected.filter(v => v !== value)
+        : [...selected, value]
+    );
   };
 
-  const removeTag = (i) => setTags(tags.filter((_, idx) => idx !== i));
+  const removeTag = (e, value) => {
+    e.stopPropagation();
+    onChange(selected.filter(v => v !== value));
+  };
 
   return (
-    <div className="su-field">
-      <label>{label}</label>
-      <div style={{
-        display: 'flex', flexWrap: 'wrap', alignItems: 'center',
-        gap: '6px', padding: '8px 13px', minHeight: '46px',
-        border: '1.5px solid #d1d5db', borderRadius: '8px',
-        background: '#fff', cursor: 'text', boxSizing: 'border-box',
-        transition: 'border-color 0.2s, box-shadow 0.2s',
-      }}
-        onClick={e => e.currentTarget.querySelector('input').focus()}
-        onFocusCapture={e => {
-          e.currentTarget.style.borderColor = '#f5a623';
-          e.currentTarget.style.boxShadow = '0 0 0 3px rgba(245,166,35,0.15)';
-        }}
-        onBlurCapture={e => {
-          e.currentTarget.style.borderColor = '#d1d5db';
-          e.currentTarget.style.boxShadow = 'none';
+    <div ref={ref} style={{ position: 'relative' }}>
+      {/* Trigger box */}
+      <div
+        onClick={() => setOpen(o => !o)}
+        style={{
+          display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px',
+          padding: '8px 13px', minHeight: '46px',
+          border: `1.5px solid ${open ? '#f5a623' : '#d1d5db'}`,
+          borderRadius: '8px', background: '#fff', cursor: 'pointer',
+          boxShadow: open ? '0 0 0 3px rgba(245,166,35,0.15)' : 'none',
+          transition: 'border-color 0.2s, box-shadow 0.2s',
+          boxSizing: 'border-box',
         }}
       >
-        {tags.map((tag, i) => (
-          <span key={i} style={{
-            display: 'inline-flex', alignItems: 'center', gap: '4px',
-            background: '#FFF3D6', color: '#1a1a1a',
-            borderRadius: '6px', padding: '2px 8px', fontSize: '13px', fontWeight: 600,
-          }}>
-            {tag}
-            <button type="button" onClick={() => removeTag(i)} style={{
-              background: 'none', border: 'none', cursor: 'pointer',
-              color: '#888', padding: 0, lineHeight: 1, fontSize: '14px',
-              display: 'flex', alignItems: 'center',
-            }}>×</button>
-          </span>
-        ))}
-        <input
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={tags.length === 0 ? placeholder : ''}
+        {selected.length === 0 && (
+          <span style={{ color: '#9ca3af', fontSize: '14px', flex: 1 }}>Select skills…</span>
+        )}
+        {selected.map(val => {
+          const opt = SKILL_OPTIONS.find(o => o.value === val);
+          return (
+            <span key={val} style={{
+              display: 'inline-flex', alignItems: 'center', gap: '4px',
+              background: '#FFF3D6', color: '#1a1a1a',
+              borderRadius: '6px', padding: '2px 8px', fontSize: '13px', fontWeight: 600,
+            }}>
+              {opt?.label}
+              <button type="button" onClick={(e) => removeTag(e, val)} style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                color: '#888', padding: 0, lineHeight: 1, fontSize: '14px',
+                display: 'flex', alignItems: 'center',
+              }}><FiX size={12} /></button>
+            </span>
+          );
+        })}
+        <FiChevronDown
+          size={16}
           style={{
-            border: 'none', outline: 'none', background: 'transparent',
-            fontSize: '14px', color: '#111', minWidth: '80px', flex: 1,
-            padding: '2px 0', fontFamily: 'inherit',
+            marginLeft: 'auto', color: '#9ca3af', flexShrink: 0,
+            transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'transform 0.2s',
           }}
         />
       </div>
-      <p className="su-field-hint">Type and press Enter to add</p>
+
+      {/* Dropdown */}
+      {open && (
+        <div style={{
+          position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0,
+          background: '#fff', border: '1.5px solid #e5e7eb',
+          borderRadius: '8px', boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+          zIndex: 50, overflow: 'hidden',
+        }}>
+          {SKILL_OPTIONS.map(opt => {
+            const isSelected = selected.includes(opt.value);
+            return (
+              <div
+                key={opt.value}
+                onClick={() => toggle(opt.value)}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '10px 14px', cursor: 'pointer', fontSize: '14px',
+                  background: isSelected ? '#FFFBF0' : 'transparent',
+                  color: isSelected ? '#1a1a1a' : '#374151',
+                  fontWeight: isSelected ? 600 : 400,
+                  transition: 'background 0.15s',
+                }}
+                onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = '#f9fafb'; }}
+                onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = 'transparent'; }}
+              >
+                <span>{opt.label}</span>
+                {isSelected && <FiCheck size={15} style={{ color: '#f5a623' }} />}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
 
+/* ─────────────────────────────────────────────────────────────
+   Main Component
+───────────────────────────────────────────────────────────── */
 const SignUpPhotographer = () => {
   const navigate = useNavigate();
 
-  // ── Form state ──────────────────────────────────────────────────────────────
-  const [firstName, setFirstName]     = useState('');
-  const [lastName, setLastName]       = useState('');
-  const [email, setEmail]             = useState('');
-  const [password, setPassword]       = useState('');
-  const [phoneCode, setPhoneCode]     = useState('+91');
-  const [phoneNo, setPhoneNo]         = useState('');
-  const [skill, setSkill]             = useState('photographer');
+  // ── Form state ──────────────────────────────────────────────
+  const [firstName, setFirstName]       = useState('');
+  const [lastName, setLastName]         = useState('');
+  const [email, setEmail]               = useState('');
+  const [password, setPassword]         = useState('');
+  const [phoneCode, setPhoneCode]       = useState('+91');
+  const [phoneNo, setPhoneNo]           = useState('');
+  const [skills, setSkills]             = useState([]);
   const [showPassword, setShowPassword] = useState(false);
 
-  // ── UI state ────────────────────────────────────────────────────────────────
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState('');
-  const [success, setSuccess]   = useState('');
+  // ── UI state ────────────────────────────────────────────────
+  const [loading, setLoading]     = useState(false);
+  const [error, setError]         = useState('');
+  const [errorType, setErrorType] = useState(''); // 'conflict' | 'general'
+  const [success, setSuccess]     = useState('');
 
-  // ── Submit ──────────────────────────────────────────────────────────────────
+  // ── Submit ──────────────────────────────────────────────────
   const handleSignup = async (e) => {
     e?.preventDefault();
     setError('');
+    setErrorType('');
     setSuccess('');
 
-    // Basic client-side validation
     if (!firstName.trim() || !lastName.trim() || !email.trim() ||
         !password.trim() || !phoneNo.trim()) {
       setError('Please fill in all required fields.');
+      setErrorType('general');
+      return;
+    }
+
+    if (skills.length === 0) {
+      setError('Please select at least one skill.');
+      setErrorType('general');
       return;
     }
 
@@ -114,26 +170,31 @@ const SignUpPhotographer = () => {
       phone_code: phoneCode,
       phone_no:   phoneNo.trim(),
       user_type:  'service_provider',
-      skills:     [skill],
+      skills,
     };
 
     try {
       setLoading(true);
       const res = await signUpAsPhotographer(payload);
 
-      // Save tokens so all subsequent API calls are authenticated
       const { access_token, refresh_token } = res?.data?.data || {};
-      if (access_token)  localStorage.setItem('authToken',     access_token);
-      if (refresh_token) localStorage.setItem('refreshToken',  refresh_token);
+      if (access_token)  localStorage.setItem('authToken',    access_token);
+      if (refresh_token) localStorage.setItem('refreshToken', refresh_token);
 
       setSuccess('Account created! Redirecting…');
       setTimeout(() => navigate('/join-as-photographer/login'), 1500);
     } catch (err) {
-      const msg =
-        err?.response?.data?.message ||
-        err?.response?.data?.error   ||
-        'Signup failed. Please try again.';
-      setError(msg);
+      const status = err?.response?.status;
+      const code   = err?.response?.data?.error?.code;
+      const msg    = err?.response?.data?.error?.message || err?.response?.data?.message;
+
+      if (status === 409 || code === 'CONFLICT') {
+        setErrorType('conflict');
+        setError(msg || 'An account with this email or phone number already exists.');
+      } else {
+        setErrorType('general');
+        setError(msg || 'Signup failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -150,15 +211,32 @@ const SignUpPhotographer = () => {
             Sign Up
           </h1>
 
-          {/* Error / Success banners */}
+          {/* ── Error Banner ── */}
           {error && (
             <div style={{
-              marginBottom: '16px', padding: '10px 14px', borderRadius: '8px',
-              background: '#fee2e2', color: '#b91c1c', fontSize: '13px',
+              marginBottom: '16px', padding: '12px 14px', borderRadius: '8px',
+              background: errorType === 'conflict' ? '#FFF7ED' : '#fee2e2',
+              border: `1px solid ${errorType === 'conflict' ? '#FDBA74' : '#fca5a5'}`,
+              color: errorType === 'conflict' ? '#9a3412' : '#b91c1c',
+              fontSize: '13px', lineHeight: '1.6',
             }}>
               {error}
+              {errorType === 'conflict' && (
+                <span>
+                  {' '}Please{' '}
+                  <a
+                    href="/join-as-photographer/login"
+                    style={{ color: '#c2410c', fontWeight: 700, textDecoration: 'underline' }}
+                  >
+                    log in
+                  </a>
+                  {' '}instead, or use a different email and phone number.
+                </span>
+              )}
             </div>
           )}
+
+          {/* ── Success Banner ── */}
           {success && (
             <div style={{
               marginBottom: '16px', padding: '10px 14px', borderRadius: '8px',
@@ -252,19 +330,11 @@ const SignUpPhotographer = () => {
                 <p className="su-field-hint">Enter valid number for OTP verification</p>
               </div>
 
-              {/* Skills */}
-              <div className="su-field">
+              {/* Skills — multi-select, full width */}
+              <div className="su-field" style={{ gridColumn: 'span 2' }}>
                 <label>Skills<sup style={{ color: '#ef4444' }}>*</sup></label>
-                <select
-                  className="su-country"
-                  value={skill}
-                  onChange={e => setSkill(e.target.value)}
-                >
-                  <option value="photographer">Photographer</option>
-                  <option value="videographer">Videographer</option>
-                  <option value="drone_photographer">Drone Photographer</option>
-                  <option value="drone_videographer">Drone Videographer</option>
-                </select>
+                <MultiSkillSelect selected={skills} onChange={setSkills} />
+                <p className="su-field-hint">Select one or more skills that apply to you.</p>
               </div>
 
               {/* Submit */}

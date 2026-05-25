@@ -27,6 +27,7 @@ export const commonEndpoint = {
   getCategory: `${baseUrl}/common/event-categories`,
   getUploadLink: `${baseUrl}/document/upload_url`,
   uploadtoAWS: `${baseUrl}/document/upload`,
+  getAddress : `${baseUrl}/address`
   
 }
 

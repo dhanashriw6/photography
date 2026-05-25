@@ -44,30 +44,30 @@ const CustomCursor = () => {
   }, []);
 
   const variants = {
-    // default: {
-    //   x: mousePosition.x - 16,
-    //   y: mousePosition.y - 16,
-    //   width: '32px',
-    //   height: '32px',
-    //   backgroundColor: 'var(--color-khaki)',
-    //   mixBlendMode: 'difference',
-    // },
-    // camera: {
-    //   x: mousePosition.x - 40,
-    //   y: mousePosition.y - 40,
-    //   width: '80px',
-    //   height: '80px',
-    //   backgroundColor: '#FFAE00', // Solid background for camera icon visibility
-    //   mixBlendMode: 'normal',
-    // },
-    // pointer: {
-    //   x: mousePosition.x - 24,
-    //   y: mousePosition.y - 24,
-    //   width: '48px',
-    //   height: '48px',
-    //   backgroundColor: 'var(--color-khaki)',
-    //   mixBlendMode: 'difference',
-    // }
+    default: {
+      x: mousePosition.x - 16,
+      y: mousePosition.y - 16,
+      width: '32px',
+      height: '32px',
+      backgroundColor: 'var(--color-khaki)',
+      mixBlendMode: 'difference',
+    },
+    camera: {
+      x: mousePosition.x - 40,
+      y: mousePosition.y - 40,
+      width: '80px',
+      height: '80px',
+      backgroundColor: '#FFAE00', // Solid background for camera icon visibility
+      mixBlendMode: 'normal',
+    },
+    pointer: {
+      x: mousePosition.x - 24,
+      y: mousePosition.y - 24,
+      width: '48px',
+      height: '48px',
+      backgroundColor: 'var(--color-khaki)',
+      mixBlendMode: 'difference',
+    }
   };
 
   const currentVariant = cursorVariant === 'camera' ? 'camera' : (isPointer ? 'pointer' : 'default');
