@@ -20,19 +20,19 @@ const PackageModal = ({ open, onClose, onSaved, editData, categories }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    useEffect(() => {
-        if (editData) {
-            setForm({
-                category_id: editData.category_id ?? '',
-                price_per_hour: editData.price_per_hour ?? '',
-                price_per_half_day: editData.price_per_half_day ?? '',
-                price_per_day: editData.price_per_day ?? '',
-            });
-        } else {
-            setForm({ category_id: '', price_per_hour: '', price_per_half_day: '', price_per_day: '' });
-        }
-        setError('');
-    }, [editData, open]);
+   useEffect(() => {
+    if (editData) {
+        setForm({
+            category_id: editData.category?.id ?? editData.category_id ?? '',
+            price_per_hour: editData.price_per_hour ?? '',
+            price_per_half_day: editData.price_per_half_day ?? '',
+            price_per_day: editData.price_per_day ?? '',
+        });
+    } else {
+        setForm({ category_id: '', price_per_hour: '', price_per_half_day: '', price_per_day: '' });
+    }
+    setError('');
+}, [editData, open]);
 
     const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
 
@@ -136,13 +136,13 @@ const PackageModal = ({ open, onClose, onSaved, editData, categories }) => {
                     <div className="su-field">
                         <label>Category</label>
                         <select value={form.category_id} onChange={set('category_id')}>
-                            <option value="">Select Category</option>
-                            {categories.map(cat => (
-                                <option key={cat.id ?? cat.name} value={cat.id ?? cat.name}>
-                                    {cat.name}
-                                </option>
-                            ))}
-                        </select>
+    <option value="">Select Category</option>
+    {categories.map(cat => (
+        <option key={cat.id ?? cat.name} value={cat.id}>
+            {cat.name}
+        </option>
+    ))}
+</select>
                     </div>
 
                     {/* Price per Hour */}
