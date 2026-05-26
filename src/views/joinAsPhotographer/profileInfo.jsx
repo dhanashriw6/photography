@@ -18,10 +18,6 @@ const uploadFileToAWS = async (file, documentFor = 'profile') => {
     const { presignedUrl, key } = linkRes.data.data;
     await fetch(presignedUrl, {
         method: 'PUT',
-        headers: {
-            'Content-Type': file.type,
-            'x-amz-checksum-algorithm': 'CRC32',
-        },
         body: file,
     });
     return key;
@@ -428,7 +424,8 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
             last_name: form.lastName.trim(),
             ...(form.experience && { years_of_exp: parseInt(form.experience, 10) || form.experience }),
             ...(form.gender && { gender: form.gender.trim() }),
-            ...(photoKey && { profile: photoKey }),
+            ...(photoKey && { profile_image: photoKey }),
+            
         };
 
         const castDiff = buildCastDiff();
@@ -468,10 +465,10 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
                         experience: user.years_of_exp ? `${user.years_of_exp}` : '',
                         country: 'India',
                     }));
-                    if (user.profile) {
-                        setPhoto(user.profile);
-                        setPhotoKey(user.profile);
-                    }
+                    if (user.profile_document?.url) {
+    setPhoto(user.profile_document.url);
+    // photoKey stays as the S3 key for uploads, don't set it from URL
+}
                     if (user.casts?.length) {
                         const mapped = user.casts.map(c => extractCast(c));
                         setCantShootCasts(mapped);

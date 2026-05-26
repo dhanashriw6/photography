@@ -15,10 +15,6 @@ const uploadFileToAWS = async (file, documentFor = 'portfolio', side = 'front') 
     const { presignedUrl, key } = linkRes.data.data;
     await fetch(presignedUrl, {
         method: 'PUT',
-        headers: {
-            'Content-Type': file.type,
-            'x-amz-checksum-algorithm': 'CRC32',
-        },
         body: file,
     });
     return key;
@@ -70,15 +66,15 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
                 if (user.bio) setBio(user.bio);
 
                 // Portfolio docs
-                if (user.portfolios?.length) {
-                    setPortfolioFiles(user.portfolios.map(d => ({
-                        id: d.id,
-                        key: d.key || d.document_key,
-                        document_type: d.document_type || 'image',
-                        previewUrl: d.url || d.key,
-                        source: 'existing',
-                    })));
-                }
+                if (user.portfolio_documents?.length) {
+    setPortfolioFiles(user.portfolio_documents.map(d => ({
+        id: d.id,
+        key: d.key || d.document_key,
+        document_type: d.document_type || 'image',
+        previewUrl: d.url || d.key,
+        source: 'existing',
+    })));
+}
 
                 // Social links — API returns array [{link_type, url}]
                 const socialsFromApi = {};
@@ -230,7 +226,7 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
 
         const payload = {
             ...(bio.trim() && { bio: bio.trim() }),
-            ...(portfolioDiff.length && { portfolios: portfolioDiff }),
+            ...(portfolioDiff.length && { portfolio_documents: portfolioDiff }),
             ...(socialsDiff.length   && { social_links: socialsDiff }),
             ...(videoDiff.length     && { video_links: videoDiff }),
             ...(awards.trim()        && { awards: awards.trim() }),

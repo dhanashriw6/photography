@@ -66,10 +66,6 @@ const KYCVerification = () => {
       // Step 2: Upload binary to AWS S3 pre-signed URL
       await fetch(awsUploadUrl, {
         method: 'PUT',
-        headers: {
-          'Content-Type': f.type,
-          'x-amz-checksum-algorithm': 'CRC32',
-        },
         body: f,
       });
 

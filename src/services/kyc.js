@@ -8,9 +8,8 @@ export const submitKyc = async (data) => {
   );
 };
 
-export const getKycStatus = async (data) => {
+export const getKycStatus = async () => {
   return await httpServices.get(
-    `${kycEndpoint.getKycStatus}`,
-    data
+    `${kycEndpoint.getKycStatus}`
   );
 };

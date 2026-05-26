@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { FiEye, FiEyeOff } from 'react-icons/fi'
 import PhotographerLayout from './PhotographerLayout';
 import { loginAsPhotographer } from '../../services/auth';
+import { getKycStatus } from '../../services/kyc'
 
 const LoginPhotographer = () => {
   const navigate = useNavigate();
@@ -42,7 +43,20 @@ const LoginPhotographer = () => {
       if (access_token)  localStorage.setItem('authToken',    access_token);
       if (refresh_token) localStorage.setItem('refreshToken', refresh_token);
 
-      navigate('/join-as-photographer/kyc-verification');
+      // Check KYC status and route accordingly
+      try {
+        const kycRes = await getKycStatus();
+        const kycStatus = kycRes?.data?.data?.status || 'pending';
+
+        if (kycStatus === 'pending') {
+          navigate('/join-as-photographer/verification-ip');   // in progress page
+        } else {
+          navigate('/join-as-photographer/kyc-verification');  // normal kyc page
+        }
+      } catch {
+        navigate('/join-as-photographer/kyc-verification');    // fallback
+      }
+
     } catch (err) {
       const msg =
         err?.response?.data?.error?.message ||
@@ -53,7 +67,6 @@ const LoginPhotographer = () => {
       setLoading(false);
     }
   };
-
   return (
     <PhotographerLayout>
       <div className="w-full" style={{ maxWidth: '640px' }}>
