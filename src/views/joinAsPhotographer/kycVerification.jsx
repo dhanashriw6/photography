@@ -260,7 +260,7 @@ const KYCVerification = () => {
                       Click to upload or drag &amp; drop
                     </p>
                     <p style={{ margin: 0, fontSize: '12px', color: '#bbb', textAlign: 'center' }}>
-                      JPG, JPEG, PNG or PDF — max 5MB
+                     Upload front &amp; back image of your {docType}
                     </p>
                   </>
                 ) : (
@@ -350,14 +350,14 @@ const KYCVerification = () => {
                   </div>
                 )}
               </div>
-              <input
-                ref={fileRef}
-                type="file"
-                accept=".jpg,.jpeg,.png,.pdf"
-                multiple
-                style={{ display: 'none' }}
-                onChange={handleFiles}
-              />
+             <input
+    ref={fileRef}
+    type="file"
+    accept=".jpg,.jpeg,.png,.pdf,.txt,.mp4,.mov,.avi,.mp3,.wav,.doc,.docx"
+    multiple
+    style={{ display: 'none' }}
+    onChange={handleFiles}
+/>
               <p className="su-field-hint">Upload front &amp; back of your {docType} if applicable.</p>
             </div>
 

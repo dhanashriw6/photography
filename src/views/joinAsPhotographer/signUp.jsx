@@ -9,10 +9,10 @@ import { signUpAsPhotographer } from '../../services/auth';
    Multi-Select Skills Dropdown
 ───────────────────────────────────────────────────────────── */
 const SKILL_OPTIONS = [
-  { value: 'photographer',       label: 'Photographer' },
-  { value: 'videographer',       label: 'Videographer' },
-  { value: 'drone_photographer', label: 'Drone Photographer' },
-  { value: 'drone_videographer', label: 'Drone Videographer' },
+  { value: 'photographer',       label: 'photographer' },
+  { value: 'videographer',       label: 'videographer' },
+  { value: 'cinematographer', label: 'cinematographer' },
+  { value: 'drone_operator', label: 'drone_operator' },
 ];
 
 const MultiSkillSelect = ({ selected, onChange }) => {
