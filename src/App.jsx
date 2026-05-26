@@ -2,7 +2,6 @@ import React from 'react';
 import './App.css';
 import { Routes, Route } from 'react-router-dom';
 import ScrollSwirl from './Components/Carousel';
-import CustomCursor from './Components/CustomCursor';
 import Home from './views/Home';
 import SignUp from './views/findPhotographer/signUp';
 import Login from './views/findPhotographer/login';
@@ -32,9 +31,6 @@ import ResetPassword from './views/joinAsPhotographer/resetPassword';
 function App() {
   return (
     <>
-      {/* Global custom cursor for all routes */}
-      <CustomCursor />
-
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/find-photographer" element={<SignUp />} />

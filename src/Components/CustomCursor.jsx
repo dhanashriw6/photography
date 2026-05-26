@@ -27,6 +27,8 @@ const CustomCursor = () => {
   const [isPointer, setIsPointer] = useState(false);
 
   useEffect(() => {
+    document.body.classList.add('has-custom-cursor');
+
     const updateMousePosition = (e) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
 
@@ -40,7 +42,10 @@ const CustomCursor = () => {
     };
 
     window.addEventListener('mousemove', updateMousePosition);
-    return () => window.removeEventListener('mousemove', updateMousePosition);
+    return () => {
+      document.body.classList.remove('has-custom-cursor');
+      window.removeEventListener('mousemove', updateMousePosition);
+    };
   }, []);
 
   const variants = {
