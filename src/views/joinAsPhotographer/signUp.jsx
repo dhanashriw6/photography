@@ -9,10 +9,10 @@ import { signUpAsPhotographer } from '../../services/auth';
    Multi-Select Skills Dropdown
 ───────────────────────────────────────────────────────────── */
 const SKILL_OPTIONS = [
-  { value: 'photographer',       label: 'photographer' },
-  { value: 'videographer',       label: 'videographer' },
+  { value: 'photographer', label: 'photographer' },
+  { value: 'videographer', label: 'videographer' },
   { value: 'cinematographer', label: 'cinematographer' },
-  { value: 'drone_operator', label: 'drone_operator' },
+  { value: 'drone_operator', label: 'drone operator' },
 ];
 
 const MultiSkillSelect = ({ selected, onChange }) => {
@@ -127,70 +127,130 @@ const SignUpPhotographer = () => {
   const navigate = useNavigate();
 
   // ── Form state ──────────────────────────────────────────────
-  const [firstName, setFirstName]       = useState('');
-  const [lastName, setLastName]         = useState('');
-  const [email, setEmail]               = useState('');
-  const [password, setPassword]         = useState('');
-  const [phoneCode, setPhoneCode]       = useState('+91');
-  const [phoneNo, setPhoneNo]           = useState('');
-  const [skills, setSkills]             = useState([]);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [phoneCode, setPhoneCode] = useState('+91');
+  const [phoneNo, setPhoneNo] = useState('');
+  const [skills, setSkills] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   // ── UI state ────────────────────────────────────────────────
-  const [loading, setLoading]     = useState(false);
-  const [error, setError]         = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [errorType, setErrorType] = useState(''); // 'conflict' | 'general'
-  const [success, setSuccess]     = useState('');
+  const [success, setSuccess] = useState('');
 
   // ── Submit ──────────────────────────────────────────────────
   const handleSignup = async (e) => {
     e?.preventDefault();
+
     setError('');
     setErrorType('');
     setSuccess('');
+    setFieldErrors({});
 
-    if (!firstName.trim() || !lastName.trim() || !email.trim() ||
-        !password.trim() || !phoneNo.trim()) {
-      setError('Please fill in all required fields.');
-      setErrorType('general');
-      return;
+    const errors = {};
+
+    // First Name
+    if (!firstName.trim()) {
+      errors.firstName = 'First name is required';
+    } else if (!/^[A-Za-z\s]+$/.test(firstName.trim())) {
+      errors.firstName = 'Only alphabets are allowed';
     }
 
+    // Last Name
+    if (!lastName.trim()) {
+      errors.lastName = 'Last name is required';
+    } else if (!/^[A-Za-z\s]+$/.test(lastName.trim())) {
+      errors.lastName = 'Only alphabets are allowed';
+    }
+
+    // Email
+    if (!email.trim()) {
+      errors.email = 'Email is required';
+    } else if (
+      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email)
+    ) {
+      errors.email = 'Enter a valid email address';
+    }
+
+    // Password
+    if (!password.trim()) {
+      errors.password = 'Password is required';
+    } else if (password.length < 8) {
+      errors.password = 'Password must be at least 8 characters';
+    } else if (password.length > 16) {
+      errors.password = 'Password cannot exceed 16 characters';
+    }
+
+    // Phone Number
+    if (!phoneNo.trim()) {
+      errors.phoneNo = 'Phone number is required';
+    } else if (!/^\d+$/.test(phoneNo)) {
+      errors.phoneNo = 'Only numbers are allowed';
+    } else if (phoneNo.length !== 10) {
+      errors.phoneNo = 'Phone number must be exactly 10 digits';
+    }
+
+    // Skills
     if (skills.length === 0) {
-      setError('Please select at least one skill.');
-      setErrorType('general');
+      errors.skills = 'Please select at least one skill';
+    }
+
+    // Stop if errors
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
 
     const payload = {
       first_name: firstName.trim(),
-      last_name:  lastName.trim(),
-      email:      email.trim(),
+      last_name: lastName.trim(),
+      email: email.trim(),
       password,
       phone_code: phoneCode,
-      phone_no:   phoneNo.trim(),
-      user_type:  'service_provider',
+      phone_no: phoneNo.trim(),
+      user_type: 'service_provider',
       skills,
     };
 
     try {
       setLoading(true);
+
       const res = await signUpAsPhotographer(payload);
 
       const { access_token, refresh_token } = res?.data?.data || {};
-      if (access_token)  localStorage.setItem('authToken',    access_token);
-      if (refresh_token) localStorage.setItem('refreshToken', refresh_token);
+
+      if (access_token) {
+        localStorage.setItem('authToken', access_token);
+      }
+
+      if (refresh_token) {
+        localStorage.setItem('refreshToken', refresh_token);
+      }
 
       setSuccess('Account created! Redirecting…');
-      setTimeout(() => navigate('/join-as-photographer/login'), 1500);
+
+      setTimeout(() => {
+        navigate('/join-as-photographer/login');
+      }, 1500);
+
     } catch (err) {
       const status = err?.response?.status;
-      const code   = err?.response?.data?.error?.code;
-      const msg    = err?.response?.data?.error?.message || err?.response?.data?.message;
+      const code = err?.response?.data?.error?.code;
+      const msg =
+        err?.response?.data?.error?.message ||
+        err?.response?.data?.message;
 
       if (status === 409 || code === 'CONFLICT') {
         setErrorType('conflict');
-        setError(msg || 'An account with this email or phone number already exists.');
+        setError(
+          msg ||
+          'An account with this email or phone number already exists.'
+        );
       } else {
         setErrorType('general');
         setError(msg || 'Signup failed. Please try again.');
@@ -199,7 +259,6 @@ const SignUpPhotographer = () => {
       setLoading(false);
     }
   };
-
   return (
     <PhotographerLayout>
       <div className="w-full" style={{ maxWidth: '640px' }}>
@@ -259,6 +318,9 @@ const SignUpPhotographer = () => {
                   onChange={e => setFirstName(e.target.value)}
                 />
                 <p className="su-field-hint">Must match identification documents.</p>
+                {fieldErrors.firstName && (
+                  <p className="su-error">{fieldErrors.firstName}</p>
+                )}
               </div>
 
               {/* Last Name */}
@@ -271,6 +333,10 @@ const SignUpPhotographer = () => {
                   onChange={e => setLastName(e.target.value)}
                 />
                 <p className="su-field-hint">Must match identification documents.</p>
+                {fieldErrors.lastName && (
+                  <p className="su-error">{fieldErrors.lastName}</p>
+                )}
+
               </div>
 
               {/* Email */}
@@ -282,6 +348,9 @@ const SignUpPhotographer = () => {
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                 />
+                {fieldErrors.email && (
+                  <p className="su-error">{fieldErrors.email}</p>
+                )}
               </div>
 
               {/* Password */}
@@ -304,6 +373,9 @@ const SignUpPhotographer = () => {
                     {showPassword ? <FiEyeOff size={17} /> : <FiEye size={17} />}
                   </button>
                 </div>
+                {fieldErrors.password && (
+                  <p className="su-error">{fieldErrors.password}</p>
+                )}
               </div>
 
               {/* Phone — full width */}
@@ -324,10 +396,18 @@ const SignUpPhotographer = () => {
                     type="tel"
                     placeholder="12345 67890"
                     value={phoneNo}
-                    onChange={e => setPhoneNo(e.target.value)}
+                    maxLength={10}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      setPhoneNo(value);
+                    }}
                   />
                 </div>
                 <p className="su-field-hint">Enter valid number for OTP verification</p>
+                {fieldErrors.phoneNo && (
+                  <p className="su-error">{fieldErrors.phoneNo}</p>
+                )}
+
               </div>
 
               {/* Skills — multi-select, full width */}
@@ -335,6 +415,9 @@ const SignUpPhotographer = () => {
                 <label>Skills<sup style={{ color: '#ef4444' }}>*</sup></label>
                 <MultiSkillSelect selected={skills} onChange={setSkills} />
                 <p className="su-field-hint">Select one or more skills that apply to you.</p>
+                {fieldErrors.skills && (
+                  <p className="su-error">{fieldErrors.skills}</p>
+                )}
               </div>
 
               {/* Submit */}
@@ -348,6 +431,7 @@ const SignUpPhotographer = () => {
                   {loading ? 'Creating account…' : 'Sign Up'}
                 </button>
               </div>
+
             </div>
           </form>
 

@@ -589,6 +589,11 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
                 </p>
             </div>
 
+  {saveOk && (
+                <div style={{ marginBottom: '16px', padding: '10px 14px', borderRadius: '8px', background: '#dcfce7', color: '#15803d', fontSize: '13px' }}>
+                    {saveOk}
+                </div>
+            )}
             {/* ── Personal fields ── */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '24px 20px' }}>
                 <div className="su-field">
@@ -661,11 +666,7 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
                     {saveErr}
                 </div>
             )}
-            {saveOk && (
-                <div style={{ marginBottom: '16px', padding: '10px 14px', borderRadius: '8px', background: '#dcfce7', color: '#15803d', fontSize: '13px' }}>
-                    {saveOk}
-                </div>
-            )}
+          
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '24px 20px' }}>
                 <PincodeField

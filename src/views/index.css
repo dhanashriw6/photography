@@ -155,6 +155,13 @@
   width: 95px;
 }
 
+.su-error {
+  color: #dc2626;
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
 .su-phone-row .su-number {
   flex: 1;
 }

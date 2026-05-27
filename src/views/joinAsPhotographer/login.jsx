@@ -9,15 +9,15 @@ const LoginPhotographer = () => {
   const navigate = useNavigate();
 
   // ── Form state ──────────────────────────────────────────────────────────────
-  const [phoneCode,    setPhoneCode]    = useState('+91');
-  const [phoneNo,      setPhoneNo]      = useState('');
-  const [password,     setPassword]     = useState('');
+  const [phoneCode, setPhoneCode] = useState('+91');
+  const [phoneNo, setPhoneNo] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe,   setRememberMe]   = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   // ── UI state ────────────────────────────────────────────────────────────────
   const [loading, setLoading] = useState(false);
-  const [error,   setError]   = useState('');
+  const [error, setError] = useState('');
 
   // ── Submit ──────────────────────────────────────────────────────────────────
   const handleLogin = async (e) => {
@@ -28,9 +28,16 @@ const LoginPhotographer = () => {
       setError('Please enter your phone number and password.');
       return;
     }
+       if (!phoneNo.trim()) {
+      setError('Phone number is required');
+    } else if (!/^\d+$/.test(phoneNo)) {
+      setError('Only numbers are allowed');
+    } else if (phoneNo.length !== 10) {
+      setError('Phone number must be exactly 10 digits');
+    }
 
     const payload = {
-      phone_no:   phoneNo.trim(),
+      phone_no: phoneNo.trim(),
       phone_code: phoneCode,
       password,
     };
@@ -40,7 +47,7 @@ const LoginPhotographer = () => {
       const res = await loginAsPhotographer(payload);
 
       const { access_token, refresh_token } = res?.data?.data || {};
-      if (access_token)  localStorage.setItem('authToken',    access_token);
+      if (access_token) localStorage.setItem('authToken', access_token);
       if (refresh_token) localStorage.setItem('refreshToken', refresh_token);
 
       // Check KYC status and route accordingly
@@ -60,7 +67,7 @@ const LoginPhotographer = () => {
     } catch (err) {
       const msg =
         err?.response?.data?.error?.message ||
-        err?.response?.data?.message        ||
+        err?.response?.data?.message ||
         'Login failed. Please check your credentials.';
       setError(msg);
     } finally {
@@ -114,7 +121,11 @@ const LoginPhotographer = () => {
                     type="tel"
                     placeholder="12345 67890"
                     value={phoneNo}
-                    onChange={e => setPhoneNo(e.target.value)}
+                    maxLength={10}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      setPhoneNo(value);
+                    }}
                   />
                 </div>
                 <p className="su-field-hint">Enter the number used during registration</p>

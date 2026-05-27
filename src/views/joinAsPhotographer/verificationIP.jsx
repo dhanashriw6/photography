@@ -153,7 +153,7 @@ const VerificationIP = () => {
                     {/* Action Links */}
                     <div style={{ display: 'flex', justifyContent: 'center', gap: '40px' }}>
                         <a
-                            href="/join-as-photographer/dashboard"
+                            href="/join-as-photographer/home"
                             style={{
                                 fontSize: '13px',
                                 fontWeight: 600,
