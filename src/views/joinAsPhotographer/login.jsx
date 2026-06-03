@@ -184,7 +184,7 @@ const LoginPhotographer = () => {
             textAlign: 'center', fontSize: '13px', color: '#111',
             fontWeight: 700, cursor: 'pointer', marginTop: '20px',
           }}
-            onClick={() => navigate('/join-as-photographer/otp-verification')}
+            onClick={() => navigate('/otp-verification')}
           >
             Forgot Password?
           </p>

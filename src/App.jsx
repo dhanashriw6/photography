@@ -51,8 +51,8 @@ function App() {
         <Route element={<PublicRoute />}>
           <Route path="/join-as-photographer" element={<SignUpPhotographer />} />
           <Route path="/join-as-photographer/login" element={<LoginPhotographer />} />
-          <Route path="/join-as-photographer/otp-verification" element={<OTPVerification />} />
-          <Route path="/join-as-photographer/reset-password" element={<ResetPassword />} />
+          <Route path="/otp-verification" element={<OTPVerification />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
         </Route>
 
         {/* Protected pages — no token sends user back to signup */}

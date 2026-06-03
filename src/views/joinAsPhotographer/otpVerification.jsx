@@ -88,7 +88,7 @@ const OTPVerification = () => {
       const reset_token = res?.data?.data?.reset_token;
 
       // Pass it to the next screen via navigation state
-      navigate('/join-as-photographer/reset-password', {
+      navigate('/reset-password', {
         state: { reset_token },
       });
     } catch (err) {
