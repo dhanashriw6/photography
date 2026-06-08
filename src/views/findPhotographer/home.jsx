@@ -335,8 +335,8 @@ const Home = () => {
                     {/* CTA Button */}
                     <button
                         className="su-btn-primary"
-                        onClick={() => navigate('/find-best')}
-                    
+                        onClick={() => navigate('/tell-us')}
+
                     >
                         Book Now
                     </button>
@@ -407,7 +407,7 @@ const Home = () => {
             {/* ══════════════════
                 OUR TEAM SECTION
             ══════════════════ */}
-            <div style={{
+            {/* <div style={{
                 width: '100%',
                 padding: '70px 0 80px',
                 position: 'relative',
@@ -432,19 +432,16 @@ const Home = () => {
                     }
                 `}</style>
 
-                {/* Decorative star top-left */}
                 <div style={{ position: 'absolute', top: '40px', left: '48px' }}>
                     <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
                         <path d="M16 2 L17.5 14 L29 16 L17.5 18 L16 30 L14.5 18 L3 16 L14.5 14 Z" fill="#bbb" />
                     </svg>
                 </div>
 
-                {/* Decorative camera top-right */}
                 <div style={{ position: 'absolute', top: '36px', right: '52px', color: '#E8A317' }}>
                     <LuCamera size={32} />
                 </div>
 
-                {/* Title */}
                 <h2 style={{
                     textAlign: 'center',
                     fontSize: '60px',
@@ -455,7 +452,6 @@ const Home = () => {
                     fontFamily: 'inherit',
                 }}>Our Team</h2>
 
-                {/* Scrolling polaroid row */}
                 <div style={{ overflow: 'hidden', width: '100%' }}>
                     <div className="team-track">
                         {[...Array(2)].map((_, copy) => (
@@ -500,7 +496,6 @@ const Home = () => {
                                                         }}
                                                     />
                                                 </div>
-                                                {/* Name + stars on bottom tab */}
                                                 <div style={{
                                                     position: 'absolute',
                                                     bottom: '-46px',
@@ -530,7 +525,6 @@ const Home = () => {
                     </div>
                 </div>
 
-                {/* Explore button */}
                 <div style={{ textAlign: 'center', marginTop: '56px' }}>
                     <button
                         onClick={() => navigate('/find-best')}
@@ -541,8 +535,8 @@ const Home = () => {
                         Explor our Team
                     </button>
                 </div>
-            </div>
-            <ExpertiseCarousel />
+            </div> */}
+            {/* <ExpertiseCarousel /> */}
             </div>
         </ViewsLayout>
     );

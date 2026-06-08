@@ -28,7 +28,7 @@ const login = () => {
       setError('Please enter your phone number and password.');
       return;
     }
-       if (!phoneNo.trim()) {
+    if (!phoneNo.trim()) {
       setError('Phone number is required');
     } else if (!/^\d+$/.test(phoneNo)) {
       setError('Only numbers are allowed');
@@ -49,6 +49,7 @@ const login = () => {
       const { access_token, refresh_token } = res?.data?.data || {};
       if (access_token) localStorage.setItem('authToken', access_token);
       if (refresh_token) localStorage.setItem('refreshToken', refresh_token);
+      navigate('/home');
 
       // Check KYC status and route accordingly
       // try {

@@ -38,3 +38,9 @@ export const packagesEndpoint = {
    getAllPackages: `${baseUrl}/user/packages`,
    
 }
+
+export const bookingEndpoint={
+  getPackage:`${baseUrl}/booking/package_suggestions`,
+  getServiceProviders:`${baseUrl}/booking/service_providers`,
+  
+}

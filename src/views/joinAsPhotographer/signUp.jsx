@@ -166,7 +166,7 @@ const parseGeocodeResult = (result, placeId) => {
   return { address_line1, city, state, country, postal_code, lat, lng, place_id: placeId, timezone };
 };
 
-const AddressAutocomplete = ({ label, hint, value, onAddressSelect, error, isCurrentAddress }) => {
+export const AddressAutocomplete = ({ label, hint, value, onAddressSelect, error, isCurrentAddress }) => {
   const [inputValue, setInputValue] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [open, setOpen] = useState(false);

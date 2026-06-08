@@ -7,6 +7,7 @@ import SignUp from './views/findPhotographer/signUp';
 import Login from './views/findPhotographer/login';
 import StylePrefer from './views/findPhotographer/stylePrefer';
 import TellUs from './views/findPhotographer/tellUs';
+import PackageSuggestion from './views/findPhotographer/packageSuggestion';
 import FindBest from './views/findPhotographer/findBest';
 import PhotographerDetail from './views/findPhotographer/photographerDetail';
 import RequestBook from './views/findPhotographer/requestBook';
@@ -28,6 +29,7 @@ import JoinHomePage from './views/joinAsPhotographer/joinHomePage';
 import ProtectedRoute from './Components/ProtectedRoute';
 import PublicRoute from './Components/PublicRoute';
 import ResetPassword from './views/joinAsPhotographer/resetPassword';
+import SelectPackage from './views/findPhotographer/selectPackage';
 function App() {
   return (
     <>
@@ -38,7 +40,9 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/style-prefer" element={<StylePrefer />} />
         <Route path="/tell-us" element={<TellUs />} />
+        <Route path="/package-suggestion" element={<PackageSuggestion />} />
         <Route path="/find-best" element={<FindBest />} />
+        <Route path="/select-package" element={<SelectPackage />} />
         <Route path="/photographer/:id" element={<PhotographerDetail />} />
         <Route path="/requestBook" element={<RequestBook />} />
         <Route path="/thank-you" element={<ThankYou />} />

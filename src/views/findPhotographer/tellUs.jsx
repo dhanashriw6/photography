@@ -1,24 +1,80 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../index.css';
 import ViewsLayout from '../Layout';
 import { useNavigate } from 'react-router-dom';
+import { getCategory } from '../../services/common';
+import { AddressAutocomplete } from '../joinAsPhotographer/signUp';
+import { getPackage } from '../../services/booking';
 
 const TellUs = () => {
   const [agreed, setAgreed] = useState(false);
-  const [form, setForm] = useState({
-    eventType: 'wedding',
-    startDate: '14/04/2025',
-    endDate: '14/04/2025',
-    startTime: '01:20',
-    endTime: '01:20',
-    location: 'Gujrat , India',
-    pincode: '360003',
-  });
+  const [categories, setCategories] = useState([]);
+  const [address, setAddress] = useState(null);
+ const [form, setForm] = useState({
+  categoryId: "",
+  startDate: "",
+  endDate: "",
+  startTime: "",
+  endTime: "",
+  pincode: "",
+});
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const res = await getCategory();
+      setCategories(res?.data?.data?.event_categories || []);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    loadCategories();
+  }, []);
+
+  const buildDateTime = (date, time) => {
+  if (!date || !time) {
+    return null;
+  }
+
+  const dateTime = new Date(`${date}T${time}:00`);
+
+  if (isNaN(dateTime.getTime())) {
+    console.error("Invalid date/time:", date, time);
+    return null;
+  }
+
+  return dateTime.toISOString();
+};
 
   const handleChange = (field, value) => {
     setForm(prev => ({ ...prev, [field]: value }));
   };
+
+const handleBookNow = async () => {
+  try {
+    const params = {
+      category_id: form.categoryId,
+      lat: address?.lat,
+      lng: address?.lng,
+      date: form.startDate,                          // ← add this
+      start_datetime: buildDateTime(form.startDate, form.startTime),
+      end_datetime: buildDateTime(form.endDate, form.endTime),
+    };
+
+    const response = await getPackage(params);
+
+    navigate("/package-suggestion", {
+      state: {
+        packages: response?.data?.data,
+        filters: params,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   return (
     <ViewsLayout>
@@ -48,64 +104,69 @@ const TellUs = () => {
             <div className="su-field" style={{ gridColumn: 'span 2' }}>
               <label>Select Your Event</label>
               <select
-                value={form.eventType}
-                onChange={e => handleChange('eventType', e.target.value)}
+                value={form.categoryId}
+                onChange={(e) => handleChange("categoryId", e.target.value)}
               >
-                <option value="wedding">Wedding</option>
-                <option value="birthday">Birthday</option>
-                <option value="corporate">Corporate</option>
-                <option value="engagement">Engagement</option>
-                <option value="other">Other</option>
+                <option value="">Select Event</option>
+
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+
               </select>
             </div>
 
             {/* Event Start Date */}
             <div className="su-field">
               <label>Event Start Date</label>
-              <input
-                type="text"
-                value={form.startDate}
-                onChange={e => handleChange('startDate', e.target.value)}
-              />
+             <input
+  type="date"
+  value={form.startDate}
+  min={new Date().toISOString().split("T")[0]}
+  onChange={(e) => handleChange("startDate", e.target.value)}
+/>
             </div>
 
             {/* Event End Date */}
             <div className="su-field">
               <label>Event End Date</label>
-              <input
-                type="text"
-                value={form.endDate}
-                onChange={e => handleChange('endDate', e.target.value)}
-              />
+             <input
+  type="date"
+  value={form.endDate}
+  min={form.startDate || new Date().toISOString().split("T")[0]}
+  onChange={(e) => handleChange("endDate", e.target.value)}
+/>
             </div>
 
             {/* Event Start Time */}
             <div className="su-field">
               <label>Event Start Time</label>
-              <input
-                type="text"
-                value={form.startTime}
-                onChange={e => handleChange('startTime', e.target.value)}
-              />
+             <input
+  type="time"
+  value={form.startTime}
+  onChange={(e) => handleChange("startTime", e.target.value)}
+/>
             </div>
 
             {/* Event End Time */}
             <div className="su-field">
               <label>Event End Time</label>
-              <input
-                type="text"
-                value={form.endTime}
-                onChange={e => handleChange('endTime', e.target.value)}
-              />
+          <input
+  type="time"
+  value={form.endTime}
+  onChange={(e) => handleChange("endTime", e.target.value)}
+/>
             </div>
 
             {/* Event Location */}
             <div className="su-field" style={{ gridColumn: 'span 2' }}>
               <label>Event Location</label>
-              <input
-                type="text"
-                value={form.location}
-                onChange={e => handleChange('location', e.target.value)}
+              <AddressAutocomplete
+                label="Event Location"
+                value={address}
+                onAddressSelect={setAddress}
               />
             </div>
 
@@ -139,10 +200,10 @@ const TellUs = () => {
             {/* Book Now CTA */}
             <div style={{ gridColumn: 'span 2', marginTop: '4px' }}>
               <button
-                type="submit"
+                type="button"
                 className="su-btn-primary"
-                style={{ width: '100%' }}
-                onClick={() => navigate('/find-best')}
+                style={{ width: "100%" }}
+                onClick={handleBookNow}
               >
                 Book Now
               </button>

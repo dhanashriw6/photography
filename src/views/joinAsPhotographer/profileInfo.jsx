@@ -21,9 +21,9 @@ const uploadFileToAWS = async (file, documentFor = 'profile') => {
 
 /* ─── Skills Multi-Select ─────────────────────────────────────────────────── */
 const SKILL_OPTIONS = [
-    { value: 'photographer',   label: 'Photographer' },
-    { value: 'videographer',   label: 'Videographer' },
-    { value: 'cinematographer',label: 'Cinematographer' },
+    { value: 'photographer', label: 'Photographer' },
+    { value: 'videographer', label: 'Videographer' },
+    { value: 'cinematographer', label: 'Cinematographer' },
     { value: 'drone_operator', label: 'Drone Operator' },
 ];
 
@@ -214,7 +214,7 @@ const AddressAutocompleteField = ({ label, addressData, onAddressFill, onPincode
         if (addressData?.address_line1 && !inputValue) {
             setInputValue(addressData.address_line1);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [addressData?.address_line1]);
 
     // Close dropdown on outside click
@@ -266,18 +266,18 @@ const AddressAutocompleteField = ({ label, addressData, onAddressFill, onPincode
             const get = (types) => result.address_components?.find(c => types.every(t => c.types.includes(t)))?.long_name || '';
 
             const sublocality = get(['sublocality_level_1']) || get(['sublocality']) || '';
-            const premise     = get(['premise']) || '';
-            const streetNo    = get(['street_number']) || '';
-            const route       = get(['route']) || '';
+            const premise = get(['premise']) || '';
+            const streetNo = get(['street_number']) || '';
+            const route = get(['route']) || '';
             const address_line1 = [premise, streetNo, route, sublocality].filter(Boolean).join(', ') || mainText;
 
-            const city    = get(['locality', 'political']) || get(['administrative_area_level_3', 'political']) || get(['administrative_area_level_2', 'political']) || '';
-            const state   = get(['administrative_area_level_1', 'political']) || '';
+            const city = get(['locality', 'political']) || get(['administrative_area_level_3', 'political']) || get(['administrative_area_level_2', 'political']) || '';
+            const state = get(['administrative_area_level_1', 'political']) || '';
             const country = get(['country', 'political']) || '';
             const postal_code = get(['postal_code']) || '';
-            const lat     = result.geometry?.location?.lat || 0;
-            const lng     = result.geometry?.location?.lng || 0;
-            const tzMap   = { India: 'Asia/Kolkata', 'United States': 'America/New_York', 'United Kingdom': 'Europe/London' };
+            const lat = result.geometry?.location?.lat || 0;
+            const lng = result.geometry?.location?.lng || 0;
+            const tzMap = { India: 'Asia/Kolkata', 'United States': 'America/New_York', 'United Kingdom': 'Europe/London' };
             const timezone = tzMap[country] || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
 
             onAddressFill({ address_line1, city, state, country, postal_code, lat, lng, place_id: placeId, timezone });
@@ -392,14 +392,14 @@ const addressFromApi = (apiAddr) => {
     if (!apiAddr) return emptyAddress();
     return {
         address_line1: apiAddr.address_line1 || '',
-        city:          apiAddr.city          || '',
-        state:         apiAddr.state         || '',
-        country:       apiAddr.country       || 'India',
-        postal_code:   apiAddr.postal_code   || '',
-        lat:           apiAddr.lat           ?? null,
-        lng:           apiAddr.lng           ?? null,
-        place_id:      apiAddr.place_id      || '',
-        timezone:      apiAddr.timezone      || 'Asia/Kolkata',
+        city: apiAddr.city || '',
+        state: apiAddr.state || '',
+        country: apiAddr.country || 'India',
+        postal_code: apiAddr.postal_code || '',
+        lat: apiAddr.lat ?? null,
+        lng: apiAddr.lng ?? null,
+        place_id: apiAddr.place_id || '',
+        timezone: apiAddr.timezone || 'Asia/Kolkata',
     };
 };
 
@@ -408,13 +408,13 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
     const fileRef = useRef();
 
     // Profile photo
-    const [photo, setPhoto]               = useState(null);
+    const [photo, setPhoto] = useState(null);
     const [photoUploading, setPhotoUploading] = useState(false);
-    const [photoKey, setPhotoKey]         = useState('');
+    const [photoKey, setPhotoKey] = useState('');
 
-    const [saving, setSaving]     = useState(false);
-    const [saveErr, setSaveErr]   = useState('');
-    const [saveOk, setSaveOk]     = useState('');
+    const [saving, setSaving] = useState(false);
+    const [saveErr, setSaveErr] = useState('');
+    const [saveOk, setSaveOk] = useState('');
 
     const [form, setForm] = useState({
         firstName: '', lastName: '', email: '', phone: '',
@@ -422,24 +422,24 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
     });
 
     // Tag state
-    const [cantShootCasts, setCantShootCasts]   = useState([]);
-    const [originalCasts, setOriginalCasts]     = useState([]);
+    const [cantShootCasts, setCantShootCasts] = useState([]);
+    const [originalCasts, setOriginalCasts] = useState([]);
     const [specializations, setSpecializations] = useState([]);
-    const [originalSpecs, setOriginalSpecs]     = useState([]);
-    const [languages, setLanguages]             = useState([]);
-    const [originalLangs, setOriginalLangs]     = useState([]);
+    const [originalSpecs, setOriginalSpecs] = useState([]);
+    const [languages, setLanguages] = useState([]);
+    const [originalLangs, setOriginalLangs] = useState([]);
 
     // Skills — array of skill value strings e.g. ['photographer', 'videographer']
-    const [skills, setSkills]                 = useState([]);
+    const [skills, setSkills] = useState([]);
     const [originalSkills, setOriginalSkills] = useState([]);
 
     // Suggestions
-    const [casteSuggestions, setCasteSuggestions]       = useState([]);
+    const [casteSuggestions, setCasteSuggestions] = useState([]);
     const [languageSuggestions, setLanguageSuggestions] = useState([]);
     const [categorySuggestions, setCategorySuggestions] = useState([]);
 
     // Address state — full objects ready to send in payload
-    const [currentAddress, setCurrentAddress]     = useState(emptyAddress());
+    const [currentAddress, setCurrentAddress] = useState(emptyAddress());
     const [permanentAddress, setPermanentAddress] = useState(emptyAddress());
 
     const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
@@ -491,23 +491,23 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
 
         const profilePayload = {
             first_name: form.firstName.trim(),
-            last_name:  form.lastName.trim(),
+            last_name: form.lastName.trim(),
             ...(form.experience && { years_of_exp: parseInt(form.experience, 10) || form.experience }),
-            ...(form.gender     && { gender: form.gender.trim() }),
-            ...(photoKey        && { profile_image: photoKey }),
+            ...(form.gender && { gender: form.gender.trim() }),
+            ...(photoKey && { profile_image: photoKey }),
         };
 
         // Include addresses only if they have at least address_line1 + city
         if (currentAddress.address_line1 && currentAddress.city) {
             profilePayload.current_address = {
                 address_line1: currentAddress.address_line1,
-                city:          currentAddress.city,
-                state:         currentAddress.state,
-                country:       currentAddress.country,
-                postal_code:   currentAddress.postal_code,
-                lat:           currentAddress.lat,
-                lng:           currentAddress.lng,
-                timezone:      currentAddress.timezone || 'Asia/Kolkata',
+                city: currentAddress.city,
+                state: currentAddress.state,
+                country: currentAddress.country,
+                postal_code: currentAddress.postal_code,
+                lat: currentAddress.lat,
+                lng: currentAddress.lng,
+                timezone: currentAddress.timezone || 'Asia/Kolkata',
                 service_area_radius_meters: 50000,
                 ...(currentAddress.place_id && { place_id: currentAddress.place_id }),
             };
@@ -516,25 +516,25 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
         if (permanentAddress.address_line1 && permanentAddress.city) {
             profilePayload.permanent_address = {
                 address_line1: permanentAddress.address_line1,
-                city:          permanentAddress.city,
-                state:         permanentAddress.state,
-                country:       permanentAddress.country,
-                postal_code:   permanentAddress.postal_code,
-                lat:           permanentAddress.lat,
-                lng:           permanentAddress.lng,
-                timezone:      permanentAddress.timezone || 'Asia/Kolkata',
+                city: permanentAddress.city,
+                state: permanentAddress.state,
+                country: permanentAddress.country,
+                postal_code: permanentAddress.postal_code,
+                lat: permanentAddress.lat,
+                lng: permanentAddress.lng,
+                timezone: permanentAddress.timezone || 'Asia/Kolkata',
                 ...(permanentAddress.place_id && { place_id: permanentAddress.place_id }),
             };
         }
 
-        const castDiff   = buildCastDiff();
-        const catDiff    = buildCategoryDiff();
-        const langDiff   = buildLanguageDiff();
+        const castDiff = buildCastDiff();
+        const catDiff = buildCategoryDiff();
+        const langDiff = buildLanguageDiff();
         const skillsDiff = buildSkillsDiff();
-        if (castDiff.length)    profilePayload.casts            = castDiff;
-        if (catDiff.length)     profilePayload.event_categories = catDiff;
-        if (langDiff.length)    profilePayload.languages        = langDiff;
-        if (skillsDiff.length)  profilePayload.skills           = skillsDiff;
+        if (castDiff.length) profilePayload.casts = castDiff;
+        if (catDiff.length) profilePayload.event_categories = catDiff;
+        if (langDiff.length) profilePayload.languages = langDiff;
+        if (skillsDiff.length) profilePayload.skills = skillsDiff;
 
         try {
             setSaving(true);
@@ -558,17 +558,17 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
                 if (user) {
                     setForm(f => ({
                         ...f,
-                        firstName:  user.first_name  || '',
-                        lastName:   user.last_name   || '',
-                        email:      user.email       || '',
-                        phone:      user.phone_no    || '',
+                        firstName: user.first_name || '',
+                        lastName: user.last_name || '',
+                        email: user.email || '',
+                        phone: user.phone_no || '',
                         experience: user.years_of_exp ? `${user.years_of_exp}` : '',
-                        gender:     user.gender      || '',
+                        gender: user.gender || '',
                     }));
                     if (user.profile_document?.url) setPhoto(user.profile_document.url);
 
                     // Pre-fill addresses
-                    if (user.current_address)   setCurrentAddress(addressFromApi(user.current_address));
+                    if (user.current_address) setCurrentAddress(addressFromApi(user.current_address));
                     if (user.permanent_address) setPermanentAddress(addressFromApi(user.permanent_address));
 
                     if (user.casts?.length) {
@@ -614,13 +614,13 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
     }, []);
 
     // Tag name adapters
-    const castNames    = cantShootCasts.map(c => c.name);
+    const castNames = cantShootCasts.map(c => c.name);
     const setCastNames = (names) => setCantShootCasts(names.map(name => cantShootCasts.find(c => c.name === name) || casteSuggestions.find(s => s.name === name) || { id: null, name }));
 
-    const specNames    = specializations.map(c => c.name);
+    const specNames = specializations.map(c => c.name);
     const setSpecNames = (names) => setSpecializations(names.map(name => specializations.find(c => c.name === name) || categorySuggestions.find(s => s.name === name) || { id: null, name }));
 
-    const langNames    = languages.map(l => l.name);
+    const langNames = languages.map(l => l.name);
     const setLangNames = (names) => setLanguages(names.map(name => languages.find(l => l.name === name) || languageSuggestions.find(s => s.name === name) || { id: null, name, proficiency: 'fluent' }));
 
     return (
