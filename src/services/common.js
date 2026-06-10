@@ -11,6 +11,9 @@ export const getCasteList = async () => {
 export const getLanguagesList = async () => {
   return await httpServices.get(commonEndpoint.getLanguagesList);
 }
+export const getBankList = async () => {
+  return await httpServices.get(commonEndpoint.getBanksList);
+}
 export const getCategory = async () => {
   return await httpServices.get(commonEndpoint.getCategory);
 }

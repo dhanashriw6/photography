@@ -4,98 +4,107 @@ import ViewsLayout from '../Layout';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getServiceProviders } from '../../services/booking';
 
-/* ─── Mock data for preview (replace with real data from location.state) ── */
-const MOCK_PACKAGES = [
-  {
-    id: 1,
-    cover_image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80',
-    members: [
-      { id: 1, name: 'John', role: 'Photographer', avatar: 'https://i.pravatar.cc/32?img=1', price: 120 },
-      { id: 2, name: 'John', role: 'Videographer', avatar: 'https://i.pravatar.cc/32?img=2', price: 120 },
-    ],
-  },
-  {
-    id: 2,
-    cover_image: 'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=400&q=80',
-    members: [
-      { id: 1, name: 'John', role: 'Photographer', avatar: 'https://i.pravatar.cc/32?img=3', price: 120 },
-      { id: 2, name: 'John', role: 'Videographer', avatar: 'https://i.pravatar.cc/32?img=4', price: 120 },
-      { id: 3, name: 'John', role: 'Candid', avatar: 'https://i.pravatar.cc/32?img=5', price: 120 },
-      { id: 4, name: 'John', role: 'Cinematic', avatar: 'https://i.pravatar.cc/32?img=6', price: 120 },
-    ],
-  },
-  {
-    id: 3,
-    cover_image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=400&q=80',
-    members: [
-      { id: 1, name: 'John', role: 'Photographer', avatar: 'https://i.pravatar.cc/32?img=7', price: 120 },
-      { id: 2, name: 'John', role: 'Videographer', avatar: 'https://i.pravatar.cc/32?img=8', price: 120 },
-      { id: 3, name: 'John', role: 'Candid', avatar: 'https://i.pravatar.cc/32?img=9', price: 120 },
-      { id: 4, name: 'John', role: 'Cinematic', avatar: 'https://i.pravatar.cc/32?img=10', price: 120 },
-      { id: 5, name: 'John', role: 'Drone', avatar: 'https://i.pravatar.cc/32?img=11', price: 120 },
-    ],
-  },
-];
 
 /* ─── Package Card ───────────────────────────────────────────────── */
 const PackageCard = ({ pkg, index, onBookInstantly, onCustomizeTeam }) => {
-  const total = pkg.members.reduce((sum, m) => sum + (m.price || 0), 0);
+  // Flatten team → one row per provider (skip skills with no providers)
+  const total = pkg.team.reduce((sum, team) => {
+    return (
+      sum +
+      team.providers.reduce(
+        (providerSum, p) => providerSum + (p.price_with_commission || 0),
+        0
+      )
+    );
+  }, 0);
+  const coverImage =
+    pkg.images?.[0]?.url ||
+    'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80';
 
   return (
-    <div
-      className="pkg-card"
-      style={{
-        animationDelay: `${index * 0.1}s`,
-      }}
-    >
+    <div className="pkg-card" style={{ animationDelay: `${index * 0.1}s` }}>
       {/* Cover Image */}
       <div className="pkg-image-wrap">
-        <img
-          src={pkg.cover_image}
-          alt="Package cover"
-          className="pkg-image"
-        />
+        <img src={coverImage} alt="Package cover" className="pkg-image" />
         <div className="pkg-image-overlay" />
-        {/* Package number badge */}
-        <div className="pkg-badge">Package {index + 1}</div>
+        <div className="pkg-badge">{pkg.name}</div>
       </div>
 
       {/* Details */}
       <div className="pkg-details">
-        {/* Members list */}
-        <div className="pkg-members">
-          {pkg.members.map((member, i) => (
-            <div key={member.id || i} className="pkg-member-row">
-              <div className="pkg-member-left">
-                <img
-                  src={member.avatar}
-                  alt={member.name}
-                  className="pkg-avatar"
-                />
-                <div className="pkg-member-info">
-                  <span className="pkg-member-name">{member.name}</span>
-                  <span className="pkg-member-role">{member.role}</span>
+        {pkg.team.length === 0 ? (
+          <p style={{ color: '#aaa', fontSize: '13px', flex: 1 }}>
+            No providers available for this package.
+          </p>
+        ) : (
+          <div className="pkg-members">
+            {pkg.team.map((teamMember, index) => (
+              <div key={index} className="pkg-team-section">
+                <div className="pkg-team-header">
+                  <div>
+                    <strong>
+                      {teamMember.skill.charAt(0).toUpperCase() +
+                        teamMember.skill.slice(1)}
+                    </strong>
+                  </div>
+
+                  <div className="pkg-required-count">
+                    Required: {teamMember.required_count}
+                  </div>
                 </div>
+
+                {teamMember.providers.length > 0 ? (
+                  teamMember.providers.map((provider) => (
+                    <div
+                      key={provider.id}
+                      className="pkg-member-row"
+                    >
+                      <div className="pkg-member-left">
+                        <img
+                          src={
+                            provider.profile_picture ||
+                            "https://ui-avatars.com/api/?name=" +
+                            provider.first_name
+                          }
+                          alt={provider.first_name}
+                          className="pkg-avatar"
+                        />
+
+                        <div className="pkg-member-info">
+                          <span className="pkg-member-name">
+                            {provider.first_name} {provider.last_name}
+                          </span>
+
+                          <span className="pkg-member-role">
+                            {teamMember.skill}
+                          </span>
+                        </div>
+                      </div>
+
+                      <span className="pkg-member-price">
+                        ₹{provider.price_with_commission}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="pkg-empty-provider">
+                    No provider assigned
+                  </div>
+                )}
               </div>
-              <span className="pkg-member-price">
-                ${member.price?.toFixed(2)}
-              </span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* Divider + total */}
         <div className="pkg-total-row">
           <span className="pkg-total-label">Total</span>
-          <span className="pkg-total-value">${total.toFixed(2)}</span>
+          <span className="pkg-total-value">₹{total.toFixed(2)}</span>
         </div>
 
         {/* Action buttons */}
         <div className="pkg-actions">
-          <button
-            className="su-btn-primary"
-            onClick={() => onBookInstantly(pkg)}
-          >
+          <button className="su-btn-primary" onClick={() => onBookInstantly(pkg)}>
             Book Instantly
           </button>
           <button
@@ -115,21 +124,19 @@ const packageSuggestion = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Use real data from navigation state, fall back to mock
-  const packages = location.state?.packages?.length
-    ? location.state.packages
-    : MOCK_PACKAGES;
+  // Real data from navigation state (no mock fallback needed)
+  const packages = location.state?.packages || [];
 
   const handleBookInstantly = (pkg) => {
     navigate('/select-package', { state: { package: pkg } });
   };
-    const filters = location.state?.filters;
+  const filters = location.state?.filters;
 
   const handleCustomizeTeam = (pkg) => {
     navigate('/customize-team', { state: { package: pkg } });
   };
 
- const handleSkip = async () => {
+  const handleSkip = async () => {
     try {
       const response = await getServiceProviders({
         category_id: filters?.category_id,
@@ -211,6 +218,48 @@ const STYLES = `
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+  .pkg-header-info {
+  margin-bottom: 16px;
+}
+
+.pkg-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #222;
+}
+
+.pkg-meta {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: #666;
+}
+
+.pkg-team-section {
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.pkg-team-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.pkg-required-count {
+  color: #666;
+  font-size: 12px;
+}
+
+.pkg-empty-provider {
+  padding: 8px 0;
+  color: #999;
+  font-size: 13px;
+  font-style: italic;
 }
 
 /* ── Card ── */

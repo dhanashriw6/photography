@@ -1,160 +1,281 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import '../index.css';
 import ViewsLayout from '../Layout';
-import { FiSearch, FiSliders } from 'react-icons/fi';
-import { FaStar } from 'react-icons/fa';
-import { PiFilmSlate } from 'react-icons/pi';
-import { BsStarFill } from 'react-icons/bs';
-import { TbCameraPlus } from 'react-icons/tb';
-
-const photographers = [
-    { id: 1, name: 'John Smith', rating: 4, highlight: false, img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80' },
-    { id: 2, name: 'Olivia Davis', rating: 5, highlight: true, img: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&q=80' },
-    { id: 3, name: 'Emma Johnson', rating: 4, highlight: false, img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=80' },
-    { id: 4, name: 'Michael Brown', rating: 5, highlight: false, img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80' },
-    { id: 5, name: 'Daniel Wilson', rating: 4, highlight: true, img: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80' },
-    { id: 6, name: 'Sophia Taylor', rating: 4, highlight: false, img: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&q=80' },
-];
-
-/* Fixed tilt per card so it looks hand-placed */
-const TILTS = [-2.8, 1.6, -1.4, 2.4, -1.8, 1.2];
-
-const Stars = ({ count }) => (
-    <div style={{ display: 'flex', gap: '2px' }}>
-        {[1, 2, 3, 4, 5].map(i => (
-            <BsStarFill key={i} size={11} color={i <= count ? '#F5A623' : '#555'} />
-        ))}
-    </div>
-);
-
-const PolaroidCard = ({ person, index, onClick }) => {
-    const { name, rating, highlight, img } = person;
-    const tilt = TILTS[index % TILTS.length];
-    const borderColor = highlight ? 'var(--color-orange)' : '#000';
-    const shadowColor = highlight ? '#b87800' : '#000';
-
-    return (
-        <div style={{ position: 'relative', paddingTop: '36px', paddingBottom: '10px' }}>
-            <div
-                style={{
-                    position: 'relative',
-                    border: `12px solid ${borderColor}`,
-                    borderBottom: `52px solid ${borderColor}`,
-                    background: highlight ? 'var(--color-orange)' : '#000',
-                    transform: `rotate(${tilt}deg)`,
-                    transition: 'transform 0.25s ease, box-shadow 0.25s ease',
-                    cursor: 'pointer',
-                    overflow: 'visible',
-                }}
-                onClick={onClick}
-            >
-                <div
-                    style={{
-                        width: '100%',
-                        aspectRatio: '3/4',
-                        overflow: 'hidden',
-                        // background: '#2a2a2a',
-
-                    }}
-                >
-                    <img
-                        src={img}
-                        alt={name}
-                        style={{
-                            width: '100%',
-                            height: '90%',
-                            objectFit: 'cover',
-                            objectPosition: 'top center',
-
-                        }}
-                    />
-
-                    {/* Name + stars overlay */}
-                    <div style={{ position: 'absolute', bottom: '-10px', left: '10px' }}>
-                        <Stars count={rating} highlight={highlight} />
-                        <p style={{
-                            margin: '3px 0 0',
-                            color: '#fff',
-                            fontSize: '15px',
-                            fontWeight: 700,
-                            letterSpacing: '0.01em',
-                            textShadow: '0 1px 4px rgba(0,0,0,0.5)',
-                        }}>
-                            {name}
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
+import { FiSearch, FiSliders, FiMapPin, FiStar } from 'react-icons/fi';
 
 const FindBest = () => {
-    const [search, setSearch] = useState('');
-    const navigate = useNavigate();
-    const filtered = photographers.filter(p =>
-        p.name.toLowerCase().includes(search.toLowerCase())
-    );
+  const [search, setSearch] = useState('');
+  const location = useLocation();
+  const navigate = useNavigate();
 
-    return (
-        <ViewsLayout>
-            <div style={{ width: '100%', maxWidth: '100%', margin: '0 auto' }}>
+  const providers = location.state?.providers || [];
+  const filters = location.state?.filters;
 
-                {/* Hero */}
-                <div style={{ width: '100%', height: '304px', overflow: 'hidden', position: 'relative', marginBottom: '28px' }}>
-                    <img
-                        src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=80"
-                        alt="camera"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.45)' }}
-                    />
-                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <h1 style={{ color: '#fff', fontSize: '36px', fontWeight: 700, textAlign: 'center', letterSpacing: '-0.01em', margin: 0, textShadow: '0 2px 12px rgba(0,0,0,0.5)' }}>
-                            Find A Best One For You
-                        </h1>
-                    </div>
-                </div>
+  const filtered = providers.filter((p) => {
+    const fullName = `${p.first_name} ${p.last_name}`.toLowerCase();
+    return fullName.includes(search.toLowerCase());
+  });
 
-                {/* Search + Filter */}
-                <div style={{ display: 'flex',padding: '0 100px', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', gap: '12px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#fff', border: '1.5px solid #e5e7eb', borderRadius: '50px', padding: '10px 18px', flex: 1, maxWidth: '260px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-                        <input
-                            type="text"
-                            placeholder="Search"
-                            value={search}
-                            onChange={e => setSearch(e.target.value)}
-                            style={{ border: 'none', outline: 'none', fontSize: '14px', color: '#1a1a1a', background: 'transparent', flex: 1 }}
-                        />
-                        <FiSearch size={15} color="#888" />
-                    </div>
-                    <PiFilmSlate size={28} color="#F5A623" style={{ opacity: 0.8 }} />
-                    <button style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: 600, color: '#1a1a1a', padding: '8px 12px' }}>
-                        Filter <FiSliders size={16} color="#1a1a1a" />
-                    </button>
-                </div>
+  return (
+    <ViewsLayout>
+      <div style={{ width: '100%', maxWidth: '720px', margin: '0 auto', padding: '32px 20px' }}>
 
-                {/* Grid */}
-                <div style={{ position: 'relative',padding: '0 100px' }}>
-                    <FaStar size={22} color="#ccc" style={{ position: 'absolute', left: '-32px', top: '8px' }} />
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '40px 30px', padding: '0 12px' }}>
-                        {filtered.map((person, index) => (
-                            <PolaroidCard
-                                key={person.id}
-                                person={person}
-                                index={index}
-                                onClick={() => navigate(`/photographer/${person.id}`, { state: { person } })}
-                            />
-                        ))}
-                    </div>
-                    <div style={{ textAlign: 'right', marginTop: '24px' }}>
-                        <TbCameraPlus size={26} color="#F5A623" style={{ opacity: 0.7 }} />
-                    </div>
-                </div>
+        {/* Header */}
+        <h1 style={{ fontSize: '26px', fontWeight: 700, color: '#1a1a1a', marginBottom: '6px' }}>
+          Available Providers
+        </h1>
+        <p style={{ fontSize: '14px', color: '#888', marginBottom: '24px' }}>
+          {filtered.length} provider{filtered.length !== 1 ? 's' : ''} found
+        </p>
 
-            </div>
-        </ViewsLayout>
-    );
+        {/* Search + Filter */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '8px',
+            background: '#fff', border: '1.5px solid #e5e7eb',
+            borderRadius: '10px', padding: '10px 14px', flex: 1,
+            boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+          }}>
+            <FiSearch size={15} color="#aaa" />
+            <input
+              type="text"
+              placeholder="Search by name..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{ border: 'none', outline: 'none', fontSize: '14px', color: '#1a1a1a', background: 'transparent', flex: 1 }}
+            />
+          </div>
+          <button style={{
+            display: 'flex', alignItems: 'center', gap: '6px',
+            background: '#fff', border: '1.5px solid #e5e7eb',
+            borderRadius: '10px', padding: '10px 16px',
+            cursor: 'pointer', fontSize: '13px', fontWeight: 600,
+            color: '#1a1a1a', boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+          }}>
+            <FiSliders size={15} /> Filter
+          </button>
+        </div>
+
+        {/* Provider List */}
+        {filtered.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '60px 0', color: '#aaa', fontSize: '15px' }}>
+            No providers found.
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {filtered.map((p) => {
+              const name = `${p.first_name} ${p.last_name}`;
+              const avatar = p.profile_picture ;
+              const rating = p.reviews?.avg_rating;
+              const reviewCount = p.reviews?.count || 0;
+              const skills = p.skills?.map((s) => s.skill.charAt(0).toUpperCase() + s.skill.slice(1)).join(' · ') || '—';
+              const pkg = p.packages?.[0];
+              const price = pkg?.price_with_commission;
+
+              return (
+            <div
+  key={p.id}
+  onClick={() =>
+    navigate(`/photographer/${p.id}`, {
+      state: { person: p, filters },
+    })
+  }
+  style={{
+    background: "#fff",
+    borderRadius: "18px",
+    padding: "18px",
+    border: "1px solid #ececec",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+    cursor: "pointer",
+    transition: "all .25s ease",
+  }}
+>
+  {/* Top Section */}
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+      gap: "16px",
+    }}
+  >
+    <div
+      style={{
+        display: "flex",
+        gap: "14px",
+      }}
+    >
+      <img
+        src={
+          p.profile_picture ||
+          `https://ui-avatars.com/api/?name=${p.first_name}+${p.last_name}`
+        }
+        alt={name}
+        style={{
+          width: "68px",
+          height: "68px",
+          borderRadius: "50%",
+          objectFit: "cover",
+        }}
+      />
+
+      <div>
+        <h3
+          style={{
+            margin: 0,
+            fontSize: "17px",
+            fontWeight: 700,
+          }}
+        >
+          {name}
+        </h3>
+
+        <p
+          style={{
+            margin: "4px 0",
+            color: "#666",
+            fontSize: "13px",
+          }}
+        >
+          {skills}
+        </p>
+
+        <p
+          style={{
+            margin: 0,
+            color: "#888",
+            fontSize: "12px",
+          }}
+        >
+          📍 {p.city}, {p.state}
+        </p>
+      </div>
+    </div>
+
+    <div style={{ textAlign: "right" }}>
+      <div
+        style={{
+          fontSize: "24px",
+          fontWeight: 700,
+          color: "#111",
+        }}
+      >
+        ₹{price?.toLocaleString()}
+      </div>
+
+      <div
+        style={{
+          fontSize: "12px",
+          color: "#888",
+        }}
+      >
+        Final Price
+      </div>
+    </div>
+  </div>
+
+  {/* Info Chips */}
+  <div
+    style={{
+      display: "flex",
+      flexWrap: "wrap",
+      gap: "8px",
+      marginTop: "14px",
+    }}
+  >
+    <div className="provider-chip">
+      {pkg?.category?.name}
+    </div>
+
+    <div className="provider-chip">
+      {pkg?.duration_value} {pkg?.duration_type}
+    </div>
+
+    <div className="provider-chip">
+      {(p.distance_meters / 1000).toFixed(1)} km away
+    </div>
+  </div>
+
+  {/* Pricing */}
+  <div
+    style={{
+      marginTop: "14px",
+      borderTop: "1px solid #eee",
+      paddingTop: "12px",
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr 1fr",
+      gap: "12px",
+    }}
+  >
+    <div>
+      <div style={{ fontSize: "11px", color: "#999" }}>
+        Unit Price
+      </div>
+      <div style={{ fontWeight: 600 }}>
+        ₹{pkg?.unit_price}
+      </div>
+    </div>
+
+    <div>
+      <div style={{ fontSize: "11px", color: "#999" }}>
+        Total Price
+      </div>
+      <div style={{ fontWeight: 600 }}>
+        ₹{pkg?.total_price}
+      </div>
+    </div>
+
+    <div>
+      <div style={{ fontSize: "11px", color: "#999" }}>
+        Commission
+      </div>
+      <div style={{ fontWeight: 600 }}>
+        ₹{pkg?.commission_amount}
+      </div>
+    </div>
+  </div>
+
+  {/* Footer */}
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginTop: "16px",
+    }}
+  >
+    <div>
+      {reviewCount > 0 ? (
+        <>
+          ⭐ {rating} ({reviewCount} reviews)
+        </>
+      ) : (
+        <span
+          style={{
+            color: "#999",
+            fontSize: "13px",
+          }}
+        >
+          New Provider
+        </span>
+      )}
+    </div>
+
+    <button
+      className="su-btn-primary"
+    >
+      View Profile
+    </button>
+  </div>
+</div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </ViewsLayout>
+  );
 };
 
 export default FindBest;

@@ -27,7 +27,8 @@ export const commonEndpoint = {
   getCategory: `${baseUrl}/common/event-categories`,
   getUploadLink: `${baseUrl}/document/upload_url`,
   uploadtoAWS: `${baseUrl}/document/upload`,
-  getAddress : `${baseUrl}/address`
+  getAddress : `${baseUrl}/address`,
+  getBanksList : `${baseUrl}/bank-details`
   
 }
 
@@ -44,3 +45,8 @@ export const bookingEndpoint={
   getServiceProviders:`${baseUrl}/booking/service_providers`,
   
 }
+
+export const bankEndpoint = {
+  addBankDetails : `${baseUrl}/bank-details`
+}
+
