@@ -430,7 +430,12 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
     const [originalLangs, setOriginalLangs] = useState([]);
 
     // Skills — array of skill value strings e.g. ['photographer', 'videographer']
-    const [skills, setSkills] = useState([]);
+    const [skills, setSkills] = useState(() => {
+        try {
+            const stored = localStorage.getItem('photographer_skills');
+            return stored ? JSON.parse(stored) : [];
+        } catch { return []; }
+    });
     const [originalSkills, setOriginalSkills] = useState([]);
 
     // Suggestions
@@ -476,11 +481,11 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
     };
 
     // Skills diff: { type: 'insert'|'delete', skill: string }
-    const buildSkillsDiff = () => {
-        const toInsert = skills.filter(s => !originalSkills.includes(s)).map(s => ({ type: 'insert', skill: s }));
-        const toDelete = originalSkills.filter(s => !skills.includes(s)).map(s => ({ type: 'delete', skill: s }));
-        return [...toInsert, ...toDelete];
-    };
+    // const buildSkillsDiff = () => {
+    //     const toInsert = skills.filter(s => !originalSkills.includes(s)).map(s => ({ type: 'insert', skill: s }));
+    //     const toDelete = originalSkills.filter(s => !skills.includes(s)).map(s => ({ type: 'delete', skill: s }));
+    //     return [...toInsert, ...toDelete];
+    // };
 
     // ── Single Save — profile + both addresses in one call ──
     const handleSave = async () => {
@@ -530,15 +535,15 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
         const castDiff = buildCastDiff();
         const catDiff = buildCategoryDiff();
         const langDiff = buildLanguageDiff();
-        const skillsDiff = buildSkillsDiff();
+        profilePayload.skills = skills;
         if (castDiff.length) profilePayload.casts = castDiff;
         if (catDiff.length) profilePayload.event_categories = catDiff;
         if (langDiff.length) profilePayload.languages = langDiff;
-        if (skillsDiff.length) profilePayload.skills = skillsDiff;
 
         try {
             setSaving(true);
             await updateProfile(profilePayload);
+            localStorage.setItem('photographer_skills', JSON.stringify(skills));
             setSaveOk('Profile saved successfully!');
             onSave?.();
         } catch (err) {
@@ -588,6 +593,7 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
                         const mapped = user.skills.map(s => s.skill).filter(Boolean);
                         setSkills(mapped);
                         setOriginalSkills(mapped);
+                        localStorage.setItem('photographer_skills', JSON.stringify(mapped));
                     }
                 }
             } catch (err) { console.error('Profile fetch error:', err); }

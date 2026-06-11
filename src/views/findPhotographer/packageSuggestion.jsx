@@ -132,8 +132,27 @@ const packageSuggestion = () => {
   };
   const filters = location.state?.filters;
 
-  const handleCustomizeTeam = (pkg) => {
-    navigate('/customize-team', { state: { package: pkg } });
+  const handleCustomizeTeam = async (pkg) => {
+    try {
+      const response = await getServiceProviders({
+        category_id: filters?.category_id,
+        lat: filters?.lat,
+        lng: filters?.lng,
+        start_datetime: filters?.start_datetime,
+        end_datetime: filters?.end_datetime,
+      });
+
+      navigate("/find-best", {
+        state: {
+          providers: response?.data?.data,
+          filters,
+          package: pkg,
+          mode: 'customize',
+        },
+      });
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleSkip = async () => {

@@ -50,3 +50,6 @@ export const bankEndpoint = {
   addBankDetails : `${baseUrl}/bank-details`
 }
 
+export const orderEndpoint = {
+  draftOrder : `${baseUrl}/order/draft`,
+}

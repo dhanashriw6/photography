@@ -3,8 +3,7 @@ import { FiEye, FiEyeOff, FiLock } from 'react-icons/fi';
 import { changePassword } from '../../services/profile';
 
 const ChangePassword = () => {
-    const [fields, setFields] = useState({ current: '', newPwd: '', confirm: '' });
-    const [show, setShow] = useState({ current: false, newPwd: false, confirm: false });
+
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
@@ -21,8 +20,8 @@ const ChangePassword = () => {
 
     const handleSave = async () => {
 
-         setError('');       // ← clear at START (before validation), not at end
-    setSuccess(false);
+        setError('');       // ← clear at START (before validation), not at end
+        setSuccess(false);
         if (!currentPassword) return setError('Please enter your current password.');
         if (newPassword.length < 8) return setError('New password must be at least 8 characters.');
         if (newPassword !== confirmPassword) return setError('Passwords do not match.');
@@ -30,19 +29,30 @@ const ChangePassword = () => {
         const payload = {
             current_password: currentPassword,
             new_password: newPassword,
-          
+
         };
         try {
             setLoading(true);
             const res = await changePassword(payload);
+
+            // Clear fields
+            setCurrentPassword('');
+            setNewPassword('');
+            setConfirmPassword('');
+
             setSuccess(true);
         } catch (error) {
-            const msg = error?.response?.data?.error?.message || error?.response?.data?.message || error?.message || "Something went wrong";
+            const msg =
+                error?.response?.data?.error?.message ||
+                error?.response?.data?.message ||
+                error?.message ||
+                "Something went wrong";
+
             setError(msg);
         } finally {
             setLoading(false);
         }
-       
+
     };
 
 
@@ -56,14 +66,14 @@ const ChangePassword = () => {
                     ✓ Password updated successfully!
                 </div>
             )}
-             {error && (
-            <div style={{
-              marginBottom: '16px', padding: '10px 14px', borderRadius: '8px',
-              background: '#fee2e2', color: '#b91c1c', fontSize: '13px',
-            }}>
-              {error}
-            </div>
-          )}
+            {error && (
+                <div style={{
+                    marginBottom: '16px', padding: '10px 14px', borderRadius: '8px',
+                    background: '#fee2e2', color: '#b91c1c', fontSize: '13px',
+                }}>
+                    {error}
+                </div>
+            )}
 
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '480px' }}>
@@ -127,8 +137,18 @@ const ChangePassword = () => {
 
 
                 <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-                    <button onClick={() => { setFields({ current: '', newPwd: '', confirm: '' }); setError(''); setSuccess(false); }} className="su-btn-primary-outline">Cancel</button>
-                    <button onClick={handleSave} className="su-btn-primary">Update Password</button>
+                    <button
+                        onClick={() => {
+                            setCurrentPassword('');
+                            setNewPassword('');
+                            setConfirmPassword('');
+                            setError('');
+                            setSuccess(false);
+                        }}
+                        className="su-btn-primary-outline"
+                    >
+                        Cancel
+                    </button>                    <button onClick={handleSave} className="su-btn-primary">Update Password</button>
                 </div>
             </div>
         </div>

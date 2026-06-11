@@ -6,389 +6,448 @@ import { MdVerified } from 'react-icons/md';
 import { FiPhone, FiEdit2 } from 'react-icons/fi';
 import { LuCalendar, LuClock } from 'react-icons/lu';
 import { ChevronDown } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-/* ── Reusable field using shared .su-field CSS class ── */
+/* ── Helpers ── */
+const fmtDate = (iso) => {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-IN', {
+    day: '2-digit', month: 'short', year: 'numeric',
+  });
+};
+
+const fmtTime = (iso) => {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleTimeString('en-IN', {
+    hour: '2-digit', minute: '2-digit', hour12: true,
+  });
+};
+
+const fmt = (val, prefix = '') =>
+  val !== null && val !== undefined && val !== '' ? `${prefix}${val}` : '—';
+
+/* ── Reusable field ── */
 const FieldBox = ({ label, children, style = {} }) => (
-    <div className="su-field" style={style}>
-        <label>{label}</label>
-        {children}
-    </div>
+  <div className="su-field" style={style}>
+    <label>{label}</label>
+    {children}
+  </div>
 );
 
-/* ── Map placeholder ── */
-const MapPreview = () => (
-    <div style={{
-        borderRadius: '10px',
-        overflow: 'hidden',
-        height: '160px',
-        position: 'relative',
-        background: '#e8edf0',
-    }}>
-        <img
-            src="https://tile.openstreetmap.org/13/4823/3084.png"
-            alt="map"
-            style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85 }}
-            onError={e => { e.target.style.display = 'none'; }}
-        />
-        <div style={{
-            position: 'absolute', top: '50%', left: '50%',
-            width: 20, height: 20,
-            borderRadius: '50%',
-            background: '#e53935',
-            border: '3px solid #fff',
-            transform: 'translate(-50%, -50%)',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-        }} />
-    </div>
-);
-
-const RequestBook = () => {
-    const [eventName, setEventName] = useState('wedding');
-    const [startDate] = useState('29 May 2025');
-    const [endDate] = useState('29 May 2025');
-    const [startTime, setStartTime] = useState('01:00 PM');
-    const [endTime, setEndTime] = useState('07:00 PM');
-    const [pkg] = useState('Full day');
-    const [addons, setAddons] = useState('');
-    const [venue, setVenue] = useState('party plot');
-    const [address, setAddress] = useState('');
-    const navigate = useNavigate()
-
+/* ── OpenStreetMap iframe with red pin ── */
+const MapPreview = ({ lat, lng }) => {
+  if (!lat || !lng) {
     return (
-        <ViewsLayout>
-           
-
-            <div style={{
-                background: '#f7f7f5',
-                minHeight: '100vh',
-                padding: '36px 0 ',
-            }}>
-
-                {/* ── Page Title ── */}
-                <h1 style={{
-                    textAlign: 'center',
-                    fontSize: '36px',
-                    fontWeight: 700,
-                    color: '#1a1a1a',
-                    margin: '0 0 32px',
-                    letterSpacing: '-0.02em',
-                    fontFamily: 'inherit',
-                }}>Request to booking</h1>
-
-                {/* ── Two-column grid ── */}
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: '560px 560px',
-                    gap: '20px',
-                    // alignItems: 'start',
-                    // maxWidth: '1100px',
-                    margin: '0 auto',
-                    padding: '0 40px',
-                }}>
-
-                    {/* ════ LEFT COLUMN ════ */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-                        {/* ── Booking Details Card ── */}
-                        <div className="rb-card" style={{
-                            background: '#fff',
-                            borderRadius: '16px',
-                            padding: '22px 24px',
-                            boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-                        }}>
-                            <p style={{ margin: '0 0 20px', fontWeight: 700, fontSize: '15px', color: '#1a1a1a' }}>
-                                Your Booking Details
-                            </p>
-
-                            {/* Event Name */}
-                            <FieldBox label="Event Name">
-                                <div className="rb-event-input-wrap">
-                                    <input
-                                        value={eventName}
-                                        onChange={e => setEventName(e.target.value)}
-                                    />
-                                    <ChevronDown size={16} color="#999" className="rb-chevron" />
-                                </div>
-                            </FieldBox>
-
-                            {/* Dates */}
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '16px' }}>
-                                <FieldBox label="Start Date">
-                                    <div className="rb-field-display">
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                            <LuCalendar size={15} color="#E8A317" />
-                                            <span style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a' }}>{startDate}</span>
-                                        </div>
-                                        <FiEdit2 size={13} color="#bbb" />
-                                    </div>
-                                </FieldBox>
-                                <FieldBox label="End Date">
-                                    <div className="rb-field-display">
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                            <LuCalendar size={15} color="#E8A317" />
-                                            <span style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a' }}>{endDate}</span>
-                                        </div>
-                                        <FiEdit2 size={13} color="#bbb" />
-                                    </div>
-                                </FieldBox>
-                            </div>
-
-                            {/* Time */}
-                            <div style={{ marginTop: '16px' }}>
-                                <FieldBox label="Time">
-                                    <div className="rb-field-display">
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1 }}>
-                                            <LuClock size={15} color="#E8A317" />
-                                            <input
-                                                className="rb-inline-input"
-                                                value={startTime}
-                                                onChange={e => setStartTime(e.target.value)}
-                                            />
-                                            <span style={{ color: '#bbb', fontSize: '13px' }}>to</span>
-                                            <input
-                                                className="rb-inline-input"
-                                                value={endTime}
-                                                onChange={e => setEndTime(e.target.value)}
-                                            />
-                                        </div>
-                                        <FiEdit2 size={13} color="#bbb" />
-                                    </div>
-                                </FieldBox>
-                            </div>
-
-                            {/* Package */}
-                            <div style={{ marginTop: '16px' }}>
-                                <FieldBox label="Your package">
-                                    <div className="rb-field-display">
-                                        <span style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a' }}>{pkg}</span>
-                                        <FiEdit2 size={13} color="#bbb" />
-                                    </div>
-                                </FieldBox>
-                            </div>
-
-                            {/* Add-ons */}
-                            <div style={{ marginTop: '16px' }}>
-                                <FieldBox label="AddOns">
-                                    <div className="rb-field-display" style={{ alignItems: 'flex-start' }}>
-                                        <textarea
-                                            className="rb-inline-textarea"
-                                            value={addons}
-                                            onChange={e => setAddons(e.target.value)}
-                                            placeholder="write here you want to add in your package"
-                                        />
-                                        <FiEdit2 size={13} color="#bbb" style={{ marginLeft: '8px', flexShrink: 0, marginTop: '2px' }} />
-                                    </div>
-                                </FieldBox>
-                            </div>
-                        </div>
-
-                        {/* ── Photographer Card ── */}
-                        <div className="rb-card" style={{
-                            borderRadius: '16px',
-                            overflow: 'hidden',
-                            boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-                        }}>
-                            {/* Orange banner */}
-                            <div style={{
-                                background: 'var(--color-orange)',
-                                height: '80px',
-                            }} />
-
-                            {/* White body */}
-                            <div style={{
-                                background: '#fff',
-                                padding: '0 24px 24px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                            }}>
-                                {/* Avatar overlapping banner */}
-                                <div style={{ marginTop: '-44px', position: 'relative', marginBottom: '12px' }}>
-                                    <div style={{
-                                        width: '80px', height: '80px',
-                                        borderRadius: '50%',
-                                        border: '4px solid #fff',
-                                        overflow: 'hidden',
-                                        boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
-                                    }}>
-                                        <img
-                                            src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&q=80"
-                                            alt="John Miller"
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                        />
-                                    </div>
-                                    <div style={{
-                                        position: 'absolute', bottom: '5px', right: '5px',
-                                        width: '13px', height: '13px',
-                                        borderRadius: '50%', background: '#22c55e',
-                                        border: '2px solid #fff',
-                                    }} />
-                                </div>
-
-                                <p style={{
-                                    margin: '0 0 8px', fontWeight: 800,
-                                    fontSize: '20px', color: '#1a1a1a',
-                                    letterSpacing: '-0.01em',
-                                }}>John Miller</p>
-
-                                {/* Verified badge + since */}
-                                <div style={{
-                                    display: 'flex', alignItems: 'center',
-                                    gap: '10px', marginBottom: '18px',
-                                    flexWrap: 'wrap', justifyContent: 'center',
-                                }}>
-                                    <div style={{
-                                        display: 'inline-flex', alignItems: 'center', gap: '4px',
-                                        background: '#FFF3D6',
-                                        border: '1px solid var(--color-orange)',
-                                        borderRadius: '50px', padding: '4px 12px',
-                                        fontSize: '12px', fontWeight: 700, color: 'var(--color-orange)',
-                                    }}>
-                                        <MdVerified size={13} color="var(--color-orange)" />
-                                        Verified photographer
-                                    </div>
-                                    <span style={{ fontSize: '12px', color: '#999', fontWeight: 500 }}>
-                                        Since March 2021
-                                    </span>
-                                </div>
-
-                                {/* Stats */}
-                                <div style={{
-                                    display: 'flex',
-                                    width: '100%',
-                                    border: '1.5px solid #f0f0f0',
-                                    borderRadius: '12px',
-                                    overflow: 'hidden',
-                                    marginBottom: '18px',
-                                }}>
-                                    <div style={{
-                                        flex: 1, textAlign: 'center',
-                                        padding: '14px 12px',
-                                        borderRight: '1.5px solid #f0f0f0',
-                                    }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', marginBottom: '3px' }}>
-                                            <BsCameraFill size={13} color="#E8A317" />
-                                            <span style={{ fontWeight: 800, fontSize: '20px', color: '#1a1a1a' }}>180+</span>
-                                        </div>
-                                        <p style={{ margin: 0, fontSize: '11px', color: '#999', fontWeight: 500 }}>Event completed</p>
-                                    </div>
-                                    <div style={{ flex: 1, textAlign: 'center', padding: '14px 12px' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', marginBottom: '3px' }}>
-                                            <BsStarFill size={13} color="#E8A317" />
-                                            <span style={{ fontWeight: 800, fontSize: '20px', color: '#1a1a1a' }}>4.8</span>
-                                        </div>
-                                        <p style={{ margin: 0, fontSize: '11px', color: '#999', fontWeight: 500 }}>Rating</p>
-                                    </div>
-                                </div>
-
-                                {/* Contact — reuses .su-btn-primary from index.css */}
-                                <button className="su-btn-primary" style={{
-                                    display: 'flex', alignItems: 'center',
-                                    justifyContent: 'center', gap: '8px',
-                                }}>
-                                    <FiPhone size={15} />
-                                    Contact Photographer
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* ════ RIGHT COLUMN ════ */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-                        {/* Event Location */}
-                        <div className="rb-card" style={{
-                            background: '#fff', borderRadius: '16px',
-                            padding: '20px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-                        }}>
-                            <p style={{ margin: '0 0 14px', fontWeight: 700, fontSize: '15px', color: '#1a1a1a' }}>
-                                Event Location
-                            </p>
-                            <MapPreview />
-                        </div>
-
-                        {/* Add Event Location */}
-                        <div className="rb-card" style={{
-                            background: '#fff', borderRadius: '16px',
-                            padding: '20px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-                        }}>
-                            <p style={{ margin: '0 0 20px', fontWeight: 700, fontSize: '15px', color: '#1a1a1a' }}>
-                                Add Event Location
-                            </p>
-
-                            {/* Venue — uses .su-field + native input → gets focus ring from index.css */}
-                            <div style={{ marginBottom: '16px' }}>
-                                <FieldBox label="Venue Name">
-                                    <input
-                                        type="text"
-                                        value={venue}
-                                        onChange={e => setVenue(e.target.value)}
-                                        placeholder="venue name"
-                                    />
-                                </FieldBox>
-                            </div>
-
-                            {/* Address */}
-                            <div style={{ marginBottom: '20px' }}>
-                                <FieldBox label="Add address details">
-                                    <input
-                                        type="text"
-                                        value={address}
-                                        onChange={e => setAddress(e.target.value)}
-                                        placeholder="Area name , street name"
-                                    />
-                                </FieldBox>
-                            </div>
-
-                            {/* Save — reuses .su-btn-primary */}
-                            <button className="su-btn-primary">Save</button>
-                        </div>
-
-                        {/* Price List */}
-                        <div className="rb-card" style={{
-                            background: '#fff', borderRadius: '16px',
-                            padding: '20px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-                        }}>
-                            <p style={{ margin: '0 0 14px', fontWeight: 700, fontSize: '15px', color: '#1a1a1a' }}>
-                                Price list
-                            </p>
-
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                                <span style={{ fontSize: '12px', fontWeight: 600, color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Summary</span>
-                                <span style={{ fontSize: '12px', fontWeight: 600, color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Credits Used</span>
-                            </div>
-
-                            <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                {[
-                                    { label: 'Package Price', value: 20 },
-                                    { label: 'Add On Price', value: 20 },
-                                ].map(row => (
-                                    <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontSize: '13px', color: '#555', fontWeight: 500 }}>{row.label}</span>
-                                        <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>{row.value}</span>
-                                    </div>
-                                ))}
-                                <div style={{
-                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                    borderTop: '1px solid #f0f0f0', paddingTop: '10px', marginTop: '2px',
-                                }}>
-                                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#1a1a1a' }}>Total</span>
-                                    <span style={{ fontSize: '14px', fontWeight: 800, color: '#1a1a1a' }}>40</span>
-                                </div>
-                            </div>
-
-                            {/* Pay Now — reuses .su-btn-primary */}
-                            <button className="su-btn-primary" style={{ marginTop: '16px' }} onClick={() => navigate('/thank-you')}>
-                                Pay Now
-                            </button>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </ViewsLayout>
+      <div style={{
+        borderRadius: '10px', height: '160px',
+        background: '#f0f0f0', display: 'flex',
+        alignItems: 'center', justifyContent: 'center',
+        color: '#bbb', fontSize: '13px',
+      }}>
+        No location data
+      </div>
     );
+  }
+
+  // Use OpenStreetMap embed with marker
+  const zoom = 14;
+  const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.01}%2C${lat - 0.01}%2C${lng + 0.01}%2C${lat + 0.01}&layer=mapnik&marker=${lat}%2C${lng}`;
+
+  return (
+    <div style={{ borderRadius: '10px', overflow: 'hidden', height: '200px', position: 'relative' }}>
+      <iframe
+        title="Event Location"
+        src={mapSrc}
+        width="100%"
+        height="100%"
+        style={{ border: 'none', display: 'block' }}
+        loading="lazy"
+      />
+      {/* coords badge */}
+      <div style={{
+        position: 'absolute', bottom: '8px', left: '8px',
+        background: 'rgba(0,0,0,0.6)', color: '#fff',
+        fontSize: '11px', padding: '3px 8px', borderRadius: '6px',
+        backdropFilter: 'blur(4px)',
+      }}>
+        {lat.toFixed(5)}, {lng.toFixed(5)}
+      </div>
+    </div>
+  );
+};
+
+/* ── Info Row ── */
+const InfoRow = ({ label, value }) => (
+  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #f5f5f5' }}>
+    <span style={{ fontSize: '12px', color: '#999', fontWeight: 500 }}>{label}</span>
+    <span style={{ fontSize: '13px', fontWeight: 600, color: '#1a1a1a' }}>{value}</span>
+  </div>
+);
+
+/* ── Main Component ── */
+const RequestBook = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Data from navigation state (passed from FindBest after draftOrder API)
+  const order = location.state?.order || {};
+  const person = location.state?.person || {};
+
+  // Derived fields from draft order response
+  const lat = order.event_lat ?? order.event_address?.lat;
+  const lng = order.event_lng ?? order.event_address?.lng;
+  const category = order.category?.name ?? '—';
+  const orderNumber = order.order_number ?? '—';
+  const status = order.status ?? '—';
+  const currency = order.currency ?? 'INR';
+  const subtotal = order.subtotal ?? '0';
+  const discountAmount = order.discount_amount ?? '0';
+  const taxAmount = order.tax_amount ?? '0';
+  const totalAmount = order.total_amount ?? '0';
+
+  // Editable local state pre-filled from order
+  const [addons, setAddons] = useState('');
+  const [venue, setVenue] = useState(order.event_address?.address_line1 ?? '');
+  const [addressDetail, setAddressDetail] = useState(
+    [order.event_address?.address_line2, order.event_address?.city, order.event_address?.state]
+      .filter(Boolean).join(', ')
+  );
+
+  const providerName = person.first_name
+    ? `${person.first_name} ${person.last_name}`
+    : 'Photographer';
+  const providerAvatar = person.profile_picture ||
+    `https://ui-avatars.com/api/?name=${providerName.replace(' ', '+')}`;
+  const providerRating = person.reviews?.avg_rating ?? '—';
+  const providerEvents = person.total_events ?? '—';
+
+  return (
+    <ViewsLayout>
+      <div style={{ background: '#f7f7f5', minHeight: '100vh', padding: '36px 0' }}>
+
+        {/* ── Page Title ── */}
+        <h1 style={{
+          textAlign: 'center', fontSize: '36px', fontWeight: 700,
+          color: '#1a1a1a', margin: '0 0 4px', letterSpacing: '-0.02em',
+        }}>
+          Request to Booking
+        </h1>
+
+        {/* Order number + status badge */}
+        <div style={{ textAlign: 'center', marginBottom: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+          <span style={{ fontSize: '13px', color: '#888' }}>{orderNumber}</span>
+          <span style={{
+            fontSize: '11px', fontWeight: 700, textTransform: 'uppercase',
+            letterSpacing: '0.06em', padding: '3px 10px', borderRadius: '20px',
+            background: status === 'draft' ? '#FFF3D6' : '#dcfce7',
+            color: status === 'draft' ? '#b45309' : '#15803d',
+          }}>
+            {status}
+          </span>
+        </div>
+
+        {/* ── Two-column grid ── */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '560px 560px',
+          gap: '20px',
+          margin: '0 auto',
+          padding: '0 40px',
+        }}>
+
+          {/* ════ LEFT COLUMN ════ */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+            {/* ── Booking Details Card ── */}
+            <div style={{
+              background: '#fff', borderRadius: '16px',
+              padding: '22px 24px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+            }}>
+              <p style={{ margin: '0 0 16px', fontWeight: 700, fontSize: '15px', color: '#1a1a1a' }}>
+                Your Booking Details
+              </p>
+
+              {/* Category */}
+              <FieldBox label="Event Category">
+                <div className="rb-field-display">
+                  <span style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a' }}>{category}</span>
+                </div>
+              </FieldBox>
+
+              {/* Dates */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '16px' }}>
+                <FieldBox label="Start Date">
+                  <div className="rb-field-display">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <LuCalendar size={15} color="#E8A317" />
+                      <span style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a' }}>
+                        {fmtDate(order.event_start_at)}
+                      </span>
+                    </div>
+                    <FiEdit2 size={13} color="#bbb" />
+                  </div>
+                </FieldBox>
+                <FieldBox label="End Date">
+                  <div className="rb-field-display">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <LuCalendar size={15} color="#E8A317" />
+                      <span style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a' }}>
+                        {fmtDate(order.event_end_at)}
+                      </span>
+                    </div>
+                    <FiEdit2 size={13} color="#bbb" />
+                  </div>
+                </FieldBox>
+              </div>
+
+              {/* Time */}
+              <div style={{ marginTop: '16px' }}>
+                <FieldBox label="Time">
+                  <div className="rb-field-display">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1 }}>
+                      <LuClock size={15} color="#E8A317" />
+                      <span style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a' }}>
+                        {fmtTime(order.event_start_at)}
+                      </span>
+                      <span style={{ color: '#bbb', fontSize: '13px' }}>to</span>
+                      <span style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a' }}>
+                        {fmtTime(order.event_end_at)}
+                      </span>
+                    </div>
+                    <FiEdit2 size={13} color="#bbb" />
+                  </div>
+                </FieldBox>
+              </div>
+
+              {/* Package */}
+              {order.snapshot_event_package_name && (
+                <div style={{ marginTop: '16px' }}>
+                  <FieldBox label="Your Package">
+                    <div className="rb-field-display">
+                      <span style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a' }}>
+                        {order.snapshot_event_package_name}
+                      </span>
+                      <FiEdit2 size={13} color="#bbb" />
+                    </div>
+                  </FieldBox>
+                </div>
+              )}
+
+              {/* Add-ons */}
+              <div style={{ marginTop: '16px' }}>
+                <FieldBox label="AddOns">
+                  <div className="rb-field-display" style={{ alignItems: 'flex-start' }}>
+                    <textarea
+                      className="rb-inline-textarea"
+                      value={addons}
+                      onChange={e => setAddons(e.target.value)}
+                      placeholder="Write what you'd like to add to your package"
+                    />
+                    <FiEdit2 size={13} color="#bbb" style={{ marginLeft: '8px', flexShrink: 0, marginTop: '2px' }} />
+                  </div>
+                </FieldBox>
+              </div>
+
+              {/* Notes */}
+              {order.notes && (
+                <div style={{ marginTop: '12px', padding: '10px 12px', background: '#fafafa', borderRadius: '8px', fontSize: '13px', color: '#555' }}>
+                  📝 {order.notes}
+                </div>
+              )}
+            </div>
+
+            {/* ── Photographer Card ── */}
+            <div style={{ borderRadius: '16px', overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
+              {/* Orange banner */}
+              <div style={{ background: 'var(--color-orange)', height: '80px' }} />
+
+              {/* White body */}
+              <div style={{
+                background: '#fff', padding: '0 24px 24px',
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+              }}>
+                {/* Avatar */}
+                <div style={{ marginTop: '-44px', position: 'relative', marginBottom: '12px' }}>
+                  <div style={{
+                    width: '80px', height: '80px', borderRadius: '50%',
+                    border: '4px solid #fff', overflow: 'hidden',
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+                  }}>
+                    <img
+                      src={providerAvatar}
+                      alt={providerName}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  </div>
+                  <div style={{
+                    position: 'absolute', bottom: '5px', right: '5px',
+                    width: '13px', height: '13px', borderRadius: '50%',
+                    background: '#22c55e', border: '2px solid #fff',
+                  }} />
+                </div>
+
+                <p style={{ margin: '0 0 8px', fontWeight: 800, fontSize: '20px', color: '#1a1a1a', letterSpacing: '-0.01em' }}>
+                  {providerName}
+                </p>
+
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: '10px',
+                  marginBottom: '18px', flexWrap: 'wrap', justifyContent: 'center',
+                }}>
+                  <div style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '4px',
+                    background: '#FFF3D6', border: '1px solid var(--color-orange)',
+                    borderRadius: '50px', padding: '4px 12px',
+                    fontSize: '12px', fontWeight: 700, color: 'var(--color-orange)',
+                  }}>
+                    <MdVerified size={13} color="var(--color-orange)" />
+                    Verified photographer
+                  </div>
+                </div>
+
+                {/* Stats */}
+                <div style={{
+                  display: 'flex', width: '100%',
+                  border: '1.5px solid #f0f0f0', borderRadius: '12px',
+                  overflow: 'hidden', marginBottom: '18px',
+                }}>
+                  <div style={{ flex: 1, textAlign: 'center', padding: '14px 12px', borderRight: '1.5px solid #f0f0f0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', marginBottom: '3px' }}>
+                      <BsCameraFill size={13} color="#E8A317" />
+                      <span style={{ fontWeight: 800, fontSize: '20px', color: '#1a1a1a' }}>
+                        {providerEvents !== '—' ? `${providerEvents}+` : '—'}
+                      </span>
+                    </div>
+                    <p style={{ margin: 0, fontSize: '11px', color: '#999', fontWeight: 500 }}>Events completed</p>
+                  </div>
+                  <div style={{ flex: 1, textAlign: 'center', padding: '14px 12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', marginBottom: '3px' }}>
+                      <BsStarFill size={13} color="#E8A317" />
+                      <span style={{ fontWeight: 800, fontSize: '20px', color: '#1a1a1a' }}>{providerRating}</span>
+                    </div>
+                    <p style={{ margin: 0, fontSize: '11px', color: '#999', fontWeight: 500 }}>Rating</p>
+                  </div>
+                </div>
+
+                <button className="su-btn-primary" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  <FiPhone size={15} />
+                  Contact Photographer
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* ════ RIGHT COLUMN ════ */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+            {/* ── Event Location Map ── */}
+            <div style={{
+              background: '#fff', borderRadius: '16px',
+              padding: '20px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+            }}>
+              <p style={{ margin: '0 0 14px', fontWeight: 700, fontSize: '15px', color: '#1a1a1a' }}>
+                Event Location
+              </p>
+              <MapPreview lat={lat} lng={lng} />
+
+              {/* Address fields from API */}
+              {(order.event_address?.city || order.event_address?.state) && (
+                <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <InfoRow label="City" value={fmt(order.event_address?.city)} />
+                  <InfoRow label="State" value={fmt(order.event_address?.state)} />
+                  <InfoRow label="Country" value={fmt(order.event_address?.country)} />
+                  <InfoRow label="Postal Code" value={fmt(order.event_address?.postal_code)} />
+                </div>
+              )}
+            </div>
+
+            {/* ── Add / Edit Event Location ── */}
+            <div style={{
+              background: '#fff', borderRadius: '16px',
+              padding: '20px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+            }}>
+              <p style={{ margin: '0 0 20px', fontWeight: 700, fontSize: '15px', color: '#1a1a1a' }}>
+                Add Event Location
+              </p>
+
+              <div style={{ marginBottom: '16px' }}>
+                <FieldBox label="Venue Name">
+                  <input
+                    type="text"
+                    value={venue}
+                    onChange={e => setVenue(e.target.value)}
+                    placeholder="Venue name"
+                  />
+                </FieldBox>
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <FieldBox label="Address Details">
+                  <input
+                    type="text"
+                    value={addressDetail}
+                    onChange={e => setAddressDetail(e.target.value)}
+                    placeholder="Area name, street name"
+                  />
+                </FieldBox>
+              </div>
+
+              <button className="su-btn-primary">Save</button>
+            </div>
+
+            {/* ── Order Summary / Price List ── */}
+            <div style={{
+              background: '#fff', borderRadius: '16px',
+              padding: '20px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+            }}>
+              <p style={{ margin: '0 0 14px', fontWeight: 700, fontSize: '15px', color: '#1a1a1a' }}>
+                Price Summary
+              </p>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                <span style={{ fontSize: '12px', fontWeight: 600, color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Summary</span>
+                <span style={{ fontSize: '12px', fontWeight: 600, color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{currency}</span>
+              </div>
+
+              <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {[
+                  { label: 'Subtotal', value: subtotal },
+                  { label: 'Discount', value: discountAmount },
+                  { label: 'Tax', value: taxAmount },
+                ].map(row => (
+                  <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '13px', color: '#555', fontWeight: 500 }}>{row.label}</span>
+                    <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>
+                      ₹{parseFloat(row.value).toLocaleString('en-IN')}
+                    </span>
+                  </div>
+                ))}
+
+                <div style={{
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  borderTop: '1px solid #f0f0f0', paddingTop: '10px', marginTop: '2px',
+                }}>
+                  <span style={{ fontSize: '14px', fontWeight: 700, color: '#1a1a1a' }}>Total</span>
+                  <span style={{ fontSize: '16px', fontWeight: 800, color: '#1a1a1a' }}>
+                    ₹{parseFloat(totalAmount).toLocaleString('en-IN')}
+                  </span>
+                </div>
+              </div>
+
+              <button
+                className="su-btn-primary"
+                style={{ marginTop: '16px' }}
+                onClick={() => navigate('/thank-you', { state: { order } })}
+              >
+                Pay Now
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </ViewsLayout>
+  );
 };
 
 export default RequestBook;

@@ -12,7 +12,6 @@ const AddBankDetails = ({ onSave, onCancel }) => {
         holderName: '',
         accountNumber: '',
         ifscCode: '',
-        bankName: '',
         accountType: 'savings',
         isPrimary: true,
     });
@@ -142,7 +141,7 @@ const AddBankDetails = ({ onSave, onCancel }) => {
                 </div>
 
                 {/* Bank Name */}
-                <div className="su-field">
+                {/* <div className="su-field">
                     <label>Bank Name<sup style={{ color: '#ef4444' }}>*</sup></label>
                     <select
                         value={form.bankName}
@@ -160,7 +159,7 @@ const AddBankDetails = ({ onSave, onCancel }) => {
                             return <option key={value} value={value}>{label}</option>;
                         })}
                     </select>
-                </div>
+                </div> */}
 
                 {/* Account Type */}
                 <div className="su-field">
