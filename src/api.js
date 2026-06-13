@@ -52,4 +52,5 @@ export const bankEndpoint = {
 
 export const orderEndpoint = {
   draftOrder : `${baseUrl}/order/draft`,
+  getEditingPackage : `${baseUrl}/editing-packages/list`,
 }

@@ -132,40 +132,93 @@ const MultiSkillSelect = ({ selected, onChange }) => {
  * Parse a geocode result into the payload-ready address object.
  * Returns { address_line1, city, state, country, postal_code, lat, lng, place_id, timezone }
  */
+// const parseGeocodeResult = (result, placeId) => {
+//   const components = result.address_components || [];
+
+//   const get = (types) => {
+//     const comp = components.find(c => types.every(t => c.types.includes(t)));
+//     return comp?.long_name || '';
+//   };
+
+//   // Build address_line1 from sublocality + premise/street_number/route if present
+//   const sublocality = get(['sublocality_level_1']) || get(['sublocality']) || '';
+//   const premise = get(['premise']) || '';
+//   const streetNumber = get(['street_number']) || '';
+//   const route = get(['route']) || '';
+//   const address_line1 = [premise, streetNumber, route, sublocality].filter(Boolean).join(', ') || result.formatted_address?.split(',')[0] || '';
+
+//   const city =
+//     get(['locality', 'political']) ||
+//     get(['administrative_area_level_3', 'political']) ||
+//     get(['administrative_area_level_2', 'political']) ||
+//     '';
+
+//   const state = get(['administrative_area_level_1', 'political']) || '';
+//   const country = get(['country', 'political']) || '';
+//   const postal_code = get(['postal_code']) || '';
+//   const lat = result.geometry?.location?.lat || 0;
+//   const lng = result.geometry?.location?.lng || 0;
+
+//   // Derive timezone from country (simplified — for production use a timezone API)
+//   const timezoneMap = { India: 'Asia/Kolkata', 'United States': 'America/New_York', 'United Kingdom': 'Europe/London' };
+//   const timezone = timezoneMap[country] || 'UTC';
+
+//   return { address_line1, city, state, country, postal_code, lat, lng, place_id: placeId, timezone };
+// };
+
+
 const parseGeocodeResult = (result, placeId) => {
   const components = result.address_components || [];
 
-  const get = (types) => {
+  const get = (types, nameType = 'long_name') => {
     const comp = components.find(c => types.every(t => c.types.includes(t)));
-    return comp?.long_name || '';
+    return comp?.[nameType] || '';
   };
 
-  // Build address_line1 from sublocality + premise/street_number/route if present
   const sublocality = get(['sublocality_level_1']) || get(['sublocality']) || '';
-  const premise = get(['premise']) || '';
+  const premise      = get(['premise']) || '';
   const streetNumber = get(['street_number']) || '';
-  const route = get(['route']) || '';
-  const address_line1 = [premise, streetNumber, route, sublocality].filter(Boolean).join(', ') || result.formatted_address?.split(',')[0] || '';
+  const route        = get(['route']) || '';
+  const address_line1 =
+    [premise, streetNumber, route, sublocality].filter(Boolean).join(', ') ||
+    result.formatted_address?.split(',')[0] || '';
 
   const city =
     get(['locality', 'political']) ||
     get(['administrative_area_level_3', 'political']) ||
-    get(['administrative_area_level_2', 'political']) ||
-    '';
+    get(['administrative_area_level_2', 'political']) || '';
 
-  const state = get(['administrative_area_level_1', 'political']) || '';
-  const country = get(['country', 'political']) || '';
-  const postal_code = get(['postal_code']) || '';
-  const lat = result.geometry?.location?.lat || 0;
-  const lng = result.geometry?.location?.lng || 0;
+  const state        = get(['administrative_area_level_1', 'political']) || '';
+  const state_code   = get(['administrative_area_level_1', 'political'], 'short_name') || '';
+  const country      = get(['country', 'political']) || '';
+  const country_code = get(['country', 'political'], 'short_name') || '';
+  const postal_code  = get(['postal_code']) || '';
+  const lat          = result.geometry?.location?.lat || 0;
+  const lng          = result.geometry?.location?.lng || 0;
 
-  // Derive timezone from country (simplified — for production use a timezone API)
-  const timezoneMap = { India: 'Asia/Kolkata', 'United States': 'America/New_York', 'United Kingdom': 'Europe/London' };
+  const timezoneMap  = {
+    India: 'Asia/Kolkata',
+    'United States': 'America/New_York',
+    'United Kingdom': 'Europe/London',
+  };
   const timezone = timezoneMap[country] || 'UTC';
 
-  return { address_line1, city, state, country, postal_code, lat, lng, place_id: placeId, timezone };
+  return {
+    address_line1,
+    address_line2: '',   // not available from geocode
+    address_line3: '',
+    city,
+    state,
+    state_code,
+    country,
+    country_code,
+    postal_code,
+    lat,
+    lng,
+    place_id: placeId,
+    timezone,
+  };
 };
-
 export const AddressAutocomplete = ({ label, hint, value, onAddressSelect, error, isCurrentAddress }) => {
   const [inputValue, setInputValue] = useState('');
   const [suggestions, setSuggestions] = useState([]);

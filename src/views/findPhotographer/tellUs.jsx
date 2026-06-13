@@ -55,21 +55,29 @@ const TellUs = () => {
 const handleBookNow = async () => {
   try {
     const params = {
-      category_id: form.categoryId,
-      lat: address?.lat,
-      lng: address?.lng,
-      date: form.startDate,                          // ← add this
-      start_datetime: buildDateTime(form.startDate, form.startTime),
-      end_datetime: buildDateTime(form.endDate, form.endTime),
+      category_id:      form.categoryId,
+      lat:              address?.lat,
+      lng:              address?.lng,
+      place_id:         address?.place_id,
+      // ── all optional address fields from geocode ──
+      address_line1:    address?.address_line1  || undefined,
+      address_line2:    address?.address_line2  || undefined,
+      address_line3:    address?.address_line3  || undefined,
+      city:             address?.city           || undefined,
+      state:            address?.state          || undefined,
+      state_code:       address?.state_code     || undefined,
+      country:          address?.country        || undefined,
+      country_code:     address?.country_code   || undefined,
+      postal_code:      address?.postal_code    || undefined,
+      timezone:         address?.timezone       || undefined,
+      date:             form.startDate,
+      start_datetime:   buildDateTime(form.startDate, form.startTime),
+      end_datetime:     buildDateTime(form.endDate, form.endTime),
     };
 
     const response = await getPackage(params);
-
-    navigate("/package-suggestion", {
-      state: {
-        packages: response?.data?.data,
-        filters: params,
-      },
+    navigate('/package-suggestion', {
+      state: { packages: response?.data?.data, filters: params },
     });
   } catch (err) {
     console.error(err);

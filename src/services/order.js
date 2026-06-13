@@ -7,3 +7,10 @@ export const draftOrder = async (data) => {
     data
   );
 };
+
+
+export const getEditingPackage = async () => {
+  return await httpServices.get(
+    `${orderEndpoint.getEditingPackage}`
+  );
+};

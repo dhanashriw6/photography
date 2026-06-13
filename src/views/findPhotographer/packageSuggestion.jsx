@@ -4,6 +4,15 @@ import ViewsLayout from '../Layout';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getServiceProviders } from '../../services/booking';
 
+const encodeFilters = (filters) => {
+  try {
+    return filters
+      ? btoa(unescape(encodeURIComponent(JSON.stringify(filters))))
+      : '';
+  } catch {
+    return '';
+  }
+};
 
 /* ─── Package Card ───────────────────────────────────────────────── */
 const PackageCard = ({ pkg, index, onBookInstantly, onCustomizeTeam }) => {
@@ -126,55 +135,72 @@ const packageSuggestion = () => {
 
   // Real data from navigation state (no mock fallback needed)
   const packages = location.state?.packages || [];
-
-  const handleBookInstantly = (pkg) => {
-    navigate('/select-package', { state: { package: pkg } });
-  };
   const filters = location.state?.filters;
 
-  const handleCustomizeTeam = async (pkg) => {
-    try {
-      const response = await getServiceProviders({
-        category_id: filters?.category_id,
-        lat: filters?.lat,
-        lng: filters?.lng,
-        start_datetime: filters?.start_datetime,
-        end_datetime: filters?.end_datetime,
-      });
+ const handleBookInstantly = (pkg) => {
+  const params = new URLSearchParams({
+    f: encodeFilters(filters),
+    pkgId: pkg.id,
+  });
 
-      navigate("/find-best", {
-        state: {
-          providers: response?.data?.data,
-          filters,
-          package: pkg,
-          mode: 'customize',
-        },
-      });
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  navigate(`/select-package?${params.toString()}`, {
+    state: { package: pkg, filters },
+  });
+};
+
+const handleCustomizeTeam = async (pkg) => {
+  try {
+    const response = await getServiceProviders({
+      category_id: filters?.category_id,
+      lat: filters?.lat,
+      lng: filters?.lng,
+      start_datetime: filters?.start_datetime,
+      end_datetime: filters?.end_datetime,
+    });
+
+    const params = new URLSearchParams({
+      f: encodeFilters(filters),
+      pkgId: pkg.id,
+      mode: 'customize',
+    });
+
+    navigate(`/find-best?${params.toString()}`, {
+      state: {
+        providers: response?.data?.data,
+        filters,
+        package: pkg,
+        mode: 'customize',
+      },
+    });
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const handleSkip = async () => {
-    try {
-      const response = await getServiceProviders({
-        category_id: filters?.category_id,
-        lat: filters?.lat,
-        lng: filters?.lng,
-        start_datetime: filters?.start_datetime,
-        end_datetime: filters?.end_datetime,
-      });
+  try {
+    const response = await getServiceProviders({
+      category_id: filters?.category_id,
+      lat: filters?.lat,
+      lng: filters?.lng,
+      start_datetime: filters?.start_datetime,
+      end_datetime: filters?.end_datetime,
+    });
 
-      navigate("/find-best", {
-        state: {
-          providers: response?.data?.data,
-          filters,
-        },
-      });
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    const params = new URLSearchParams({
+      f: encodeFilters(filters),
+    });
+
+    navigate(`/find-best?${params.toString()}`, {
+      state: {
+        providers: response?.data?.data,
+        filters,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   return (
     <ViewsLayout>
