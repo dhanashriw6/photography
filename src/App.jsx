@@ -30,6 +30,8 @@ import ProtectedRoute from './Components/ProtectedRoute';
 import PublicRoute from './Components/PublicRoute';
 import ResetPassword from './views/joinAsPhotographer/resetPassword';
 import SelectPackage from './views/findPhotographer/selectPackage';
+import DraftOrders from './views/findPhotographer/draftOrders';
+
 function App() {
   return (
     <>
@@ -46,6 +48,7 @@ function App() {
         <Route path="/photographer/:id" element={<PhotographerDetail />} />
         <Route path="/requestBook" element={<RequestBook />} />
         <Route path="/thank-you" element={<ThankYou />} />
+        <Route path="/draft-orders" element={<DraftOrders />} />
         <Route path="/booking-summary" element={<BookingSummary />} />
         <Route path="/home" element={<FindHomePage />} />
         <Route path="/edit-profile" element={<EditProfile />} />

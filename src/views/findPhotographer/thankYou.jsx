@@ -1,10 +1,12 @@
 import React from 'react';
 import ViewsLayout from '../Layout';
 import thankyoubadge from '../../assets/Images/thankyoubadge.png';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const ThankYou = () => {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const location = useLocation();
+    const order = location.state?.order || {};
     return (
         <ViewsLayout>
             <div>
@@ -68,7 +70,7 @@ const ThankYou = () => {
                         justifyContent: 'center',
                         gap: '40px',
                     }}>
-                        <a
+                        {/* <a
                             href="#"
                             style={{
                                 fontSize: '13px',
@@ -83,9 +85,9 @@ const ThankYou = () => {
                             onMouseLeave={e => e.target.style.color = '#1a1a1a'}
                         >
                             Download invoice
-                        </a>
+                        </a> */}
                         <a
-                            href="/booking-summary"
+                            href={`/booking-summary?orderId=${order.id || ''}`}
                             style={{
                                 fontSize: '13px',
                                 fontWeight: 600,

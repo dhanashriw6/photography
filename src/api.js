@@ -53,4 +53,8 @@ export const bankEndpoint = {
 export const orderEndpoint = {
   draftOrder : `${baseUrl}/order/draft`,
   getEditingPackage : `${baseUrl}/editing-packages/list`,
+  placeOrder: (orderId) => `${baseUrl}/order/${orderId}/place`,
+  cancelPayment: (orderId) => `${baseUrl}/order/${orderId}/cancel-payment`,
+  getOrderDetails: (orderId) => `${baseUrl}/order/${orderId}`,
+  getDraftOrders : `${baseUrl}/order/draft`,
 }

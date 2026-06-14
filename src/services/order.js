@@ -14,3 +14,21 @@ export const getEditingPackage = async () => {
     `${orderEndpoint.getEditingPackage}`
   );
 };
+
+export const placeOrder = async (orderId) => {
+  return await httpServices.post(
+    orderEndpoint.placeOrder(orderId)
+  );
+};
+
+export const getOrderDetails = async (orderId) => {
+  return await httpServices.get(
+    `${orderEndpoint.getOrderDetails(orderId)}`
+  );
+};
+
+export const getDraftOrders = async () => {
+  return await httpServices.get(
+    `${orderEndpoint.getDraftOrders}`
+  );
+};

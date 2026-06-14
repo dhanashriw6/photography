@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import '../index.css';
 import ViewsLayout from '../Layout';
-import { FiSearch, FiSliders, FiCalendar, FiClock, FiMapPin, FiTag, FiUserCheck, FiUsers } from 'react-icons/fi';
+import { FiSearch, FiSliders, FiCalendar, FiClock, FiMapPin, FiTag, FiUserCheck, FiUsers, FiX } from 'react-icons/fi';
 import { draftOrder } from '../../services/order';
 
 /* ── helpers ── */
@@ -16,12 +16,21 @@ const fmtTime = (iso) => {
 };
 const decodeFilters = (encoded) => {
   try {
-    return encoded
-      ? JSON.parse(decodeURIComponent(escape(atob(encoded))))
-      : null;
-  } catch {
-    return null;
-  }
+    return encoded ? JSON.parse(decodeURIComponent(escape(atob(encoded)))) : null;
+  } catch { return null; }
+};
+
+const SKILL_LABELS = {
+  photographer:    'Photographer',
+  videographer:    'Videographer',
+  drone_operator:  'Drone Operator',
+  cinematographer: 'Cinematographer',
+};
+const SKILL_EMOJI = {
+  photographer:    '📷',
+  videographer:    '🎥',
+  drone_operator:  '🚁',
+  cinematographer: '🎬',
 };
 
 /* ── Filter Summary ── */
@@ -59,10 +68,7 @@ const FilterSummary = ({ filters }) => {
   if (items.length === 0) return null;
 
   return (
-    <div style={{
-      background: '#fff', border: '1px solid #e5e7eb',
-      borderRadius: '16px', padding: '16px 20px', marginBottom: '24px',
-    }}>
+    <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '16px', padding: '16px 20px', marginBottom: '24px' }}>
       <p style={{ fontSize: '11px', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 12px' }}>
         Your event filters
       </p>
@@ -97,38 +103,41 @@ const FilterSummary = ({ filters }) => {
 
 /* ── Main ── */
 const FindBest = () => {
-  const [search, setSearch]         = useState('');
-  const [loadingId, setLoadingId]   = useState(null);
+  const [search, setSearch]           = useState('');
+  const [loadingKey, setLoadingKey]   = useState(null);
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [providers, setProviders]     = useState([]);
+  const [restoring, setRestoring]     = useState(false);
+
+  // ── Package mode: track manually added provider IDs ──
   const [manuallyAdded, setManuallyAdded] = useState(new Set());
-  const [providers, setProviders]   = useState([]);
-  const [restoring, setRestoring]   = useState(false);
+
+  // ── Category mode: track selected "providerId-skill" keys ──
+  const [selected, setSelected] = useState(new Map());
 
   const location       = useLocation();
   const navigate       = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // ── Resolve filters: prefer location.state, fall back to URL param ──
   const filtersFromState = location.state?.filters ?? null;
   const filtersFromUrl   = decodeFilters(searchParams.get('f'));
   const filters          = filtersFromState ?? filtersFromUrl;
 
-  const statePackage  = location.state?.package  ?? null;
-  const pkgIdFromUrl  = searchParams.get('pkgId');
-  const packageId     = statePackage?.id ?? location.state?.packageId ?? (pkgIdFromUrl ? Number(pkgIdFromUrl) : null);
-  const modeFromUrl   = searchParams.get('mode');
+  const statePackage = location.state?.package ?? null;
+  const pkgIdFromUrl = searchParams.get('pkgId');
+  const packageId    = statePackage?.id ?? location.state?.packageId ?? (pkgIdFromUrl ? Number(pkgIdFromUrl) : null);
 
-  // ── Restore providers on refresh (state lost, URL params survive) ──
+  // ── Which mode are we in? ──
+  const isPackageMode = !!packageId;
+
+  /* ── Restore providers on refresh ── */
   useEffect(() => {
     if (location.state?.providers?.length) {
       setProviders(location.state.providers);
       return;
     }
-
-    // No state → restore via API using URL params
     if (!filters) return;
     setRestoring(true);
-
     const { getServiceProviders } = require('../../services/booking');
     getServiceProviders({
       category_id:    filters.category_id,
@@ -140,28 +149,9 @@ const FindBest = () => {
       .then((res) => setProviders(res?.data?.data || []))
       .catch(console.error)
       .finally(() => setRestoring(false));
-  }, []); // run once on mount
+  }, []);
 
-  const filtered = providers.filter((p) =>
-    `${p.first_name} ${p.last_name}`.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const packageProviderIds = new Set(
-    statePackage?.team?.flatMap((tm) => tm.providers?.map((p) => p.id) || []) || []
-  );
-  const allSelectedIds    = new Set([...packageProviderIds, ...manuallyAdded]);
-  const selectedProviders = filtered.filter((p) => allSelectedIds.has(p.id));
-  const otherProviders    = filtered.filter((p) => !allSelectedIds.has(p.id));
-
-  const handleToggleAdd = (e, providerId) => {
-    e.stopPropagation();
-    setManuallyAdded((prev) => {
-      const next = new Set(prev);
-      next.has(providerId) ? next.delete(providerId) : next.add(providerId);
-      return next;
-    });
-  };
-
+  /* ── Build address ── */
   const buildAddress = (filters) => ({
     lat:           filters?.lat           ?? null,
     lng:           filters?.lng           ?? null,
@@ -178,10 +168,37 @@ const FindBest = () => {
     timezone:      filters?.timezone      || undefined,
   });
 
-  const handleAdd = async (e, provider) => {
+  /* ════════════════════════════════════════════
+     PACKAGE MODE
+  ════════════════════════════════════════════ */
+
+  const packageProviderIds = new Set(
+    statePackage?.team?.flatMap((tm) => tm.providers?.map((p) => p.id) || []) || []
+  );
+  const allSelectedIds    = new Set([...packageProviderIds, ...manuallyAdded]);
+
+  const filteredProviders = providers.filter((p) =>
+    `${p.first_name} ${p.last_name}`.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const selectedProviders = filteredProviders.filter((p) => allSelectedIds.has(p.id));
+  const otherProviders    = filteredProviders.filter((p) => !allSelectedIds.has(p.id));
+
+  const handleToggleAdd = (e, providerId) => {
     e.stopPropagation();
+    setManuallyAdded((prev) => {
+      const next = new Set(prev);
+      next.has(providerId) ? next.delete(providerId) : next.add(providerId);
+      return next;
+    });
+  };
+
+  // Single book in package mode
+  const handleBookSingle = async (e, provider) => {
+    e.stopPropagation();
+    const key = `${provider.id}-single`;
     try {
-      setLoadingId(provider.id);
+      setLoadingKey(key);
       const payload = {
         event_category_id: filters?.category_id ?? null,
         start_at:          filters?.start_datetime ?? null,
@@ -199,11 +216,12 @@ const FindBest = () => {
     } catch (err) {
       console.error('draftOrder failed:', err);
     } finally {
-      setLoadingId(null);
+      setLoadingKey(null);
     }
   };
 
-  const handleAddPackage = async () => {
+  // Book all selected (package mode)
+  const handleBookPackage = async () => {
     if (selectedProviders.length === 0) return;
     try {
       setBulkLoading(true);
@@ -234,29 +252,32 @@ const FindBest = () => {
     }
   };
 
-  const renderProviderCard = (p, isSelected = false) => {
-    const name        = `${p.first_name} ${p.last_name}`;
-    const rating      = p.reviews?.avg_rating;
-    const reviewCount = p.reviews?.count || 0;
-    const skills      = p.skills?.map((s) => s.skill.charAt(0).toUpperCase() + s.skill.slice(1)).join(' · ') || '—';
-    const pkg         = p.packages?.[0];
-    const price       = pkg?.price_with_commission;
+  const renderPackageCard = (p, isSelected = false) => {
+    const name          = `${p.first_name} ${p.last_name}`;
+    const rating        = p.reviews?.avg_rating;
+    const reviewCount   = p.reviews?.count || 0;
+    const skills        = p.skills?.map((s) => s.skill.charAt(0).toUpperCase() + s.skill.slice(1)).join(' · ') || '—';
+    const pkg           = p.packages?.[0];
+    const price         = pkg?.price_with_commission;
     const isFromPackage = packageProviderIds.has(p.id);
+    const isLoading     = loadingKey === `${p.id}-single`;
 
     return (
       <div key={p.id} style={{
         background: '#fff', borderRadius: '18px', padding: '18px',
         border: isSelected ? '2px solid #6366f1' : '1px solid #ececec',
         boxShadow: isSelected ? '0 6px 20px rgba(99,102,241,0.12)' : '0 2px 8px rgba(0,0,0,0.05)',
-        cursor: 'pointer', transition: 'all .2s ease',
-        position: 'relative', marginTop: isSelected ? '10px' : '0',
+        transition: 'all .2s ease', position: 'relative',
       }}>
         {isSelected && (
           <div style={{
             position: 'absolute', top: '-11px', left: '18px',
-            background: isFromPackage ? 'linear-gradient(135deg,#6366f1,#4f46e5)' : 'linear-gradient(135deg,#10b981,#059669)',
+            background: isFromPackage
+              ? 'linear-gradient(135deg,#6366f1,#4f46e5)'
+              : 'linear-gradient(135deg,#10b981,#059669)',
             color: '#fff', fontSize: '10px', fontWeight: 700,
-            padding: '3px 10px', borderRadius: '20px', textTransform: 'uppercase', letterSpacing: '0.04em',
+            padding: '3px 10px', borderRadius: '20px',
+            textTransform: 'uppercase', letterSpacing: '0.04em',
           }}>
             {isFromPackage ? '✓ Pre-selected' : '✓ Added'}
           </div>
@@ -276,7 +297,9 @@ const FindBest = () => {
             </div>
           </div>
           <div style={{ textAlign: 'right', flexShrink: 0 }}>
-            <div style={{ fontSize: '22px', fontWeight: 700, color: '#111' }}>₹{price?.toLocaleString()}</div>
+            <div style={{ fontSize: '22px', fontWeight: 700, color: '#111' }}>
+              {price != null ? `₹${price.toLocaleString()}` : '—'}
+            </div>
             <div style={{ fontSize: '11px', color: '#aaa' }}>Final Price</div>
           </div>
         </div>
@@ -306,7 +329,6 @@ const FindBest = () => {
               ? <>⭐ {rating} <span style={{ color: '#aaa' }}>({reviewCount} reviews)</span></>
               : <span style={{ color: '#aaa' }}>New Provider</span>}
           </div>
-
           {isSelected ? (
             <div style={{ display: 'flex', gap: '8px' }} onClick={(e) => e.stopPropagation()}>
               <button
@@ -315,49 +337,269 @@ const FindBest = () => {
                 style={{
                   padding: '8px 14px', borderRadius: '10px', fontSize: '13px', fontWeight: 600,
                   border: '1.5px solid #e5e7eb', color: '#6b7280', background: '#f9fafb',
-                  cursor: isFromPackage ? 'not-allowed' : 'pointer', opacity: isFromPackage ? 0.4 : 1,
+                  cursor: isFromPackage ? 'not-allowed' : 'pointer',
+                  opacity: isFromPackage ? 0.4 : 1,
                 }}
               >
                 Remove
               </button>
               <button
-                onClick={(e) => handleAdd(e, p)}
-                disabled={loadingId === p.id}
+                onClick={(e) => handleBookSingle(e, p)}
+                disabled={isLoading}
                 className="su-btn-primary"
-                style={{ opacity: loadingId === p.id ? 0.7 : 1, minWidth: '64px' }}
+                style={{ opacity: isLoading ? 0.7 : 1, minWidth: '64px' }}
               >
-                {loadingId === p.id ? '...' : 'Book'}
+                {isLoading ? '...' : 'Book'}
               </button>
             </div>
           ) : (
             <div style={{ display: 'flex', gap: '8px' }} onClick={(e) => e.stopPropagation()}>
               <button
-                onClick={(e) => handleAdd(e, p)}
-                disabled={loadingId === p.id}
+                onClick={(e) => handleBookSingle(e, p)}
+                disabled={isLoading}
                 className="su-btn-primary"
-                style={{ opacity: loadingId === p.id ? 0.7 : 1, minWidth: '56px' }}
+                style={{ opacity: isLoading ? 0.7 : 1, minWidth: '56px' }}
               >
-                {loadingId === p.id ? '...' : 'Add'}
+                {isLoading ? '...' : 'Add'}
               </button>
-              {packageId && (
-                <button
-                  onClick={(e) => handleToggleAdd(e, p.id)}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '5px',
-                    padding: '8px 14px', borderRadius: '10px', fontSize: '13px', fontWeight: 600,
-                    border: '1.5px solid #6366f1', color: '#6366f1', background: '#f5f3ff',
-                    cursor: 'pointer', whiteSpace: 'nowrap',
-                  }}
-                >
-                  <FiUserCheck size={14} /> Add to Package
-                </button>
-              )}
+              <button
+                onClick={(e) => handleToggleAdd(e, p.id)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '5px',
+                  padding: '8px 14px', borderRadius: '10px', fontSize: '13px', fontWeight: 600,
+                  border: '1.5px solid #6366f1', color: '#6366f1', background: '#f5f3ff',
+                  cursor: 'pointer', whiteSpace: 'nowrap',
+                }}
+              >
+                <FiUserCheck size={14} /> Add to Package
+              </button>
             </div>
           )}
         </div>
       </div>
     );
   };
+
+  /* ════════════════════════════════════════════
+     CATEGORY MODE (multi-skill expanded rows)
+  ════════════════════════════════════════════ */
+
+  const expandedRows = filteredProviders.flatMap((p) =>
+    (p.packages?.length ? p.packages : [null]).map((pkg) => ({
+      key:      `${p.id}-${pkg?.skill ?? 'unknown'}`,
+      provider: p,
+      skill:    pkg?.skill ?? p.skills?.[0]?.skill ?? 'photographer',
+      pkg,
+    }))
+  );
+
+  const selectedKeys   = new Set(selected.keys());
+  const selectedRows   = expandedRows.filter((r) => selectedKeys.has(r.key));
+  const unselectedRows = expandedRows.filter((r) => !selectedKeys.has(r.key));
+
+  const handleToggleSelect = (e, row) => {
+    e.stopPropagation();
+    setSelected((prev) => {
+      const next = new Map(prev);
+      next.has(row.key) ? next.delete(row.key) : next.set(row.key, row);
+      return next;
+    });
+  };
+
+  // Single book in category mode
+  const handleBookNow = async (e, row) => {
+    e.stopPropagation();
+    const key = row.key;
+    try {
+      setLoadingKey(key);
+      const payload = {
+        event_category_id: filters?.category_id ?? null,
+        start_at:          filters?.start_datetime ?? null,
+        end_at:            filters?.end_datetime   ?? null,
+        address:           buildAddress(filters),
+        service_providers: [{
+          service_provider_id: row.provider.id,
+          skill:               row.skill,
+        }],
+      };
+      const response = await draftOrder(payload);
+      navigate('/requestBook', {
+        state: {
+          order:   response?.data?.data,
+          payload,
+          person:  row.provider,
+          skill:   row.skill,
+          filters,
+        },
+      });
+    } catch (err) {
+      console.error('draftOrder failed:', err);
+    } finally {
+      setLoadingKey(null);
+    }
+  };
+
+  // Book all selected (category mode)
+  const handleBookSelected = async () => {
+    if (selected.size === 0) return;
+    try {
+      setBulkLoading(true);
+      const rows = [...selected.values()];
+      const payload = {
+        event_category_id: filters?.category_id ?? null,
+        start_at:          filters?.start_datetime ?? null,
+        end_at:            filters?.end_datetime   ?? null,
+        address:           buildAddress(filters),
+        service_providers: rows.map((r) => ({
+          service_provider_id: r.provider.id,
+          skill:               r.skill,
+        })),
+      };
+      const response = await draftOrder(payload);
+      navigate('/requestBook', {
+        state: {
+          order:     response?.data?.data,
+          payload,
+          providers: rows.map((r) => ({ ...r.provider, _bookedSkill: r.skill })),
+          filters,
+        },
+      });
+    } catch (err) {
+      console.error('draftOrder (bulk) failed:', err);
+    } finally {
+      setBulkLoading(false);
+    }
+  };
+
+  const renderSkillCard = (row, isSelected = false) => {
+    const { provider: p, skill, pkg, key } = row;
+    const name        = `${p.first_name} ${p.last_name}`;
+    const reviewCount = p.reviews?.count || 0;
+    const rating      = p.reviews?.avg_rating;
+    const price       = pkg?.price_with_commission;
+    const skillLabel  = SKILL_LABELS[skill] || skill;
+    const skillEmoji  = SKILL_EMOJI[skill] || '🎯';
+    const isLoading   = loadingKey === key;
+
+    return (
+      <div key={key} style={{
+        background:   '#fff', borderRadius: '18px', padding: '18px',
+        border:       isSelected ? '2px solid #6366f1' : '1px solid #ececec',
+        boxShadow:    isSelected
+          ? '0 6px 20px rgba(99,102,241,0.12)'
+          : '0 2px 8px rgba(0,0,0,0.05)',
+        transition:   'all .2s ease', position: 'relative',
+      }}>
+        {isSelected && (
+          <div style={{
+            position: 'absolute', top: '-11px', left: '18px',
+            background: 'linear-gradient(135deg,#6366f1,#4f46e5)',
+            color: '#fff', fontSize: '10px', fontWeight: 700,
+            padding: '3px 10px', borderRadius: '20px',
+            textTransform: 'uppercase', letterSpacing: '0.04em',
+          }}>
+            ✓ Selected
+          </div>
+        )}
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
+          <div style={{ display: 'flex', gap: '14px' }}>
+            <img
+              src={p.profile_picture || `https://ui-avatars.com/api/?name=${p.first_name}+${p.last_name}`}
+              alt={name}
+              style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+            />
+            <div>
+              <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700 }}>{name}</h3>
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: '4px',
+                marginTop: '4px', marginBottom: '2px',
+                background: '#f0f0ff', border: '1px solid #c7d2fe',
+                borderRadius: '6px', padding: '2px 8px',
+                fontSize: '11px', fontWeight: 700, color: '#4338ca',
+              }}>
+                {skillEmoji} {skillLabel}
+              </div>
+              <p style={{ margin: 0, color: '#999', fontSize: '12px' }}>📍 {p.city}, {p.state}</p>
+            </div>
+          </div>
+          <div style={{ textAlign: 'right', flexShrink: 0 }}>
+            <div style={{ fontSize: '22px', fontWeight: 700, color: '#111' }}>
+              {price != null ? `₹${price.toLocaleString()}` : '—'}
+            </div>
+            <div style={{ fontSize: '11px', color: '#aaa' }}>Final Price</div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '14px' }}>
+          {pkg?.category?.name && <div className="provider-chip">{pkg.category.name}</div>}
+          {pkg && <div className="provider-chip">{pkg.duration_value} {pkg.duration_type}</div>}
+          <div className="provider-chip">{(p.distance_meters / 1000).toFixed(1)} km away</div>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', flexWrap: 'wrap', gap: '10px' }}>
+          <div style={{ fontSize: '13px' }}>
+            {reviewCount > 0
+              ? <>⭐ {rating} <span style={{ color: '#aaa' }}>({reviewCount} reviews)</span></>
+              : <span style={{ color: '#aaa' }}>New Provider</span>}
+          </div>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }} onClick={(e) => e.stopPropagation()}>
+            {isSelected ? (
+              <>
+                <button
+                  onClick={(e) => handleToggleSelect(e, row)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '4px',
+                    padding: '8px 14px', borderRadius: '10px',
+                    fontSize: '13px', fontWeight: 600,
+                    border: '1.5px solid #e5e7eb', color: '#6b7280',
+                    background: '#f9fafb', cursor: 'pointer',
+                  }}
+                >
+                  <FiX size={13} /> Remove
+                </button>
+                <button
+                  onClick={(e) => handleBookNow(e, row)}
+                  disabled={isLoading}
+                  className="su-btn-primary"
+                  style={{ opacity: isLoading ? 0.7 : 1, minWidth: '80px' }}
+                >
+                  {isLoading ? '...' : `Book as ${skillLabel}`}
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={(e) => handleToggleSelect(e, row)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '5px',
+                    padding: '8px 14px', borderRadius: '10px',
+                    fontSize: '13px', fontWeight: 600,
+                    border: '1.5px solid #6366f1', color: '#6366f1',
+                    background: '#f5f3ff', cursor: 'pointer', whiteSpace: 'nowrap',
+                  }}
+                >
+                  <FiUserCheck size={14} /> Add as {skillLabel}
+                </button>
+                <button
+                  onClick={(e) => handleBookNow(e, row)}
+                  disabled={isLoading}
+                  className="su-btn-primary"
+                  style={{ opacity: isLoading ? 0.7 : 1, minWidth: '80px' }}
+                >
+                  {isLoading ? '...' : `Book as ${skillLabel}`}
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  /* ── Render ── */
+  const totalSelected = isPackageMode ? selectedProviders.length : selected.size;
+  const totalRows     = isPackageMode ? filteredProviders.length : expandedRows.length;
 
   return (
     <ViewsLayout>
@@ -366,16 +608,24 @@ const FindBest = () => {
           Available Providers
         </h1>
         <p style={{ fontSize: '14px', color: '#888', marginBottom: '24px' }}>
-          {restoring ? 'Restoring...' : `${filtered.length} provider${filtered.length !== 1 ? 's' : ''} found`}
-          {packageId && (
+          {restoring
+            ? 'Restoring...'
+            : `${totalRows} ${isPackageMode ? 'provider' : 'option'}${totalRows !== 1 ? 's' : ''} found`}
+          {isPackageMode && packageId && (
             <span style={{ marginLeft: '10px', fontSize: '11px', fontWeight: 600, background: '#ede9fe', color: '#6d28d9', padding: '2px 8px', borderRadius: '20px' }}>
               Package #{packageId}
+            </span>
+          )}
+          {!isPackageMode && totalSelected > 0 && (
+            <span style={{ marginLeft: '10px', fontSize: '11px', fontWeight: 600, background: '#ede9fe', color: '#6d28d9', padding: '2px 8px', borderRadius: '20px' }}>
+              {totalSelected} selected
             </span>
           )}
         </p>
 
         <FilterSummary filters={filters} />
 
+        {/* Search bar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
           <div style={{
             display: 'flex', alignItems: 'center', gap: '8px',
@@ -406,11 +656,12 @@ const FindBest = () => {
           <div style={{ textAlign: 'center', padding: '60px 0', color: '#aaa', fontSize: '15px' }}>
             ⏳ Restoring your search…
           </div>
-        ) : filtered.length === 0 ? (
+        ) : totalRows === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0', color: '#aaa', fontSize: '15px' }}>
             No providers found.
           </div>
-        ) : (
+        ) : isPackageMode ? (
+          /* ══ PACKAGE MODE LAYOUT ══ */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
             {selectedProviders.length > 0 && (
               <div style={{ background: '#f8f7ff', border: '1.5px solid #e0e0ff', borderRadius: '20px', padding: '20px' }}>
@@ -422,14 +673,14 @@ const FindBest = () => {
                     </span>
                   </div>
                   <button
-                    onClick={handleAddPackage}
-                    disabled={bulkLoading || !packageId}
+                    onClick={handleBookPackage}
+                    disabled={bulkLoading}
                     style={{
                       display: 'flex', alignItems: 'center', gap: '6px',
-                      background: bulkLoading || !packageId ? '#a5b4fc' : '#6366f1',
+                      background: bulkLoading ? '#a5b4fc' : '#6366f1',
                       color: '#fff', border: 'none', borderRadius: '10px',
                       padding: '9px 18px', fontSize: '13px', fontWeight: 700,
-                      cursor: bulkLoading || !packageId ? 'not-allowed' : 'pointer',
+                      cursor: bulkLoading ? 'not-allowed' : 'pointer',
                       boxShadow: '0 4px 12px rgba(99,102,241,0.3)', transition: 'all .2s',
                     }}
                   >
@@ -437,19 +688,83 @@ const FindBest = () => {
                   </button>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  {selectedProviders.map((p) => renderProviderCard(p, true))}
+                  {selectedProviders.map((p) => renderPackageCard(p, true))}
                 </div>
               </div>
             )}
-
             <div>
-              {selectedProviders.length > 0 && (
+              {selectedProviders.length > 0 && otherProviders.length > 0 && (
                 <p style={{ fontSize: '12px', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '14px' }}>
                   Rest of the providers · {otherProviders.length}
                 </p>
               )}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {otherProviders.map((p) => renderProviderCard(p, false))}
+                {otherProviders.map((p) => renderPackageCard(p, false))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* ══ CATEGORY MODE LAYOUT (multi-skill) ══ */
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            {selectedRows.length > 0 && (
+              <div style={{ background: '#f8f7ff', border: '1.5px solid #e0e0ff', borderRadius: '20px', padding: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <FiUsers size={15} color="#4f46e5" />
+                    <span style={{ fontSize: '13px', fontWeight: 700, color: '#4f46e5', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                      Your Selection · {selectedRows.length}
+                    </span>
+                  </div>
+                  <button
+                    onClick={handleBookSelected}
+                    disabled={bulkLoading}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '6px',
+                      background: bulkLoading ? '#a5b4fc' : '#6366f1',
+                      color: '#fff', border: 'none', borderRadius: '10px',
+                      padding: '9px 18px', fontSize: '13px', fontWeight: 700,
+                      cursor: bulkLoading ? 'not-allowed' : 'pointer',
+                      boxShadow: '0 4px 12px rgba(99,102,241,0.3)', transition: 'all .2s',
+                    }}
+                  >
+                    {bulkLoading ? '⏳ Booking...' : `📦 Book All (${selectedRows.length})`}
+                  </button>
+                </div>
+
+                {/* Selection summary chips */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
+                  {selectedRows.map((r) => (
+                    <div key={r.key} style={{
+                      display: 'inline-flex', alignItems: 'center', gap: '5px',
+                      background: '#fff', border: '1px solid #c7d2fe',
+                      borderRadius: '20px', padding: '4px 10px',
+                      fontSize: '12px', fontWeight: 600, color: '#4338ca',
+                    }}>
+                      {SKILL_EMOJI[r.skill]} {r.provider.first_name} · {SKILL_LABELS[r.skill] || r.skill}
+                      <button
+                        onClick={(e) => handleToggleSelect(e, r)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#a5b4fc', padding: '0 0 0 2px', lineHeight: 1 }}
+                      >
+                        <FiX size={11} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {selectedRows.map((r) => renderSkillCard(r, true))}
+                </div>
+              </div>
+            )}
+
+            <div>
+              {selectedRows.length > 0 && unselectedRows.length > 0 && (
+                <p style={{ fontSize: '12px', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '14px' }}>
+                  More Providers · {unselectedRows.length}
+                </p>
+              )}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {unselectedRows.map((r) => renderSkillCard(r, false))}
               </div>
             </div>
           </div>
