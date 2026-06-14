@@ -34,7 +34,6 @@ const DraftOrders = () => {
 
     const formatDate = (date) => {
         if (!date) return '-';
-
         return new Date(date).toLocaleDateString('en-IN', {
             day: '2-digit',
             month: 'short',
@@ -44,7 +43,6 @@ const DraftOrders = () => {
 
     const formatTime = (date) => {
         if (!date) return '-';
-
         return new Date(date).toLocaleTimeString('en-IN', {
             hour: '2-digit',
             minute: '2-digit',
@@ -59,6 +57,7 @@ const DraftOrders = () => {
                     minHeight: '100vh',
                     background: '#f8f8f8',
                     padding: '40px 24px',
+                    width: '100%',
                 }}
             >
                 <div
@@ -115,7 +114,7 @@ const DraftOrders = () => {
                         <div
                             style={{
                                 display: 'grid',
-                               gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+                                gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))',
                                 gap: '20px',
                                 width: '100%',
                             }}
@@ -127,9 +126,10 @@ const DraftOrders = () => {
                                         background: '#fff',
                                         borderRadius: '18px',
                                         padding: '18px',
-                                        boxShadow:
-                                            '0 4px 18px rgba(0,0,0,0.06)',
+                                        boxShadow: '0 4px 18px rgba(0,0,0,0.06)',
                                         border: '1px solid #f1f1f1',
+                                        display: 'flex',
+                                        flexDirection: 'column',
                                     }}
                                 >
                                     {/* Header */}
@@ -139,20 +139,23 @@ const DraftOrders = () => {
                                             justifyContent: 'space-between',
                                             alignItems: 'flex-start',
                                             marginBottom: '18px',
+                                            gap: '10px',
                                         }}
                                     >
-                                        <div>
+                                        <div style={{ minWidth: 0 }}>
                                             <h3
                                                 style={{
                                                     margin: 0,
                                                     fontSize: '18px',
                                                     fontWeight: 700,
                                                     color: '#1a1a1a',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                    whiteSpace: 'nowrap',
                                                 }}
                                             >
                                                 {order.event_name}
                                             </h3>
-
                                             <p
                                                 style={{
                                                     margin: '6px 0 0',
@@ -168,12 +171,13 @@ const DraftOrders = () => {
                                             style={{
                                                 background: '#FFF4D6',
                                                 color: '#B7791F',
-                                                padding:
-                                                    '6px 12px',
+                                                padding: '6px 12px',
                                                 borderRadius: '999px',
                                                 fontSize: '11px',
                                                 fontWeight: 700,
                                                 textTransform: 'uppercase',
+                                                whiteSpace: 'nowrap',
+                                                flexShrink: 0,
                                             }}
                                         >
                                             {order.status}
@@ -189,14 +193,8 @@ const DraftOrders = () => {
                                             marginBottom: '12px',
                                         }}
                                     >
-                                        <FiCalendar color="#E8A317" />
-
-                                        <span
-                                            style={{
-                                                fontSize: '14px',
-                                                color: '#555',
-                                            }}
-                                        >
+                                        <FiCalendar color="#E8A317" style={{ flexShrink: 0 }} />
+                                        <span style={{ fontSize: '14px', color: '#555' }}>
                                             {formatDate(order.event_date)}
                                         </span>
                                     </div>
@@ -210,21 +208,9 @@ const DraftOrders = () => {
                                             marginBottom: '12px',
                                         }}
                                     >
-                                        <FiClock color="#E8A317" />
-
-                                        <span
-                                            style={{
-                                                fontSize: '14px',
-                                                color: '#555',
-                                            }}
-                                        >
-                                            {formatTime(
-                                                order.event_start_at
-                                            )}{' '}
-                                            -{' '}
-                                            {formatTime(
-                                                order.event_end_at
-                                            )}
+                                        <FiClock color="#E8A317" style={{ flexShrink: 0 }} />
+                                        <span style={{ fontSize: '14px', color: '#555' }}>
+                                            {formatTime(order.event_start_at)} – {formatTime(order.event_end_at)}
                                         </span>
                                     </div>
 
@@ -239,11 +225,8 @@ const DraftOrders = () => {
                                     >
                                         <FiMapPin
                                             color="#E8A317"
-                                            style={{
-                                                marginTop: '3px',
-                                            }}
+                                            style={{ marginTop: '3px', flexShrink: 0 }}
                                         />
-
                                         <span
                                             style={{
                                                 fontSize: '14px',
@@ -258,55 +241,35 @@ const DraftOrders = () => {
                                     {/* Pricing */}
                                     <div
                                         style={{
-                                            borderTop:
-                                                '1px solid #f2f2f2',
+                                            borderTop: '1px solid #f2f2f2',
                                             paddingTop: '16px',
                                             marginBottom: '18px',
                                         }}
                                     >
-                                        <div
+                                        {/* <div
                                             style={{
                                                 display: 'flex',
-                                                justifyContent:
-                                                    'space-between',
+                                                justifyContent: 'space-between',
                                                 marginBottom: '10px',
                                             }}
                                         >
-                                            <span
-                                                style={{
-                                                    color: '#777',
-                                                    fontSize: '14px',
-                                                }}
-                                            >
+                                            <span style={{ color: '#777', fontSize: '14px' }}>
                                                 Subtotal
                                             </span>
-
                                             <strong>
-                                                ₹
-                                                {Number(
-                                                    order.subtotal
-                                                ).toLocaleString(
-                                                    'en-IN'
-                                                )}
+                                                ₹{Number(order.subtotal).toLocaleString('en-IN')}
                                             </strong>
-                                        </div>
+                                        </div> */}
 
                                         <div
                                             style={{
                                                 display: 'flex',
-                                                justifyContent:
-                                                    'space-between',
+                                                justifyContent: 'space-between',
                                             }}
                                         >
-                                            <span
-                                                style={{
-                                                    color: '#1a1a1a',
-                                                    fontWeight: 600,
-                                                }}
-                                            >
+                                            <span style={{ color: '#1a1a1a', fontWeight: 600 }}>
                                                 Total
                                             </span>
-
                                             <span
                                                 style={{
                                                     fontSize: '18px',
@@ -314,12 +277,7 @@ const DraftOrders = () => {
                                                     color: '#E8A317',
                                                 }}
                                             >
-                                                ₹
-                                                {Number(
-                                                    order.total_amount
-                                                ).toLocaleString(
-                                                    'en-IN'
-                                                )}
+                                                ₹{Number(order.total_amount).toLocaleString('en-IN')}
                                             </span>
                                         </div>
                                     </div>
@@ -336,36 +294,36 @@ const DraftOrders = () => {
                                         }}
                                     >
                                         <FiFileText />
-
-                                        Created on{' '}
-                                        {formatDate(order.created_at)}
+                                        Created on {formatDate(order.created_at)}
                                     </div>
 
-                                    {/* Action Button */}
-                                    <button 
-                                        onClick={() =>
-                                            navigate('/requestBook', {
-                                                state: { orderId: order.id },
-                                            })
-                                        }
-                                        style={{
-                                            width: '100%',
-                                            border: 'none',
-                                            background: '#E8A317',
-                                            color: '#fff',
-                                            padding: '12px',
-                                            borderRadius: '10px',
-                                            fontWeight: 700,
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            gap: '8px',
-                                        }}
-                                    >
-                                        Continue Draft
-                                        <FiArrowRight />
-                                    </button>
+                                    {/* Action Button — pinned to bottom */}
+                                    <div style={{ marginTop: 'auto' }}>
+                                        <button
+                                            onClick={() =>
+                                                navigate('/requestBook', {
+                                                    state: { orderId: order.id },
+                                                })
+                                            }
+                                            style={{
+                                                width: '100%',
+                                                border: 'none',
+                                                background: '#E8A317',
+                                                color: '#fff',
+                                                padding: '12px',
+                                                borderRadius: '10px',
+                                                fontWeight: 700,
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: '8px',
+                                            }}
+                                        >
+                                            Continue Draft
+                                            <FiArrowRight />
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
                         </div>
