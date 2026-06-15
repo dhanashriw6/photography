@@ -179,14 +179,14 @@ const handleBookNow = async () => {
             </div>
 
             {/* Pincode / Zipcode */}
-            <div className="su-field" style={{ gridColumn: 'span 2' }}>
+            {/* <div className="su-field" style={{ gridColumn: 'span 2' }}>
               <label>Pincode / Zipcode</label>
               <input
                 type="text"
                 value={form.pincode}
                 onChange={e => handleChange('pincode', e.target.value)}
               />
-            </div>
+            </div> */}
 
             {/* Terms checkbox */}
             <div style={{ gridColumn: 'span 2', marginTop: '4px', display: 'flex' }}>

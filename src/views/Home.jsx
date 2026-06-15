@@ -16,12 +16,10 @@ import {
   Categories,
 } from '../Components';
 import Hero2 from '../Components/Hero2';
-import CustomCursor from '../Components/CustomCursor';
 
 const Home = () => {
   return (
     <div className="App">
-      <CustomCursor />
       {/* Global elements that feel like part of the landing flow */}
       <div className="grain-overlay" />
       <Navigation />

@@ -1,7 +1,6 @@
 // Export all components from a single file for cleaner imports
 export { default as Navigation } from './Navigation';
 export { default as Hero } from './Hero';
-export { default as CustomCursor } from './CustomCursor';
 export { default as ScrollProgress } from './ScrollProgress';
 export { default as MarqueeStrip } from './MarqueeStrip';
 export { default as UserPaths } from './UserPaths';

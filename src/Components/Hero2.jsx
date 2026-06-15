@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useMotionValue } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useCursor } from './CustomCursor';
 import "../index.css"
 
 // ─── Curved Image Scroll ────────────────────────────────────────────────────
@@ -156,7 +155,6 @@ function CurvedImageScroll() {
 // ─── Hero2 ───────────────────────────────────────────────────────────────────
 
 const Hero2 = () => {
-  const { setCursorVariant } = useCursor();
   const navigate = useNavigate();
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 500], [0, 100]);
@@ -266,8 +264,6 @@ const Hero2 = () => {
             style={{ width: isMobile?'60px':'100px', height:'2px', background:'#FFAE00', margin:'0 auto 2rem', transformOrigin:'center', boxShadow:'0 0 10px rgba(255,174,0,0.5)' }} />
 
           <h1
-            onMouseEnter={() => setCursorVariant('camera')}
-            onMouseLeave={() => setCursorVariant('default')}
             style={{ margin:'1.5rem 0', display:'flex', flexDirection:'column', alignItems:'center', position:'relative', fontWeight:'900' }}>
             <div style={{ display:'flex', flexDirection:'row', textTransform:'capitalize', alignItems:'center', justifyContent:'center', gap: isMobile?'0.5rem':'0' }}>
               <div style={{ display:'flex', overflow:'visible', padding: isMobile?'0.25rem 0':'0.5rem 2rem', justifyContent:'center' }}>

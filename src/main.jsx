@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
-import { CursorProvider } from './Components/CustomCursor'
 import { getOrCreateDeviceId } from './utils/deviceId.js'
 
 getOrCreateDeviceId() 
@@ -11,9 +10,7 @@ getOrCreateDeviceId()
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
-      <CursorProvider>
-        <App />
-      </CursorProvider>
+      <App />
     </BrowserRouter>
   </StrictMode>
 )
