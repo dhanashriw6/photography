@@ -52,7 +52,7 @@ const CashWithdrawal = ({ balance = 123.0, onWithdraw }) => {
                     </div>
                 </div>
  
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                <div className="pe-form-actions" style={{ marginTop: 0 }}>
                     <button
                         className="su-btn-primary-outline"
                         // onClick={() => setShowChange(v => !v)}
@@ -72,10 +72,7 @@ const CashWithdrawal = ({ balance = 123.0, onWithdraw }) => {
             {/* Inline Change Bank Details form */}
            
                 <div>
-                    <h2 style={{
-                        margin: '0 0 24px',
-                        fontSize: '24px', fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.02em',
-                    }}>
+                    <h2 className="pe-title" style={{ marginBottom: '24px' }}>
                         Change Bank Details
                     </h2>
  
@@ -106,7 +103,7 @@ const CashWithdrawal = ({ balance = 123.0, onWithdraw }) => {
  
                     </div>
  
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '28px' }}>
+                    <div className="pe-form-actions" style={{ marginTop: '28px' }}>
                         <button className="su-btn-primary-outline" onClick={() => setShowChange(false)}>Cancel</button>
                         <button
                             className="su-btn-primary"

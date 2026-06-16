@@ -92,13 +92,14 @@ const Navigation = () => {
           gap: '0.5rem',
           cursor: 'pointer'
         }}>
-          <Camera size={isMobile ? 20 : 24} />
+          <img src='/src/assets/Images/Final-logo.png' alt="Logo" style={{ width: '50px', height: '50px' }} />
+          {/* <Camera size={isMobile ? 20 : 24} /> */}
           <span style={{
             fontFamily: 'var(--font-heading)',
             fontSize: isMobile ? '1.2rem' : '1.5rem',
             fontWeight: 'bold'
           }}>
-            Online Photographer
+            Fulltime Photographers
           </span>
         </div>
 

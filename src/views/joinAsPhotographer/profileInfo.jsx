@@ -630,7 +630,7 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
     const setLangNames = (names) => setLanguages(names.map(name => languages.find(l => l.name === name) || languageSuggestions.find(s => s.name === name) || { id: null, name, proficiency: 'fluent' }));
 
     return (
-        <div>
+        <div className="profile-form-container">
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
             <h2 style={{ margin: '0 0 6px', fontSize: '28px', fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.02em' }}>
@@ -686,7 +686,7 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
             )}
 
             {/* ── Personal fields ── */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '24px 20px' }}>
+           <div className="profile-grid">
                 <div className="su-field">
                     <label>First Name</label>
                     <input type="text" value={form.firstName} onChange={set('firstName')} />
@@ -713,7 +713,7 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
                     </div>
                     <p className="su-field-hint">Enter a valid phone number to receive OTPs</p>
                 </div>
-                <div className="su-field" style={{ gridColumn: 'span 2' }}>
+                <div className="su-field full-width-field">
                     <label>Gender</label>
                     <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
                         {['male', 'female'].map(g => {
@@ -749,21 +749,21 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
                 </div>
 
                 {/* Skills multi-select */}
-                <div className="su-field" style={{ gridColumn: 'span 2' }}>
+                <div className="su-field full-width-field">
                     <label>Skills<sup style={{ color: '#ef4444' }}>*</sup></label>
                     <MultiSkillSelect selected={skills} onChange={setSkills} />
                     <p className="su-field-hint">Select one or more skills that apply to you.</p>
                 </div>
 
-                <div style={{ gridColumn: 'span 2' }}>
+                <div className="full-width-field">
                     <TagInput label="Which cast you can't shoot" tags={castNames} setTags={setCastNames}
                         placeholder="e.g. Patel, Aditi..." suggestions={casteSuggestions.map(s => s.name)} />
                 </div>
-                <div style={{ gridColumn: 'span 2' }}>
+                <div className="full-width-field">
                     <TagInput label="Specialization" tags={specNames} setTags={setSpecNames}
                         placeholder="e.g. Wedding, Portrait…" suggestions={categorySuggestions.map(s => s.name)} />
                 </div>
-                <div style={{ gridColumn: 'span 2' }}>
+                <div className="full-width-field">
                     <TagInput label="Languages Spoken" tags={langNames} setTags={setLangNames}
                         placeholder="e.g. English, Hindi…" suggestions={languageSuggestions.map(s => s.name)} />
                 </div>
@@ -790,7 +790,7 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
                     <label>State</label>
                     <input type="text" value={currentAddress.state} onChange={e => setCurrentAddress(p => ({ ...p, state: e.target.value }))} placeholder="State" />
                 </div>
-                <div className="su-field" style={{ gridColumn: 'span 2' }}>
+                <div className="su-field full-width-field">
                     <label>Country / Region</label>
                     <input type="text" value={currentAddress.country} onChange={e => setCurrentAddress(p => ({ ...p, country: e.target.value }))} placeholder="Country" />
                 </div>
@@ -817,7 +817,7 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
                     <label>State</label>
                     <input type="text" value={permanentAddress.state} onChange={e => setPermanentAddress(p => ({ ...p, state: e.target.value }))} placeholder="State" />
                 </div>
-                <div className="su-field" style={{ gridColumn: 'span 2' }}>
+                <div className="su-field full-width-field">
                     <label>Country / Region</label>
                     <input type="text" value={permanentAddress.country} onChange={e => setPermanentAddress(p => ({ ...p, country: e.target.value }))} placeholder="Country" />
                 </div>

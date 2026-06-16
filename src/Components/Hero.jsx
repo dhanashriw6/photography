@@ -547,7 +547,7 @@ const ParallaxColumn = ({ images, duration, reverse, yStart = "0%" }) => (
       }}>
         <img
           src={src}
-          alt="Online Photographer"
+          alt="Fulltime Photographer"
           style={{
             width: '100%',
             height: '100%',

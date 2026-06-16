@@ -18,8 +18,9 @@ const Navigation = () => (
     color: 'var(--color-beige)'
   }}>
     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <img src="/src/assets/Images/Final-logo.png" alt="Logo" style={{ width: '100px', height: '100px' }} />
       <Camera size={24} />
-      <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', fontWeight: 'bold' }}>Online Photographer</span>
+      <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', fontWeight: 'bold' }}>Fulltime Photographers</span>
     </div>
     <div style={{ display: 'flex', gap: '2rem', fontFamily: 'var(--font-body)', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
       <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Photographers</a>
@@ -41,7 +42,7 @@ const Hero = () => {
   const rotate1 = useTransform(scrollY, [0, 500], [0, 10]);
   const rotate2 = useTransform(scrollY, [0, 500], [0, -15]);
 
-  const titleline1 = "Online".split("");
+  const titleline1 = "FullTime".split("");
   const titleline2 = "Photographer".split("");
 
   // Floating poster images
@@ -250,7 +251,7 @@ const Hero = () => {
               pointerEvents: 'none'
             }}
           >
-            Online Photographer
+            Fulltime Photographera
           </motion.div>
 
           <div style={{ display: 'flex', overflow: 'hidden' }}>
@@ -981,7 +982,7 @@ const Testimonials = () => {
     {
       name: "Sarah Mitchell",
       role: "Wedding Client",
-      text: "Online Photographer connected us with an incredible photographer who captured our special day perfectly. The platform made everything seamless!",
+      text: "Fulltime Photographer connected us with an incredible photographer who captured our special day perfectly. The platform made everything seamless!",
       rating: 5,
       image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&q=80"
     },
@@ -995,7 +996,7 @@ const Testimonials = () => {
     {
       name: "Emily Chen",
       role: "Brand Manager",
-      text: "We've hired multiple photographers through Online Photographer for our campaigns. The quality and professionalism are consistently outstanding.",
+      text: "We've hired multiple photographers through Fulltime Photographer for our campaigns. The quality and professionalism are consistently outstanding.",
       rating: 5,
       image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&q=80"
     }
@@ -1483,7 +1484,7 @@ const CTASection = () => {
               margin: '0 auto 3rem'
             }}
           >
-            Join thousands of clients and creators who trust Online Photographer for exceptional photography experiences.
+            Join thousands of clients and creators who trust Fulltime Photographer for exceptional photography experiences.
           </motion.p>
 
           <div

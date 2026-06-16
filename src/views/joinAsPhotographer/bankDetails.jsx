@@ -79,10 +79,7 @@ const AddBankDetails = ({ onSave, onCancel }) => {
 
     return (
         <div>
-            <h2 style={{
-                margin: '0 0 6px',
-                fontSize: '28px', fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.02em',
-            }}>
+            <h2 className="pe-title">
                 Add Bank Details
             </h2>
             <p style={{ margin: '0 0 24px', fontSize: '12px', color: '#aaa', lineHeight: 1.6 }}>
@@ -238,7 +235,7 @@ const AddBankDetails = ({ onSave, onCancel }) => {
             </div>
 
             {/* Action buttons */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '32px' }}>
+            <div className="pe-form-actions" style={{ marginTop: '32px' }}>
                 <button onClick={onCancel} className="su-btn-primary-outline">Cancel</button>
                 <button
                     type="button"

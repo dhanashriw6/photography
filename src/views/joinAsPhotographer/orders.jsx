@@ -120,10 +120,7 @@ const YourOrderList = () => {
     return (
         <div>
             {/* Header */}
-            <h2 style={{
-                margin: '0 0 20px', fontSize: '28px', fontWeight: 700,
-                color: '#1a1a1a', letterSpacing: '-0.02em',
-            }}>
+            <h2 className="pe-title">
                 Your Order list
             </h2>
 
@@ -187,11 +184,7 @@ const YourOrderList = () => {
             </div>
 
             {/* Order Cards Grid */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-                gap: '16px',
-            }}>
+            <div className="pe-orders-grid">
                 {filtered.map(order => (
                     <OrderCard key={order.id} order={order} />
                 ))}

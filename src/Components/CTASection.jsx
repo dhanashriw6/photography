@@ -83,7 +83,7 @@ const CTASection = () => {
               margin: '0 auto 3rem'
             }}
           >
-            Join thousands of clients and creators who trust Online Photographer for exceptional photography experiences.
+            Join thousands of clients and creators who trust Fulltime Photographer for exceptional photography experiences.
           </motion.p>
 
           <div

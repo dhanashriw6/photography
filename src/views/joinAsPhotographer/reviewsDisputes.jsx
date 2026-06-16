@@ -16,32 +16,42 @@ const ReviewCard = ({ name, avatar, text, time, rating, liked, onLike }) => (
         flexDirection: 'column',
         gap: '10px',
     }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {/* Avatar */}
-            <div style={{
-                width: '44px', height: '44px', borderRadius: '50%', overflow: 'hidden',
-                background: '#e5e7eb', flexShrink: 0,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '18px',
-            }}>
-                {avatar
-                    ? <img src={avatar} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    : <span>📷</span>
-                }
+        <div className="pe-review-row">
+            <div className="pe-review-user-info">
+                {/* Avatar */}
+                <div style={{
+                    width: '44px', height: '44px', borderRadius: '50%', overflow: 'hidden',
+                    background: '#e5e7eb', flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '18px',
+                }}>
+                    {avatar
+                        ? <img src={avatar} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        : <span>📷</span>
+                    }
+                </div>
+     
+                {/* Name & Stars (mobile) */}
+                <div>
+                    <p style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#1a1a1a' }}>{name}</p>
+                    <div className="pe-review-rating-mobile">
+                        <StarRating rating={rating} />
+                        <span style={{ fontSize: '11px', color: '#aaa' }}>{time}</span>
+                    </div>
+                </div>
             </div>
  
-            {/* Name + text */}
-            <div style={{ flex: 1 }}>
-                <p style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#1a1a1a' }}>{name}</p>
-                <p style={{ margin: '2px 0 0', fontSize: '13px', color: '#666', lineHeight: 1.4 }}>{text}</p>
-            </div>
- 
-            {/* Rating + time */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', flexShrink: 0 }}>
+            {/* Rating + time (desktop) */}
+            <div className="pe-review-rating-desktop">
                 <StarRating rating={rating} />
                 <span style={{ fontSize: '11px', color: '#aaa' }}>{time}</span>
             </div>
         </div>
+
+        {/* Text */}
+        <p className="pe-review-text" style={{ margin: 0, fontSize: '13px', color: '#666', lineHeight: 1.4, paddingLeft: '56px' }}>
+            {text}
+        </p>
  
         {/* Like */}
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -74,7 +84,7 @@ const Reviews = ({ reviews: initialReviews }) => {
  
     return (
         <div>
-            <h2 style={{ margin: '0 0 20px', fontSize: '28px', fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.02em' }}>
+            <h2 className="pe-title" style={{ marginBottom: '20px' }}>
                 Reviews
             </h2>
  

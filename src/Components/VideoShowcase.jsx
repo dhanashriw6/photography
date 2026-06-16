@@ -113,7 +113,7 @@ const VideoShowcase = () => {
 
             <div className="video-player-container">
                 <div className="player-header">
-                    <span className="player-brand">Online Photographer</span>
+                    <span className="player-brand">Fulltime Photographers</span>
                     <div className="player-status">
                         <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>100%</span>
                         <Battery size={18} fill="currentColor" />

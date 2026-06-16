@@ -465,8 +465,7 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
                 </div>
 
                 {/* ── Social Links — 2 column grid ── */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '20px' }}>
-                    <div className="su-field">
+<div className="profile-grid">                    <div className="su-field">
                         <label>Instagram Profile Link</label>
                         <input type="url" value={socials.instagram}
                             onChange={e => setSocials(s => ({ ...s, instagram: e.target.value }))}

@@ -3,50 +3,58 @@ import PhotographerLayout from './PhotographerLayout';
 import { useNavigate } from 'react-router-dom';
 import {
     FiUser, FiLock, FiChevronRight, FiHome,
-    FiImage, FiPackage, FiShoppingBag, FiCreditCard, FiStar
+    FiImage, FiPackage, FiShoppingBag, FiCreditCard, FiStar, FiChevronDown
 } from 'react-icons/fi';
-import ProfileInformation from './profileInfo';     
+import ProfileInformation from './profileInfo';
 import Portfolio          from './portfolio';
 import Package            from './package';
 import Orders             from './orders';
 import Wallet             from './wallet';
 import ReviewsDisputes    from './reviewsDisputes';
 import ChangePassword     from './changePassword';
-import AddBankDetails from './bankDetails';
+import AddBankDetails     from './bankDetails';
 
 const MENU = [
-    { key: 'profile',   label: 'Profile Information', icon: <FiUser      size={17} /> },
-    { key: 'portfolio', label: 'Portfolio',            icon: <FiImage     size={17} /> },
-    { key: 'package',   label: 'Package',              icon: <FiPackage   size={17} /> },
-    { key: 'orders',    label: 'Orders',               icon: <FiShoppingBag size={17} /> },
-    {key : 'bankDetails', label : 'Bank Details', icon : <FiCreditCard size={17} />},
-    { key: 'wallet',    label: 'Wallet',               icon: <FiCreditCard size={17} /> },
-    { key: 'reviews',   label: 'Reviews & Disputes',   icon: <FiStar      size={17} /> },
-    { key: 'password',  label: 'Change Password',      icon: <FiLock      size={17} /> },
+    { key: 'profile',     label: 'Profile Information', icon: <FiUser        size={17} /> },
+    { key: 'portfolio',   label: 'Portfolio',           icon: <FiImage       size={17} /> },
+    { key: 'package',     label: 'Package',             icon: <FiPackage     size={17} /> },
+    { key: 'orders',      label: 'Orders',              icon: <FiShoppingBag size={17} /> },
+    { key: 'bankDetails', label: 'Bank Details',        icon: <FiCreditCard  size={17} /> },
+    { key: 'wallet',      label: 'Wallet',              icon: <FiCreditCard  size={17} /> },
+    { key: 'reviews',     label: 'Reviews & Disputes',  icon: <FiStar        size={17} /> },
+    { key: 'password',    label: 'Change Password',     icon: <FiLock        size={17} /> },
 ];
 
 const PhotographerEditProfile = () => {
-    const [active, setActive]   = useState('profile');
-    const navigate              = useNavigate();
-    const completion            = 64;
+    const [active, setActive]         = useState('profile');
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const navigate                    = useNavigate();
+    const completion                  = 64;
+
+    const activeItem = MENU.find(m => m.key === active);
 
     const renderContent = () => {
         switch (active) {
-            case 'profile':   return <ProfileInformation onSave={() => {}} onCancel={() => navigate(-1)} />;
-            case 'portfolio': return <Portfolio />;
-            case 'package':   return <Package />;
-            case 'orders':    return <Orders />;
+            case 'profile':     return <ProfileInformation onSave={() => {}} onCancel={() => navigate(-1)} />;
+            case 'portfolio':   return <Portfolio />;
+            case 'package':     return <Package />;
+            case 'orders':      return <Orders />;
             case 'bankDetails': return <AddBankDetails />;
-            case 'wallet':    return <Wallet />;
-            case 'reviews':   return <ReviewsDisputes />;
-            case 'password':  return <ChangePassword />;
-            default:          return null;
+            case 'wallet':      return <Wallet />;
+            case 'reviews':     return <ReviewsDisputes />;
+            case 'password':    return <ChangePassword />;
+            default:            return null;
         }
+    };
+
+    const handleMenuSelect = (key) => {
+        setActive(key);
+        setMobileMenuOpen(false);
     };
 
     return (
         <PhotographerLayout>
-            <div style={{ width: '100%', margin: '0 auto', padding: '0 40px 60px', fontFamily: 'inherit' }}>
+            <div className="pe-container">
 
                 {/* Breadcrumb */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 0 24px', fontSize: '13px', color: '#888' }}>
@@ -60,21 +68,90 @@ const PhotographerEditProfile = () => {
                     <span style={{ color: '#1a1a1a', fontWeight: 600 }}>Edit Profile</span>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: '28px', alignItems: 'start' }}>
-
-                    {/* ════ LEFT SIDEBAR ════ */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', position: 'sticky', top: '24px' }}>
-
-                        {/* Progress card */}
-                        <div style={{
-                            background: 'var(--color-orange)',
-                            borderRadius: '16px',
-                            padding: '18px 20px',
+                {/* ── Mobile: section picker dropdown ── */}
+                <div className="pe-mobile-picker">
+                    <button
+                        type="button"
+                        onClick={() => setMobileMenuOpen(v => !v)}
+                        style={{
+                            width: '100%',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '14px',
-                            boxShadow: '0 4px 20px rgba(232,163,23,0.3)',
+                            justifyContent: 'space-between',
+                            padding: '12px 16px',
+                            background: '#fff',
+                            border: '1.5px solid #E8A317',
+                            borderRadius: mobileMenuOpen ? '12px 12px 0 0' : '12px',
+                            cursor: 'pointer',
+                            fontFamily: 'inherit',
+                            fontSize: '14px',
+                            fontWeight: 600,
+                            color: '#1a1a1a',
+                        }}
+                    >
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <span style={{ color: '#E8A317', display: 'flex' }}>{activeItem?.icon}</span>
+                            {activeItem?.label}
+                        </span>
+                        <FiChevronDown
+                            size={18}
+                            style={{
+                                color: '#E8A317',
+                                transform: mobileMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                                transition: 'transform 0.2s',
+                                flexShrink: 0,
+                            }}
+                        />
+                    </button>
+
+                    {mobileMenuOpen && (
+                        <div style={{
+                            background: '#fff',
+                            border: '1.5px solid #E8A317',
+                            borderTop: 'none',
+                            borderRadius: '0 0 12px 12px',
+                            overflow: 'hidden',
                         }}>
+                            {MENU.filter(m => m.key !== active).map((item, i, arr) => (
+                                <button
+                                    key={item.key}
+                                    type="button"
+                                    onClick={() => handleMenuSelect(item.key)}
+                                    style={{
+                                        width: '100%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '10px',
+                                        padding: '12px 16px',
+                                        background: 'transparent',
+                                        border: 'none',
+                                        borderBottom: i < arr.length - 1 ? '1px solid #f5f5f5' : 'none',
+                                        cursor: 'pointer',
+                                        fontFamily: 'inherit',
+                                        fontSize: '14px',
+                                        fontWeight: 500,
+                                        color: '#333',
+                                        textAlign: 'left',
+                                        transition: 'background 0.15s',
+                                    }}
+                                    onMouseEnter={e => e.currentTarget.style.background = '#fffbf0'}
+                                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                                >
+                                    <span style={{ color: '#bbb', display: 'flex' }}>{item.icon}</span>
+                                    {item.label}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                <div className="pe-grid">
+
+                    {/* ════ LEFT SIDEBAR — desktop only ════ */}
+                    <div className="pe-sidebar">
+
+                        {/* Progress card */}
+                        <div className="pe-progress-card">
                             <div style={{ position: 'relative', flexShrink: 0 }}>
                                 <svg width="56" height="56" viewBox="0 0 56 56">
                                     <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="4" />
@@ -98,39 +175,15 @@ const PhotographerEditProfile = () => {
                         </div>
 
                         {/* Nav menu */}
-                        <div style={{
-                            background: '#fff',
-                            borderRadius: '16px',
-                            overflow: 'hidden',
-                            boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-                            border: '1px solid #f0f0f0',
-                        }}>
+                        <div className="pe-nav-menu">
                             {MENU.map((item, i) => {
                                 const isActive = active === item.key;
                                 return (
                                     <button
                                         key={item.key}
                                         onClick={() => setActive(item.key)}
-                                        style={{
-                                            width: '100%',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '12px',
-                                            padding: '15px 18px',
-                                            background: isActive ? '#FFF3D6' : 'transparent',
-                                            border: 'none',
-                                            borderLeft: isActive ? '3px solid var(--color-orange)' : '3px solid transparent',
-                                            borderBottom: i < MENU.length - 1 ? '1px solid #f5f5f5' : 'none',
-                                            cursor: 'pointer',
-                                            fontSize: '14px',
-                                            fontWeight: isActive ? 700 : 500,
-                                            color: isActive ? 'var(--color-orange)' : '#555',
-                                            fontFamily: 'inherit',
-                                            textAlign: 'left',
-                                            transition: 'all 0.18s ease',
-                                        }}
-                                        onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = '#fafafa'; }}
-                                        onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
+                                        className={`pe-nav-btn ${isActive ? 'active' : ''}`}
+                                        style={{ borderBottom: i < MENU.length - 1 ? undefined : 'none' }}
                                     >
                                         <span style={{ color: isActive ? 'var(--color-orange)' : '#bbb', display: 'flex', flexShrink: 0 }}>
                                             {item.icon}
@@ -143,14 +196,7 @@ const PhotographerEditProfile = () => {
                     </div>
 
                     {/* ════ RIGHT CONTENT ════ */}
-                    <div style={{
-                        background: '#fff',
-                        borderRadius: '16px',
-                        padding: '32px 36px',
-                        boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-                        border: '1px solid #f0f0f0',
-                        minHeight: '500px',
-                    }}>
+                    <div className="pe-content-card">
                         {renderContent()}
                     </div>
 

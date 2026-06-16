@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './index.css';
-import logo from '../assets/Images/logo1.png';
+import logo from '../assets/Images/Final-logo.png';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BsInstagram } from 'react-icons/bs';
@@ -248,7 +248,7 @@ const ViewsLayout = ({ children }) => {
             onClick={() => navigate('/home')}
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginTop: '10px' }}
           >
-            <img src={logo} alt="Online Photographer logo" className="w-[180px] md:w-[224px]" />
+            <img src={logo} alt="Fulltime Photographer logo" className="w-[140px] md:w-[140px]" />
           </button>
 
           {/* Desktop nav + avatar */}
@@ -313,7 +313,7 @@ const ViewsLayout = ({ children }) => {
         >
           {/* Brand */}
           <div>
-            <img src={logo} alt="Online Photographer logo"
+            <img src={logo} alt="Fulltime Photographer logo"
               style={{ width: '180px', height: 'auto', display: 'block' }} />
           </div>
 
@@ -369,7 +369,7 @@ const ViewsLayout = ({ children }) => {
           textAlign: 'center',
           fontSize: '12px', color: '#999', fontWeight: 500,
         }}>
-          © 2025 online photographer | All rights reserved by{' '}
+          © 2026 Fulltime photographer | All rights reserved by{' '}
           <span style={{ color: '#1a1a1a', fontWeight: 700 }}>DIGI- Trend.</span>
         </div>
       </footer>

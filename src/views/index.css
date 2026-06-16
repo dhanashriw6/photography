@@ -308,6 +308,7 @@
   transition: transform 0.15s, opacity 0.15s;
   text-decoration: none;
 }
+
 .provider-chip {
   background: #f6f7f8;
   border: 1px solid #e8e8e8;
@@ -461,5 +462,87 @@
 
   .views-nav {
     display: none;
+  }
+}
+
+/* ── Add these rules to your existing CSS file (index.css or wherever pe-* lives) ── */
+
+/* Mobile section picker — shown only below md breakpoint */
+.pe-mobile-picker {
+  display: none;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 10;
+}
+
+/* Desktop sidebar — hidden on mobile */
+.pe-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Responsive overrides ── */
+@media (max-width: 767px) {
+
+  /* Show the mobile dropdown picker */
+  .pe-mobile-picker {
+    display: block;
+  }
+
+  /* Stack grid into single column */
+  .pe-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px;
+  }
+
+  /* Hide the sidebar on mobile — navigation is handled by the dropdown */
+  .pe-sidebar {
+    display: none;
+  }
+
+  /* Content card full width, tighter padding */
+  .pe-content-card {
+    padding: 20px 16px !important;
+  }
+
+  /* Container gets less horizontal breathing room */
+  .pe-container {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 100% !important;
+  }
+}
+.profile-form-container {
+  width: 100%;
+  max-width: 1000px;
+}
+
+@media (max-width: 768px) {
+  .profile-form-container {
+    padding: 0 12px;
+  }
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px 20px;
+}
+
+@media (max-width: 768px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.full-width-field {
+  grid-column: span 2;
+}
+
+@media (max-width: 768px) {
+  .full-width-field {
+    grid-column: span 1;
   }
 }

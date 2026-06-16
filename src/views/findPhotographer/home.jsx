@@ -302,9 +302,8 @@ const Home = () => {
                     </div>
 
                     {/* Headline */}
-                    <h1 style={{
+                    <h1 className='md:text-[60px] text-[30px]' style={{
                         margin: '0 0 22px',
-                        fontSize: '60px',
                         fontWeight: 700,
                         lineHeight: 1.15,
                         color: '#1a1a1a',

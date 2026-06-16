@@ -67,7 +67,6 @@ const PackageModal = ({ open, onClose, onSaved, editData, categories, userSkills
                     ? 'Package updated successfully!'
                     : 'Package added successfully!'
             );
-
             onClose();
         } catch (err) {
             const msg =
@@ -90,146 +89,155 @@ const PackageModal = ({ open, onClose, onSaved, editData, categories, userSkills
                 style={{
                     position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)',
                     zIndex: 1000, backdropFilter: 'blur(2px)',
-                    animation: 'modalFadeIn 0.18s ease',
                 }}
             />
 
-            {/* Modal panel */}
-            <div style={{
-                position: 'fixed', top: '50%', left: '50%',
-                transform: 'translate(-50%, -50%)',
-                zIndex: 1001, width: '100%', maxWidth: '480px',
-                background: '#fff', borderRadius: '16px',
-                boxShadow: '0 24px 60px rgba(0,0,0,0.18)',
-                padding: '32px 28px 28px',
-                animation: 'modalSlideUp 0.22s cubic-bezier(0.34,1.56,0.64,1)',
+            {/* Modal wrapper — bottom sheet on mobile, centered on desktop */}
+            <div className="pkg-modal-wrapper" style={{
+                position: 'fixed', inset: 0,
+                zIndex: 1001,
+                display: 'flex',
+                alignItems: 'flex-end',
+                justifyContent: 'center',
             }}>
+                <div className="pkg-modal-inner" style={{
+                    width: '100%',
+                    maxWidth: '480px',
+                    background: '#fff',
+                    borderRadius: '16px 16px 0 0',
+                    boxShadow: '0 -8px 48px rgba(0,0,0,0.18)',
+                    padding: '28px 20px 32px',
+                    maxHeight: '92dvh',
+                    overflowY: 'auto',
+                }}>
+                    {/* Drag handle (mobile) */}
+                    <div className="pkg-drag-handle" style={{
+                        width: '36px', height: '4px', background: '#e5e7eb',
+                        borderRadius: '2px', margin: '0 auto 20px',
+                    }} />
 
-                {/* Modal header */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-                    <div>
-                        <p style={{ margin: '0 0 2px', fontSize: '11px', fontWeight: 700, color: '#f5a623', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                            {editData ? 'Edit Package' : 'New Package'}
-                        </p>
-                        <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.02em' }}>
-                            {editData ? 'Update Package' : 'Add Package'}
-                        </h2>
-                    </div>
-                    <button
-                        onClick={onClose}
-                        style={{
-                            width: '32px', height: '32px', borderRadius: '50%',
-                            border: '1.5px solid #e5e7eb', background: '#fafafa',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            cursor: 'pointer', color: '#888', flexShrink: 0,
-                            transition: 'all 0.15s',
-                        }}
-                        onMouseEnter={e => { e.currentTarget.style.background = '#fee2e2'; e.currentTarget.style.borderColor = '#ef4444'; e.currentTarget.style.color = '#ef4444'; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = '#fafafa'; e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.color = '#888'; }}
-                    >
-                        <FiX size={15} />
-                    </button>
-                </div>
-
-                {error && (
-                    <div style={{
-                        marginBottom: '16px', padding: '10px 14px', borderRadius: '8px',
-                        background: '#fee2e2', color: '#b91c1c', fontSize: '13px',
-                    }}>
-                        {error}
-                    </div>
-                )}
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-                    {/* Category dropdown */}
-                    <div className="su-field">
-                        <label>Category</label>
-                        <select value={form.category_id} onChange={set('category_id')}>
-                            <option value="">Select Category</option>
-                            {categories.map(cat => (
-                                <option key={cat.id ?? cat.name} value={cat.id}>
-                                    {cat.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="su-field">
-                        <label>Skill</label>
-                        <select value={form.skill} onChange={set('skill')}>
-                            <option value="">Select Skill</option>
-                            {userSkills.map(skill => (
-                                <option key={skill} value={skill}>
-                                    {skill.charAt(0).toUpperCase() + skill.slice(1).replace(/_/g, ' ')}
-                                </option>
-                            ))}
-                        </select>
+                    {/* Modal header */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+                        <div>
+                            <p style={{ margin: '0 0 2px', fontSize: '11px', fontWeight: 700, color: '#f5a623', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                                {editData ? 'Edit Package' : 'New Package'}
+                            </p>
+                            <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.02em' }}>
+                                {editData ? 'Update Package' : 'Add Package'}
+                            </h2>
+                        </div>
+                        <button
+                            onClick={onClose}
+                            style={{
+                                width: '32px', height: '32px', borderRadius: '50%',
+                                border: '1.5px solid #e5e7eb', background: '#fafafa',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                cursor: 'pointer', color: '#888', flexShrink: 0,
+                                transition: 'all 0.15s',
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.background = '#fee2e2'; e.currentTarget.style.borderColor = '#ef4444'; e.currentTarget.style.color = '#ef4444'; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = '#fafafa'; e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.color = '#888'; }}
+                        >
+                            <FiX size={15} />
+                        </button>
                     </div>
 
-                    {/* Price per Hour */}
-                    <div className="su-field">
-                        <label>Price Per Hour (₹)</label>
-                        <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={form.price_per_hour}
-                            onChange={set('price_per_hour')}
-                            placeholder="e.g. 500"
-                        />
+                    {error && (
+                        <div style={{
+                            marginBottom: '16px', padding: '10px 14px', borderRadius: '8px',
+                            background: '#fee2e2', color: '#b91c1c', fontSize: '13px',
+                        }}>
+                            {error}
+                        </div>
+                    )}
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+
+                        {/* Category dropdown */}
+                        <div className="su-field">
+                            <label>Category</label>
+                            <select value={form.category_id} onChange={set('category_id')}>
+                                <option value="">Select Category</option>
+                                {categories.map(cat => (
+                                    <option key={cat.id ?? cat.name} value={cat.id}>{cat.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Skill dropdown */}
+                        <div className="su-field">
+                            <label>Skill</label>
+                            <select value={form.skill} onChange={set('skill')}>
+                                <option value="">Select Skill</option>
+                                {userSkills.map(skill => (
+                                    <option key={skill} value={skill}>
+                                        {skill.charAt(0).toUpperCase() + skill.slice(1).replace(/_/g, ' ')}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Price row — side-by-side on wider screens */}
+                        <div className="pkg-price-grid">
+                            <div className="su-field">
+                                <label>Per Hour (₹)</label>
+                                <input type="number" min="0" step="0.01" value={form.price_per_hour} onChange={set('price_per_hour')} placeholder="e.g. 500" />
+                            </div>
+                            <div className="su-field">
+                                <label>Half Day (₹)</label>
+                                <input type="number" min="0" step="0.01" value={form.price_per_half_day} onChange={set('price_per_half_day')} placeholder="e.g. 1500" />
+                            </div>
+                            <div className="su-field">
+                                <label>Per Day (₹)</label>
+                                <input type="number" min="0" step="0.01" value={form.price_per_day} onChange={set('price_per_day')} placeholder="e.g. 2500" />
+                            </div>
+                        </div>
+
                     </div>
 
-                    {/* Price per Half Day */}
-                    <div className="su-field">
-                        <label>Price Per Half Day (₹)</label>
-                        <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={form.price_per_half_day}
-                            onChange={set('price_per_half_day')}
-                            placeholder="e.g. 1500"
-                        />
+                    {/* Modal actions */}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
+                        <button onClick={onClose} className="su-btn-primary-outline" disabled={loading}>
+                            Cancel
+                        </button>
+                        <button
+                            onClick={handleSubmit}
+                            className="su-btn-primary"
+                            style={{ padding: '11px 32px', borderRadius: '50px' }}
+                            disabled={loading}
+                        >
+                            {loading ? 'Saving...' : editData ? 'Update' : 'Save'}
+                        </button>
                     </div>
-
-                    {/* Price per Day */}
-                    <div className="su-field">
-                        <label>Price Per Day (₹)</label>
-                        <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={form.price_per_day}
-                            onChange={set('price_per_day')}
-                            placeholder="e.g. 2500"
-                        />
-                    </div>
-
-                </div>
-
-                {/* Modal actions */}
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
-                    <button onClick={onClose} className="su-btn-primary-outline" disabled={loading}>
-                        Cancel
-                    </button>
-                    <button
-                        onClick={handleSubmit}
-                        className="su-btn-primary"
-                        style={{ padding: '11px 32px', borderRadius: '50px' }}
-                        disabled={loading}
-                    >
-                        {loading ? 'Saving...' : editData ? 'Update' : 'Save'}
-                    </button>
                 </div>
             </div>
 
             <style>{`
-        @keyframes modalFadeIn { from { opacity: 0 } to { opacity: 1 } }
-        @keyframes modalSlideUp {
-          from { opacity: 0; transform: translate(-50%, -46%) scale(0.97); }
-          to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        }
-      `}</style>
+                @media (min-width: 600px) {
+                    .pkg-modal-wrapper {
+                        align-items: center !important;
+                    }
+                    .pkg-modal-inner {
+                        border-radius: 16px !important;
+                        max-height: 90dvh !important;
+                        padding: 32px 28px 28px !important;
+                    }
+                    .pkg-drag-handle {
+                        display: none !important;
+                    }
+                }
+                .pkg-price-grid {
+                    display: grid;
+                    grid-template-columns: 1fr;
+                    gap: 14px;
+                }
+                @media (min-width: 420px) {
+                    .pkg-price-grid {
+                        grid-template-columns: repeat(3, 1fr);
+                        gap: 10px;
+                    }
+                }
+            `}</style>
         </>
     );
 };
@@ -243,10 +251,7 @@ const AddYourPackage = ({ onSave, onCancel }) => {
     const [pageLoading, setPageLoading] = useState(true);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    const [deleteModal, setDeleteModal] = useState({
-        open: false,
-        id: null,
-    });
+    const [deleteModal, setDeleteModal] = useState({ open: false, id: null });
     const [userSkills] = useState(() => {
         try {
             const stored = localStorage.getItem('photographer_skills');
@@ -258,16 +263,9 @@ const AddYourPackage = ({ onSave, onCancel }) => {
     const fetchPackages = async () => {
         try {
             setError('');
-
             const res = await getAllPackages();
-
-            const data =
-                res?.data?.data?.packages ??
-                res?.data?.data ??
-                [];
-
+            const data = res?.data?.data?.packages ?? res?.data?.data ?? [];
             setPackages(Array.isArray(data) ? data : []);
-
         } catch {
             setError('Failed to load packages.');
         }
@@ -289,40 +287,19 @@ const AddYourPackage = ({ onSave, onCancel }) => {
         init();
     }, []);
 
-    const handleEdit = (pkg) => {
-        setEditData(pkg);
-        setModalOpen(true);
-    };
-
-    const handleDelete = (id) => {
-        setDeleteModal({
-            open: true,
-            id,
-        });
-    };
+    const handleEdit = (pkg) => { setEditData(pkg); setModalOpen(true); };
+    const handleDelete = (id) => setDeleteModal({ open: true, id });
+    const openAdd = () => { setEditData(null); setModalOpen(true); };
 
     const confirmDelete = async () => {
         try {
             setDeleteLoading(true);
             setError('');
-
             await deletePackage(deleteModal.id);
-
-            setPackages(prev =>
-                prev.filter(p => p.id !== deleteModal.id)
-            );
-
+            setPackages(prev => prev.filter(p => p.id !== deleteModal.id));
             setSuccess('Package deleted successfully!');
-
-            setTimeout(() => {
-                setSuccess('');
-            }, 2500);
-
-            setDeleteModal({
-                open: false,
-                id: null,
-            });
-
+            setTimeout(() => setSuccess(''), 2500);
+            setDeleteModal({ open: false, id: null });
         } catch {
             setError('Failed to delete package.');
         } finally {
@@ -330,17 +307,19 @@ const AddYourPackage = ({ onSave, onCancel }) => {
         }
     };
 
-    const openAdd = () => {
-        setEditData(null);
-        setModalOpen(true);
-    };
-
     return (
         <div>
-            {/* Header */}
-            <div className='flex w-full justify-between items-start' style={{ marginBottom: '20px' }}>
+            {/* ── Header ── */}
+            <div style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '12px',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '20px',
+            }}>
                 <h2 style={{
-                    margin: 0, fontSize: '28px', fontWeight: 700,
+                    margin: 0, fontSize: 'clamp(20px, 5vw, 28px)', fontWeight: 700,
                     color: '#1a1a1a', letterSpacing: '-0.02em',
                 }}>
                     Add Your Package
@@ -349,7 +328,7 @@ const AddYourPackage = ({ onSave, onCancel }) => {
                     type="button"
                     onClick={openAdd}
                     className="su-btn-primary"
-                    style={{ padding: '11px 32px', borderRadius: '50px' }}
+                    style={{ padding: '10px 24px', borderRadius: '50px', whiteSpace: 'nowrap' }}
                 >
                     Add Package
                 </button>
@@ -357,14 +336,9 @@ const AddYourPackage = ({ onSave, onCancel }) => {
 
             {success && (
                 <div style={{
-                    background: '#F0FDF4',
-                    border: '1.5px solid #86EFAC',
-                    borderRadius: '10px',
-                    padding: '14px 18px',
-                    marginBottom: '20px',
-                    fontSize: '13px',
-                    color: '#16A34A',
-                    fontWeight: 600,
+                    background: '#F0FDF4', border: '1.5px solid #86EFAC',
+                    borderRadius: '10px', padding: '14px 18px', marginBottom: '20px',
+                    fontSize: '13px', color: '#16A34A', fontWeight: 600,
                 }}>
                     ✓ {success}
                 </div>
@@ -372,12 +346,8 @@ const AddYourPackage = ({ onSave, onCancel }) => {
 
             {error && (
                 <div style={{
-                    marginBottom: '16px',
-                    padding: '10px 14px',
-                    borderRadius: '8px',
-                    background: '#fee2e2',
-                    color: '#b91c1c',
-                    fontSize: '13px',
+                    marginBottom: '16px', padding: '10px 14px', borderRadius: '8px',
+                    background: '#fee2e2', color: '#b91c1c', fontSize: '13px',
                 }}>
                     {error}
                 </div>
@@ -385,7 +355,6 @@ const AddYourPackage = ({ onSave, onCancel }) => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
 
-                {/* Loading */}
                 {pageLoading ? (
                     <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0' }}>
                         <div style={{
@@ -395,7 +364,6 @@ const AddYourPackage = ({ onSave, onCancel }) => {
                         }} />
                     </div>
                 ) : packages.length === 0 ? (
-                    /* Empty state */
                     <div style={{
                         display: 'flex', flexDirection: 'column', alignItems: 'center',
                         justifyContent: 'center', padding: '40px 20px', gap: '10px',
@@ -408,17 +376,13 @@ const AddYourPackage = ({ onSave, onCancel }) => {
                         </p>
                     </div>
                 ) : (
-                    /* ── Compact horizontal package cards ── */
                     packages.map(pkg => (
                         <div
                             key={pkg.id}
+                            className="pkg-card"
                             style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '12px',
                                 border: '1.5px solid #e5e7eb',
                                 borderRadius: '10px',
-                                padding: '10px 14px',
                                 background: '#fafafa',
                                 position: 'relative',
                                 overflow: 'hidden',
@@ -435,126 +399,128 @@ const AddYourPackage = ({ onSave, onCancel }) => {
                         >
                             {/* Left accent bar */}
                             <div style={{
-                                position: 'absolute', left: 0, top: 0, bottom: 0,
-                                width: '3px',
+                                position: 'absolute', left: 0, top: 0, bottom: 0, width: '3px',
                                 background: 'linear-gradient(180deg, #f5a623, #f7c26b)',
                                 borderRadius: '10px 0 0 10px',
                             }} />
 
-                            {/* Category badge */}
-                            <span style={{
-                                display: 'inline-block',
-                                padding: '4px 12px',
-                                borderRadius: '20px',
-                                background: '#FFF3D6',
-                                color: '#c27a00',
-                                fontSize: '12px',
-                                fontWeight: 700,
-                                letterSpacing: '0.03em',
-                                whiteSpace: 'nowrap',
-                                flexShrink: 0,
-                                minWidth: '130px',
-                                textAlign: 'center',
+                            {/* Card inner — responsive layout */}
+                            <div className="pkg-card-inner" style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '10px',
+                                padding: '12px 12px 12px 16px',
                             }}>
-                                {pkg.category.name}
-                            </span>
-
-                            {/* Divider */}
-                            <div style={{ width: '1px', alignSelf: 'stretch', background: '#e5e7eb', flexShrink: 0 }} />
-                            <span style={{
-                                fontSize: '14px',
-                                fontWeight: 700,
-                                color: '#1a1a1a',
-                                minWidth: '130px',
-                                textAlign: 'center',
-                                textTransform: 'capitalize',
-                                letterSpacing: '0.03em',
-                            }}>
-                                {pkg.skill
-                                    ? pkg.skill
-                                        .split('_')
-                                        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-                                        .join(' ')
-                                    : 'N/A'}
-                            </span>
-
-                            {/* Price columns */}
-                            <div style={{ display: 'flex', flex: 1, gap: 0 }}>
-                                {[
-                                    { label: 'Per Hour', value: pkg.price_per_hour },
-                                    { label: 'Half Day', value: pkg.price_per_half_day },
-                                    { label: 'Per Day', value: pkg.price_per_day },
-                                ].map(({ label, value }, i, arr) => (
-                                    <div
-                                        key={label}
-                                        style={{
-                                            flex: 1,
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            gap: '2px',
-                                            padding: '2px 8px',
-                                            borderRight: i < arr.length - 1 ? '1px solid #f0f0f0' : 'none',
-                                        }}
-                                    >
+                                {/* Top row: badges + action buttons */}
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                        {/* Category badge */}
                                         <span style={{
-                                            fontSize: '10px',
-                                            color: '#999',
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '0.06em',
-                                            fontWeight: 600,
-                                        }}>
-                                            {label}
-                                        </span>
-                                        <span style={{
-                                            fontSize: '15px',
+                                            display: 'inline-block',
+                                            padding: '4px 12px',
+                                            borderRadius: '20px',
+                                            background: '#FFF3D6',
+                                            color: '#c27a00',
+                                            fontSize: '12px',
                                             fontWeight: 700,
-                                            color: '#1a1a1a',
+                                            letterSpacing: '0.03em',
+                                            whiteSpace: 'nowrap',
                                         }}>
-                                            ₹{Number(value).toLocaleString('en-IN')}
+                                            {pkg.category.name}
+                                        </span>
+
+                                        {/* Skill badge */}
+                                        <span style={{
+                                            display: 'inline-block',
+                                            padding: '4px 12px',
+                                            borderRadius: '20px',
+                                            background: '#F3F4F6',
+                                            color: '#374151',
+                                            fontSize: '12px',
+                                            fontWeight: 700,
+                                            letterSpacing: '0.03em',
+                                            whiteSpace: 'nowrap',
+                                            textTransform: 'capitalize',
+                                        }}>
+                                            {pkg.skill
+                                                ? pkg.skill.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+                                                : 'N/A'}
                                         </span>
                                     </div>
-                                ))}
-                            </div>
 
-                            {/* Divider */}
-                            <div style={{ width: '1px', alignSelf: 'stretch', background: '#e5e7eb', flexShrink: 0 }} />
+                                    {/* Action buttons */}
+                                    <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleEdit(pkg)}
+                                            style={{
+                                                width: '30px', height: '30px', borderRadius: '8px',
+                                                border: '1.5px solid #e5e7eb', background: '#fff',
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                cursor: 'pointer', color: '#666', transition: 'all 0.15s',
+                                            }}
+                                            onMouseEnter={e => { e.currentTarget.style.borderColor = '#f5a623'; e.currentTarget.style.color = '#f5a623'; e.currentTarget.style.background = '#FFF9EE'; }}
+                                            onMouseLeave={e => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.color = '#666'; e.currentTarget.style.background = '#fff'; }}
+                                        >
+                                            <FiEdit2 size={13} />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleDelete(pkg.id)}
+                                            style={{
+                                                width: '30px', height: '30px', borderRadius: '8px',
+                                                border: '1.5px solid #e5e7eb', background: '#fff',
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                cursor: 'pointer', color: '#666', transition: 'all 0.15s',
+                                            }}
+                                            onMouseEnter={e => { e.currentTarget.style.borderColor = '#ef4444'; e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = '#fee2e2'; }}
+                                            onMouseLeave={e => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.color = '#666'; e.currentTarget.style.background = '#fff'; }}
+                                        >
+                                            <FiTrash2 size={13} />
+                                        </button>
+                                    </div>
+                                </div>
 
-                            {/* Action buttons */}
-                            <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
-                                <button
-                                    type="button"
-                                    onClick={() => handleEdit(pkg)}
-                                    style={{
-                                        width: '30px', height: '30px', borderRadius: '8px',
-                                        border: '1.5px solid #e5e7eb', background: '#fff',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        cursor: 'pointer', color: '#666', transition: 'all 0.15s',
-                                    }}
-                                    onMouseEnter={e => { e.currentTarget.style.borderColor = '#f5a623'; e.currentTarget.style.color = '#f5a623'; e.currentTarget.style.background = '#FFF9EE'; }}
-                                    onMouseLeave={e => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.color = '#666'; e.currentTarget.style.background = '#fff'; }}
-                                >
-                                    <FiEdit2 size={13} />
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => handleDelete(pkg.id)}
-                                    style={{
-                                        width: '30px', height: '30px', borderRadius: '8px',
-                                        border: '1.5px solid #e5e7eb', background: '#fff',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        cursor: 'pointer', color: '#666', transition: 'all 0.15s',
-                                    }}
-                                    onMouseEnter={e => { e.currentTarget.style.borderColor = '#ef4444'; e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = '#fee2e2'; }}
-                                    onMouseLeave={e => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.color = '#666'; e.currentTarget.style.background = '#fff'; }}
-                                >
-                                    <FiTrash2 size={13} />
-                                </button>
+                                {/* Price columns — always row, wraps on tiny screens */}
+                                <div style={{
+                                    display: 'flex',
+                                    borderTop: '1px solid #f0f0f0',
+                                    paddingTop: '10px',
+                                    gap: 0,
+                                }}>
+                                    {[
+                                        { label: 'Per Hour', value: pkg.price_per_hour },
+                                        { label: 'Half Day', value: pkg.price_per_half_day },
+                                        { label: 'Per Day', value: pkg.price_per_day },
+                                    ].map(({ label, value }, i, arr) => (
+                                        <div
+                                            key={label}
+                                            style={{
+                                                flex: 1,
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                gap: '2px',
+                                                padding: '2px 4px',
+                                                borderRight: i < arr.length - 1 ? '1px solid #f0f0f0' : 'none',
+                                            }}
+                                        >
+                                            <span style={{
+                                                fontSize: '10px', color: '#999',
+                                                textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600,
+                                            }}>
+                                                {label}
+                                            </span>
+                                            <span style={{ fontSize: '14px', fontWeight: 700, color: '#1a1a1a' }}>
+                                                ₹{Number(value).toLocaleString('en-IN')}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     ))
                 )}
-
             </div>
 
             {/* Modal */}
@@ -563,12 +529,8 @@ const AddYourPackage = ({ onSave, onCancel }) => {
                 onClose={() => setModalOpen(false)}
                 onSaved={async (message) => {
                     await fetchPackages();
-
                     setSuccess(message);
-
-                    setTimeout(() => {
-                        setSuccess('');
-                    }, 2500);
+                    setTimeout(() => setSuccess(''), 2500);
                 }}
                 editData={editData}
                 categories={categories}
@@ -576,91 +538,53 @@ const AddYourPackage = ({ onSave, onCancel }) => {
             />
 
             <style>{`@keyframes pkgSpin { to { transform: rotate(360deg); } }`}</style>
+
             {/* Delete Confirmation Modal */}
             {deleteModal.open && (
                 <>
                     <div
-                        onClick={() =>
-                            setDeleteModal({
-                                open: false,
-                                id: null,
-                            })
-                        }
+                        onClick={() => setDeleteModal({ open: false, id: null })}
                         style={{
-                            position: 'fixed',
-                            inset: 0,
-                            background: 'rgba(0,0,0,0.35)',
-                            zIndex: 1100,
-                            backdropFilter: 'blur(2px)',
+                            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)',
+                            zIndex: 1100, backdropFilter: 'blur(2px)',
                         }}
                     />
-
                     <div style={{
                         position: 'fixed',
-                        top: '50%',
-                        left: '50%',
+                        /* center on all screen sizes */
+                        top: '50%', left: '50%',
                         transform: 'translate(-50%, -50%)',
                         zIndex: 1101,
-                        width: '100%',
+                        width: 'calc(100% - 32px)',
                         maxWidth: '420px',
                         background: '#fff',
                         borderRadius: '16px',
                         boxShadow: '0 24px 60px rgba(0,0,0,0.18)',
-                        padding: '28px',
+                        padding: '28px 24px',
                     }}>
-
-
-
-                        <h3 style={{
-                            margin: '0 0 8px',
-                            fontSize: '22px',
-                            fontWeight: 700,
-                            color: '#111827',
-                        }}>
+                        <h3 style={{ margin: '0 0 8px', fontSize: '20px', fontWeight: 700, color: '#111827' }}>
                             Delete Package
                         </h3>
-
-                        <p style={{
-                            margin: '0 0 24px',
-                            fontSize: '14px',
-                            color: '#6B7280',
-                            lineHeight: 1.6,
-                        }}>
-                            Are you sure you want to delete this package?
-                            This action cannot be undone.
+                        <p style={{ margin: '0 0 24px', fontSize: '14px', color: '#6B7280', lineHeight: 1.6 }}>
+                            Are you sure you want to delete this package? This action cannot be undone.
                         </p>
-
-                        <div style={{
-                            display: 'flex',
-                            justifyContent: 'flex-end',
-                            gap: '12px',
-                        }}>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
                             <button
                                 type="button"
                                 className="su-btn-primary-outline"
-                                onClick={() =>
-                                    setDeleteModal({
-                                        open: false,
-                                        id: null,
-                                    })
-                                }
+                                onClick={() => setDeleteModal({ open: false, id: null })}
                                 disabled={deleteLoading}
                             >
                                 Cancel
                             </button>
-
                             <button
                                 type="button"
                                 onClick={confirmDelete}
                                 disabled={deleteLoading}
                                 style={{
-                                    background: '#DC2626',
-                                    color: '#fff',
-                                    border: 'none',
-                                    borderRadius: '50px',
-                                    padding: '11px 24px',
-                                    fontWeight: 600,
-                                    cursor: 'pointer',
+                                    background: '#DC2626', color: '#fff', border: 'none',
+                                    borderRadius: '50px', padding: '11px 24px',
+                                    fontWeight: 600, cursor: 'pointer',
                                     opacity: deleteLoading ? 0.7 : 1,
                                 }}
                             >
