@@ -8,9 +8,9 @@ import { FiUser, FiEdit2, FiLogOut, FiAlertCircle, FiMenu, FiX } from 'react-ico
 
 const navItems = [
   { label: 'Home', to: '/join-as-photographer/home' },
-  { label: 'About Us', to: '/about-us' },
-  { label: 'FAQs', to: '/faqs' },
-  { label: 'Blog', to: '/blog' },
+  // { label: 'About Us', to: '/about-us' },
+  // { label: 'FAQs', to: '/faqs' },
+  // { label: 'Blog', to: '/blog' },
 ];
 
 /* ── Avatar Dropdown ── */
@@ -33,13 +33,28 @@ const AvatarDropdown = () => {
     navigate('/');
   };
 
-  const menuItems = [
-    { icon: <FiEdit2 size={15} />, label: 'Edit Profile', action: () => navigate('/join-as-photographer/edit-profile') },
-    // { icon: <FiAlertCircle size={15} />, label: 'Raise a Dispute', action: () => navigate('/dispute'), danger: true },
-    { divider: true },
-    { icon: <FiLogOut size={15} />, label: 'Logout', action: handleLogout, danger: true },
-  ];
+ const isLoggedIn = !!localStorage.getItem('authToken');
 
+const menuItems = [
+  ...(isLoggedIn
+    ? [
+        {
+          icon: <FiEdit2 size={15} />,
+          label: 'Edit Profile',
+          action: () => navigate('/join-as-photographer/edit-profile'),
+        },
+      ]
+    : []),
+
+  { divider: true },
+
+  {
+    icon: <FiLogOut size={15} />,
+    label: 'Logout',
+    action: handleLogout,
+    danger: true,
+  },
+];
   return (
     <div ref={ref} style={{ position: 'relative' }}>
       <button
@@ -283,7 +298,7 @@ const PhotographerLayout = ({ children }) => {
               className="flex md:hidden"
               style={{
                 background: 'none', border: 'none', cursor: 'pointer',
-                color: '#555', padding: '4px', display: 'flex', alignItems: 'center',
+                color: '#555', padding: '4px',  alignItems: 'center',
               }}
             >
               <FiMenu size={24} />
@@ -305,83 +320,218 @@ const PhotographerLayout = ({ children }) => {
         {children}
       </motion.main>
 
-      {/* ── Footer ── */}
-      <footer style={{ background: '#fff', borderTop: '1px solid #ebebeb' }}>
-        <div
-          style={{
-            margin: '0 auto',
-            padding: '36px 24px 0px',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(1, 1fr)',
-            gap: '32px',
-          }}
-          className="md:grid-cols-[220px_1fr_auto]"
-        >
-          {/* Brand */}
-          <div style={{ marginTop: '-60px' }}>
-            <img
-              src={logo}
-              alt="Fulltime Photographer logo"
-              style={{ width: '200px', height: 'auto', display: 'block', marginTop: '20px' }}
-            />
-          </div>
+     {/* ── Footer ── */}
+{/* ── Footer ── */}
+<footer
+  style={{
+    background: '#fff',
+    borderTop: '1px solid #ebebeb',
+    marginTop: 'auto',
+  }}
+>
+  <div
+    style={{
+      maxWidth: '1200px',
+      margin: '0 auto',
+      padding: '56px 32px 40px',
+      display: 'grid',
+      gridTemplateColumns: '1fr',
+      gap: '40px',
+    }}
+    className="md:!grid-cols-[1.3fr_1fr_1fr_1fr]"
+  >
+    {/* Brand */}
+    <div>
+      <img
+        src={logo}
+        alt="Fulltime Photographer"
+        style={{ width: '160px', height: 'auto', display: 'block' }}
+      />
 
-          {/* Links */}
-          <div>
-            <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#1a1a1a', margin: '0 0 16px' }}>
-              Useful Links
-            </h4>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, auto)', gap: '0 32px' }}>
-              {[
-                ['FAQs', 'Customer Care'],
-                ['About', 'Blog'],
-                ['Privacy Policy', 'Terms'],
-              ].map((col, ci) => (
-                <div key={ci} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {col.map(link => (
-                    <a key={link} href="#" style={{
-                      fontSize: '13px', color: '#555', textDecoration: 'none',
-                      fontWeight: 500, transition: 'color 0.15s',
-                    }}
-                      onMouseEnter={e => e.currentTarget.style.color = '#1a1a1a'}
-                      onMouseLeave={e => e.currentTarget.style.color = '#555'}
-                    >{link}</a>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
+      <p
+        style={{
+          fontSize: '13.5px',
+          color: '#777',
+          lineHeight: 1.7,
+          marginTop: '16px',
+          marginBottom: 0,
+          maxWidth: '260px',
+        }}
+      >
+        Connecting talented photographers with clients who value creativity,
+        professionalism, and unforgettable moments.
+      </p>
 
-          {/* Social icons */}
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            {[
-              { content: <span style={{ fontSize: '16px', fontWeight: 700 }}>in</span> },
-              { content: <BsInstagram size={19} /> },
-              { content: <span style={{ fontSize: '16px', fontWeight: 700 }}>f</span> },
-            ].map((s, i) => (
-              <div key={i} style={{
-                width: '42px', height: '42px', borderRadius: '10px',
-                background: '#FFAE00', color: '#fff',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', transition: 'opacity 0.2s, transform 0.2s',
-              }}>
-                {s.content}
-              </div>
-            ))}
+      <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
+        {[
+          <span style={{ fontSize: '14px', fontWeight: 700 }}>in</span>,
+          <BsInstagram size={17} />,
+          <span style={{ fontSize: '14px', fontWeight: 700 }}>f</span>,
+        ].map((icon, index) => (
+          <div
+            key={index}
+            style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '10px',
+              background: '#FFAE00',
+              color: '#fff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'opacity 0.2s, transform 0.2s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.opacity = '0.85'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+            onMouseLeave={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'translateY(0)'; }}
+          >
+            {icon}
           </div>
-        </div>
+        ))}
+      </div>
+    </div>
 
-        {/* Bottom bar */}
-        <div style={{
-          borderTop: '1px solid #ebebeb',
-          padding: '14px 24px',
-          textAlign: 'center',
-          fontSize: '12px', color: '#999', fontWeight: 500,
-        }}>
-          © 2026 Fulltime photographer | All rights reserved by{' '}
-          <span style={{ color: '#1a1a1a', fontWeight: 700 }}>DIGI- Trend.</span>
-        </div>
-      </footer>
+    {/* Useful Links */}
+    <div>
+      <h4
+        style={{
+          fontSize: '14px',
+          fontWeight: 700,
+          color: '#1a1a1a',
+          margin: '0 0 20px',
+          letterSpacing: '0.2px',
+        }}
+      >
+        Useful Links
+      </h4>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        {[
+          ['Home', '/join-as-photographer/home'],
+          ['About Us', '/about-us'],
+          ['FAQs', '/faqs'],
+          ['Blog', '/blog'],
+          ['Contact', '/contact'],
+        ].map(([label, to]) => (
+          <button
+            key={label}
+            onClick={() => navigate(to)}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              textAlign: 'left',
+              cursor: 'pointer',
+              fontSize: '13.5px',
+              color: '#555',
+              fontWeight: 500,
+              fontFamily: 'inherit',
+              width: 'fit-content',
+              transition: 'color 0.15s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.color = '#1a1a1a'}
+            onMouseLeave={e => e.currentTarget.style.color = '#555'}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    {/* For Photographers */}
+    <div>
+      <h4
+        style={{
+          fontSize: '14px',
+          fontWeight: 700,
+          color: '#1a1a1a',
+          margin: '0 0 20px',
+          letterSpacing: '0.2px',
+        }}
+      >
+        For Photographers
+      </h4>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        {[
+          ['Join as Photographer', '/join-as-photographer'],
+          ['KYC Verification', '/kyc-verification'],
+          ['Photographer Login', '/photographer-login'],
+          ['Dashboard', '/dashboard'],
+          ['Support', '/support'],
+        ].map(([label, to]) => (
+          <button
+            key={label}
+            onClick={() => navigate(to)}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              textAlign: 'left',
+              cursor: 'pointer',
+              fontSize: '13.5px',
+              color: '#555',
+              fontWeight: 500,
+              fontFamily: 'inherit',
+              width: 'fit-content',
+              transition: 'color 0.15s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.color = '#1a1a1a'}
+            onMouseLeave={e => e.currentTarget.style.color = '#555'}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    {/* Contact */}
+    <div>
+      <h4
+        style={{
+          fontSize: '14px',
+          fontWeight: 700,
+          color: '#1a1a1a',
+          margin: '0 0 20px',
+          letterSpacing: '0.2px',
+        }}
+      >
+        Contact Us
+      </h4>
+
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '14px',
+          fontSize: '13.5px',
+          color: '#555',
+          fontWeight: 500,
+        }}
+      >
+        <span>support@fulltimephotographer.com</span>
+        <span>+91 98765 43210</span>
+        <span>Rajkot, Gujarat, India</span>
+        <span>Mon - Sat : 10:00 AM - 7:00 PM</span>
+      </div>
+    </div>
+  </div>
+
+  {/* Bottom Bar */}
+  <div
+    style={{
+      borderTop: '1px solid #ebebeb',
+      padding: '18px 32px',
+      textAlign: 'center',
+      fontSize: '12px',
+      color: '#999',
+      fontWeight: 500,
+    }}
+  >
+    © {new Date().getFullYear()} Fulltime Photographer. All Rights Reserved.{' '}
+    <span style={{ color: '#1a1a1a', fontWeight: 700 }}>by DiGi Trend</span>
+  </div>
+</footer>
 
       <div className="views-accent-bar" />
     </div>

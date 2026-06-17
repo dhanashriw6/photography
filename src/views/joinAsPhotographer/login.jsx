@@ -154,7 +154,7 @@ const LoginPhotographer = () => {
               </div>
 
               {/* Remember me */}
-              <div style={{ gridColumn: 'span 2', marginTop: '4px', display: 'flex' }}>
+              {/* <div style={{ gridColumn: 'span 2', marginTop: '4px', display: 'flex' }}>
                 <label className="su-checkbox-row">
                   <input
                     type="checkbox"
@@ -163,7 +163,7 @@ const LoginPhotographer = () => {
                   />
                   <span>Remember me</span>
                 </label>
-              </div>
+              </div> */}
 
               {/* Submit */}
               <div style={{ gridColumn: 'span 2', marginTop: '4px' }}>

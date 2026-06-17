@@ -76,7 +76,7 @@ const Navigation = () => {
           top: 0,
           left: 0,
           right: 0,
-          padding: isMobile ? '1.5rem' : '2rem',
+          padding: isMobile ? '1.5rem' : '1rem',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -92,7 +92,7 @@ const Navigation = () => {
           gap: '0.5rem',
           cursor: 'pointer'
         }}>
-          <img src='/src/assets/Images/Final-logo.png' alt="Logo" style={{ width: '50px', height: '50px' }} />
+          <img src='/src/assets/Images/white-variant.png' alt="Logo" style={{ width: '80px', height: '60px' }} />
           {/* <Camera size={isMobile ? 20 : 24} /> */}
           <span style={{
             fontFamily: 'var(--font-heading)',

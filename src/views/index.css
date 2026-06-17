@@ -243,6 +243,13 @@
   transition: background 0.2s;
 }
 
+.su-btn-primary:disabled,
+.su-btn-primary-outline:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
 /* ── Footer ── */
 .views-footer {
   background: #fff;
