@@ -6,19 +6,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { BsInstagram } from 'react-icons/bs';
 import { FiUser, FiEdit2, FiCalendar, FiLogOut, FiAlertCircle, FiMenu, FiX } from 'react-icons/fi';
 
-const navItems = [
-  { label: 'Home', to: '/home' },
-  { label: 'Draft Orders', to: '/draft-orders' },
-  // { label: 'About Us', to: '/about-us' },
-  // { label: 'FAQs', to: '/faqs' },
-  // { label: 'Blog', to: '/blog' },
-];
 
-/* ── Avatar Dropdown ── */
-const AvatarDropdown = () => {
+
+/* ── Avatar Dropdown (desktop only) ── */
+const AvatarDropdown = ({ menuItems }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const handler = (e) => {
@@ -28,28 +21,8 @@ const AvatarDropdown = () => {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-   const isLoggedIn = !!localStorage.getItem('authToken');
-
-
-  const menuItems = [
-     ...(isLoggedIn
-        ? [
-            {
-              icon: <FiEdit2 size={15} />,
-              label: 'Edit Profile',
-              action: () => navigate('/join-as-photographer/edit-profile'),
-            },
-          ]
-        : []),
-    
-      { divider: true },
-    { icon: <FiAlertCircle size={15} />, label: 'Raise a Dispute', action: () => navigate('/dispute'), danger: true },
-    { divider: true },
-    { icon: <FiLogOut size={15} />, label: 'Logout', action: () => navigate('/'), danger: true },
-  ];
-
   return (
-    <div ref={ref} style={{ position: 'relative' }}>
+    <div ref={ref} style={{ position: 'relative' }} className="hidden md:block">
       <button
         type="button"
         onClick={() => setOpen(v => !v)}
@@ -131,8 +104,8 @@ const AvatarDropdown = () => {
   );
 };
 
-/* ── Mobile Drawer ── */
-const MobileDrawer = ({ open, onClose }) => {
+/* ── Mobile Drawer (nav links + profile menu, mobile only) ── */
+const MobileDrawer = ({ open, onClose, navItems, menuItems }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -166,9 +139,10 @@ const MobileDrawer = ({ open, onClose }) => {
             transition={{ duration: 0.28, ease: 'easeOut' }}
             style={{
               position: 'fixed', top: 0, right: 0, bottom: 0,
-              width: '260px', background: '#fff', zIndex: 1101,
+              width: '270px', background: '#fff', zIndex: 1101,
               display: 'flex', flexDirection: 'column',
               boxShadow: '-8px 0 32px rgba(0,0,0,0.12)',
+              overflowY: 'auto',
             }}
           >
             {/* Drawer header */}
@@ -186,6 +160,51 @@ const MobileDrawer = ({ open, onClose }) => {
               >
                 <FiX size={22} />
               </button>
+            </div>
+
+            {/* Profile section */}
+            <div style={{
+              padding: '16px 20px', borderBottom: '1px solid #f0f0f0',
+              background: 'linear-gradient(135deg, #FFF3D6 0%, #fff8ea 100%)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '38px', height: '38px', borderRadius: '50%',
+                  background: '#E8A317', display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', flexShrink: 0, color: '#fff',
+                }}>
+                  <FiUser size={18} />
+                </div>
+                <div>
+                  <p style={{ margin: 0, fontSize: '13.5px', fontWeight: 700, color: '#1a1a1a' }}>John Doe</p>
+                  <p style={{ margin: 0, fontSize: '11.5px', color: '#999', fontWeight: 500 }}>john@example.com</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Profile menu items (Edit Profile, Raise a Dispute, Logout, etc.) */}
+            <div style={{ padding: '8px 0', borderBottom: '1px solid #f0f0f0' }}>
+              {menuItems.map((item, i) => {
+                if (item.divider) return <div key={i} style={{ height: '1px', background: '#f5f5f5', margin: '4px 0' }} />;
+                return (
+                  <button
+                    key={i} type="button"
+                    onClick={() => { item.action(); onClose(); }}
+                    style={{
+                      width: '100%', display: 'flex', alignItems: 'center', gap: '10px',
+                      padding: '12px 20px', background: 'transparent', border: 'none',
+                      cursor: 'pointer', fontSize: '14px', fontWeight: 600,
+                      color: item.danger ? '#e53935' : '#333', textAlign: 'left',
+                      transition: 'background 0.15s', fontFamily: 'inherit',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = item.danger ? '#fff5f5' : '#f9f9f9'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                  >
+                    <span style={{ color: item.danger ? '#e53935' : '#E8A317', display: 'flex' }}>{item.icon}</span>
+                    {item.label}
+                  </button>
+                );
+              })}
             </div>
 
             {/* Nav links */}
@@ -243,6 +262,35 @@ const ViewsLayout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const isLoggedIn = !!localStorage.getItem('authToken');
+  const navItems = isLoggedIn
+  ? [
+      { label: 'Home', to: '/home' },
+      { label: 'Draft Orders', to: '/draft-orders' },
+    ]
+  : [];
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('refreshToken');
+    navigate('/');
+  };
+
+  const menuItems = [
+    ...(isLoggedIn
+      ? [
+        {
+          icon: <FiEdit2 size={15} />,
+          label: 'Edit Profile',
+          action: () => navigate('/join-as-photographer/edit-profile'),
+        },
+        { divider: true },
+        { icon: <FiAlertCircle size={15} />, label: 'Raise a Dispute', action: () => navigate('/dispute'), danger: true },
+      ]
+      : []),
+    { divider: true },
+    { icon: <FiLogOut size={15} />, label: 'Logout', action: handleLogout, danger: true },
+  ];
 
   return (
     <div className="views-shell min-h-screen flex flex-col">
@@ -281,26 +329,33 @@ const ViewsLayout = ({ children }) => {
               })}
             </nav>
 
-            <AvatarDropdown />
+            {/* Avatar dropdown — desktop only */}
+            <AvatarDropdown menuItems={menuItems} />
 
-            {/* Hamburger — mobile only */}
-            <button
+            {/* Hamburger — mobile only, single entry point to nav + profile */}
+            {isLoggedIn &&  <button
               type="button"
               onClick={() => setDrawerOpen(true)}
               className="flex md:hidden"
               style={{
                 background: 'none', border: 'none', cursor: 'pointer',
-                color: '#555', padding: '4px',  alignItems: 'center',
+                color: '#555', padding: '4px', alignItems: 'center',
               }}
             >
               <FiMenu size={24} />
-            </button>
+            </button>}
+           
           </div>
         </div>
       </motion.header>
 
       {/* Mobile drawer */}
-      <MobileDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      <MobileDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        navItems={navItems}
+        menuItems={menuItems}
+      />
 
       {/* ── Main ── */}
       <motion.main
@@ -313,216 +368,216 @@ const ViewsLayout = ({ children }) => {
       </motion.main>
 
       {/* ── Footer ── */}
-    <footer
-      style={{
-        background: '#fff',
-        borderTop: '1px solid #ebebeb',
-        marginTop: 'auto',
-      }}
-    >
-      <div
+      <footer
         style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          padding: '56px 32px 40px',
-          display: 'grid',
-          gridTemplateColumns: '1fr',
-          gap: '40px',
-        }}
-        className="md:!grid-cols-[1.3fr_1fr_1fr_1fr]"
-      >
-        {/* Brand */}
-        <div>
-          <img
-            src={logo}
-            alt="Fulltime Photographer"
-            style={{ width: '160px', height: 'auto', display: 'block' }}
-          />
-    
-          <p
-            style={{
-              fontSize: '13.5px',
-              color: '#777',
-              lineHeight: 1.7,
-              marginTop: '16px',
-              marginBottom: 0,
-              maxWidth: '260px',
-            }}
-          >
-            Connecting talented photographers with clients who value creativity,
-            professionalism, and unforgettable moments.
-          </p>
-    
-          <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
-            {[
-              <span style={{ fontSize: '14px', fontWeight: 700 }}>in</span>,
-              <BsInstagram size={17} />,
-              <span style={{ fontSize: '14px', fontWeight: 700 }}>f</span>,
-            ].map((icon, index) => (
-              <div
-                key={index}
-                style={{
-                  width: '38px',
-                  height: '38px',
-                  borderRadius: '10px',
-                  background: '#FFAE00',
-                  color: '#fff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  transition: 'opacity 0.2s, transform 0.2s',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.opacity = '0.85'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                onMouseLeave={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'translateY(0)'; }}
-              >
-                {icon}
-              </div>
-            ))}
-          </div>
-        </div>
-    
-        {/* Useful Links */}
-        <div>
-          <h4
-            style={{
-              fontSize: '14px',
-              fontWeight: 700,
-              color: '#1a1a1a',
-              margin: '0 0 20px',
-              letterSpacing: '0.2px',
-            }}
-          >
-            Useful Links
-          </h4>
-    
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {[
-              ['Home', '/join-as-photographer/home'],
-              ['About Us', '/about-us'],
-              ['FAQs', '/faqs'],
-              ['Blog', '/blog'],
-              ['Contact', '/contact'],
-            ].map(([label, to]) => (
-              <button
-                key={label}
-                onClick={() => navigate(to)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  padding: 0,
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  fontSize: '13.5px',
-                  color: '#555',
-                  fontWeight: 500,
-                  fontFamily: 'inherit',
-                  width: 'fit-content',
-                  transition: 'color 0.15s',
-                }}
-                onMouseEnter={e => e.currentTarget.style.color = '#1a1a1a'}
-                onMouseLeave={e => e.currentTarget.style.color = '#555'}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-    
-        {/* For Photographers */}
-        <div>
-          <h4
-            style={{
-              fontSize: '14px',
-              fontWeight: 700,
-              color: '#1a1a1a',
-              margin: '0 0 20px',
-              letterSpacing: '0.2px',
-            }}
-          >
-            For Photographers
-          </h4>
-    
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {[
-              ['Join as Photographer', '/join-as-photographer'],
-              ['KYC Verification', '/kyc-verification'],
-              ['Photographer Login', '/photographer-login'],
-              ['Dashboard', '/dashboard'],
-              ['Support', '/support'],
-            ].map(([label, to]) => (
-              <button
-                key={label}
-                onClick={() => navigate(to)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  padding: 0,
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  fontSize: '13.5px',
-                  color: '#555',
-                  fontWeight: 500,
-                  fontFamily: 'inherit',
-                  width: 'fit-content',
-                  transition: 'color 0.15s',
-                }}
-                onMouseEnter={e => e.currentTarget.style.color = '#1a1a1a'}
-                onMouseLeave={e => e.currentTarget.style.color = '#555'}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-    
-        {/* Contact */}
-        <div>
-          <h4
-            style={{
-              fontSize: '14px',
-              fontWeight: 700,
-              color: '#1a1a1a',
-              margin: '0 0 20px',
-              letterSpacing: '0.2px',
-            }}
-          >
-            Contact Us
-          </h4>
-    
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '14px',
-              fontSize: '13.5px',
-              color: '#555',
-              fontWeight: 500,
-            }}
-          >
-            <span>support@fulltimephotographer.com</span>
-            <span>+91 98765 43210</span>
-            <span>Rajkot, Gujarat, India</span>
-            <span>Mon - Sat : 10:00 AM - 7:00 PM</span>
-          </div>
-        </div>
-      </div>
-    
-      {/* Bottom Bar */}
-      <div
-        style={{
+          background: '#fff',
           borderTop: '1px solid #ebebeb',
-          padding: '18px 32px',
-          textAlign: 'center',
-          fontSize: '12px',
-          color: '#999',
-          fontWeight: 500,
+          marginTop: 'auto',
         }}
       >
-        © {new Date().getFullYear()} Fulltime Photographer. All Rights Reserved.{' '}
-        <span style={{ color: '#1a1a1a', fontWeight: 700 }}>by DiGi Trend</span>
-      </div>
-    </footer>
+        <div
+          style={{
+            maxWidth: '1200px',
+            margin: '0 auto',
+            padding: '56px 32px 40px',
+            display: 'grid',
+            gridTemplateColumns: '1fr',
+            gap: '40px',
+          }}
+          className="md:!grid-cols-[1.3fr_1fr_1fr_1fr]"
+        >
+          {/* Brand */}
+          <div>
+            <img
+              src={logo}
+              alt="Fulltime Photographer"
+              style={{ width: '160px', height: 'auto', display: 'block' }}
+            />
+
+            <p
+              style={{
+                fontSize: '13.5px',
+                color: '#777',
+                lineHeight: 1.7,
+                marginTop: '16px',
+                marginBottom: 0,
+                maxWidth: '260px',
+              }}
+            >
+              Connecting talented photographers with clients who value creativity,
+              professionalism, and unforgettable moments.
+            </p>
+
+            <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
+              {[
+                <span style={{ fontSize: '14px', fontWeight: 700 }}>in</span>,
+                <BsInstagram size={17} />,
+                <span style={{ fontSize: '14px', fontWeight: 700 }}>f</span>,
+              ].map((icon, index) => (
+                <div
+                  key={index}
+                  style={{
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '10px',
+                    background: '#FFAE00',
+                    color: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    transition: 'opacity 0.2s, transform 0.2s',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.opacity = '0.85'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'translateY(0)'; }}
+                >
+                  {icon}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Useful Links */}
+          <div>
+            <h4
+              style={{
+                fontSize: '14px',
+                fontWeight: 700,
+                color: '#1a1a1a',
+                margin: '0 0 20px',
+                letterSpacing: '0.2px',
+              }}
+            >
+              Useful Links
+            </h4>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {[
+                ['Home', '/join-as-photographer/home'],
+                ['About Us', '/about-us'],
+                ['FAQs', '/faqs'],
+                ['Blog', '/blog'],
+                ['Contact', '/contact'],
+              ].map(([label, to]) => (
+                <button
+                  key={label}
+                  onClick={() => navigate(to)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    fontSize: '13.5px',
+                    color: '#555',
+                    fontWeight: 500,
+                    fontFamily: 'inherit',
+                    width: 'fit-content',
+                    transition: 'color 0.15s',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.color = '#1a1a1a'}
+                  onMouseLeave={e => e.currentTarget.style.color = '#555'}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* For Photographers */}
+          <div>
+            <h4
+              style={{
+                fontSize: '14px',
+                fontWeight: 700,
+                color: '#1a1a1a',
+                margin: '0 0 20px',
+                letterSpacing: '0.2px',
+              }}
+            >
+              For Photographers
+            </h4>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {[
+                ['Join as Photographer', '/join-as-photographer'],
+                ['KYC Verification', '/kyc-verification'],
+                ['Photographer Login', '/photographer-login'],
+                ['Dashboard', '/dashboard'],
+                ['Support', '/support'],
+              ].map(([label, to]) => (
+                <button
+                  key={label}
+                  onClick={() => navigate(to)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    fontSize: '13.5px',
+                    color: '#555',
+                    fontWeight: 500,
+                    fontFamily: 'inherit',
+                    width: 'fit-content',
+                    transition: 'color 0.15s',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.color = '#1a1a1a'}
+                  onMouseLeave={e => e.currentTarget.style.color = '#555'}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <h4
+              style={{
+                fontSize: '14px',
+                fontWeight: 700,
+                color: '#1a1a1a',
+                margin: '0 0 20px',
+                letterSpacing: '0.2px',
+              }}
+            >
+              Contact Us
+            </h4>
+
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '14px',
+                fontSize: '13.5px',
+                color: '#555',
+                fontWeight: 500,
+              }}
+            >
+              <span>support@fulltimephotographer.com</span>
+              <span>+91 98765 43210</span>
+              <span>Rajkot, Gujarat, India</span>
+              <span>Mon - Sat : 10:00 AM - 7:00 PM</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div
+          style={{
+            borderTop: '1px solid #ebebeb',
+            padding: '18px 32px',
+            textAlign: 'center',
+            fontSize: '12px',
+            color: '#999',
+            fontWeight: 500,
+          }}
+        >
+          © {new Date().getFullYear()} Fulltime Photographer. All Rights Reserved.{' '}
+          <span style={{ color: '#1a1a1a', fontWeight: 700 }}>by DiGi Trend</span>
+        </div>
+      </footer>
 
       <div className="views-accent-bar" />
     </div>

@@ -6,160 +6,230 @@ import { draftOrder, getEditingPackage } from '../../services/order';
 
 /* ─── Tier accent colors ─────────────────────────────────────────── */
 const TIER_COLORS = {
-  silver: { accent: '#9ca3af', glow: 'rgba(156,163,175,0.25)' },
-  gold: { accent: '#f5a623', glow: 'rgba(245,166,35,0.28)' },
-  platinum: { accent: '#818cf8', glow: 'rgba(129,140,248,0.28)' },
+  silver: { accent: '#9ca3af', glow: 'rgba(156,163,175,0.25)', chip: '#9ca3af' },
+  gold: { accent: '#f5a623', glow: 'rgba(245,166,35,0.28)', chip: '#f5a623' },
+  platinum: { accent: '#818cf8', glow: 'rgba(129,140,248,0.28)', chip: '#1f2937' },
 };
 
-const getTierColors = (name = '') => {
+const getTierKey = (name = '') => {
   const key = name.toLowerCase().trim();
-  if (key.includes('silver')) return TIER_COLORS.silver;
-  if (key.includes('gold')) return TIER_COLORS.gold;
-  if (key.includes('platinum')) return TIER_COLORS.platinum;
-  return TIER_COLORS.gold; // fallback
+  if (key.includes('silver')) return 'silver';
+  if (key.includes('platinum')) return 'platinum';
+  if (key.includes('gold')) return 'gold';
+  return 'gold'; // fallback
 };
 
-const getFeatureIcon = (key) => {
-  switch (key) {
-    case "edited_photos":
-      return "📸";
-    case "reels":
-      return "🎬";
-    case "highlight":
-      return "✨";
-    case "video":
-      return "🎥";
-    default:
-      return "✔️";
-  }
+const getTierColors = (name) => TIER_COLORS[getTierKey(name)];
+
+const getFeatureIcon = (key = '') => {
+  const k = key.toLowerCase();
+  if (k.includes('photo')) return '📸';
+  if (k.includes('reel')) return '🎬';
+  if (k.includes('highlight')) return '✨';
+  if (k.includes('video')) return '🎥';
+  if (k.includes('revision')) return '🔁';
+  if (k.includes('deliver')) return '🕒';
+  if (k.includes('album')) return '📖';
+  if (k.includes('gallery') || k.includes('cloud')) return '☁️';
+  return '✔️';
 };
 
-const formatFeatureName = (key) => {
-  return key
-    ?.replaceAll("_", " ")
-    ?.replace(/\b\w/g, (c) => c.toUpperCase());
+const formatFeatureName = (key) =>
+  key?.replaceAll('_', ' ')?.replace(/\b\w/g, (c) => c.toUpperCase());
+
+const formatDate = (iso) => {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 };
+
+const STEPS = [
+  { label: 'Event Details', status: 'done' },
+  { label: 'Package Suggestion', status: 'done' },
+  { label: 'Select Editing Package', status: 'active' },
+  { label: 'Review & Confirm', status: 'upcoming' },
+];
+
+/* ─── Stepper ─────────────────────────────────────────────────────── */
+const Stepper = () => (
+  <div className="ep-stepper">
+    {STEPS.map((s, i) => (
+      <React.Fragment key={s.label}>
+        <div className="ep-step">
+          <span
+            className={`ep-step-dot ${
+              s.status === 'done' ? 'ep-step-dot--done' : s.status === 'active' ? 'ep-step-dot--active' : ''
+            }`}
+          >
+            {s.status === 'done' ? '✓' : i + 1}
+          </span>
+          <span className="ep-step-text">
+            <span className="ep-step-label">{s.label}</span>
+            <span className={`ep-step-sub ep-step-sub--${s.status}`}>
+              {s.status === 'done' ? 'Completed' : s.status === 'active' ? 'In Progress' : 'Upcoming'}
+            </span>
+          </span>
+        </div>
+        {i < STEPS.length - 1 && <span className="ep-step-line" />}
+      </React.Fragment>
+    ))}
+  </div>
+);
 
 /* ─── Editing Package Card ───────────────────────────────────────── */
-const EditingPackageCard = ({
-  pkg,
-  index,
-  selected,
-  onSelect,
-  onBookNow,
-  bookingId
-}) => {
+const EditingPackageCard = ({ pkg, index, onBookNow, bookingId }) => {
+  const tierKey = getTierKey(pkg.name);
   const colors = getTierColors(pkg.name);
-  const isSelected = selected === pkg.id;
-
-  const coverImage = pkg.images?.[0]?.url;
+  const isPopular = tierKey === 'gold';
+  const images = pkg.images || [];
 
   return (
     <div
-      className="ep-card"
-      style={{
-        animationDelay: `${index * 0.12}s`,
-        outline: isSelected
-          ? `2.5px solid ${colors.accent}`
-          : "2.5px solid transparent",
-        boxShadow: isSelected
-          ? `0 0 0 4px ${colors.glow}, 0 8px 32px rgba(0,0,0,0.13)`
-          : "0 4px 20px rgba(0,0,0,0.08)",
-      }}
-      onClick={() => onSelect(pkg.id)}
+      className={`ep-card ${isPopular ? 'ep-card--popular' : ''}`}
+      style={{ animationDelay: `${index * 0.1}s`, '--accent': colors.accent }}
     >
-      <div className="ep-image-wrap">
-        {coverImage ? (
-          <img
-            src={coverImage}
-            alt={pkg.name}
-            className="ep-image"
-          />
+      {isPopular && <span className="ep-popular-badge">★ MOST POPULAR</span>}
+
+      <div className="ep-gallery-strip">
+        <span className="ep-tier-chip" style={{ background: colors.chip }}>
+          {tierKey.toUpperCase()}
+        </span>
+        {images.length > 0 ? (
+          images.slice(0, 4).map((img) => (
+            <div className="ep-gallery-seg" key={img.id}>
+              <img src={img.url} alt={pkg.name} />
+            </div>
+          ))
         ) : (
-          <div
-            style={{
-              width: "100%",
-              height: "100%",
-              background: "#f3f4f6",
-            }}
-          />
+          <div className="ep-gallery-seg ep-gallery-seg--empty">No image</div>
+        )}
+      </div>
+
+      <div className="ep-body">
+        <h3 className="ep-name">{pkg.name}</h3>
+        <div className="ep-price">₹{Number(pkg.price).toLocaleString('en-IN')}</div>
+
+        {pkg.features?.length > 0 && (
+          <div className="ep-stat-grid">
+            {pkg.features.map((f) => (
+              <div className="ep-stat-box" key={f.id}>
+                <span className="ep-stat-icon">{getFeatureIcon(f.feature_key)}</span>
+                <div>
+                  <div className="ep-stat-value">{f.quantity ?? f.label}</div>
+                  <div className="ep-stat-label">{formatFeatureName(f.feature_key)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
 
-        <div className="ep-overlay" />
-
-        <span className="ep-tier-label">
-          {pkg.name}
-        </span>
-
-        <span className="ep-price">
-          ₹{Number(pkg.price).toLocaleString("en-IN")}
-        </span>
-      </div>
-
-      {/* Gallery */}
-      {pkg.images?.length > 1 && (
-        <div className="ep-gallery">
-          {pkg.images.slice(0, 3).map((img) => (
-            <img
-              key={img.id}
-              src={img.url}
-              alt=""
-              className="ep-thumb"
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Features */}
-      <div className="ep-features">
-        {pkg.features?.map((feature) => (
-          <div
-            key={feature.id}
-            className="ep-feature-card"
-          >
-            <div className="ep-feature-icon">
-              {getFeatureIcon(feature.feature_key)}
-            </div>
-
-            <div>
-              <div className="ep-feature-title">
-                {formatFeatureName(
-                  feature.feature_key
-                )}
-              </div>
-
-              <div className="ep-feature-value">
-                {feature.label}
-              </div>
+        {pkg.features?.length > 0 && (
+          <div className="ep-included">
+            <span className="ep-included-title">What's Included</span>
+            <div className="ep-included-list">
+              {pkg.features.map((f) => (
+                <span className="ep-included-item" key={f.id}>
+                  <span className="ep-included-check">✓</span>
+                  {f.label}
+                </span>
+              ))}
             </div>
           </div>
-        ))}
+        )}
       </div>
 
-
-
-      <div className="ep-btn-wrap">
+      <div className="ep-btn-row">
+        {/* <button
+          className="su-btn-primary-outline ep-btn-half"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          View Details
+        </button> */}
         <button
-          className="su-btn-primary"
-          style={{ width: '100%', opacity: bookingId === pkg.id ? 0.7 : 1, cursor: bookingId === pkg.id ? 'not-allowed' : 'pointer' }}
+          className="su-btn-primary ep-btn-half"
           disabled={bookingId === pkg.id}
           onClick={(e) => {
             e.stopPropagation();
             onBookNow(pkg);
           }}
         >
-          {bookingId === pkg.id ? 'Booking…' : 'Book Now'}
+          {bookingId === pkg.id ? 'Booking…' : 'Select Package'}
         </button>
       </div>
     </div>
   );
 };
+
+/* ─── Sidebar ─────────────────────────────────────────────────────── */
+const Sidebar = ({ photographyPackage, filters, navigate }) => {
+  const coverImage = photographyPackage?.images?.[0]?.url;
+  const days =
+    filters?.start_datetime && filters?.end_datetime
+      ? Math.max(
+          1,
+          Math.round(
+            (new Date(filters.end_datetime) - new Date(filters.start_datetime)) / (1000 * 60 * 60 * 24)
+          )
+        )
+      : null;
+
+  return (
+    <aside className="ep-sidebar">
+      <div className="ep-sidebar-card">
+        <span className="ep-sidebar-title">Your Selected Photography Package</span>
+
+        {photographyPackage && (
+          <div className="ep-selected-pkg">
+            <div className="ep-selected-pkg-img">
+              {coverImage ? <img src={coverImage} alt={photographyPackage.name} /> : null}
+            </div>
+            <div>
+              <div className="ep-selected-pkg-name">{photographyPackage.name}</div>
+              <button className="ep-view-link" onClick={() => navigate(-1)}>
+                View Details ↗
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="ep-summary-block">
+          <span className="ep-summary-heading">Event Summary</span>
+          <div className="ep-summary-row">
+            <span>📅 Date</span>
+            <span>{formatDate(filters?.start_datetime)}</span>
+          </div>
+          <div className="ep-summary-row">
+            <span>🕒 Duration</span>
+            <span>{days ? `${days} Day${days > 1 ? 's' : ''}` : '—'}</span>
+          </div>
+          <div className="ep-summary-row">
+            <span>📍 Location</span>
+            <span>{filters?.city || filters?.state || '—'}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="ep-sidebar-card">
+        <span className="ep-sidebar-title">Need Help?</span>
+        <p className="ep-help-text">Our team is here to help you choose the perfect package.</p>
+        <a className="ep-help-btn ep-help-btn--primary" href="tel:+919876543210">
+          📞 +91 98765 43210
+        </a>
+        <button className="ep-help-btn">💬 Chat with us</button>
+        <p className="ep-secure-text">🔒 Your information is secure and encrypted</p>
+      </div>
+    </aside>
+  );
+};
+
 /* ─── Main Component ─────────────────────────────────────────────── */
 const SelectEditingPackage = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [selected, setSelected] = useState(null);
   const [editingPackages, setEditingPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [bookingId, setBookingId] = useState(null);
@@ -168,7 +238,7 @@ const SelectEditingPackage = () => {
   const filters = location.state?.filters;
 
   useEffect(() => {
-    let cancelled = false;                        // ← prevents double-set on StrictMode
+    let cancelled = false;
 
     const fetchPackages = async () => {
       try {
@@ -183,7 +253,9 @@ const SelectEditingPackage = () => {
     };
 
     fetchPackages();
-    return () => { cancelled = true; };           // cleanup
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleBookNow = async (editingPkg) => {
@@ -209,16 +281,15 @@ const SelectEditingPackage = () => {
           postal_code: filters?.postal_code || undefined,
           timezone: filters?.timezone || undefined,
         },
-        // re-attach the photographers from the photography package
-        service_providers: photographyPackage?.team?.flatMap((tm) =>
-          tm.providers?.map((p) => ({
-            service_provider_id: p.id,
-            skill: tm.skill ?? 'photographer',
-          })) || []
-        ) ?? [],
-        editing_items: [
-          { editing_package_id: editingPkg.id },
-        ],
+        service_providers:
+          photographyPackage?.team?.flatMap(
+            (tm) =>
+              tm.providers?.map((p) => ({
+                service_provider_id: p.id,
+                skill: tm.skill ?? 'photographer',
+              })) || []
+          ) ?? [],
+        editing_items: [{ editing_package_id: editingPkg.id }],
       };
 
       const response = await draftOrder(payload);
@@ -239,212 +310,247 @@ const SelectEditingPackage = () => {
     }
   };
 
-  return (                                        // ← always return JSX, use loading inside
+  return (
     <ViewsLayout>
       <style>{STYLES}</style>
       <div className="ep-page">
-        <div className="ep-container">
-          <h1 className="ep-heading">Select Editing Package</h1>
+        {/* <Stepper /> */}
 
-          {loading ? (
-            <div style={{
-              display: 'flex', justifyContent: 'center',
-              alignItems: 'center', minHeight: '200px',
-              color: '#aaa', fontSize: '15px', gap: '10px',
-            }}>
-              <span style={{ animation: 'spin 0.8s linear infinite', display: 'inline-block' }}>⏳</span>
-              Loading packages…
-            </div>
-          ) : editingPackages.length === 0 ? (
-            <div style={{
-              textAlign: 'center', padding: '60px 0',
-              color: '#aaa', fontSize: '15px',
-            }}>
-              No editing packages available.
-            </div>
-          ) : (
-            <div className="ep-grid">
-              {editingPackages.map((pkg, i) => (
-                <EditingPackageCard
-                  key={pkg.id}
-                  pkg={pkg}
-                  index={i}
-                  selected={selected}
-                  onSelect={setSelected}
-                  onBookNow={handleBookNow}
-                  bookingId={bookingId}
-                />
-              ))}
-            </div>
-          )}
+        <div className="ep-layout">
+          <Sidebar photographyPackage={photographyPackage} filters={filters} navigate={navigate} />
+
+          <main className="ep-main">
+            <h1 className="ep-heading">Choose Your Editing Package</h1>
+            <p className="ep-subheading">
+              Professional editing that brings your memories to life. Select the perfect package
+              that matches your needs and storytelling style.
+            </p>
+
+            {loading ? (
+              <div className="ep-loading">
+                <span className="ep-spin">⏳</span> Loading packages…
+              </div>
+            ) : editingPackages.length === 0 ? (
+              <div className="ep-empty">No editing packages available.</div>
+            ) : (
+              <div className="ep-grid">
+                {editingPackages.map((pkg, i) => (
+                  <EditingPackageCard
+                    key={pkg.id}
+                    pkg={pkg}
+                    index={i}
+                    onBookNow={handleBookNow}
+                    bookingId={bookingId}
+                  />
+                ))}
+              </div>
+            )}
+          </main>
         </div>
       </div>
     </ViewsLayout>
   );
 };
 
-/* ─── Styles (unchanged) ─────────────────────────────────────────── */
+/* ─── Styles ─────────────────────────────────────────────────────── */
 const STYLES = `
 @keyframes fadeSlideUp {
   from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
 .ep-page {
   width: 100%;
-  padding: 24px 16px 48px;
+  padding: 20px 24px 60px;
+}
+
+/* ── Stepper ── */
+.ep-stepper {
   display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 8px 24px;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 24px;
+}
+.ep-step { display: flex; align-items: center; gap: 10px; }
+.ep-step-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
   justify-content: center;
-}
-.ep-container {
-  width: 100%;
-  max-width: 1400px;
-  padding: 28px 24px 32px;
-  background: #fff;
-}
-.ep-heading {
-  text-align: center;
-  font-size: 26px;
+  font-size: 13px;
   font-weight: 700;
-  color: #1a1a1a;
-  margin: 0 0 28px;
-  letter-spacing: -0.01em;
+  flex-shrink: 0;
 }
+.ep-step-dot--done { background: #ff9c2b; color: #fff; }
+.ep-step-dot--active { background: #ff9c2b; color: #fff; box-shadow: 0 0 0 4px rgba(255,156,43,0.18); }
+.ep-step-text { display: flex; flex-direction: column; }
+.ep-step-label { font-size: 13px; font-weight: 700; color: #1a1a1a; }
+.ep-step-sub { font-size: 11px; }
+.ep-step-sub--done { color: #999; }
+.ep-step-sub--active { color: #ff9c2b; font-weight: 600; }
+.ep-step-sub--upcoming { color: #bbb; }
+.ep-step-line { flex: 1; height: 1px; background: #f0d9b8; min-width: 30px; max-width: 80px; }
+
+/* ── Layout ── */
+.ep-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* ── Sidebar ── */
+.ep-sidebar { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 20px; }
+.ep-sidebar-card {
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 14px;
+  padding: 16px;
+}
+.ep-sidebar-title { display: block; font-size: 13px; font-weight: 700; color: #1a1a1a; margin-bottom: 12px; }
+.ep-selected-pkg { display: flex; gap: 10px; padding-bottom: 14px; margin-bottom: 14px; border-bottom: 1px solid #f5f5f5; }
+.ep-selected-pkg-img { width: 58px; height: 58px; border-radius: 10px; overflow: hidden; background: #f3f4f6; flex-shrink: 0; }
+.ep-selected-pkg-img img { width: 100%; height: 100%; object-fit: cover; }
+.ep-selected-pkg-name { font-size: 13px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+.ep-view-link { background: none; border: none; padding: 0; font-size: 11.5px; font-weight: 600; color: #ff9c2b; cursor: pointer; }
+
+.ep-summary-heading { display: block; font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 10px; }
+.ep-summary-row { display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; color: #444; padding: 6px 0; }
+.ep-summary-row span:first-child { color: #888; }
+.ep-summary-row span:last-child { font-weight: 600; color: #1a1a1a; }
+
+.ep-help-text { font-size: 12px; color: #888; margin: 0 0 12px; line-height: 1.5; }
+.ep-help-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  border: 1px solid #eee;
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #1a1a1a;
+  cursor: pointer;
+  margin-bottom: 8px;
+  text-decoration: none;
+}
+.ep-help-btn--primary { background: #fff7ea; border-color: #ffe6bf; color: #8a6d3b; }
+.ep-secure-text { font-size: 11px; color: #aaa; text-align: center; margin: 10px 0 0; }
+
+/* ── Main ── */
+.ep-main { min-width: 0; }
+.ep-heading { font-size: 24px; font-weight: 700; color: #1a1a1a; margin: 0 0 6px; letter-spacing: -0.01em; }
+.ep-subheading { font-size: 13.5px; color: #888; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+.ep-loading, .ep-empty { display: flex; justify-content: center; align-items: center; gap: 10px; min-height: 200px; color: #aaa; font-size: 14px; }
+.ep-spin { display: inline-block; animation: spin 0.8s linear infinite; }
+
 .ep-grid {
   display: grid;
-  grid-template-columns: repeat(
-    auto-fill,
-    minmax(340px, 1fr)
-  );
-  gap: 24px;
-}
-  .ep-gallery {
-  display: flex;
-  gap: 8px;
-  padding: 12px 14px 0;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
 }
 
-.ep-thumb {
-  width: 58px;
-  height: 58px;
-  object-fit: cover;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
-}
-
-.ep-feature-card {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #f9fafb;
-  padding: 10px;
-  border-radius: 10px;
-}
-
-.ep-feature-icon {
-  font-size: 18px;
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.ep-feature-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: #111827;
-}
-
-.ep-feature-value {
-  font-size: 13px;
-  color: #6b7280;
-  margin-top: 2px;
-}
-
-.ep-summary {
-  margin: 0 14px 14px;
-  padding: 10px;
-  border-radius: 10px;
-  background: #f3f4f6;
-  font-size: 12px;
-  font-weight: 600;
-  color: #374151;
-  text-align: center;
-}
+/* ── Card ── */
 .ep-card {
-  border-radius: 14px;
+  position: relative;
+  border-radius: 16px;
   overflow: hidden;
   background: #fff;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s, outline 0.15s;
+  border: 2px solid transparent;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
   animation: fadeSlideUp 0.4s ease both;
   display: flex;
   flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
-.ep-card:hover { transform: translateY(-3px); }
-.ep-image-wrap {
+.ep-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,0.12); }
+.ep-card--popular { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(245,166,35,0.15), 0 8px 28px rgba(0,0,0,0.1); }
+
+.ep-popular-badge {
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 5px 14px;
+  border-radius: 0 0 10px 10px;
+  z-index: 2;
+}
+
+.ep-gallery-strip {
   position: relative;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-  border-radius: 12px 12px 0 0;
-}
-.ep-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.35s ease;
-}
-.ep-card:hover .ep-image { transform: scale(1.04); }
-.ep-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.05) 40%, rgba(0,0,0,0.55) 100%);
-  pointer-events: none;
-}
-.ep-tier-label {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  font-size: 18px;
-  font-weight: 700;
-  color: #fff;
-  text-shadow: 0 1px 6px rgba(0,0,0,0.5);
-}
-.ep-price {
-  position: absolute;
-  bottom: 12px;
-  left: 12px;
-  font-size: 15px;
-  font-weight: 700;
-  color: #fff;
-  text-shadow: 0 1px 6px rgba(0,0,0,0.55);
-}
-.ep-features {
-  padding: 14px 14px 10px;
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 1;
+  height: 130px;
+  gap: 2px;
 }
-.ep-feature-row {
+.ep-gallery-seg { flex: 1; overflow: hidden; background: #f3f4f6; }
+.ep-gallery-seg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ep-gallery-seg--empty { display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 11px; }
+.ep-tier-chip {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: 6px;
+  z-index: 2;
+}
+
+.ep-body { padding: 16px; flex: 1; display: flex; flex-direction: column; }
+.ep-name { font-size: 17px; font-weight: 700; color: #1a1a1a; margin: 0 0 4px; }
+.ep-price { font-size: 22px; font-weight: 700; color: #1a1a1a; margin-bottom: 14px; }
+
+.ep-stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.ep-stat-box {
   display: flex;
-  align-items: flex-start;
-  gap: 7px;
+  align-items: center;
+  gap: 8px;
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 8px 10px;
 }
-.ep-star { font-size: 12px; flex-shrink: 0; margin-top: 1px; }
-.ep-feature-text { font-size: 12px; color: #374151; line-height: 1.4; }
-.ep-btn-wrap { padding: 4px 14px 16px; }
-.ep-btn-wrap .su-btn-primary { font-size: 13px; padding: 10px 16px; border-radius: 50px; }
+.ep-stat-icon { font-size: 16px; }
+.ep-stat-value { font-size: 13px; font-weight: 700; color: #1a1a1a; }
+.ep-stat-label { font-size: 10.5px; color: #888; }
+
+.ep-included { border-top: 1px solid #f2f2f2; padding-top: 12px; margin-top: auto; }
+.ep-included-title { display: block; font-size: 11px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px; }
+.ep-included-list { display: flex; flex-direction: column; gap: 6px; }
+.ep-included-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #444; }
+.ep-included-check { color: #22c55e; font-weight: 700; }
+
+.ep-btn-row { display: flex; gap: 8px; padding: 0 16px 16px; }
+.ep-btn-half { flex: 1; padding: 10px 12px; font-size: 13px; text-align: center; }
+
+@media (max-width: 900px) {
+  .ep-layout { grid-template-columns: 1fr; }
+  .ep-sidebar { position: static; }
+}
 @media (max-width: 640px) {
   .ep-grid { grid-template-columns: 1fr; }
-  .ep-image-wrap { aspect-ratio: 16 / 7; }
-}
-@media (min-width: 641px) and (max-width: 820px) {
-  .ep-grid { grid-template-columns: repeat(2, 1fr); }
+  .ep-stepper { flex-wrap: wrap; }
 }
 `;
 
