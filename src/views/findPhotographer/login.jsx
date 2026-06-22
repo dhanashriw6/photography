@@ -66,6 +66,13 @@ const login = () => {
       // }
 
     } catch (err) {
+      const status = err?.response?.status;
+
+      if (status === 401) {
+        navigate('/login');
+        return;
+      }
+
       const msg =
         err?.response?.data?.error?.message ||
         err?.response?.data?.message ||
@@ -192,7 +199,7 @@ const login = () => {
 
           <p style={{ textAlign: 'center', fontSize: '13px', color: '#666', marginTop: '20px' }}>
             Don't have an account?{' '}
-            <a href="/join-as-photographer" style={{ color: '#111', fontWeight: 700, textDecoration: 'none', cursor: 'pointer' }}>
+            <a href="/find-photographer" style={{ color: '#111', fontWeight: 700, textDecoration: 'none', cursor: 'pointer' }}>
               Sign Up
             </a>
           </p>
