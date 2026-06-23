@@ -31,6 +31,7 @@ import PublicRoute from './Components/PublicRoute';
 import ResetPassword from './views/joinAsPhotographer/resetPassword';
 import SelectPackage from './views/findPhotographer/selectPackage';
 import DraftOrders from './views/findPhotographer/draftOrders';
+import LegalPage from './views/LegalPage';
 
 function App() {
   return (
@@ -54,6 +55,7 @@ function App() {
         <Route path="/edit-profile" element={<EditProfile />} />
         <Route path="/review" element={<Review />} />
         <Route path="/dispute" element={<Dispute />} />
+        <Route path="/legal" element={<LegalPage />}/>
         {/* Public auth pages — already logged-in users go straight to dashboard */}
         <Route element={<PublicRoute />}>
           <Route path="/join-as-photographer" element={<SignUpPhotographer />} />

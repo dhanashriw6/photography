@@ -3,6 +3,7 @@ import '../index.css';
 import ViewsLayout from '../Layout';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getServiceProviders, getPackage } from '../../services/booking';
+import { createPortal } from 'react-dom';
 
 const encodeFilters = (filters) => {
   try {
@@ -27,6 +28,8 @@ const initials = (f, l) => ((f?.[0] || '') + (l?.[0] || '')).toUpperCase();
 const PackageCard = ({ pkg, index, onBookInstantly, onCustomizeTeam }) => {
   const [activeImg, setActiveImg] = useState(0);
   const timerRef = useRef(null);
+  const [showGallery, setShowGallery] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(0);
 
   const images = pkg.images || [];
 
@@ -61,6 +64,17 @@ const PackageCard = ({ pkg, index, onBookInstantly, onCustomizeTeam }) => {
       sum + (t.providers || []).reduce((ps, p) => ps + (p.price_with_commission || 0), 0),
     0
   );
+  const nextImage = () => {
+    setSelectedImage((prev) =>
+      prev === images.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const prevImage = () => {
+    setSelectedImage((prev) =>
+      prev === 0 ? images.length - 1 : prev - 1
+    );
+  };
 
   const allProviders = (pkg.team || []).flatMap((t) =>
     (t.providers || []).map((p) => ({ ...p, skill: t.skill }))
@@ -82,17 +96,51 @@ const PackageCard = ({ pkg, index, onBookInstantly, onCustomizeTeam }) => {
       >
         <div className="pkg-gallery-main-h">
           {coverUrl ? (
-            <img src={coverUrl} alt={pkg.name} />
+            <img
+              src={coverUrl}
+              alt={pkg.name}
+              onClick={() => {
+                setSelectedImage(activeImg);
+                setShowGallery(true);
+              }}
+              style={{ cursor: 'pointer' }}
+            />
           ) : (
             <div className="pkg-gallery-placeholder">No image</div>
           )}
         </div>
         <div className="pkg-gallery-side">
           <div className="pkg-gallery-thumb">
-            {thumb1 ? <img src={thumb1} alt="" /> : <div className="pkg-gallery-placeholder" />}
+            {thumb1 ? (
+              <img
+                src={thumb1}
+                alt=""
+                onClick={() => {
+                  setSelectedImage(1);
+                  setShowGallery(true);
+                }}
+                style={{ cursor: 'pointer' }}
+              />
+            ) : (
+              <div className="pkg-gallery-placeholder" />
+            )}
           </div>
+
           <div className="pkg-gallery-thumb">
-            {thumb2 ? <img src={thumb2} alt="" /> : <div className="pkg-gallery-placeholder" />}
+            {thumb2 ? (
+              <img
+                src={thumb2}
+                alt=""
+                onClick={() => {
+                  setSelectedImage(2);
+                  setShowGallery(true);
+                }}
+                style={{ cursor: 'pointer' }}
+              />
+            ) : (
+              <div className="pkg-gallery-placeholder" />
+            )}
+
             {extraCount > 0 && (
               <div className="pkg-img-count-badge">
                 <span>🖼</span> {images.length}+
@@ -181,6 +229,46 @@ const PackageCard = ({ pkg, index, onBookInstantly, onCustomizeTeam }) => {
           </button>
         </div>
       </div>
+      {showGallery &&
+  createPortal(
+    <div
+      className="gallery-modal"
+      onClick={() => setShowGallery(false)}
+    >
+      <div
+        className="gallery-modal-content"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          className="gallery-close"
+          onClick={() => setShowGallery(false)}
+        >
+          ✕
+        </button>
+
+        <button
+          className="gallery-arrow gallery-arrow-left"
+          onClick={prevImage}
+        >
+          ❮
+        </button>
+
+        <img
+          src={images[selectedImage]?.url}
+          alt=""
+          className="gallery-full-image"
+        />
+
+        <button
+          className="gallery-arrow gallery-arrow-right"
+          onClick={nextImage}
+        >
+          ❯
+        </button>
+      </div>
+    </div>,
+    document.body
+  )}
     </div>
   );
 };
@@ -197,6 +285,7 @@ const packageSuggestion = () => {
   const [budgetRange, setBudgetRange] = useState([5000, 50000]);
   const [duration, setDuration] = useState(null);
   const [applying, setApplying] = useState(false);
+
 
   const handleApplyFilters = async () => {
     setApplying(true);
@@ -312,12 +401,12 @@ const packageSuggestion = () => {
                 <span className="pkg-summary-value-h">
                   {filters?.start_datetime && filters?.end_datetime
                     ? `${Math.max(
-                        1,
-                        Math.round(
-                          (new Date(filters.end_datetime) - new Date(filters.start_datetime)) /
-                            (1000 * 60 * 60 * 24)
-                        )
-                      )} Days`
+                      1,
+                      Math.round(
+                        (new Date(filters.end_datetime) - new Date(filters.start_datetime)) /
+                        (1000 * 60 * 60 * 24)
+                      )
+                    )} Days`
                     : '—'}
                 </span>
               </div>
@@ -434,7 +523,9 @@ const packageSuggestion = () => {
           </button>
         </div>
       </div>
+
     </ViewsLayout>
+
   );
 };
 
@@ -443,6 +534,80 @@ const STYLES = `
 @keyframes fadeSlideUp {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+  .gallery-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.92);
+  z-index: 99999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gallery-modal-content {
+  position: relative;
+  width: 90vw;
+  height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gallery-full-image {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 12px;
+  object-fit: contain;
+}
+
+.gallery-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  font-size: 28px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+
+.gallery-arrow:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+.gallery-arrow-left {
+  left: 20px;
+}
+
+.gallery-arrow-right {
+  right: 20px;
+}
+
+.gallery-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.gallery-counter {
+  position: absolute;
+  bottom: 20px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .pkg-page-h {
