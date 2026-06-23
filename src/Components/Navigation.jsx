@@ -92,7 +92,7 @@ const Navigation = () => {
           gap: '0.5rem',
           cursor: 'pointer'
         }}>
-          <img src='/src/assets/Images/white-variant.png' alt="Logo" style={{ width: '80px', height: '60px' }} />
+          <img src='/white-variant.png' alt="Logo" style={{ width: '80px', height: '60px' }} />
           {/* <Camera size={isMobile ? 20 : 24} /> */}
           <span style={{
             fontFamily: 'var(--font-heading)',
