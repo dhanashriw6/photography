@@ -58,3 +58,8 @@ export const orderEndpoint = {
   getOrderDetails: (orderId) => `${baseUrl}/order/${orderId}`,
   getDraftOrders : `${baseUrl}/order/draft`,
 }
+
+export const calendarEndpoint = {
+  getBlocks : `${baseUrl}/calendar/blocks`,
+  addBlocks : `${baseUrl}/calendar/blocks`,
+}

@@ -3,6 +3,7 @@ import '../index.css';
 import ViewsLayout from '../Layout';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { draftOrder, getEditingPackage } from '../../services/order';
+import { createPortal } from 'react-dom';
 
 /* ─── Tier accent colors ─────────────────────────────────────────── */
 const TIER_COLORS = {
@@ -58,9 +59,8 @@ const Stepper = () => (
       <React.Fragment key={s.label}>
         <div className="ep-step">
           <span
-            className={`ep-step-dot ${
-              s.status === 'done' ? 'ep-step-dot--done' : s.status === 'active' ? 'ep-step-dot--active' : ''
-            }`}
+            className={`ep-step-dot ${s.status === 'done' ? 'ep-step-dot--done' : s.status === 'active' ? 'ep-step-dot--active' : ''
+              }`}
           >
             {s.status === 'done' ? '✓' : i + 1}
           </span>
@@ -83,6 +83,19 @@ const EditingPackageCard = ({ pkg, index, onBookNow, bookingId }) => {
   const colors = getTierColors(pkg.name);
   const isPopular = tierKey === 'gold';
   const images = pkg.images || [];
+  const [showGallery, setShowGallery] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(0);
+  const nextImage = () => {
+    setSelectedImage((prev) =>
+      prev === images.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const prevImage = () => {
+    setSelectedImage((prev) =>
+      prev === 0 ? images.length - 1 : prev - 1
+    );
+  };
 
   return (
     <div
@@ -96,14 +109,66 @@ const EditingPackageCard = ({ pkg, index, onBookNow, bookingId }) => {
           {tierKey.toUpperCase()}
         </span>
         {images.length > 0 ? (
-          images.slice(0, 4).map((img) => (
-            <div className="ep-gallery-seg" key={img.id}>
+          images.slice(0, 4).map((img, idx) => (
+            <div
+              className="ep-gallery-seg"
+              key={img.id}
+              onClick={() => {
+                setSelectedImage(idx);
+                setShowGallery(true);
+              }}
+              style={{ cursor: 'pointer' }}
+            >
               <img src={img.url} alt={pkg.name} />
             </div>
           ))
         ) : (
           <div className="ep-gallery-seg ep-gallery-seg--empty">No image</div>
         )}
+        {showGallery &&
+  createPortal(
+    <div
+      className="gallery-modal"
+      onClick={() => setShowGallery(false)}
+    >
+      <div
+        className="gallery-modal-content"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          className="gallery-close"
+          onClick={() => setShowGallery(false)}
+        >
+          ✕
+        </button>
+
+        <button
+          className="gallery-arrow gallery-arrow-left"
+          onClick={prevImage}
+        >
+          ❮
+        </button>
+
+        <img
+          src={images[selectedImage]?.url}
+          alt=""
+          className="gallery-full-image"
+        />
+
+        <button
+          className="gallery-arrow gallery-arrow-right"
+          onClick={nextImage}
+        >
+          ❯
+        </button>
+
+        <div className="gallery-counter">
+          {selectedImage + 1} / {images.length}
+        </div>
+      </div>
+    </div>,
+    document.body
+  )}
       </div>
 
       <div className="ep-body">
@@ -169,11 +234,11 @@ const Sidebar = ({ photographyPackage, filters, navigate }) => {
   const days =
     filters?.start_datetime && filters?.end_datetime
       ? Math.max(
-          1,
-          Math.round(
-            (new Date(filters.end_datetime) - new Date(filters.start_datetime)) / (1000 * 60 * 60 * 24)
-          )
+        1,
+        Math.round(
+          (new Date(filters.end_datetime) - new Date(filters.start_datetime)) / (1000 * 60 * 60 * 24)
         )
+      )
       : null;
 
   return (
@@ -236,6 +301,9 @@ const SelectEditingPackage = () => {
 
   const photographyPackage = location.state?.package;
   const filters = location.state?.filters;
+  const packageId = location.state?.packageId ?? photographyPackage?.id ?? null;
+  const customServiceProviders = location.state?.serviceProviders;
+  const teamProviders = location.state?.teamProviders;
 
   useEffect(() => {
     let cancelled = false;
@@ -261,9 +329,10 @@ const SelectEditingPackage = () => {
   const handleBookNow = async (editingPkg) => {
     try {
       setBookingId(editingPkg.id);
-
       const payload = {
-        event_package_id: photographyPackage?.id ?? null,
+        ...(packageId
+          ? { event_package_id: packageId }
+          : { event_category_id: filters?.category_id ?? null }),
         start_at: filters?.start_datetime ?? null,
         end_at: filters?.end_datetime ?? null,
         address: {
@@ -282,16 +351,17 @@ const SelectEditingPackage = () => {
           timezone: filters?.timezone || undefined,
         },
         service_providers:
-          photographyPackage?.team?.flatMap(
-            (tm) =>
-              tm.providers?.map((p) => ({
-                service_provider_id: p.id,
-                skill: tm.skill ?? 'photographer',
-              })) || []
-          ) ?? [],
+          customServiceProviders?.length > 0
+            ? customServiceProviders
+            : photographyPackage?.team?.flatMap(
+              (tm) =>
+                tm.providers?.map((p) => ({
+                  service_provider_id: p.id,
+                  skill: tm.skill ?? 'photographer',
+                })) || []
+            ) ?? [],
         editing_items: [{ editing_package_id: editingPkg.id }],
       };
-
       const response = await draftOrder(payload);
 
       navigate('/requestBook', {
@@ -300,6 +370,7 @@ const SelectEditingPackage = () => {
           payload,
           editingPackage: editingPkg,
           package: photographyPackage,
+          teamProviders,
           filters,
         },
       });
@@ -543,6 +614,75 @@ const STYLES = `
 
 .ep-btn-row { display: flex; gap: 8px; padding: 0 16px 16px; }
 .ep-btn-half { flex: 1; padding: 10px 12px; font-size: 13px; text-align: center; }
+.gallery-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.92);
+  z-index: 99999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gallery-modal-content {
+  position: relative;
+  width: 90vw;
+  height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gallery-full-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+.gallery-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.gallery-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.gallery-arrow-left {
+  left: 20px;
+}
+
+.gallery-arrow-right {
+  right: 20px;
+}
+
+.gallery-counter {
+  position: absolute;
+  bottom: 20px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+}
 
 @media (max-width: 900px) {
   .ep-layout { grid-template-columns: 1fr; }

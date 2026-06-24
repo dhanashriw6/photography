@@ -20,25 +20,25 @@ const decodeFilters = (encoded) => {
 };
 
 const SKILL_LABELS = {
-  photographer:    'Photographer',
-  videographer:    'Videographer',
-  drone_operator:  'Drone Operator',
+  photographer: 'Photographer',
+  videographer: 'Videographer',
+  drone_operator: 'Drone Operator',
   cinematographer: 'Cinematographer',
-  editor:          'Editor',
+  editor: 'Editor',
 };
 const SKILL_EMOJI = {
-  photographer:    '📷',
-  videographer:    '🎥',
-  drone_operator:  '🚁',
+  photographer: '📷',
+  videographer: '🎥',
+  drone_operator: '🚁',
   cinematographer: '🎬',
-  editor:          '🎞️',
+  editor: '🎞️',
 };
 const SKILL_COLORS = {
-  photographer:    { bg: '#fce7f3', text: '#be185d' },
-  videographer:    { bg: '#fef3c7', text: '#b45309' },
-  drone_operator:  { bg: '#dbeafe', text: '#1d4ed8' },
+  photographer: { bg: '#fce7f3', text: '#be185d' },
+  videographer: { bg: '#fef3c7', text: '#b45309' },
+  drone_operator: { bg: '#dbeafe', text: '#1d4ed8' },
   cinematographer: { bg: '#ede9fe', text: '#6d28d9' },
-  editor:          { bg: '#dcfce7', text: '#15803d' },
+  editor: { bg: '#dcfce7', text: '#15803d' },
 };
 
 const ROLE_OPTIONS = ['photographer', 'cinematographer', 'drone_operator', 'editor', 'videographer'];
@@ -286,31 +286,31 @@ const ProviderCard = ({
 
 /* ── Main ── */
 const FindBest = () => {
-  const [search, setSearch]           = useState('');
-  const [loadingKey, setLoadingKey]   = useState(null);
+  const [search, setSearch] = useState('');
+  const [loadingKey, setLoadingKey] = useState(null);
   const [bulkLoading, setBulkLoading] = useState(false);
-  const [providers, setProviders]     = useState([]);
-  const [restoring, setRestoring]     = useState(false);
+  const [providers, setProviders] = useState([]);
+  const [restoring, setRestoring] = useState(false);
 
   const [manuallyAdded, setManuallyAdded] = useState(new Set());
-  const [selected, setSelected]           = useState(new Map());
-  const [favorites, setFavorites]         = useState(new Set());
+  const [selected, setSelected] = useState(new Map());
+  const [favorites, setFavorites] = useState(new Set());
 
-  const [roleFilter, setRoleFilter]     = useState(new Set(ROLE_OPTIONS));
-  const [budgetRange, setBudgetRange]   =  useState([0, 25000]);
+  const [roleFilter, setRoleFilter] = useState(new Set(ROLE_OPTIONS));
+  const [budgetRange, setBudgetRange] = useState([0, 25000]);
   const [availability, setAvailability] = useState('any'); // UI-only: no live data field yet
 
-  const location       = useLocation();
-  const navigate       = useNavigate();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const filtersFromState = location.state?.filters ?? null;
-  const filtersFromUrl   = decodeFilters(searchParams.get('f'));
-  const filters          = filtersFromState ?? filtersFromUrl;
+  const filtersFromUrl = decodeFilters(searchParams.get('f'));
+  const filters = filtersFromState ?? filtersFromUrl;
 
   const statePackage = location.state?.package ?? null;
   const pkgIdFromUrl = searchParams.get('pkgId');
-  const packageId    = statePackage?.id ?? location.state?.packageId ?? (pkgIdFromUrl ? Number(pkgIdFromUrl) : null);
+  const packageId = statePackage?.id ?? location.state?.packageId ?? (pkgIdFromUrl ? Number(pkgIdFromUrl) : null);
 
   const isPackageMode = !!packageId;
 
@@ -323,11 +323,11 @@ const FindBest = () => {
     setRestoring(true);
     const { getServiceProviders } = require('../../services/booking');
     getServiceProviders({
-      category_id:    filters.category_id,
-      lat:            filters.lat,
-      lng:            filters.lng,
+      category_id: filters.category_id,
+      lat: filters.lat,
+      lng: filters.lng,
       start_datetime: filters.start_datetime,
-      end_datetime:   filters.end_datetime,
+      end_datetime: filters.end_datetime,
     })
       .then((res) => setProviders(res?.data?.data || []))
       .catch(console.error)
@@ -343,19 +343,19 @@ const FindBest = () => {
   };
 
   const buildAddress = (filters) => ({
-    lat:           filters?.lat           ?? null,
-    lng:           filters?.lng           ?? null,
-    place_id:      filters?.place_id      || undefined,
+    lat: filters?.lat ?? null,
+    lng: filters?.lng ?? null,
+    place_id: filters?.place_id || undefined,
     address_line1: filters?.address_line1 || undefined,
     address_line2: filters?.address_line2 || undefined,
     address_line3: filters?.address_line3 || undefined,
-    city:          filters?.city          || undefined,
-    state:         filters?.state         || undefined,
-    state_code:    filters?.state_code    || undefined,
-    country:       filters?.country       || undefined,
-    country_code:  filters?.country_code  || undefined,
-    postal_code:   filters?.postal_code   || undefined,
-    timezone:      filters?.timezone      || undefined,
+    city: filters?.city || undefined,
+    state: filters?.state || undefined,
+    state_code: filters?.state_code || undefined,
+    country: filters?.country || undefined,
+    country_code: filters?.country_code || undefined,
+    postal_code: filters?.postal_code || undefined,
+    timezone: filters?.timezone || undefined,
   });
 
   const matchesSearch = (name) => name.toLowerCase().includes(search.toLowerCase());
@@ -370,20 +370,20 @@ const FindBest = () => {
   );
   const allSelectedIds = new Set([...packageProviderIds, ...manuallyAdded]);
 
- const selectedProviders = providers.filter(
-  (p) => allSelectedIds.has(p.id) && matchesSearch(`${p.first_name} ${p.last_name}`)
-);
-
-const otherProviders = providers.filter((p) => {
-  if (allSelectedIds.has(p.id)) return false;
-  const name = `${p.first_name} ${p.last_name}`;
-  const primaryPkg = p.packages?.[0];
-  return (
-    matchesSearch(name) &&
-    (p.skills || []).some((s) => roleFilter.has(s.skill)) &&
-    matchesBudget(primaryPkg?.unit_price)
+  const selectedProviders = providers.filter(
+    (p) => allSelectedIds.has(p.id) && matchesSearch(`${p.first_name} ${p.last_name}`)
   );
-});
+
+  const otherProviders = providers.filter((p) => {
+    if (allSelectedIds.has(p.id)) return false;
+    const name = `${p.first_name} ${p.last_name}`;
+    const primaryPkg = p.packages?.[0];
+    return (
+      matchesSearch(name) &&
+      (p.skills || []).some((s) => roleFilter.has(s.skill)) &&
+      matchesBudget(primaryPkg?.unit_price)
+    );
+  });
 
   const handleToggleAdd = (providerId) => {
     setManuallyAdded((prev) => {
@@ -412,9 +412,9 @@ const otherProviders = providers.filter((p) => {
       setLoadingKey(key);
       const payload = {
         event_category_id: filters?.category_id ?? null,
-        start_at:          filters?.start_datetime ?? null,
-        end_at:            filters?.end_datetime   ?? null,
-        address:           buildAddress(filters),
+        start_at: filters?.start_datetime ?? null,
+        end_at: filters?.end_datetime ?? null,
+        address: buildAddress(filters),
         service_providers: [{ service_provider_id: provider.id, skill: provider.skills?.[0]?.skill ?? 'photographer' }],
       };
       const response = await draftOrder(payload);
@@ -426,50 +426,29 @@ const otherProviders = providers.filter((p) => {
     }
   };
 
-  const handleBookPackage = async () => {
-    if (selectedProviders.length === 0) return;
-    try {
-      setBulkLoading(true);
-      const payload = {
-        event_package_id:  packageId,
-        start_at:          filters?.start_datetime ?? null,
-        end_at:            filters?.end_datetime   ?? null,
-        address:           buildAddress(filters),
-        service_providers: selectedProviders.map((p) => ({
-          service_provider_id: p.id,
-          skill: p.skills?.[0]?.skill ?? 'photographer',
-        })),
-      };
-      const response = await draftOrder(payload);
-      navigate('/requestBook', { state: { order: response?.data?.data, payload, providers: selectedProviders, packageId, filters } });
-    } catch (err) {
-      console.error('draftOrder (package) failed:', err);
-    } finally {
-      setBulkLoading(false);
-    }
-  };
+
 
   /* ── Category mode ── */
-const allRows = providers.flatMap((p) =>
-  (p.packages?.length ? p.packages : [null]).map((pkg) => ({
-    key:      `${p.id}-${pkg?.skill ?? 'unknown'}`,
-    provider: p,
-    skill:    pkg?.skill ?? p.skills?.[0]?.skill ?? 'photographer',
-    pkg,
-  }))
-);
+  const allRows = providers.flatMap((p) =>
+    (p.packages?.length ? p.packages : [null]).map((pkg) => ({
+      key: `${p.id}-${pkg?.skill ?? 'unknown'}`,
+      provider: p,
+      skill: pkg?.skill ?? p.skills?.[0]?.skill ?? 'photographer',
+      pkg,
+    }))
+  );
 
-const selectedKeys = new Set(selected.keys());
+  const selectedKeys = new Set(selected.keys());
 
-const selectedRows = allRows.filter(
-  (r) => selectedKeys.has(r.key) && matchesSearch(`${r.provider.first_name} ${r.provider.last_name}`)
-);
+  const selectedRows = allRows.filter(
+    (r) => selectedKeys.has(r.key) && matchesSearch(`${r.provider.first_name} ${r.provider.last_name}`)
+  );
 
-const unselectedRows = allRows.filter((r) => {
-  if (selectedKeys.has(r.key)) return false;
-  const name = `${r.provider.first_name} ${r.provider.last_name}`;
-  return matchesSearch(name) && roleFilter.has(r.skill) && matchesBudget(r.pkg?.unit_price);
-});
+  const unselectedRows = allRows.filter((r) => {
+    if (selectedKeys.has(r.key)) return false;
+    const name = `${r.provider.first_name} ${r.provider.last_name}`;
+    return matchesSearch(name) && roleFilter.has(r.skill) && matchesBudget(r.pkg?.unit_price);
+  });
 
   const handleToggleSelect = (row) => {
     setSelected((prev) => {
@@ -496,9 +475,9 @@ const unselectedRows = allRows.filter((r) => {
       setLoadingKey(key);
       const payload = {
         event_category_id: filters?.category_id ?? null,
-        start_at:          filters?.start_datetime ?? null,
-        end_at:            filters?.end_datetime   ?? null,
-        address:           buildAddress(filters),
+        start_at: filters?.start_datetime ?? null,
+        end_at: filters?.end_datetime ?? null,
+        address: buildAddress(filters),
         service_providers: [{ service_provider_id: row.provider.id, skill: row.skill }],
       };
       const response = await draftOrder(payload);
@@ -510,25 +489,47 @@ const unselectedRows = allRows.filter((r) => {
     }
   };
 
-  const handleBookSelected = async () => {
+  // Package mode: continue with (possibly customized) package team
+  const handleContinueWithPackageTeam = () => {
+    if (selectedProviders.length === 0) return;
+    const serviceProviders = selectedProviders.map((p) => {
+      const isFromPackage = packageProviderIds.has(p.id);
+      const skill =
+        (isFromPackage ? providerIdToBaseSkill.get(p.id) : p.packages?.[0]?.skill) ??
+        p.skills?.[0]?.skill ??
+        'photographer';
+      return { service_provider_id: p.id, skill };
+    });
+    console.log('serviceProviders', serviceProviders);
+    navigate('/select-package', {
+      state: {
+        package: statePackage,
+        packageId,
+        filters,
+        serviceProviders,
+        teamProviders: selectedProviders,
+      },
+    });
+  };
+
+  // Category mode: continue with custom-built team
+  const handleContinueWithCustomTeam = () => {
     if (selected.size === 0) return;
-    try {
-      setBulkLoading(true);
-      const rows = [...selected.values()];
-      const payload = {
-        event_category_id: filters?.category_id ?? null,
-        start_at:          filters?.start_datetime ?? null,
-        end_at:            filters?.end_datetime   ?? null,
-        address:           buildAddress(filters),
-        service_providers: rows.map((r) => ({ service_provider_id: r.provider.id, skill: r.skill })),
-      };
-      const response = await draftOrder(payload);
-      navigate('/requestBook', { state: { order: response?.data?.data, payload, providers: rows.map((r) => ({ ...r.provider, _bookedSkill: r.skill })), filters } });
-    } catch (err) {
-      console.error('draftOrder (bulk) failed:', err);
-    } finally {
-      setBulkLoading(false);
-    }
+    const rows = [...selected.values()];
+    const serviceProviders = rows.map((r) => ({
+      service_provider_id: r.provider.id,
+      skill: r.skill,
+    }));
+    console.log('rows', rows, 'serviceProviders', serviceProviders);
+    navigate('/select-package', {
+      state: {
+        package: null,
+        packageId: null,
+        filters,
+        serviceProviders,
+        teamProviders: rows.map((r) => ({ ...r.provider, _bookedSkill: r.skill })),
+      },
+    });
   };
 
   const toggleFavorite = (id) => {
@@ -551,8 +552,8 @@ const unselectedRows = allRows.filter((r) => {
     : selectedRows.reduce((s, r) => s + (r.pkg?.price_with_commission || 0), 0);
 
   const totalRows = isPackageMode
-  ? selectedProviders.length + otherProviders.length
-  : selectedRows.length + unselectedRows.length;
+    ? selectedProviders.length + otherProviders.length
+    : selectedRows.length + unselectedRows.length;
 
   return (
     <ViewsLayout>
@@ -589,7 +590,7 @@ const unselectedRows = allRows.filter((r) => {
                         <span className="fb-selected-title">
                           Selected Team ({isPackageMode ? selectedProviders.length : selectedRows.length})
                         </span>
-                        
+
                       </div>
                       <div className="fb-selected-cost">
                         <div className="fb-selected-cost-label">Total Team Cost</div>
@@ -597,50 +598,49 @@ const unselectedRows = allRows.filter((r) => {
                       </div>
                       <button
                         className="fb-continue-btn"
-                        disabled={bulkLoading}
-                        onClick={isPackageMode ? handleBookPackage : handleBookSelected}
+                        onClick={isPackageMode ? handleContinueWithPackageTeam : handleContinueWithCustomTeam}
                       >
-                        {bulkLoading ? 'Booking…' : <>Continue with Team <FiArrowRight size={14} /></>}
+                        Continue with Team <FiArrowRight size={14} />
                       </button>
                     </div>
 
                     <div className="fb-selected-rows">
                       {isPackageMode
                         ? selectedProviders.map((p) => {
-                            const isFromPackage = packageProviderIds.has(p.id);
-                            const skill = isFromPackage ? providerIdToBaseSkill.get(p.id) : p.packages?.[0]?.skill;
-                            const isLead = p.skills?.find((s) => s.skill === skill)?.is_primary;
-                            return (
-                              <SelectedTeamRow
-                                key={p.id}
-                                name={`${p.first_name} ${p.last_name}`}
-                                src={p.profile_picture}
-                                skill={skill}
-                                price={p.packages?.[0]?.price_with_commission}
-                                days={days}
-                                isLead={isLead}
-                                location={`${p.city}, ${p.state}`}
-                                removeDisabled={isFromPackage}
-                                onRemove={() => handleToggleAdd(p.id)}
-                              />
-                            );
-                          })
+                          const isFromPackage = packageProviderIds.has(p.id);
+                          const skill = isFromPackage ? providerIdToBaseSkill.get(p.id) : p.packages?.[0]?.skill;
+                          const isLead = p.skills?.find((s) => s.skill === skill)?.is_primary;
+                          return (
+                            <SelectedTeamRow
+                              key={p.id}
+                              name={`${p.first_name} ${p.last_name}`}
+                              src={p.profile_picture}
+                              skill={skill}
+                              price={p.packages?.[0]?.price_with_commission}
+                              days={days}
+                              isLead={isLead}
+                              location={`${p.city}, ${p.state}`}
+                              removeDisabled={isFromPackage}
+                              onRemove={() => handleToggleAdd(p.id)}
+                            />
+                          );
+                        })
                         : selectedRows.map((r) => {
-                            const isLead = r.provider.skills?.find((s) => s.skill === r.skill)?.is_primary;
-                            return (
-                              <SelectedTeamRow
-                                key={r.key}
-                                name={`${r.provider.first_name} ${r.provider.last_name}`}
-                                src={r.provider.profile_picture}
-                                skill={r.skill}
-                                price={r.pkg?.price_with_commission}
-                                days={days}
-                                isLead={isLead}
-                                location={`${r.provider.city}, ${r.provider.state}`}
-                                onRemove={() => handleToggleSelect(r)}
-                              />
-                            );
-                          })}
+                          const isLead = r.provider.skills?.find((s) => s.skill === r.skill)?.is_primary;
+                          return (
+                            <SelectedTeamRow
+                              key={r.key}
+                              name={`${r.provider.first_name} ${r.provider.last_name}`}
+                              src={r.provider.profile_picture}
+                              skill={r.skill}
+                              price={r.pkg?.price_with_commission}
+                              days={days}
+                              isLead={isLead}
+                              location={`${r.provider.city}, ${r.provider.state}`}
+                              onRemove={() => handleToggleSelect(r)}
+                            />
+                          );
+                        })}
                     </div>
                   </div>
                 )}
@@ -659,61 +659,61 @@ const unselectedRows = allRows.filter((r) => {
                   <div className="fb-grid">
                     {isPackageMode
                       ? otherProviders.map((p) => {
-                          const name = `${p.first_name} ${p.last_name}`;
-                          const pkg = p.packages?.[0];
-                          const skill = pkg?.skill ?? p.skills?.[0]?.skill;
-                          const showReplace = selectedProviders.some(
-                            (sp) => (sp.packages?.[0]?.skill) === skill
-                          );
-                          const isLoading = loadingKey === `${p.id}-single`;
-                          return (
-                            <ProviderCard
-                              key={p.id}
-                              name={name}
-                              src={p.profile_picture}
-                              skill={skill}
-                              city={p.city} state={p.state}
-                              rating={p.reviews?.avg_rating}
-                              reviewCount={p.reviews?.count || 0}
-                              distanceKm={p.distance_meters != null ? (p.distance_meters / 1000).toFixed(1) : null}
-                              price={pkg?.price_with_commission}
-                              isSelected={false}
-                              isLoading={isLoading}
-                              showReplace={showReplace}
-                              isFavorite={favorites.has(p.id)}
-                              onToggleFavorite={() => toggleFavorite(p.id)}
-                              onAdd={() => handleToggleAdd(p.id)}
-                              onReplace={() => handleReplaceInPackage(p)}
-                              onBookNow={() => handleBookSingle(p)}
-                            />
-                          );
-                        })
+                        const name = `${p.first_name} ${p.last_name}`;
+                        const pkg = p.packages?.[0];
+                        const skill = pkg?.skill ?? p.skills?.[0]?.skill;
+                        const showReplace = selectedProviders.some(
+                          (sp) => (sp.packages?.[0]?.skill) === skill
+                        );
+                        const isLoading = loadingKey === `${p.id}-single`;
+                        return (
+                          <ProviderCard
+                            key={p.id}
+                            name={name}
+                            src={p.profile_picture}
+                            skill={skill}
+                            city={p.city} state={p.state}
+                            rating={p.reviews?.avg_rating}
+                            reviewCount={p.reviews?.count || 0}
+                            distanceKm={p.distance_meters != null ? (p.distance_meters / 1000).toFixed(1) : null}
+                            price={pkg?.price_with_commission}
+                            isSelected={false}
+                            isLoading={isLoading}
+                            showReplace={showReplace}
+                            isFavorite={favorites.has(p.id)}
+                            onToggleFavorite={() => toggleFavorite(p.id)}
+                            onAdd={() => handleToggleAdd(p.id)}
+                            onReplace={() => handleReplaceInPackage(p)}
+                            onBookNow={() => handleBookSingle(p)}
+                          />
+                        );
+                      })
                       : unselectedRows.map((r) => {
-                          const name = `${r.provider.first_name} ${r.provider.last_name}`;
-                          const showReplace = selectedRows.some((sr) => sr.skill === r.skill);
-                          const isLoading = loadingKey === r.key;
-                          return (
-                            <ProviderCard
-                              key={r.key}
-                              name={name}
-                              src={r.provider.profile_picture}
-                              skill={r.skill}
-                              city={r.provider.city} state={r.provider.state}
-                              rating={r.provider.reviews?.avg_rating}
-                              reviewCount={r.provider.reviews?.count || 0}
-                              distanceKm={r.provider.distance_meters != null ? (r.provider.distance_meters / 1000).toFixed(1) : null}
-                              price={r.pkg?.price_with_commission}
-                              isSelected={false}
-                              isLoading={isLoading}
-                              showReplace={showReplace}
-                              isFavorite={favorites.has(r.key)}
-                              onToggleFavorite={() => toggleFavorite(r.key)}
-                              onAdd={() => handleToggleSelect(r)}
-                              onReplace={() => handleReplaceInCategory(r)}
-                              onBookNow={() => handleBookNow(r)}
-                            />
-                          );
-                        })}
+                        const name = `${r.provider.first_name} ${r.provider.last_name}`;
+                        const showReplace = selectedRows.some((sr) => sr.skill === r.skill);
+                        const isLoading = loadingKey === r.key;
+                        return (
+                          <ProviderCard
+                            key={r.key}
+                            name={name}
+                            src={r.provider.profile_picture}
+                            skill={r.skill}
+                            city={r.provider.city} state={r.provider.state}
+                            rating={r.provider.reviews?.avg_rating}
+                            reviewCount={r.provider.reviews?.count || 0}
+                            distanceKm={r.provider.distance_meters != null ? (r.provider.distance_meters / 1000).toFixed(1) : null}
+                            price={r.pkg?.price_with_commission}
+                            isSelected={false}
+                            isLoading={isLoading}
+                            showReplace={showReplace}
+                            isFavorite={favorites.has(r.key)}
+                            onToggleFavorite={() => toggleFavorite(r.key)}
+                            onAdd={() => handleToggleSelect(r)}
+                            onReplace={() => handleReplaceInCategory(r)}
+                            onBookNow={() => handleBookNow(r)}
+                          />
+                        );
+                      })}
                   </div>
                 )}
               </>

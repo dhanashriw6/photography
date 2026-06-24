@@ -1,387 +1,469 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import PhotographerLayout from './PhotographerLayout';
-import headerBgImage from '../../assets/Images/headerBgImage.jpg';
+import { getBlocks,addBlocks } from '../../services/calender';
+/* ─── constants ────────────────────────────────────────────────────────────── */
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MONTH_NAMES = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+];
 
-/* ─── Circular Progress ────────────────────────────────────────────────────── */
-const CircularProgress = ({ pct = 64, size = 110, stroke = 9 }) => {
-    const r = (size - stroke) / 2;
-    const circ = 2 * Math.PI * r;
-    const offset = circ - (pct / 100) * circ;
+const REASONS = [
+    { value: 'vacation', label: 'Vacation', color: '#f5a623', bg: '#fdf0db' },
+    { value: 'personal', label: 'Personal', color: '#d97706', bg: '#fef3c7' },
+    { value: 'busy_external', label: 'Busy (External)', color: '#2563eb', bg: '#dbeafe' },
+    { value: 'holiday', label: 'Holiday', color: '#9333ea', bg: '#f3e8ff' },
+    { value: 'other', label: 'Other', color: '#6b7280', bg: '#f3f4f6' },
+];
+const reasonMeta = (value) => REASONS.find((r) => r.value === value) || REASONS[4];
+
+/* ─── date helpers ─────────────────────────────────────────────────────────── */
+const pad = (n) => String(n).padStart(2, '0');
+const toLocalDateStr = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+// Month range for the getBlocks query — UTC month boundaries, matching the API convention
+// e.g. from=2026-07-01T00:00:00.000Z&to=2026-08-01T00:00:00.000Z
+const monthRangeUTC = (y, m) => ({
+    from: new Date(Date.UTC(y, m, 1, 0, 0, 0)).toISOString(),
+    to: new Date(Date.UTC(y, m + 1, 1, 0, 0, 0)).toISOString(),
+});
+
+// does a given local calendar day fall inside a block's [start_at, end_at) range
+const dayInBlock = (dateObj, block) => {
+    const dayStart = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+    const dayEnd = new Date(dayStart);
+    dayEnd.setDate(dayEnd.getDate() + 1);
+    const start = new Date(block.start_at);
+    const end = new Date(block.end_at);
+    return start < dayEnd && end > dayStart;
+};
+
+/* ─── Add Block modal ──────────────────────────────────────────────────────── */
+const AddBlockModal = ({ open, onClose, onSave, defaultDate }) => {
+    const [fromDate, setFromDate] = useState(defaultDate);
+    const [toDate, setToDate] = useState(defaultDate);
+    const [reason, setReason] = useState('vacation');
+    const [note, setNote] = useState('');
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        if (open) {
+            setFromDate(defaultDate);
+            setToDate(defaultDate);
+            setReason('vacation');
+            setNote('');
+            setError('');
+        }
+    }, [open, defaultDate]);
+
+    if (!open) return null;
+
+    const handleSave = async () => {
+        if (!fromDate || !toDate) {
+            setError('Please select both dates.');
+            return;
+        }
+        if (new Date(toDate) < new Date(fromDate)) {
+            setError('To date cannot be before From date.');
+            return;
+        }
+
+        // start_at = local midnight of fromDate
+        // end_at   = local midnight of the day AFTER toDate (so the block covers the full last day)
+        const [fy, fm, fd] = fromDate.split('-').map(Number);
+        const [ty, tm, td] = toDate.split('-').map(Number);
+        const start_at = new Date(fy, fm - 1, fd, 0, 0, 0, 0).toISOString();
+        const endDateObj = new Date(ty, tm - 1, td, 0, 0, 0, 0);
+        endDateObj.setDate(endDateObj.getDate() + 1);
+        const end_at = endDateObj.toISOString();
+
+        const payload = { start_at, end_at, reason, note: note.trim() || undefined };
+
+        try {
+            setSaving(true);
+            setError('');
+            await onSave(payload);
+        } catch (e) {
+            setError('Failed to save block. Please try again.');
+        } finally {
+            setSaving(false);
+        }
+    };
+
     return (
-        <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
-            <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#e5e7eb" strokeWidth={stroke} />
-            <circle
-                cx={size / 2} cy={size / 2} r={r} fill="none"
-                stroke="#f5a623" strokeWidth={stroke}
-                strokeDasharray={circ} strokeDashoffset={offset}
-                strokeLinecap="round"
-                style={{ transition: 'stroke-dashoffset 0.6s ease' }}
-            />
-        </svg>
+        <div style={overlayStyle} onClick={onClose}>
+            <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                    <div>
+                        <h2 style={{ margin: 0, fontSize: '19px', fontWeight: 800, color: '#1a1a1a' }}>Add Block Range</h2>
+                        <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#9ca3af' }}>
+                            Block dates to hide them from client availability.
+                        </p>
+                    </div>
+                    <button onClick={onClose} style={closeBtnStyle}>×</button>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginTop: '20px' }}>
+                    <div>
+                        <label style={labelStyle}>From Date</label>
+                        <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} style={inputStyle} />
+                    </div>
+                    <div>
+                        <label style={labelStyle}>To Date</label>
+                        <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} style={inputStyle} />
+                    </div>
+                </div>
+
+                <div style={{ marginTop: '16px' }}>
+                    <label style={labelStyle}>Reason</label>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '6px' }}>
+                        {REASONS.map((r) => (
+                            <button
+                                key={r.value}
+                                onClick={() => setReason(r.value)}
+                                style={{
+                                    padding: '7px 12px',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    fontSize: '12.5px',
+                                    fontWeight: 700,
+                                    border: reason === r.value ? `1.5px solid ${r.color}` : '1.5px solid #e5e7eb',
+                                    background: reason === r.value ? r.bg : '#fff',
+                                    color: reason === r.value ? r.color : '#6b7280',
+                                }}
+                            >
+                                {r.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <div style={{ marginTop: '16px' }}>
+                    <label style={labelStyle}>Note (Optional)</label>
+                    <textarea
+                        value={note}
+                        maxLength={200}
+                        onChange={(e) => setNote(e.target.value)}
+                        placeholder="Add a note…"
+                        style={{ ...inputStyle, height: '80px', resize: 'none', fontFamily: 'inherit' }}
+                    />
+                    <div style={{ textAlign: 'right', fontSize: '11px', color: '#9ca3af', marginTop: '2px' }}>
+                        {note.length}/200
+                    </div>
+                </div>
+
+                {error && <p style={{ color: '#dc2626', fontSize: '12.5px', margin: '10px 0 0' }}>{error}</p>}
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '22px' }}>
+                    <button onClick={onClose} style={cancelBtnStyle}>Cancel</button>
+                    <button onClick={handleSave} disabled={saving} style={saveBtnStyle}>
+                        {saving ? 'Saving…' : 'Save Block'}
+                    </button>
+                </div>
+            </div>
+        </div>
     );
 };
 
-/* ─── Mini Calendar ────────────────────────────────────────────────────────── */
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-const getDaysInMonth = (y, m) => new Date(y, m + 1, 0).getDate();
-const getFirstDay = (y, m) => new Date(y, m, 1).getDay();
-
-const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'];
-
-// Sample events — day number → type
-const EVENTS = { 2: 'leave', 10: 'booking', 19: 'booking', 26: 'booking', 2: 'booking-faded' };
-const BOOKINGS_HIGHLIGHT = new Set([10, 19, 26]);
-const LEAVE_DAYS = new Set([2]);
-
-const Calendar = () => {
+/* ─── Main calendar ────────────────────────────────────────────────────────── */
+const AvailabilityCalendar = () => {
     const today = new Date();
-    const [cur, setCur] = useState({ y: 2026, m: 2 }); // March 2026 (0-indexed)
+    const [cur, setCur] = useState({ y: today.getFullYear(), m: today.getMonth() }); // defaults to current month
+    const [blocks, setBlocks] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalDate, setModalDate] = useState(toLocalDateStr(today));
 
     const { y, m } = cur;
-    const daysInMonth = getDaysInMonth(y, m);
-    const firstDay = getFirstDay(y, m);
-    const daysInPrev = getDaysInMonth(y, m - 1 < 0 ? 11 : m - 1);
 
-    const prev = () => setCur(c => c.m === 0 ? { y: c.y - 1, m: 11 } : { y: c.y, m: c.m - 1 });
-    const next = () => setCur(c => c.m === 11 ? { y: c.y + 1, m: 0 } : { y: c.y, m: c.m + 1 });
+    const fetchBlocks = useCallback(async () => {
+        try {
+            setLoading(true);
+            const { from, to } = monthRangeUTC(y, m);
+            const res = await getBlocks({ from, to });
+           setBlocks(res?.data?.data?.blocks || []);
+        } catch (e) {
+            console.error('Failed to load blocks', e);
+        } finally {
+            setLoading(false);
+        }
+    }, [y, m]);
+
+    useEffect(() => {
+        fetchBlocks();
+    }, [fetchBlocks]);
+
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
+    const firstDay = new Date(y, m, 1).getDay();
+    const daysInPrev = new Date(y, m, 0).getDate();
+
+    const prev = () => setCur((c) => (c.m === 0 ? { y: c.y - 1, m: 11 } : { y: c.y, m: c.m - 1 }));
+    const next = () => setCur((c) => (c.m === 11 ? { y: c.y + 1, m: 0 } : { y: c.y, m: c.m + 1 }));
     const goToday = () => setCur({ y: today.getFullYear(), m: today.getMonth() });
 
-    // Build grid cells
     const cells = [];
     for (let i = 0; i < firstDay; i++) cells.push({ day: daysInPrev - firstDay + i + 1, cur: false });
     for (let d = 1; d <= daysInMonth; d++) cells.push({ day: d, cur: true });
-    const remaining = 42 - cells.length;
-    for (let i = 1; i <= remaining; i++) cells.push({ day: i, cur: false });
+    const totalCells = cells.length <= 35 ? 35 : 42;
+    for (let i = 1; i <= totalCells - cells.length; i++) cells.push({ day: i, cur: false });
 
     const isToday = (d, isCur) => isCur && d === today.getDate() && m === today.getMonth() && y === today.getFullYear();
 
-    return (
-        <div>
-            {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                <h3 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: '#1a1a1a' }}>
-                    {MONTH_NAMES[m]} – {y}
-                </h3>
-                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                    <button onClick={prev} style={navBtn}>‹</button>
-                    <button onClick={goToday} style={{ ...navBtn, padding: '4px 10px', fontSize: '12px' }}>Today</button>
-                    <button onClick={next} style={navBtn}>›</button>
-                </div>
-            </div>
+ const blocksForDay = (d, isCur) => {
+    if (!isCur) return [];
 
-            {/* Day headers */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', textAlign: 'center', marginBottom: '4px' }}>
-                {DAYS.map(d => (
-                    <div key={d} style={{ fontSize: '11px', fontWeight: 700, color: '#9ca3af', padding: '4px 0' }}>{d}</div>
-                ))}
-            </div>
+    const dateObj = new Date(y, m, d);
 
-            {/* Cells */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '2px' }}>
-                {cells.map((cell, i) => {
-                    const isBook = cell.cur && BOOKINGS_HIGHLIGHT.has(cell.day);
-                    const isLeave = cell.cur && LEAVE_DAYS.has(cell.day);
-                    const isFaded = !cell.cur;
-                    const todayCell = isToday(cell.day, cell.cur);
-
-                    return (
-                        <div key={i} style={{
-                            textAlign: 'center', padding: '4px 2px',
-                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
-                        }}>
-                            <div style={{
-                                width: '28px', height: '28px',
-                                borderRadius: '50%',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: '12px', fontWeight: todayCell ? 700 : 500,
-                                color: isFaded ? '#d1d5db' : todayCell ? '#fff' : '#374151',
-                                background: todayCell ? '#f5a623' : 'transparent',
-                            }}>
-                                {cell.day}
-                            </div>
-                            {isBook && (
-                                <span style={{
-                                    fontSize: '9px', fontWeight: 700, background: '#f5a623',
-                                    color: '#fff', borderRadius: '4px', padding: '1px 5px',
-                                    letterSpacing: '0.3px',
-                                }}>Booking</span>
-                            )}
-                            {isLeave && (
-                                <span style={{
-                                    fontSize: '9px', fontWeight: 700, background: '#fde68a',
-                                    color: '#92400e', borderRadius: '4px', padding: '1px 5px',
-                                }}>Leave</span>
-                            )}
-                        </div>
-                    );
-                })}
-            </div>
-        </div>
-    );
+    return Array.isArray(blocks)
+        ? blocks.filter((b) => dayInBlock(dateObj, b))
+        : [];
 };
+    const openModalForDay = (d, isCur) => {
+        if (!isCur) return;
+        setModalDate(toLocalDateStr(new Date(y, m, d)));
+        setModalOpen(true);
+    };
 
-const navBtn = {
-    background: '#fff', border: '1.5px solid #e5e7eb',
-    borderRadius: '6px', cursor: 'pointer',
-    padding: '4px 8px', fontSize: '14px', fontWeight: 700, color: '#374151',
-    lineHeight: 1,
-};
-
-/* ─── Stat Card ────────────────────────────────────────────────────────────── */
-const StatCard = ({ value, label, icon, accent = '#f5a623' }) => (
-    <div style={{
-        background: 'rgba(255,255,255,0.18)',
-        backdropFilter: 'blur(8px)',
-        border: '1px solid rgba(255,255,255,0.35)',
-        borderRadius: '14px',
-        padding: '16px 18px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        flex: 1, minWidth: 0,
-    }}>
-        <div>
-            <p style={{ margin: 0, fontSize: '22px', fontWeight: 800, color: '#1a1a1a' }}>{value}</p>
-            <p style={{ margin: '3px 0 0', fontSize: '12px', color: '#555', fontWeight: 500 }}>{label}</p>
-        </div>
-        <div style={{
-            width: '38px', height: '38px', borderRadius: '50%',
-            background: 'rgba(255,255,255,0.55)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '18px',
-        }}>
-            {icon}
-        </div>
-    </div>
-);
-
-/* ─── Notification Item ────────────────────────────────────────────────────── */
-const NotifItem = ({ avatar, title, subtitle, time }) => (
-    <div style={{
-        display: 'flex', alignItems: 'center', gap: '12px',
-        padding: '12px 0',
-        borderBottom: '1px solid #f3f4f6',
-    }}>
-        <div style={{
-            width: '42px', height: '42px', borderRadius: '50%', overflow: 'hidden',
-            background: '#e5e7eb', flexShrink: 0,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '16px',
-        }}>
-            {avatar || '📷'}
-        </div>
-        <div style={{ flex: 1 }}>
-            <p style={{ margin: 0, fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>{title}</p>
-            <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#9ca3af' }}>{subtitle}</p>
-        </div>
-        <span style={{ fontSize: '11px', color: '#9ca3af', flexShrink: 0 }}>{time}</span>
-    </div>
-);
-
-/* ─── Main Dashboard ───────────────────────────────────────────────────────── */
-const PhotographerDashboard = () => {
-
-  
-
-    const recentEvents = [
-        { orderDate: '00/00/0000', details: 'Full Day (wedding)', eventDate: '00/00/0000' },
-        { orderDate: '00/00/0000', details: 'Full Day (wedding)', eventDate: '00/00/0000' },
-        { orderDate: '00/00/0000', details: 'Full Day (wedding)', eventDate: '00/00/0000' },
-        { orderDate: '00/00/0000', details: 'Full Day (wedding)', eventDate: '00/00/0000' },
-    ];
-
-    const notifications = [
-        { title: 'Recived New order', subtitle: 'By John', time: '2 hours ago', avatar: '🧑' },
-        { title: 'Ana Added Review', subtitle: 'Lorem...', time: '2 hours ago', avatar: '👩' },
-        { title: 'John Added Review', subtitle: 'Lorem...', time: '2 hours ago', avatar: '👨' },
-    ];
+    const handleSaveBlock = async (payload) => {
+        await addBlocks(payload);
+        setModalOpen(false);
+        fetchBlocks();
+    };
 
     return (
         <PhotographerLayout>
-            <div style={{
-                background: '#f9fafb',
-                minHeight: '100vh',
-                width: '100%'
-            }}>
+            <div style={{ background: '#f9fafb', minHeight: '100vh', width: '100%', padding: '28px' }}>
 
-                {/* ── Hero / Header Banner ── */}
-                <div style={{
-                    background: `url(${headerBgImage}) center/cover no-repeat`,
-                    padding: '32px 28px 28px',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    minHeight: '140px',
-                    width: '100%'
-                }}>
-                  
-
-                    <div style={{ position: 'relative', zIndex: 1 }}>
-                        {/* Approved badge */}
-                        {/* <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
-                            <span style={{
-                                background: '#fff', color: '#16a34a',
-                                fontSize: '11px', fontWeight: 700,
-                                borderRadius: '20px', padding: '4px 10px',
-                                display: 'flex', alignItems: 'center', gap: '4px',
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                            }}>
-                                <span style={{ color: '#16a34a' }}>●</span> Approved
-                            </span>
-                        </div> */}
-
-                        {/* Greeting */}
-                        <h1 style={{ margin: '0 0 4px', fontSize: '32px', fontWeight: 800, color: '#1a1a1a', letterSpacing: '-0.02em' }}>
-                            Hello John
-                        </h1>
-                        <p style={{ margin: '0 0 24px', fontSize: '13px', color: '#555', fontWeight: 500 }}>
-                            welcome to your Dashboard
+                {/* Header */}
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+                    <div>
+                        <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 800, color: '#1a1a1a' }}>My Availability Calendar</h1>
+                        <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#6b7280' }}>
+                            Manage blocked dates. Blocked dates are hidden from client search.
                         </p>
-
-                        {/* Stat cards row */}
-                        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                            <StatCard value="$123.00" label="Total Cash" icon="💰" />
-                            <StatCard value="100" label="Total Orders" icon="📋" />
-                            <StatCard value="50" label="Active Orders" icon="✅" />
-                            <StatCard value="50" label="Pending Orders" icon="🔄" />
-                        </div>
                     </div>
+                    <button
+                        onClick={() => {
+                            setModalDate(toLocalDateStr(today));
+                            setModalOpen(true);
+                        }}
+                        style={addBtnStyle}
+                    >
+                        + Add Block
+                    </button>
                 </div>
 
-                {/* ── Body ── */}
-                <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-
-                    {/* Row 1 — Profile completion + Recent Events */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: '20px' }}>
-
-                        {/* Profile completion */}
-                        <div style={card}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', marginBottom: '12px' }}>
-                                <CircularProgress pct={64} />
-                                <span style={{
-                                    position: 'absolute', fontSize: '18px', fontWeight: 800, color: '#1a1a1a',
-                                }}>64%</span>
-                            </div>
-                            <p style={{ margin: '0 0 4px', fontSize: '15px', fontWeight: 700, color: '#1a1a1a', textAlign: 'center' }}>
-                                Complete Profile
-                            </p>
-                            <p style={{ margin: 0, fontSize: '12px', color: '#9ca3af', textAlign: 'center', lineHeight: 1.4 }}>
-                                Your profile is 64% completed.
-                            </p>
-                        </div>
-
-                        {/* Recent Events */}
-                        <div style={card}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-                                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: '#1a1a1a' }}>Your Recent Events</h3>
-                            </div>
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                <thead>
-                                    <tr>
-                                        {['OrderDate', 'Event Details', 'Event Date'].map(h => (
-                                            <th key={h} style={{
-                                                textAlign: 'left', fontSize: '12px', fontWeight: 700,
-                                                color: '#6b7280', paddingBottom: '10px',
-                                                borderBottom: '1px solid #f3f4f6',
-                                            }}>{h}</th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {recentEvents.map((ev, i) => (
-                                        <tr key={i}>
-                                            <td style={td}>{ev.orderDate}</td>
-                                            <td style={td}>{ev.details}</td>
-                                            <td style={td}>{ev.eventDate}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px' }}>
-                                <button style={{
-                                    background: 'none', border: 'none', cursor: 'pointer',
-                                    color: '#f5a623', fontSize: '13px', fontWeight: 700,
-                                    display: 'flex', alignItems: 'center', gap: '4px', padding: 0,
-                                }}>
-                                    View All Orders →
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Row 2 — Upcoming Booking + Calendar */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: '20px' }}>
-
-                        {/* Upcoming Booking */}
-                        <div style={card}>
-                            <h3 style={{ margin: '0 0 14px', fontSize: '15px', fontWeight: 700, color: '#1a1a1a' }}>
-                                Upcoming Booking
+                {/* Calendar card */}
+                <div style={card}>
+                    {/* Month nav */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <button onClick={prev} style={navBtn}>‹</button>
+                            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#1a1a1a', minWidth: '160px', textAlign: 'center' }}>
+                                {MONTH_NAMES[m]} {y}
                             </h3>
-                            <div style={{
-                                width: '100%', height: '120px', borderRadius: '10px',
-                                background: 'linear-gradient(135deg, #fde68a, #f5a623)',
-                                marginBottom: '12px', overflow: 'hidden',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: '36px',
-                            }}>
-                                📷
-                            </div>
-                            <p style={{ margin: '0 0 4px', fontSize: '15px', fontWeight: 700, color: '#1a1a1a' }}>Full Day Shoot</p>
-                            <p style={{ margin: '0 0 10px', fontSize: '12px', color: '#9ca3af' }}>Tue, 10 March 2026</p>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '16px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#555' }}>
-                                    <span>🕐</span> 05:00 Am – 05:00 Am
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#555' }}>
-                                    <span>👤</span> John
-                                </div>
-                            </div>
-                            <button style={{
-                                width: '100%', padding: '10px',
-                                background: '#f5a623', color: '#fff',
-                                border: 'none', borderRadius: '8px',
-                                fontSize: '13px', fontWeight: 700, cursor: 'pointer',
-                            }}>
-                                See Details
-                            </button>
+                            <button onClick={next} style={navBtn}>›</button>
                         </div>
-
-                        {/* Calendar */}
-                        <div style={card}>
-                            <Calendar />
-                        </div>
+                        <button onClick={goToday} style={{ ...navBtn, padding: '6px 14px', fontSize: '12.5px' }}>Today</button>
                     </div>
 
-                    {/* Row 3 — Recent Notifications */}
-                    <div style={card}>
-                        <h3 style={{ margin: '0 0 4px', fontSize: '16px', fontWeight: 700, color: '#1a1a1a' }}>
-                            Recent Notification
-                        </h3>
-                        <div>
-                            {notifications.map((n, i) => (
-                                <NotifItem key={i} {...n} />
-                            ))}
-                        </div>
+                    {/* Day headers */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', textAlign: 'center', marginBottom: '4px' }}>
+                        {DAYS.map((d) => (
+                            <div key={d} style={{ fontSize: '11.5px', fontWeight: 700, color: '#9ca3af', padding: '6px 0' }}>{d}</div>
+                        ))}
                     </div>
 
+                    {/* Grid */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '6px' }}>
+                        {cells.map((cell, i) => {
+                            const dayBlocks = blocksForDay(cell.day, cell.cur);
+                            const todayCell = isToday(cell.day, cell.cur);
+                            return (
+                                <div
+                                    key={i}
+                                    onClick={() => openModalForDay(cell.day, cell.cur)}
+                                    style={{
+                                        minHeight: '74px',
+                                        borderRadius: '10px',
+                                        border: todayCell ? '1.5px solid #f5a623' : '1px solid #f3f4f6',
+                                        background: !cell.cur ? '#fafafa' : '#fff',
+                                        padding: '6px',
+                                        cursor: cell.cur ? 'pointer' : 'default',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '4px',
+                                    }}
+                                >
+                                    <span style={{
+                                        fontSize: '12.5px',
+                                        fontWeight: todayCell ? 800 : 600,
+                                        color: !cell.cur ? '#d1d5db' : todayCell ? '#f5a623' : '#374151',
+                                    }}>
+                                        {cell.day}
+                                    </span>
+                                    {dayBlocks.slice(0, 2).map((b, idx) => {
+                                        const meta = reasonMeta(b.reason);
+                                        return (
+                                            <span
+                                                key={idx}
+                                                style={{
+                                                    fontSize: '9.5px',
+                                                    fontWeight: 700,
+                                                    color: meta.color,
+                                                    background: meta.bg,
+                                                    borderRadius: '5px',
+                                                    padding: '2px 5px',
+                                                    textTransform: 'capitalize',
+                                                    overflow: 'hidden',
+                                                    whiteSpace: 'nowrap',
+                                                    textOverflow: 'ellipsis',
+                                                }}
+                                            >
+                                                {meta.label}
+                                            </span>
+                                        );
+                                    })}
+                                    {dayBlocks.length > 2 && (
+                                        <span style={{ fontSize: '9.5px', color: '#9ca3af', fontWeight: 600 }}>
+                                            +{dayBlocks.length - 2} more
+                                        </span>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {loading && (
+                        <p style={{ textAlign: 'center', fontSize: '12.5px', color: '#9ca3af', marginTop: '14px' }}>Loading…</p>
+                    )}
+
+                    {/* Legend */}
+                    <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #f3f4f6' }}>
+                        {REASONS.map((r) => (
+                            <div key={r.value} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#6b7280' }}>
+                                <span style={{ width: '9px', height: '9px', borderRadius: '50%', background: r.color, display: 'inline-block' }} />
+                                {r.label}
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
+
+            <AddBlockModal
+                open={modalOpen}
+                onClose={() => setModalOpen(false)}
+                onSave={handleSaveBlock}
+                defaultDate={modalDate}
+            />
         </PhotographerLayout>
     );
 };
 
-/* ─── Shared styles ────────────────────────────────────────────────────────── */
+/* ─── styles ───────────────────────────────────────────────────────────────── */
 const card = {
     background: '#fff',
     borderRadius: '16px',
-    padding: '20px',
+    padding: '22px',
     boxShadow: '0 1px 8px rgba(0,0,0,0.06)',
     border: '1px solid #f3f4f6',
 };
 
-const td = {
-    padding: '10px 0',
-    fontSize: '13px', color: '#374151',
-    borderBottom: '1px solid #f9fafb',
+const navBtn = {
+    background: '#fff',
+    border: '1.5px solid #e5e7eb',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    padding: '6px 12px',
+    fontSize: '15px',
+    fontWeight: 700,
+    color: '#374151',
+    lineHeight: 1,
 };
 
-export default PhotographerDashboard;
+const addBtnStyle = {
+    background: '#f5a623',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '10px',
+    padding: '11px 18px',
+    fontSize: '13.5px',
+    fontWeight: 700,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+};
+
+const overlayStyle = {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(17,24,39,0.45)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+    padding: '16px',
+};
+
+const modalStyle = {
+    background: '#fff',
+    borderRadius: '16px',
+    padding: '26px',
+    width: '460px',
+    maxWidth: '100%',
+    maxHeight: '90vh',
+    overflowY: 'auto',
+    boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
+};
+
+const closeBtnStyle = {
+    background: 'none',
+    border: 'none',
+    fontSize: '22px',
+    lineHeight: 1,
+    color: '#9ca3af',
+    cursor: 'pointer',
+    padding: '0 0 0 12px',
+};
+
+const labelStyle = {
+    display: 'block',
+    fontSize: '12.5px',
+    fontWeight: 700,
+    color: '#374151',
+    marginBottom: '6px',
+};
+
+const inputStyle = {
+    width: '100%',
+    padding: '9px 11px',
+    borderRadius: '8px',
+    border: '1.5px solid #e5e7eb',
+    fontSize: '13px',
+    color: '#1a1a1a',
+    boxSizing: 'border-box',
+};
+
+const cancelBtnStyle = {
+    background: '#fff',
+    border: '1.5px solid #e5e7eb',
+    borderRadius: '9px',
+    padding: '10px 18px',
+    fontSize: '13px',
+    fontWeight: 700,
+    color: '#374151',
+    cursor: 'pointer',
+};
+
+const saveBtnStyle = {
+    background: '#f5a623',
+    border: 'none',
+    borderRadius: '9px',
+    padding: '10px 20px',
+    fontSize: '13px',
+    fontWeight: 700,
+    color: '#fff',
+    cursor: 'pointer',
+};
+
+export default AvailabilityCalendar;

@@ -275,7 +275,7 @@ const PhotographerLayout = ({ children }) => {
 
   const navItems = isLoggedIn
     ? [
-      { label: 'Home', to: '/home' },
+      { label: 'Home', to: '/join-as-photographer/home' },
 
     ]
     : [];

@@ -1109,7 +1109,7 @@ const PricingPlans = () => {
   const plans = [
     {
       name: "Starter",
-      price: "$49",
+      price: "₹1,299",
       period: "/session",
       features: ["1 Hour Session", "20 Edited Photos", "Online Gallery", "Basic Retouching"],
       icon: <Zap size={32} />,
@@ -1117,7 +1117,7 @@ const PricingPlans = () => {
     },
     {
       name: "Professional",
-      price: "$199",
+      price: "₹4,999",
       period: "/session",
       features: ["4 Hour Session", "100 Edited Photos", "Premium Gallery", "Advanced Retouching", "Print Rights", "Rush Delivery"],
       icon: <Award size={32} />,
