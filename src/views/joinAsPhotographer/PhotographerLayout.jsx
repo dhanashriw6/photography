@@ -343,7 +343,7 @@ const PhotographerLayout = ({ children }) => {
             </nav>
 
             {/* Avatar dropdown — desktop only */}
-            <AvatarDropdown menuItems={menuItems} />
+        {isLoggedIn &&     <AvatarDropdown menuItems={menuItems} />}
 
             {/* Hamburger — mobile only, single entry point to nav + profile */}
             {isLoggedIn && <button
@@ -388,55 +388,23 @@ const PhotographerLayout = ({ children }) => {
       marginTop: 'auto',
     }}
   >
-    <div
-      style={{
-        maxWidth: '1200px',
-        margin: '0 auto',
-        padding: '40px 32px 24px',
-        display: 'flex',
-        // flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent:"space-between",
-      
-        textAlign: 'center',
-      }}
-    >
+    <div className="footer-container">
       <img
         src={logo}
         alt="Fulltime Photographer"
-        style={{ width: '150px', height: 'auto' }}
+        className="footer-logo"
       />
   
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          fontSize: '13.5px',
-          color: '#555',
-          fontWeight: 500,
-        }}
-      >
+      <div className="footer-security">
         <FiShield size={14} style={{ color: '#E8A317' }} />
         <span>Secure</span>
-        <span style={{ color: '#E8A317' }}>•</span>
+        <span className="dot">•</span>
         <span>Trusted</span>
-        <span style={{ color: '#E8A317' }}>•</span>
+        <span className="dot">•</span>
         <span>Support</span>
       </div>
   
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '14px',
-          fontSize: '13.5px',
-          fontWeight: 600,
-          color: '#333',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-        }}
-      >
+      <div className="footer-links">
         <button
           type="button"
           onClick={() => navigate('/legal', { state: { tab: 'privacy' } })}
@@ -444,7 +412,9 @@ const PhotographerLayout = ({ children }) => {
         >
           Privacy Policy
         </button>
-        <span style={{ color: '#ddd' }}>|</span>
+  
+        <span className="divider">|</span>
+  
         <button
           type="button"
           onClick={() => navigate('/legal', { state: { tab: 'terms' } })}
@@ -452,29 +422,32 @@ const PhotographerLayout = ({ children }) => {
         >
           Terms
         </button>
-        <span style={{ color: '#ddd' }}>|</span>
-        <button type="button" onClick={() => navigate('/support')} style={footerLinkStyle}>
+  
+        <span className="divider">|</span>
+  
+        <button
+          type="button"
+          onClick={() => navigate('/support')}
+          style={footerLinkStyle}
+        >
           Support
         </button>
-        <span style={{ color: '#ddd' }}>|</span>
-        <button type="button" onClick={() => navigate('/contact')} style={footerLinkStyle}>
+  
+        <span className="divider">|</span>
+  
+        <button
+          type="button"
+          onClick={() => navigate('/contact')}
+          style={footerLinkStyle}
+        >
           Contact
         </button>
       </div>
     </div>
   
-    <div
-      style={{
-        borderTop: '1px solid #f0f0f0',
-        padding: '16px 32px',
-        textAlign: 'center',
-        fontSize: '12px',
-        color: '#999',
-        fontWeight: 500,
-      }}
-    >
-      © {new Date().getFullYear()} Fulltime Photographer. All Rights Reserved.{' '}
-      <span style={{ color: '#1a1a1a', fontWeight: 700 }}>by DiGi Trend</span>
+    <div className="footer-bottom">
+      © {new Date().getFullYear()} Fulltime Photographer. All Rights Reserved.
+      <span className="footer-company"> by DiGi Trend</span>
     </div>
   </footer>
 

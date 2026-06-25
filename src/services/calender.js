@@ -8,3 +8,7 @@ export const getBlocks = async (params) => {
 export const addBlocks = async (data) => {
     return await httpServices.post(calendarEndpoint.addBlocks, data);
 }   
+
+export const deleteBlocks = async (id) => {
+    return await httpServices.delete(calendarEndpoint.deleteBlocks(id));
+}   

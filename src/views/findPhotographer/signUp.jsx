@@ -252,7 +252,8 @@ const SignUp = () => {
               </div>
 
               {/* Submit */}
-              <div style={{ gridColumn: 'span 2', marginTop: '4px' }}>
+               <button className='su-btn-primary' onClick={() => navigate('/')}>Back</button>
+              
                 <button
                   type="submit"
                   className="su-btn-primary"
@@ -265,7 +266,7 @@ const SignUp = () => {
                 >
                   {loading ? 'Creating account…' : 'Sign Up'}
                 </button>
-              </div>
+              
 
             </div>
           </form>

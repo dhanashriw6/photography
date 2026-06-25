@@ -47,7 +47,8 @@ export const bookingEndpoint={
 }
 
 export const bankEndpoint = {
-  addBankDetails : `${baseUrl}/bank-details`
+  addBankDetails : `${baseUrl}/bank-details`,
+  getBankDetailsList : `${baseUrl}/bank-details`
 }
 
 export const orderEndpoint = {
@@ -62,4 +63,5 @@ export const orderEndpoint = {
 export const calendarEndpoint = {
   getBlocks : `${baseUrl}/calendar/blocks`,
   addBlocks : `${baseUrl}/calendar/blocks`,
+  deleteBlocks: (id) => `${baseUrl}/calendar/blocks/${id}`,
 }

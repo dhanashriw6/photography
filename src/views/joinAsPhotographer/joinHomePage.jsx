@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import PhotographerLayout from './PhotographerLayout';
-import { getBlocks,addBlocks } from '../../services/calender';
+import { getBlocks, addBlocks, deleteBlocks } from '../../services/calender';
 /* ─── constants ────────────────────────────────────────────────────────────── */
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTH_NAMES = [
@@ -20,6 +20,7 @@ const reasonMeta = (value) => REASONS.find((r) => r.value === value) || REASONS[
 /* ─── date helpers ─────────────────────────────────────────────────────────── */
 const pad = (n) => String(n).padStart(2, '0');
 const toLocalDateStr = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const toLocalTimeStr = (d) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 
 // Month range for the getBlocks query — UTC month boundaries, matching the API convention
 // e.g. from=2026-07-01T00:00:00.000Z&to=2026-08-01T00:00:00.000Z
@@ -38,45 +39,65 @@ const dayInBlock = (dateObj, block) => {
     return start < dayEnd && end > dayStart;
 };
 
+// format a block's start/end for display in the modal, e.g. "Jul 9, 12:00 AM → Jul 10, 12:00 AM"
+const formatBlockRange = (block) => {
+    const fmt = (iso) =>
+        new Date(iso).toLocaleString(undefined, {
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+        });
+    return `${fmt(block.start_at)} → ${fmt(block.end_at)}`;
+};
+
 /* ─── Add Block modal ──────────────────────────────────────────────────────── */
-const AddBlockModal = ({ open, onClose, onSave, defaultDate }) => {
+const AddBlockModal = ({ open, onClose, onSave, onDelete, defaultDate, existingBlocks }) => {
     const [fromDate, setFromDate] = useState(defaultDate);
+    const [fromTime, setFromTime] = useState('00:00');
     const [toDate, setToDate] = useState(defaultDate);
+    const [toTime, setToTime] = useState('23:59');
     const [reason, setReason] = useState('vacation');
     const [note, setNote] = useState('');
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
+    const [deletingId, setDeletingId] = useState(null);
 
     useEffect(() => {
         if (open) {
             setFromDate(defaultDate);
+            setFromTime('00:00');
             setToDate(defaultDate);
+            setToTime('23:59');
             setReason('vacation');
             setNote('');
             setError('');
+            setDeletingId(null);
         }
     }, [open, defaultDate]);
 
     if (!open) return null;
 
     const handleSave = async () => {
-        if (!fromDate || !toDate) {
-            setError('Please select both dates.');
-            return;
-        }
-        if (new Date(toDate) < new Date(fromDate)) {
-            setError('To date cannot be before From date.');
+        if (!fromDate || !toDate || !fromTime || !toTime) {
+            setError('Please select date and time for both From and To.');
             return;
         }
 
-        // start_at = local midnight of fromDate
-        // end_at   = local midnight of the day AFTER toDate (so the block covers the full last day)
+        // start_at = local fromDate @ fromTime
+        // end_at   = local toDate @ toTime
         const [fy, fm, fd] = fromDate.split('-').map(Number);
+        const [fh, fmin] = fromTime.split(':').map(Number);
+        const start_at = new Date(fy, fm - 1, fd, fh, fmin, 0, 0).toISOString();
+
         const [ty, tm, td] = toDate.split('-').map(Number);
-        const start_at = new Date(fy, fm - 1, fd, 0, 0, 0, 0).toISOString();
-        const endDateObj = new Date(ty, tm - 1, td, 0, 0, 0, 0);
-        endDateObj.setDate(endDateObj.getDate() + 1);
-        const end_at = endDateObj.toISOString();
+        const [th, tmin] = toTime.split(':').map(Number);
+        const end_at = new Date(ty, tm - 1, td, th, tmin, 0, 0).toISOString();
+
+        if (new Date(end_at) <= new Date(start_at)) {
+            setError('To date/time must be after From date/time.');
+            return;
+        }
 
         const payload = { start_at, end_at, reason, note: note.trim() || undefined };
 
@@ -91,12 +112,24 @@ const AddBlockModal = ({ open, onClose, onSave, defaultDate }) => {
         }
     };
 
+    const handleDelete = async (id) => {
+        try {
+            setDeletingId(id);
+            setError('');
+            await onDelete(id);
+        } catch (e) {
+            setError('Failed to delete block. Please try again.');
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
     return (
         <div style={overlayStyle} onClick={onClose}>
             <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                     <div>
-                        <h2 style={{ margin: 0, fontSize: '19px', fontWeight: 800, color: '#1a1a1a' }}>Add Block Range</h2>
+                        <h2 style={{ margin: 0, fontSize: '19px', fontWeight: 800, color: '#1a1a1a' }}>Manage Blocks</h2>
                         <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#9ca3af' }}>
                             Block dates to hide them from client availability.
                         </p>
@@ -104,14 +137,85 @@ const AddBlockModal = ({ open, onClose, onSave, defaultDate }) => {
                     <button onClick={onClose} style={closeBtnStyle}>×</button>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginTop: '20px' }}>
+                {existingBlocks && existingBlocks.length > 0 && (
+                    <div style={{ marginTop: '18px' }}>
+                        <label style={labelStyle}>Existing Blocks on This Day</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '6px' }}>
+                            {existingBlocks.map((b) => {
+                                const meta = reasonMeta(b.reason);
+                                return (
+                                    <div
+                                        key={b.id}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            gap: '10px',
+                                            border: '1px solid #f3f4f6',
+                                            borderRadius: '9px',
+                                            padding: '8px 10px',
+                                            background: '#fafafa',
+                                        }}
+                                    >
+                                        <div style={{ minWidth: 0 }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <span
+                                                    style={{
+                                                        fontSize: '10px',
+                                                        fontWeight: 700,
+                                                        color: meta.color,
+                                                        background: meta.bg,
+                                                        borderRadius: '5px',
+                                                        padding: '2px 6px',
+                                                        textTransform: 'capitalize',
+                                                    }}
+                                                >
+                                                    {meta.label}
+                                                </span>
+                                                <span style={{ fontSize: '12px', color: '#374151', fontWeight: 600 }}>
+                                                    {formatBlockRange(b)}
+                                                </span>
+                                            </div>
+                                            {b.note && (
+                                                <p style={{ margin: '4px 0 0', fontSize: '11.5px', color: '#9ca3af', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+                                                    {b.note}
+                                                </p>
+                                            )}
+                                        </div>
+                                        <button
+                                            onClick={() => handleDelete(b.id)}
+                                            disabled={deletingId === b.id}
+                                            style={deleteBtnStyle}
+                                        >
+                                            {deletingId === b.id ? '…' : 'Delete'}
+                                        </button>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
+                <div style={{ marginTop: '20px', paddingTop: existingBlocks && existingBlocks.length > 0 ? '16px' : 0, borderTop: existingBlocks && existingBlocks.length > 0 ? '1px solid #f3f4f6' : 'none' }}>
+                    <label style={labelStyle}>Add New Block</label>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginTop: '10px' }}>
                     <div>
                         <label style={labelStyle}>From Date</label>
                         <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} style={inputStyle} />
                     </div>
                     <div>
+                        <label style={labelStyle}>From Time</label>
+                        <input type="time" value={fromTime} onChange={(e) => setFromTime(e.target.value)} style={inputStyle} />
+                    </div>
+                    <div>
                         <label style={labelStyle}>To Date</label>
                         <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} style={inputStyle} />
+                    </div>
+                    <div>
+                        <label style={labelStyle}>To Time</label>
+                        <input type="time" value={toTime} onChange={(e) => setToTime(e.target.value)} style={inputStyle} />
                     </div>
                 </div>
 
@@ -210,15 +314,20 @@ const AvailabilityCalendar = () => {
 
     const isToday = (d, isCur) => isCur && d === today.getDate() && m === today.getMonth() && y === today.getFullYear();
 
- const blocksForDay = (d, isCur) => {
-    if (!isCur) return [];
+    const blocksForDay = (d, isCur) => {
+        if (!isCur) return [];
+        const dateObj = new Date(y, m, d);
+        return Array.isArray(blocks) ? blocks.filter((b) => dayInBlock(dateObj, b)) : [];
+    };
 
-    const dateObj = new Date(y, m, d);
+    // blocks overlapping the date currently selected in the modal (works even at month edges)
+    const blocksForModalDate = () => {
+        if (!modalDate) return [];
+        const [yy, mm, dd] = modalDate.split('-').map(Number);
+        const dateObj = new Date(yy, mm - 1, dd);
+        return Array.isArray(blocks) ? blocks.filter((b) => dayInBlock(dateObj, b)) : [];
+    };
 
-    return Array.isArray(blocks)
-        ? blocks.filter((b) => dayInBlock(dateObj, b))
-        : [];
-};
     const openModalForDay = (d, isCur) => {
         if (!isCur) return;
         setModalDate(toLocalDateStr(new Date(y, m, d)));
@@ -229,6 +338,11 @@ const AvailabilityCalendar = () => {
         await addBlocks(payload);
         setModalOpen(false);
         fetchBlocks();
+    };
+
+    const handleDeleteBlock = async (id) => {
+        await deleteBlocks(id);
+        await fetchBlocks();
     };
 
     return (
@@ -355,7 +469,9 @@ const AvailabilityCalendar = () => {
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
                 onSave={handleSaveBlock}
+                onDelete={handleDeleteBlock}
                 defaultDate={modalDate}
+                existingBlocks={blocksForModalDate()}
             />
         </PhotographerLayout>
     );
@@ -409,7 +525,7 @@ const modalStyle = {
     background: '#fff',
     borderRadius: '16px',
     padding: '26px',
-    width: '460px',
+    width: '480px',
     maxWidth: '100%',
     maxHeight: '90vh',
     overflowY: 'auto',
@@ -464,6 +580,18 @@ const saveBtnStyle = {
     fontWeight: 700,
     color: '#fff',
     cursor: 'pointer',
+};
+
+const deleteBtnStyle = {
+    background: '#fef2f2',
+    border: '1.5px solid #fecaca',
+    borderRadius: '7px',
+    padding: '6px 10px',
+    fontSize: '11.5px',
+    fontWeight: 700,
+    color: '#dc2626',
+    cursor: 'pointer',
+    flexShrink: 0,
 };
 
 export default AvailabilityCalendar;
