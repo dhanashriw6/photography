@@ -292,7 +292,7 @@ const ViewsLayout = ({ children }) => {
         {
           icon: <FiEdit2 size={15} />,
           label: 'Edit Profile',
-          // action: () => navigate('/join-as-photographer/edit-profile'),
+          action: () => navigate('/customer/edit-profile'),
         },
         { divider: true },
         { icon: <FiAlertCircle size={15} />, label: 'Raise a Dispute', action: () => navigate('/dispute'), danger: true },

@@ -43,7 +43,7 @@ const StatusPill = ({ value, map }) => {
     <span style={{
       fontSize: '11px', fontWeight: 700, textTransform: 'uppercase',
       letterSpacing: '0.06em', padding: '3px 10px', borderRadius: '20px',
-      background: cfg.bg, color: cfg.color,
+      background: cfg.bg, color: cfg.color, whiteSpace: 'nowrap',
     }}>
       {value || '—'}
     </span>
@@ -64,11 +64,11 @@ const PAYMENT_STATUS = {
 
 /* ── Reusable row ── */
 const Row = ({ label, value, right = false }) => (
-  <div style={{
+  <div className="bs-row" style={{
     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-    padding: '8px 0', borderBottom: '1px solid #f5f5f5',
+    padding: '8px 0', borderBottom: '1px solid #f5f5f5', gap: '10px',
   }}>
-    <span style={{ fontSize: '12px', color: '#999', fontWeight: 500 }}>{label}</span>
+    <span style={{ fontSize: '12px', color: '#999', fontWeight: 500, flexShrink: 0 }}>{label}</span>
     <span style={{ fontSize: '13px', fontWeight: 600, color: '#1a1a1a', textAlign: right ? 'right' : 'left', maxWidth: '60%', wordBreak: 'break-word' }}>
       {value}
     </span>
@@ -77,22 +77,21 @@ const Row = ({ label, value, right = false }) => (
 
 /* ── Card ── */
 const Card = ({ title, icon, children, accent, style = {} }) => (
-  <div style={{
+  <div className="bs-card" style={{
     background: '#fff', borderRadius: '16px',
     boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
     overflow: 'hidden', ...style,
   }}>
     {title && (
-      <div style={{
-        padding: '16px 20px', borderBottom: '1px solid #f5f5f5',
+      <div className="bs-card-head" style={{
         display: 'flex', alignItems: 'center', gap: '8px',
         background: accent ? `${accent}08` : 'transparent',
       }}>
-        {icon && <span style={{ color: accent || '#E8A317' }}>{icon}</span>}
+        {icon && <span style={{ color: accent || '#E8A317', flexShrink: 0 }}>{icon}</span>}
         <p style={{ margin: 0, fontWeight: 700, fontSize: '15px', color: '#1a1a1a' }}>{title}</p>
       </div>
     )}
-    <div style={{ padding: '18px 20px' }}>
+    <div className="bs-card-body">
       {children}
     </div>
   </div>
@@ -187,28 +186,75 @@ const BookingSummary = () => {
 
   return (
     <ViewsLayout>
-      <style>{`@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }`}</style>
-      <div style={{ background: '#f7f7f5', minHeight: '100vh', padding: '36px 0', fontFamily: 'inherit' }}>
+      <style>{`
+        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+        .bs-page { padding: 36px 16px; }
+        .bs-title { font-size: 28px; }
+        .bs-badges { gap: 10px; margin-bottom: 32px; }
+
+        .bs-grid {
+          display: grid;
+          grid-template-columns: minmax(0, 560px) minmax(0, 560px);
+          gap: 20px;
+          margin: 0 auto;
+          padding: 0 24px;
+          justify-content: center;
+          max-width: 1180px;
+        }
+
+        .bs-card-head { padding: 16px 20px; border-bottom: 1px solid #f5f5f5; }
+        .bs-card-body { padding: 18px 20px; }
+
+        .bs-provider-card { display: flex; align-items: center; gap: 12px; padding: 14px 16px; }
+        .bs-provider-meta { flex: 1; min-width: 0; }
+        .bs-provider-price { text-align: right; flex-shrink: 0; }
+
+        @media (max-width: 1200px) {
+          .bs-grid {
+            grid-template-columns: minmax(0, 1fr);
+            max-width: 600px;
+            padding: 0;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .bs-page { padding: 24px 0; }
+          .bs-title { font-size: 22px; }
+          .bs-badges { gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+          .bs-grid { gap: 14px; padding: 0 12px; }
+          .bs-card-head { padding: 13px 14px; }
+          .bs-card-body { padding: 14px 14px; }
+          .bs-row span:first-child { font-size: 11px; }
+          .bs-row span:last-child { font-size: 12.5px; }
+        }
+
+        @media (max-width: 420px) {
+          .bs-provider-card { flex-wrap: wrap; }
+          .bs-provider-price { text-align: left; margin-left: 60px; }
+        }
+      `}</style>
+      <div className="bs-page" style={{ background: '#f7f7f5', minHeight: '100vh', fontFamily: 'inherit' }}>
 
         {/* ── Page header ── */}
-        <h1 style={{ textAlign: 'center', fontSize: '28px', fontWeight: 800, color: '#1a1a1a', margin: '0 0 8px', letterSpacing: '-0.02em' }}>
+        <h1 className="bs-title" style={{ textAlign: 'center', fontWeight: 800, color: '#1a1a1a', margin: '0 0 8px', letterSpacing: '-0.02em' }}>
           Booking Summary
         </h1>
 
         {/* Order number + status badges */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '32px' }}>
+        <div className="bs-badges" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
           <span style={{ fontSize: '13px', color: '#888', fontFamily: 'monospace' }}>{order.order_number}</span>
           <StatusPill value={order.status} map={ORDER_STATUS} />
           {hasPayment && <StatusPill value={`Payment: ${order.payment.status}`} map={{ [`Payment: ${order.payment.status}`]: PAYMENT_STATUS[order.payment.status] || {} }} />}
           {hasEditing && (
-            <span style={{ fontSize: '11px', fontWeight: 700, padding: '3px 10px', borderRadius: '20px', background: '#f0fdf4', color: '#15803d', border: '1px solid #bbf7d0' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, padding: '3px 10px', borderRadius: '20px', background: '#f0fdf4', color: '#15803d', border: '1px solid #bbf7d0', whiteSpace: 'nowrap' }}>
               ✂️ Editing Included
             </span>
           )}
         </div>
 
-        {/* ── Two-column grid ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: '560px 560px', gap: '20px', margin: '0 auto', padding: '0 40px', justifyContent: 'center' }}>
+        {/* ── Two-column grid (collapses to one column under 1200px) ── */}
+        <div className="bs-grid">
 
           {/* ════ LEFT COLUMN ════ */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -240,10 +286,10 @@ const BookingSummary = () => {
                         overflow: 'hidden',
                       }}>
                         {/* Provider header */}
-                        <div style={{ background: '#fafafa', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid #f0f0f0' }}>
+                        <div className="bs-provider-card" style={{ background: '#fafafa', borderBottom: '1px solid #f0f0f0' }}>
                           <img src={avatar} alt={name} style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #f0f0f0', flexShrink: 0 }} />
-                          <div style={{ flex: 1 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <div className="bs-provider-meta">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
                               <span style={{ fontWeight: 700, fontSize: '15px', color: '#1a1a1a' }}>{name}</span>
                               {item.is_verified_user && <MdVerified size={14} color="#E8A317" title="Verified" />}
                             </div>
@@ -258,7 +304,7 @@ const BookingSummary = () => {
                               )}
                             </div>
                           </div>
-                          <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                          <div className="bs-provider-price">
                             <div style={{ fontSize: '18px', fontWeight: 800, color: '#1a1a1a' }}>{fmtMoney(item.total_amount)}</div>
                             <div style={{ fontSize: '11px', color: '#aaa' }}>Total incl. tax</div>
                           </div>
@@ -291,7 +337,7 @@ const BookingSummary = () => {
 
                         {/* Booking number if confirmed */}
                         {item.booking_number && (
-                          <div style={{ margin: '0 16px 14px', padding: '8px 12px', background: '#f0fdf4', borderRadius: '8px', border: '1px solid #bbf7d0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div style={{ margin: '0 16px 14px', padding: '8px 12px', background: '#f0fdf4', borderRadius: '8px', border: '1px solid #bbf7d0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
                             <span style={{ fontSize: '11px', fontWeight: 700, color: '#15803d', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Booking #</span>
                             <span style={{ fontSize: '12px', fontWeight: 700, color: '#15803d', fontFamily: 'monospace' }}>{item.booking_number}</span>
                           </div>
@@ -315,9 +361,9 @@ const BookingSummary = () => {
                     return (
                       <div key={item.id} style={{ border: `1.5px solid ${accentColor}33`, borderRadius: '14px', overflow: 'hidden' }}>
                         {/* Header */}
-                        <div style={{ background: `${accentColor}10`, padding: '14px 16px', borderBottom: `1px solid ${accentColor}22`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ background: `${accentColor}10`, padding: '14px 16px', borderBottom: `1px solid ${accentColor}22`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <div style={{ width: '34px', height: '34px', borderRadius: '9px', background: `${accentColor}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>✂️</div>
+                            <div style={{ width: '34px', height: '34px', borderRadius: '9px', background: `${accentColor}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0 }}>✂️</div>
                             <div>
                               <div style={{ fontSize: '10px', fontWeight: 700, color: accentColor, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Editing Package</div>
                               <div style={{ fontSize: '15px', fontWeight: 800, color: '#1a1a1a' }}>{tierName}</div>
@@ -417,7 +463,7 @@ const BookingSummary = () => {
             {/* ── Payment Details ── */}
             {hasPayment && (
               <Card title="Payment Details" icon={<FiCreditCard size={14} />} accent="#10b981">
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', padding: '12px 14px', background: order.payment.status === 'completed' ? '#f0fdf4' : '#fff7ed', borderRadius: '10px', border: `1px solid ${order.payment.status === 'completed' ? '#bbf7d0' : '#fed7aa'}` }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', padding: '12px 14px', background: order.payment.status === 'completed' ? '#f0fdf4' : '#fff7ed', borderRadius: '10px', border: `1px solid ${order.payment.status === 'completed' ? '#bbf7d0' : '#fed7aa'}`, flexWrap: 'wrap', gap: '8px' }}>
                   <div>
                     <div style={{ fontSize: '11px', fontWeight: 700, color: order.payment.status === 'completed' ? '#15803d' : '#c2410c', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                       {order.payment.status === 'completed' ? '✅ Payment Successful' : '⏳ Payment Pending'}
@@ -448,8 +494,8 @@ const BookingSummary = () => {
                         <div style={{ width: '48px', height: '48px', borderRadius: '50%', overflow: 'hidden', border: '2px solid #f0f0f0', flexShrink: 0 }}>
                           <img src={avatar} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         </div>
-                        <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexWrap: 'wrap' }}>
                             <span style={{ fontSize: '14px', fontWeight: 700, color: '#1a1a1a' }}>{name}</span>
                             {item.is_verified_user && <MdVerified size={13} color="#E8A317" title="Verified" />}
                           </div>
@@ -477,7 +523,7 @@ const BookingSummary = () => {
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                 </div>
-                <div>
+                <div style={{ minWidth: 0 }}>
                   <div style={{ fontSize: '15px', fontWeight: 700, color: '#1a1a1a' }}>
                     {user ? `${user.first_name || ''} ${user.last_name || ''}`.trim() : '—'}
                   </div>
@@ -528,7 +574,7 @@ const BookingSummary = () => {
                   <Row label="Tax"      value={fmtMoney(order.tax_amount)} />
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1.5px solid #1a1a1a', paddingTop: '12px', marginTop: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1.5px solid #1a1a1a', paddingTop: '12px', marginTop: '8px', flexWrap: 'wrap', gap: '6px' }}>
                   <span style={{ fontSize: '15px', fontWeight: 800, color: '#1a1a1a' }}>Total</span>
                   <span style={{ fontSize: '18px', fontWeight: 800, color: '#1a1a1a' }}>{fmtMoney(order.total_amount)}</span>
                 </div>
@@ -536,7 +582,7 @@ const BookingSummary = () => {
 
               {/* Action buttons */}
               <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
-               
+
                 <button
                   onClick={() => navigate('/home')}
                   style={{ flex: 1, background: '#E8A317', color: '#fff', border: '2px solid #E8A317', borderRadius: '50px', padding: '12px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.2s' }}

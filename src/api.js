@@ -58,6 +58,7 @@ export const orderEndpoint = {
   cancelPayment: (orderId) => `${baseUrl}/order/${orderId}/cancel-payment`,
   getOrderDetails: (orderId) => `${baseUrl}/order/${orderId}`,
   getDraftOrders : `${baseUrl}/order/draft`,
+  getCustomerOrder: `${baseUrl}/order/list-customer-orders`
 }
 
 export const calendarEndpoint = {

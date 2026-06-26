@@ -402,6 +402,119 @@
   box-shadow: none !important;
 }
 
+/* OTP Verification Responsive */
+
+.otp-card {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.otp-phone-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+
+.otp-send-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+  min-width: 145px;
+  padding: 11px 24px;
+}
+
+.otp-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.otp-timer {
+  font-size: 13px;
+  font-weight: 600;
+  color: #888;
+  flex-shrink: 0;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .otp-card {
+    max-width: 100%;
+  }
+
+  .views-card {
+    padding: 28px 22px;
+  }
+
+  .views-card h1 {
+    font-size: 30px !important;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .otp-phone-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .otp-phone-row .su-field {
+    width: 100%;
+  }
+
+  .otp-send-btn {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .otp-input-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .otp-timer {
+    align-self: flex-end;
+    margin-top: 4px;
+  }
+
+  .views-card {
+    padding: 24px 18px;
+  }
+
+  .views-card h1 {
+    font-size: 26px !important;
+    margin-bottom: 20px !important;
+  }
+}
+
+/* Small Phones */
+@media (max-width: 400px) {
+  .views-card {
+    padding: 20px 16px;
+  }
+
+  .views-card h1 {
+    font-size: 22px !important;
+  }
+
+  .otp-send-btn {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  .su-country {
+    width: 95px;
+  }
+
+  .su-number {
+    font-size: 14px;
+  }
+}
+
 /* Textarea inside display field */
 .rb-inline-textarea {
   border: none !important;

@@ -37,7 +37,7 @@ const OTPVerification = () => {
     }
 
     const payload = {
-      phone_no:   phone.trim(),
+      phone_no: phone.trim(),
       phone_code: phoneCode,
     };
 
@@ -49,7 +49,7 @@ const OTPVerification = () => {
     } catch (err) {
       const msg =
         err?.response?.data?.error?.message ||
-        err?.response?.data?.message        ||
+        err?.response?.data?.message ||
         'Failed to send OTP. Please try again.';
       setError(msg);
     } finally {
@@ -75,7 +75,7 @@ const OTPVerification = () => {
     }
 
     const payload = {
-      phone_no:   phone.trim(),
+      phone_no: phone.trim(),
       phone_code: phoneCode,
       otp,
     };
@@ -94,7 +94,7 @@ const OTPVerification = () => {
     } catch (err) {
       const msg =
         err?.response?.data?.error?.message ||
-        err?.response?.data?.message        ||
+        err?.response?.data?.message ||
         'OTP verification failed. Please try again.';
       setError(msg);
     } finally {
@@ -108,10 +108,12 @@ const OTPVerification = () => {
 
   return (
     <PhotographerLayout>
-      <div className="w-full" style={{ maxWidth: '640px' }}>
+      <div className="otp-card">
         <div className="views-card">
-          <h1 style={{ textAlign: 'center', fontSize: '36px', fontWeight: 700,
-            color: '#1a1a1a', marginBottom: '28px', letterSpacing: '-0.01em' }}>
+          <h1 style={{
+            textAlign: 'center', fontSize: '36px', fontWeight: 700,
+            color: '#1a1a1a', marginBottom: '28px', letterSpacing: '-0.01em'
+          }}>
             OTP Verification
           </h1>
 
@@ -121,14 +123,16 @@ const OTPVerification = () => {
 
           {/* Error banner */}
           {error && (
-            <div style={{ marginBottom: '16px', padding: '10px 14px', borderRadius: '8px',
-              background: '#fee2e2', color: '#b91c1c', fontSize: '13px' }}>
+            <div style={{
+              marginBottom: '16px', padding: '10px 14px', borderRadius: '8px',
+              background: '#fee2e2', color: '#b91c1c', fontSize: '13px'
+            }}>
               {error}
             </div>
           )}
 
           {/* Phone + Send OTP row */}
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', marginBottom: '6px' }}>
+          <div className="otp-phone-row">
             <div className="su-field" style={{ flex: 1 }}>
               <label>Phone Number<sup style={{ color: '#ef4444' }}>*</sup></label>
               <div className="su-phone-row">
@@ -143,11 +147,15 @@ const OTPVerification = () => {
             </div>
 
             <button type="button" onClick={handleSendOTP} disabled={loading}
-              style={{ display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap',
-                padding: '11px 24px', backgroundColor: '#FFAE00', color: '#fff',
-                border: 'none', borderRadius: '8px',
+              className="otp-send-btn"
+              style={{
+                backgroundColor: '#FFAE00',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
                 cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.7 : 1 }}>
+                opacity: loading ? 0.7 : 1,
+              }}>
               {loading ? 'Sending…' : 'Send OTP'} <FiSend size={15} />
             </button>
           </div>
@@ -161,12 +169,11 @@ const OTPVerification = () => {
             <>
               <div className="su-field" style={{ marginBottom: '6px' }}>
                 <label>Enter OTP</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <div className="otp-input-row">
                   <input type="text" value={otp}
                     onChange={e => setOtp(e.target.value.replace(/\D/, '').slice(0, 6))}
                     placeholder="Enter OTP" style={{ flex: 1 }} maxLength={6} />
-                  <span style={{ fontSize: '13px', fontWeight: 600, color: '#888', flexShrink: 0, paddingRight: '4px' }}>
-                    {formatTime(timer)}
+                  <span className="otp-timer">                    {formatTime(timer)}
                   </span>
                 </div>
               </div>
@@ -178,8 +185,10 @@ const OTPVerification = () => {
               <p style={{ textAlign: 'center', fontSize: '13px', color: '#666', marginBottom: '24px' }}>
                 Haven't received OTP?{' '}
                 <span onClick={handleResend}
-                  style={{ color: timer === 0 ? '#111' : '#bbb', fontWeight: 700,
-                    cursor: timer === 0 ? 'pointer' : 'default' }}>
+                  style={{
+                    color: timer === 0 ? '#111' : '#bbb', fontWeight: 700,
+                    cursor: timer === 0 ? 'pointer' : 'default'
+                  }}>
                   Resend
                 </span>
               </p>
@@ -188,13 +197,17 @@ const OTPVerification = () => {
 
           {/* Submit */}
           <button type="button" className="su-btn-primary" onClick={handleSubmit} disabled={verifying}
-            style={{ width: '100%', marginBottom: '16px',
-              opacity: verifying ? 0.7 : 1, cursor: verifying ? 'not-allowed' : 'pointer' }}>
+            style={{
+              width: '100%', marginBottom: '16px',
+              opacity: verifying ? 0.7 : 1, cursor: verifying ? 'not-allowed' : 'pointer'
+            }}>
             {verifying ? 'Verifying…' : 'Submit'}
           </button>
 
-          <p style={{ textAlign: 'center', fontSize: '14px', fontWeight: 700, color: '#1a1a1a',
-            cursor: 'pointer', margin: 0 }}
+          <p style={{
+            textAlign: 'center', fontSize: '14px', fontWeight: 700, color: '#1a1a1a',
+            cursor: 'pointer', margin: 0
+          }}
             onClick={() => navigate('/join-as-photographer/login')}>
             Back to Login
           </p>

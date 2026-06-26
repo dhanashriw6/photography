@@ -19,6 +19,7 @@ import {
     FiChevronsRight,
 } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
+import { getCustomerOrders } from '../../services/order';
 
 // TODO: replace with real data once the orders API is wired up.
 const STATIC_ORDERS = [
@@ -363,6 +364,16 @@ const YourOrderList = () => {
     const [tab, setTab] = useState('upcoming'); // 'upcoming' | 'past'
     const [pageSize, setPageSize] = useState('10 per page');
     const [page, setPage] = useState(1);
+
+    const [customerOrders, setCustomerOrders] = useState([]);
+
+    // useEffect(() => {
+    //   async function fetchCustomerOrders() {
+    //     const response = await getCustomerOrders();
+    //     setCustomerOrders(response.data);
+    //   }
+    //   fetchCustomerOrders();
+    // }, []);
 
     const stats = useMemo(() => {
         const total = STATIC_ORDERS.length;

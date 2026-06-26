@@ -3,6 +3,7 @@ import PhotographerLayout from './PhotographerLayout';
 import { getBlocks, addBlocks, deleteBlocks } from '../../services/calender';
 /* ─── constants ────────────────────────────────────────────────────────────── */
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DAYS_SHORT = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 const MONTH_NAMES = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December',
@@ -16,6 +17,28 @@ const REASONS = [
     { value: 'other', label: 'Other', color: '#6b7280', bg: '#f3f4f6' },
 ];
 const reasonMeta = (value) => REASONS.find((r) => r.value === value) || REASONS[4];
+
+/* ─── responsive helper ────────────────────────────────────────────────────── */
+// Tracks viewport width against a breakpoint so layout can react with real
+// JS-driven changes (not just CSS) where inline styles need different values
+// (grid columns, font sizes, abbreviated labels, dot-vs-badge rendering, etc).
+const useIsNarrow = (breakpoint) => {
+    const getMatch = () => (typeof window !== 'undefined' ? window.innerWidth <= breakpoint : false);
+    const [isNarrow, setIsNarrow] = useState(getMatch);
+
+    useEffect(() => {
+        const onResize = () => setIsNarrow(getMatch());
+        window.addEventListener('resize', onResize);
+        window.addEventListener('orientationchange', onResize);
+        return () => {
+            window.removeEventListener('resize', onResize);
+            window.removeEventListener('orientationchange', onResize);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [breakpoint]);
+
+    return isNarrow;
+};
 
 /* ─── date helpers ─────────────────────────────────────────────────────────── */
 const pad = (n) => String(n).padStart(2, '0');
@@ -53,6 +76,8 @@ const formatBlockRange = (block) => {
 
 /* ─── Add Block modal ──────────────────────────────────────────────────────── */
 const AddBlockModal = ({ open, onClose, onSave, onDelete, defaultDate, existingBlocks }) => {
+    const isNarrow = useIsNarrow(560);
+
     const [fromDate, setFromDate] = useState(defaultDate);
     const [fromTime, setFromTime] = useState('00:00');
     const [toDate, setToDate] = useState(defaultDate);
@@ -125,11 +150,11 @@ const AddBlockModal = ({ open, onClose, onSave, onDelete, defaultDate, existingB
     };
 
     return (
-        <div style={overlayStyle} onClick={onClose}>
-            <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
+        <div style={overlayStyle(isNarrow)} onClick={onClose}>
+            <div style={modalStyle(isNarrow)} onClick={(e) => e.stopPropagation()}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                     <div>
-                        <h2 style={{ margin: 0, fontSize: '19px', fontWeight: 800, color: '#1a1a1a' }}>Manage Blocks</h2>
+                        <h2 style={{ margin: 0, fontSize: isNarrow ? '17px' : '19px', fontWeight: 800, color: '#1a1a1a' }}>Manage Blocks</h2>
                         <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#9ca3af' }}>
                             Block dates to hide them from client availability.
                         </p>
@@ -148,8 +173,9 @@ const AddBlockModal = ({ open, onClose, onSave, onDelete, defaultDate, existingB
                                         key={b.id}
                                         style={{
                                             display: 'flex',
-                                            alignItems: 'center',
+                                            alignItems: isNarrow ? 'flex-start' : 'center',
                                             justifyContent: 'space-between',
+                                            flexWrap: isNarrow ? 'wrap' : 'nowrap',
                                             gap: '10px',
                                             border: '1px solid #f3f4f6',
                                             borderRadius: '9px',
@@ -158,7 +184,7 @@ const AddBlockModal = ({ open, onClose, onSave, onDelete, defaultDate, existingB
                                         }}
                                     >
                                         <div style={{ minWidth: 0 }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                                                 <span
                                                     style={{
                                                         fontSize: '10px',
@@ -168,16 +194,17 @@ const AddBlockModal = ({ open, onClose, onSave, onDelete, defaultDate, existingB
                                                         borderRadius: '5px',
                                                         padding: '2px 6px',
                                                         textTransform: 'capitalize',
+                                                        whiteSpace: 'nowrap',
                                                     }}
                                                 >
                                                     {meta.label}
                                                 </span>
-                                                <span style={{ fontSize: '12px', color: '#374151', fontWeight: 600 }}>
+                                                <span style={{ fontSize: '12px', color: '#374151', fontWeight: 600, wordBreak: 'break-word' }}>
                                                     {formatBlockRange(b)}
                                                 </span>
                                             </div>
                                             {b.note && (
-                                                <p style={{ margin: '4px 0 0', fontSize: '11.5px', color: '#9ca3af', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+                                                <p style={{ margin: '4px 0 0', fontSize: '11.5px', color: '#9ca3af', overflow: 'hidden', whiteSpace: isNarrow ? 'normal' : 'nowrap', textOverflow: 'ellipsis' }}>
                                                     {b.note}
                                                 </p>
                                             )}
@@ -185,7 +212,7 @@ const AddBlockModal = ({ open, onClose, onSave, onDelete, defaultDate, existingB
                                         <button
                                             onClick={() => handleDelete(b.id)}
                                             disabled={deletingId === b.id}
-                                            style={deleteBtnStyle}
+                                            style={{ ...deleteBtnStyle, marginLeft: isNarrow ? 'auto' : 0 }}
                                         >
                                             {deletingId === b.id ? '…' : 'Delete'}
                                         </button>
@@ -200,7 +227,7 @@ const AddBlockModal = ({ open, onClose, onSave, onDelete, defaultDate, existingB
                     <label style={labelStyle}>Add New Block</label>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginTop: '10px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isNarrow ? '1fr 1fr' : '1fr 1fr', gap: isNarrow ? '10px' : '14px', marginTop: '10px' }}>
                     <div>
                         <label style={labelStyle}>From Date</label>
                         <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} style={inputStyle} />
@@ -227,10 +254,10 @@ const AddBlockModal = ({ open, onClose, onSave, onDelete, defaultDate, existingB
                                 key={r.value}
                                 onClick={() => setReason(r.value)}
                                 style={{
-                                    padding: '7px 12px',
+                                    padding: isNarrow ? '7px 10px' : '7px 12px',
                                     borderRadius: '8px',
                                     cursor: 'pointer',
-                                    fontSize: '12.5px',
+                                    fontSize: isNarrow ? '12px' : '12.5px',
                                     fontWeight: 700,
                                     border: reason === r.value ? `1.5px solid ${r.color}` : '1.5px solid #e5e7eb',
                                     background: reason === r.value ? r.bg : '#fff',
@@ -259,9 +286,9 @@ const AddBlockModal = ({ open, onClose, onSave, onDelete, defaultDate, existingB
 
                 {error && <p style={{ color: '#dc2626', fontSize: '12.5px', margin: '10px 0 0' }}>{error}</p>}
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '22px' }}>
-                    <button onClick={onClose} style={cancelBtnStyle}>Cancel</button>
-                    <button onClick={handleSave} disabled={saving} style={saveBtnStyle}>
+                <div style={{ display: 'flex', flexDirection: isNarrow ? 'column-reverse' : 'row', justifyContent: 'flex-end', gap: '10px', marginTop: '22px' }}>
+                    <button onClick={onClose} style={{ ...cancelBtnStyle, width: isNarrow ? '100%' : 'auto' }}>Cancel</button>
+                    <button onClick={handleSave} disabled={saving} style={{ ...saveBtnStyle, width: isNarrow ? '100%' : 'auto' }}>
                         {saving ? 'Saving…' : 'Save Block'}
                     </button>
                 </div>
@@ -278,6 +305,9 @@ const AvailabilityCalendar = () => {
     const [loading, setLoading] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalDate, setModalDate] = useState(toLocalDateStr(today));
+
+    const isNarrow = useIsNarrow(640);
+    const isTiny = useIsNarrow(420);
 
     const { y, m } = cur;
 
@@ -345,14 +375,17 @@ const AvailabilityCalendar = () => {
         await fetchBlocks();
     };
 
+    const maxBadges = isTiny ? 1 : isNarrow ? 2 : 2;
+    const dayLabels = isTiny ? DAYS_SHORT : DAYS;
+
     return (
         <PhotographerLayout>
-            <div style={{ background: '#f9fafb', minHeight: '100vh', width: '100%', padding: '28px' }}>
+            <div style={{ background: '#f9fafb', minHeight: '100vh', width: '100%', padding: isNarrow ? '14px' : '28px', boxSizing: 'border-box' }}>
 
                 {/* Header */}
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: isNarrow ? 'stretch' : 'flex-start', flexDirection: isNarrow ? 'column' : 'row', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
                     <div>
-                        <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 800, color: '#1a1a1a' }}>My Availability Calendar</h1>
+                        <h1 style={{ margin: 0, fontSize: isNarrow ? '21px' : '26px', fontWeight: 800, color: '#1a1a1a' }}>My Availability Calendar</h1>
                         <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#6b7280' }}>
                             Manage blocked dates. Blocked dates are hidden from client search.
                         </p>
@@ -362,20 +395,20 @@ const AvailabilityCalendar = () => {
                             setModalDate(toLocalDateStr(today));
                             setModalOpen(true);
                         }}
-                        style={addBtnStyle}
+                        style={{ ...addBtnStyle, width: isNarrow ? '100%' : 'auto' }}
                     >
                         + Add Block
                     </button>
                 </div>
 
                 {/* Calendar card */}
-                <div style={card}>
+                <div style={{ ...card, padding: isNarrow ? '14px' : '22px', borderRadius: isNarrow ? '14px' : '16px' }}>
                     {/* Month nav */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px', flexWrap: 'wrap', gap: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: isNarrow ? '6px' : '10px' }}>
                             <button onClick={prev} style={navBtn}>‹</button>
-                            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#1a1a1a', minWidth: '160px', textAlign: 'center' }}>
-                                {MONTH_NAMES[m]} {y}
+                            <h3 style={{ margin: 0, fontSize: isNarrow ? '15px' : '18px', fontWeight: 700, color: '#1a1a1a', minWidth: isNarrow ? '120px' : '160px', textAlign: 'center' }}>
+                                {isTiny ? MONTH_NAMES[m].slice(0, 3) : MONTH_NAMES[m]} {y}
                             </h3>
                             <button onClick={next} style={navBtn}>›</button>
                         </div>
@@ -384,13 +417,13 @@ const AvailabilityCalendar = () => {
 
                     {/* Day headers */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', textAlign: 'center', marginBottom: '4px' }}>
-                        {DAYS.map((d) => (
-                            <div key={d} style={{ fontSize: '11.5px', fontWeight: 700, color: '#9ca3af', padding: '6px 0' }}>{d}</div>
+                        {dayLabels.map((d, idx) => (
+                            <div key={`${d}-${idx}`} style={{ fontSize: isNarrow ? '10px' : '11.5px', fontWeight: 700, color: '#9ca3af', padding: isNarrow ? '4px 0' : '6px 0' }}>{d}</div>
                         ))}
                     </div>
 
                     {/* Grid */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '6px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: isNarrow ? '3px' : '6px' }}>
                         {cells.map((cell, i) => {
                             const dayBlocks = blocksForDay(cell.day, cell.cur);
                             const todayCell = isToday(cell.day, cell.cur);
@@ -399,50 +432,78 @@ const AvailabilityCalendar = () => {
                                     key={i}
                                     onClick={() => openModalForDay(cell.day, cell.cur)}
                                     style={{
-                                        minHeight: '74px',
-                                        borderRadius: '10px',
+                                        minHeight: isTiny ? '46px' : isNarrow ? '56px' : '74px',
+                                        borderRadius: isNarrow ? '7px' : '10px',
                                         border: todayCell ? '1.5px solid #f5a623' : '1px solid #f3f4f6',
                                         background: !cell.cur ? '#fafafa' : '#fff',
-                                        padding: '6px',
+                                        padding: isNarrow ? '4px 3px' : '6px',
                                         cursor: cell.cur ? 'pointer' : 'default',
                                         display: 'flex',
                                         flexDirection: 'column',
-                                        gap: '4px',
+                                        gap: '3px',
+                                        overflow: 'hidden',
                                     }}
                                 >
                                     <span style={{
-                                        fontSize: '12.5px',
+                                        fontSize: isTiny ? '11px' : '12.5px',
                                         fontWeight: todayCell ? 800 : 600,
                                         color: !cell.cur ? '#d1d5db' : todayCell ? '#f5a623' : '#374151',
                                     }}>
                                         {cell.day}
                                     </span>
-                                    {dayBlocks.slice(0, 2).map((b, idx) => {
-                                        const meta = reasonMeta(b.reason);
-                                        return (
-                                            <span
-                                                key={idx}
-                                                style={{
-                                                    fontSize: '9.5px',
-                                                    fontWeight: 700,
-                                                    color: meta.color,
-                                                    background: meta.bg,
-                                                    borderRadius: '5px',
-                                                    padding: '2px 5px',
-                                                    textTransform: 'capitalize',
-                                                    overflow: 'hidden',
-                                                    whiteSpace: 'nowrap',
-                                                    textOverflow: 'ellipsis',
-                                                }}
-                                            >
-                                                {meta.label}
-                                            </span>
-                                        );
-                                    })}
-                                    {dayBlocks.length > 2 && (
-                                        <span style={{ fontSize: '9.5px', color: '#9ca3af', fontWeight: 600 }}>
-                                            +{dayBlocks.length - 2} more
-                                        </span>
+
+                                    {/* On tiny screens, swap text badges for compact color dots so they never overflow the cell */}
+                                    {isTiny ? (
+                                        dayBlocks.length > 0 && (
+                                            <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap' }}>
+                                                {dayBlocks.slice(0, 4).map((b, idx) => {
+                                                    const meta = reasonMeta(b.reason);
+                                                    return (
+                                                        <span
+                                                            key={idx}
+                                                            title={meta.label}
+                                                            style={{
+                                                                width: '6px',
+                                                                height: '6px',
+                                                                borderRadius: '50%',
+                                                                background: meta.color,
+                                                                display: 'inline-block',
+                                                            }}
+                                                        />
+                                                    );
+                                                })}
+                                            </div>
+                                        )
+                                    ) : (
+                                        <>
+                                            {dayBlocks.slice(0, maxBadges).map((b, idx) => {
+                                                const meta = reasonMeta(b.reason);
+                                                return (
+                                                    <span
+                                                        key={idx}
+                                                        style={{
+                                                            fontSize: '9.5px',
+                                                            fontWeight: 700,
+                                                            color: meta.color,
+                                                            background: meta.bg,
+                                                            borderRadius: '5px',
+                                                            padding: '2px 5px',
+                                                            textTransform: 'capitalize',
+                                                            overflow: 'hidden',
+                                                            whiteSpace: 'nowrap',
+                                                            textOverflow: 'ellipsis',
+                                                        }}
+                                                    >
+                                                        {meta.label}
+                                                    </span>
+                                                );
+                                            })}
+                                            {dayBlocks.length > maxBadges && (
+                                                <span style={{ fontSize: '9.5px', color: '#9ca3af', fontWeight: 600 }}>
+                                                    +{dayBlocks.length - maxBadges} more
+                                                </span>
+                                            )}
+                                        </>
                                     )}
                                 </div>
                             );
@@ -454,10 +515,10 @@ const AvailabilityCalendar = () => {
                     )}
 
                     {/* Legend */}
-                    <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #f3f4f6' }}>
+                    <div style={{ display: 'flex', gap: isNarrow ? '10px' : '16px', flexWrap: 'wrap', marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #f3f4f6' }}>
                         {REASONS.map((r) => (
-                            <div key={r.value} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#6b7280' }}>
-                                <span style={{ width: '9px', height: '9px', borderRadius: '50%', background: r.color, display: 'inline-block' }} />
+                            <div key={r.value} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: isNarrow ? '11px' : '12px', color: '#6b7280' }}>
+                                <span style={{ width: '9px', height: '9px', borderRadius: '50%', background: r.color, display: 'inline-block', flexShrink: 0 }} />
                                 {r.label}
                             </div>
                         ))}
@@ -484,6 +545,7 @@ const card = {
     padding: '22px',
     boxShadow: '0 1px 8px rgba(0,0,0,0.06)',
     border: '1px solid #f3f4f6',
+    boxSizing: 'border-box',
 };
 
 const navBtn = {
@@ -510,27 +572,31 @@ const addBtnStyle = {
     whiteSpace: 'nowrap',
 };
 
-const overlayStyle = {
+// overlay/modal are functions of isNarrow so the modal behaves like a
+// bottom sheet on small screens (full width, anchored to the bottom,
+// rounded only at the top) instead of a centered fixed-width dialog.
+const overlayStyle = (isNarrow) => ({
     position: 'fixed',
     inset: 0,
     background: 'rgba(17,24,39,0.45)',
     display: 'flex',
-    alignItems: 'center',
+    alignItems: isNarrow ? 'flex-end' : 'center',
     justifyContent: 'center',
     zIndex: 1000,
-    padding: '16px',
-};
+    padding: isNarrow ? 0 : '16px',
+});
 
-const modalStyle = {
+const modalStyle = (isNarrow) => ({
     background: '#fff',
-    borderRadius: '16px',
-    padding: '26px',
-    width: '480px',
+    borderRadius: isNarrow ? '18px 18px 0 0' : '16px',
+    padding: isNarrow ? '18px' : '26px',
+    width: isNarrow ? '100%' : '480px',
     maxWidth: '100%',
-    maxHeight: '90vh',
+    maxHeight: isNarrow ? '88vh' : '90vh',
     overflowY: 'auto',
     boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
-};
+    boxSizing: 'border-box',
+});
 
 const closeBtnStyle = {
     background: 'none',

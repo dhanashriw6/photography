@@ -32,3 +32,9 @@ export const getDraftOrders = async () => {
     `${orderEndpoint.getDraftOrders}`
   );
 };
+
+export const getCustomerOrders = async () => {
+  return await httpServices.get(
+    `${orderEndpoint.getCustomerOrder}`
+  );
+};
