@@ -2,35 +2,52 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     FiUser, FiLock, FiChevronRight, FiHome,
-    FiImage, FiPackage, FiShoppingBag, FiCreditCard, FiStar, FiChevronDown
+    FiImage, FiPackage, FiShoppingBag, FiCreditCard, FiStar, FiChevronDown,
+    FiEdit2,
+    FiAlertTriangle,
+    FiMessageCircle
 } from 'react-icons/fi';
 
-import MyOrders             from './myOrders';
+import MyOrders from './myOrders';
 import ViewsLayout from '../Layout';
+import UserProfileInfo from './userProfileInfo';
+import DraftOrders from './userDraftOrders';
+import ChangePassword from '../joinAsPhotographer/changePassword';
+import UserDispute from './userDispute';
+import BookEvent from './bookEvent';
 
 
 const MENU = [
-    // { key: 'profile',   label: 'Profile Information', icon: <FiUser      size={17} /> },
+    { key: 'profile', label: 'Profile Information', icon: <FiUser size={17} /> },
     // { key: 'portfolio', label: 'Portfolio',            icon: <FiImage     size={17} /> },
     // { key: 'package',   label: 'Package',              icon: <FiPackage   size={17} /> },
-    { key: 'myOrder',    label: 'My Orders',               icon: <FiShoppingBag size={17} /> },
+    { key: "bookEvent", label: "Book an Event", icon: <FiPackage size={17} /> },
+    { key: 'myOrder', label: 'My Bookings', icon: <FiShoppingBag size={17} /> },
+    { key: "draftOrders", label: "Draft Orders", icon: <FiEdit2 size={17} /> },
     // {key : 'bankDetails', label : 'Bank Details', icon : <FiCreditCard size={17} />},
     // { key: 'wallet',    label: 'Wallet',               icon: <FiCreditCard size={17} /> },
-    // { key: 'reviews',   label: 'Reviews & Disputes',   icon: <FiStar      size={17} /> },
-    // { key: 'password',  label: 'Change Password',      icon: <FiLock      size={17} /> },
+    { key: 'dispute',   label: 'Raise a Dispute',   icon: <FiAlertTriangle      size={17} /> },
+    { key: 'password',  label: 'Change Password',      icon: <FiLock      size={17} /> },
+    {key : 'support' , label : 'Support', icon : <FiMessageCircle size={17} />}
+    
 ];
 
 const CustomerEditProfile = () => {
-    const [active, setActive]   = useState('myOrder');
-    const navigate              = useNavigate();
-    const completion            = 64;
+    const [active, setActive] = useState('profile');
+    const navigate = useNavigate();
+    const completion = 64;
 
     const renderContent = () => {
         switch (active) {
-            
-            case 'myOrder':    return <MyOrders />;
 
-            default:          return null;
+            case 'myOrder': return <MyOrders />;
+            case 'profile': return <UserProfileInfo />;
+            case 'draftOrders': return <DraftOrders />;
+            case 'password': return <ChangePassword />;
+            case 'dispute': return <UserDispute />;
+            case 'bookEvent': return <BookEvent />;
+
+            default: return null;
         }
     };
 
@@ -186,7 +203,7 @@ const CustomerEditProfile = () => {
                         border: '1px solid #f0f0f0',
                         minHeight: '500px',
                     }}
-                    className="md:!p-[32px_36px]"
+                        className="md:!p-[32px_36px]"
                     >
                         {renderContent()}
                     </div>

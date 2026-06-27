@@ -58,7 +58,8 @@ const ChangePassword = () => {
 
     return (
         <div>
-            <h2 className="pe-title">Change Password</h2>
+                        <h2 style={{ margin: '0 0 6px', fontSize: '28px', fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.02em' }}>
+Change Password</h2>
             <p style={{ margin: '0 0 32px', fontSize: '13px', color: '#888' }}>Keep your account secure by using a strong password.</p>
 
             {success && (

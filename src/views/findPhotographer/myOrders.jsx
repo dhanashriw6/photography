@@ -3,7 +3,7 @@ import { getCustomerOrders } from '../../services/order';
 import { 
   FiGrid, FiList, FiSearch, FiCalendar, FiClock, FiMapPin, 
   FiX, FiUploadCloud, FiLink, FiSend, FiEye, FiChevronDown, 
-  FiChevronUp, FiFilter, FiRefreshCw 
+  FiChevronUp, FiFilter, FiRefreshCw, FiStar 
 } from 'react-icons/fi';
 import { BsCurrencyRupee } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
@@ -31,6 +31,10 @@ const MyOrders = () => {
 
   // References state (stored in localStorage per order)
   const [referenceState, setReferenceState] = useState({});
+
+  // Review modal state
+  const [reviewModalOrderId, setReviewModalOrderId] = useState(null);
+  const [reviewState, setReviewState] = useState({});
 
   // Toast / Status messages
   const [toastMessage, setToastMessage] = useState(null);
@@ -179,6 +183,99 @@ console.log("Length:", orders.length);
       console.error(e);
     }
   };
+
+  // ---------- Review Modal helpers ----------
+  const getDefaultReview = () => ({
+    rating: 0,
+    title: '',
+    reviewText: '',
+    photos: [],
+    publicShare: true,
+    submitting: false
+  });
+
+  const getReviewForOrder = (orderId) => {
+    return reviewState[orderId] || getDefaultReview();
+  };
+
+  const updateReviewForOrder = (orderId, partial) => {
+    setReviewState(prev => ({
+      ...prev,
+      [orderId]: { ...getReviewForOrder(orderId), ...partial }
+    }));
+  };
+
+  const openReviewModal = (orderId) => {
+    if (!reviewState[orderId]) {
+      setReviewState(prev => ({ ...prev, [orderId]: getDefaultReview() }));
+    }
+    setReviewModalOrderId(orderId);
+  };
+
+  const closeReviewModal = () => {
+    setReviewModalOrderId(null);
+  };
+
+  const setReviewRating = (orderId, rating) => {
+    updateReviewForOrder(orderId, { rating });
+  };
+
+  const setReviewTitle = (orderId, title) => {
+    updateReviewForOrder(orderId, { title: title.slice(0, 120) });
+  };
+
+  const setReviewText = (orderId, text) => {
+    updateReviewForOrder(orderId, { reviewText: text.slice(0, 1000) });
+  };
+
+  const togglePublicShare = (orderId) => {
+    const current = getReviewForOrder(orderId);
+    updateReviewForOrder(orderId, { publicShare: !current.publicShare });
+  };
+
+  const handleReviewPhotoUpload = (orderId, files) => {
+    const current = getReviewForOrder(orderId);
+    if (current.photos.length >= 5) {
+      showToast("Maximum 5 photos allowed per review");
+      return;
+    }
+    const newPhotos = Array.from(files).map((file, index) => ({
+      id: `${Date.now()}-${index}`,
+      previewUrl: URL.createObjectURL(file),
+      name: file.name
+    }));
+    const updatedPhotos = [...current.photos, ...newPhotos].slice(0, 5);
+    updateReviewForOrder(orderId, { photos: updatedPhotos });
+  };
+
+  const removeReviewPhoto = (orderId, photoId) => {
+    const current = getReviewForOrder(orderId);
+    const updatedPhotos = current.photos.filter(p => p.id !== photoId);
+    updateReviewForOrder(orderId, { photos: updatedPhotos });
+  };
+
+  const publishReview = (orderId) => {
+    const current = getReviewForOrder(orderId);
+
+    if (current.rating === 0) {
+      showToast("Please select a star rating");
+      return;
+    }
+    if (!current.reviewText.trim()) {
+      showToast("Please write a few words about your experience");
+      return;
+    }
+
+    updateReviewForOrder(orderId, { submitting: true });
+
+    // Simulated submit — replace with real API call
+    setTimeout(() => {
+      updateReviewForOrder(orderId, { submitting: false });
+      showToast("Review published successfully!");
+      closeReviewModal();
+    }, 900);
+  };
+  // ---------- End Review Modal helpers ----------
 
   // Filter & Sort logic
   const filteredOrders = useMemo(() => {
@@ -425,6 +522,12 @@ console.log("Length:", orders.length);
         return { bg: '#FFF8E6', color: '#B7791F' };
     }
   };
+
+  // Order currently open in the review modal (full object, not just id)
+  const reviewModalOrder = useMemo(() => {
+    if (!reviewModalOrderId) return null;
+    return orders.find(o => o.id === reviewModalOrderId) || null;
+  }, [reviewModalOrderId, orders]);
 
   return (
     <div className="bookings-page-container">
@@ -729,6 +832,15 @@ console.log("Length:", orders.length);
 
                           <button 
                             type="button" 
+                            className="add-review-action-btn"
+                            onClick={() => openReviewModal(order.id)}
+                          >
+                            <FiStar size={14} style={{ marginRight: '6px' }} />
+                            Add Review
+                          </button>
+
+                          <button 
+                            type="button" 
                             className={`expand-toggle-btn ${isExpanded ? 'active' : ''}`}
                             onClick={() => toggleExpand(order.id)}
                             title={isExpanded ? "Collapse" : "Share References"}
@@ -915,6 +1027,160 @@ console.log("Length:", orders.length);
           )}
         </main>
       </div>
+
+      {/* Write a Review Modal */}
+      {reviewModalOrderId && reviewModalOrder && (() => {
+        const rData = getReviewForOrder(reviewModalOrderId);
+        return (
+          <div className="review-modal-overlay" onClick={closeReviewModal}>
+            <div className="review-modal-card" onClick={(e) => e.stopPropagation()}>
+              {/* Header */}
+              <div className="review-modal-header">
+                <div>
+                  <h3 className="review-modal-title">Write a Review</h3>
+                  <p className="review-modal-subtitle">
+                    Share your experience and help others make the right choice.
+                  </p>
+                </div>
+                <button 
+                  type="button" 
+                  className="review-modal-close-btn" 
+                  onClick={closeReviewModal}
+                >
+                  <FiX size={20} />
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className="review-modal-body">
+                {/* Left: Order summary */}
+                <div className="review-modal-left">
+                  <img 
+                    src={reviewModalOrder.image} 
+                    alt={reviewModalOrder.eventName} 
+                    className="review-order-image" 
+                  />
+                  <h4 className="review-order-name">{reviewModalOrder.eventName}</h4>
+                  <div className="review-order-meta-row">
+                    <FiCalendar size={12} />
+                    <span>{reviewModalOrder.dateTime}</span>
+                  </div>
+                  <div className="review-order-meta-row">
+                    <FiMapPin size={12} />
+                    <span>{reviewModalOrder.location}</span>
+                  </div>
+                  <span className="review-package-tag">{reviewModalOrder.packageName}</span>
+                </div>
+
+                {/* Right: Review form */}
+                <div className="review-modal-right">
+                  <label className="review-field-label">Your Rating</label>
+                  <div className="star-rating-row">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <span
+                        key={star}
+                        className={`star-icon ${star <= rData.rating ? 'filled' : ''}`}
+                        onClick={() => setReviewRating(reviewModalOrderId, star)}
+                      >
+                        ★
+                      </span>
+                    ))}
+                  </div>
+
+                  <label className="review-field-label">Review Title</label>
+                  <input 
+                    type="text"
+                    className="review-title-input"
+                    placeholder="e.g. Beautiful Memories, Perfectly Captured"
+                    value={rData.title}
+                    onChange={(e) => setReviewTitle(reviewModalOrderId, e.target.value)}
+                  />
+
+                  <label className="review-field-label">Your Review</label>
+                  <textarea 
+                    className="review-text-area"
+                    placeholder="Tell us about your experience with the team, the shoot, and the final photos..."
+                    value={rData.reviewText}
+                    onChange={(e) => setReviewText(reviewModalOrderId, e.target.value)}
+                    maxLength={1000}
+                    rows={5}
+                  />
+                  <div className="review-char-count">
+                    {rData.reviewText.length} / 1000
+                  </div>
+
+                  <label className="review-field-label">Add Photos (Optional)</label>
+                  <span className="review-field-hint">Upload up to 5 photos from your event</span>
+
+                  <div className="review-photos-grid">
+                    <label className="review-upload-tile">
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        multiple
+                        style={{ display: 'none' }}
+                        onChange={(e) => handleReviewPhotoUpload(reviewModalOrderId, e.target.files)}
+                        disabled={rData.photos.length >= 5}
+                      />
+                      <FiUploadCloud size={18} color="#a8a29e" />
+                      <span className="review-upload-tile-text">Drag & drop images here</span>
+                      <span className="browse-files-trigger">Browse Files</span>
+                    </label>
+
+                    {rData.photos.map((photo) => (
+                      <div key={photo.id} className="review-photo-tile">
+                        <img src={photo.previewUrl} alt="review upload" />
+                        <button 
+                          type="button" 
+                          className="remove-review-photo-btn"
+                          onClick={() => removeReviewPhoto(reviewModalOrderId, photo.id)}
+                        >
+                          <FiX size={12} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <label className="review-public-checkbox-row">
+                    <input 
+                      type="checkbox"
+                      checked={rData.publicShare}
+                      onChange={() => togglePublicShare(reviewModalOrderId)}
+                    />
+                    <div>
+                      <span className="review-public-checkbox-title">
+                        Allow this review to be shown publicly
+                      </span>
+                      <span className="review-public-checkbox-desc">
+                        Your name and review may be displayed on our platform.
+                      </span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="review-modal-footer">
+                <button 
+                  type="button" 
+                  className="review-modal-close-action-btn"
+                  onClick={closeReviewModal}
+                >
+                  Close
+                </button>
+                <button 
+                  type="button" 
+                  className="review-modal-publish-btn"
+                  onClick={() => publishReview(reviewModalOrderId)}
+                  disabled={rData.submitting}
+                >
+                  {rData.submitting ? 'Publishing...' : 'Publish Review'}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Styled JSX (incorporating premium aesthetics, clean shadows, smooth transitions, and exact styling matching the screenshot) */}
       <style>{`
@@ -1459,12 +1725,35 @@ console.log("Length:", orders.length);
           align-items: center;
           transition: all 0.2s;
           font-family: inherit;
+          white-space: nowrap;
         }
 
         .view-details-action-btn:hover {
           border-color: #cbd5e1;
           color: #0f172a;
           background: #f8fafc;
+        }
+
+        .add-review-action-btn {
+          background: #FFF3D6;
+          border: 1.5px solid #F6D98A;
+          color: #B7791F;
+          padding: 8px 14px;
+          border-radius: 10px;
+          font-size: 13px;
+          font-weight: 700;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          transition: all 0.2s;
+          font-family: inherit;
+          white-space: nowrap;
+        }
+
+        .add-review-action-btn:hover {
+          background: #FCE8B5;
+          border-color: #E8A317;
+          color: #92600f;
         }
 
         .expand-toggle-btn {
@@ -1873,6 +2162,364 @@ console.log("Length:", orders.length);
         @keyframes slideUp {
           from { transform: translateY(20px); opacity: 0; }
           to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* ===================== Write a Review Modal ===================== */
+        .review-modal-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(15, 23, 42, 0.5);
+          backdrop-filter: blur(2px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+          padding: 20px;
+          animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        .review-modal-card {
+          background: #ffffff;
+          border-radius: 18px;
+          width: 100%;
+          max-width: 760px;
+          max-height: 90vh;
+          overflow-y: auto;
+          box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+          animation: slideUp 0.25s ease-out;
+        }
+
+        .review-modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          padding: 24px 24px 16px;
+        }
+
+        .review-modal-title {
+          font-size: 19px;
+          font-weight: 800;
+          color: #0f172a;
+          margin: 0 0 4px;
+        }
+
+        .review-modal-subtitle {
+          font-size: 13px;
+          color: #64748b;
+          margin: 0;
+        }
+
+        .review-modal-close-btn {
+          background: #f1f5f9;
+          border: none;
+          color: #64748b;
+          width: 32px;
+          height: 32px;
+          border-radius: 8px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          transition: all 0.2s;
+        }
+
+        .review-modal-close-btn:hover {
+          background: #e2e8f0;
+          color: #0f172a;
+        }
+
+        .review-modal-body {
+          display: grid;
+          grid-template-columns: 200px 1fr;
+          gap: 24px;
+          padding: 0 24px 8px;
+        }
+
+        @media (max-width: 600px) {
+          .review-modal-body {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .review-modal-left {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .review-order-image {
+          width: 100%;
+          height: 130px;
+          object-fit: cover;
+          border-radius: 12px;
+          margin-bottom: 10px;
+        }
+
+        .review-order-name {
+          font-size: 15px;
+          font-weight: 800;
+          color: #0f172a;
+          margin: 0 0 8px;
+        }
+
+        .review-order-meta-row {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 12px;
+          color: #64748b;
+          margin-bottom: 6px;
+        }
+
+        .review-package-tag {
+          font-size: 11px;
+          font-weight: 700;
+          color: #475569;
+          background: #f1f5f9;
+          padding: 3px 8px;
+          border-radius: 6px;
+          display: inline-block;
+          margin-top: 6px;
+          align-self: flex-start;
+        }
+
+        .review-modal-right {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .review-field-label {
+          font-size: 12px;
+          font-weight: 700;
+          color: #334155;
+          margin-bottom: 8px;
+          margin-top: 16px;
+          display: block;
+        }
+
+        .review-field-label:first-child {
+          margin-top: 0;
+        }
+
+        .review-field-hint {
+          font-size: 11px;
+          color: #94a3b8;
+          margin-top: -4px;
+          margin-bottom: 10px;
+          display: block;
+        }
+
+        .star-rating-row {
+          display: flex;
+          gap: 6px;
+        }
+
+        .star-icon {
+          font-size: 26px;
+          line-height: 1;
+          color: #e2e8f0;
+          cursor: pointer;
+          transition: color 0.15s, transform 0.1s;
+          user-select: none;
+        }
+
+        .star-icon:hover {
+          transform: scale(1.1);
+        }
+
+        .star-icon.filled {
+          color: #E8A317;
+        }
+
+        .review-title-input {
+          width: 100%;
+          padding: 10px 12px;
+          border: 1.5px solid #e2e8f0;
+          border-radius: 10px;
+          font-size: 13.5px;
+          color: #1e293b;
+          outline: none;
+          font-family: inherit;
+          transition: border-color 0.2s;
+        }
+
+        .review-title-input:focus {
+          border-color: #E8A317;
+        }
+
+        .review-text-area {
+          width: 100%;
+          padding: 10px 12px;
+          border: 1.5px solid #e2e8f0;
+          border-radius: 10px;
+          font-size: 13.5px;
+          color: #1e293b;
+          outline: none;
+          resize: none;
+          font-family: inherit;
+          transition: border-color 0.2s;
+        }
+
+        .review-text-area:focus {
+          border-color: #E8A317;
+        }
+
+        .review-char-count {
+          text-align: right;
+          font-size: 11px;
+          color: #94a3b8;
+          margin-top: 4px;
+        }
+
+        .review-photos-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+          gap: 10px;
+          margin-top: 4px;
+        }
+
+        .review-upload-tile {
+          border: 1.5px dashed #d6d3d1;
+          border-radius: 10px;
+          aspect-ratio: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          cursor: pointer;
+          background: #ffffff;
+          padding: 6px;
+          transition: all 0.2s;
+        }
+
+        .review-upload-tile:hover {
+          border-color: #E8A317;
+          background: #fffdf9;
+        }
+
+        .review-upload-tile-text {
+          font-size: 9.5px;
+          color: #a8a29e;
+          margin: 4px 0 2px;
+          line-height: 1.2;
+        }
+
+        .review-upload-tile .browse-files-trigger {
+          font-size: 9.5px;
+        }
+
+        .review-photo-tile {
+          position: relative;
+          aspect-ratio: 1;
+          border-radius: 10px;
+          overflow: hidden;
+          border: 1px solid #e2e8f0;
+        }
+
+        .review-photo-tile img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .remove-review-photo-btn {
+          position: absolute;
+          top: 4px;
+          right: 4px;
+          background: rgba(0, 0, 0, 0.55);
+          color: #ffffff;
+          border: none;
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          padding: 0;
+        }
+
+        .review-public-checkbox-row {
+          display: flex;
+          align-items: flex-start;
+          gap: 10px;
+          margin-top: 18px;
+          cursor: pointer;
+        }
+
+        .review-public-checkbox-row input[type="checkbox"] {
+          margin-top: 2px;
+          width: 16px;
+          height: 16px;
+          accent-color: #E8A317;
+          cursor: pointer;
+          flex-shrink: 0;
+        }
+
+        .review-public-checkbox-title {
+          font-size: 13px;
+          font-weight: 700;
+          color: #1e293b;
+          display: block;
+        }
+
+        .review-public-checkbox-desc {
+          font-size: 11.5px;
+          color: #94a3b8;
+          display: block;
+          margin-top: 1px;
+        }
+
+        .review-modal-footer {
+          display: flex;
+          justify-content: flex-end;
+          gap: 10px;
+          padding: 20px 24px 24px;
+        }
+
+        .review-modal-close-action-btn {
+          background: #ffffff;
+          border: 1.5px solid #e2e8f0;
+          color: #475569;
+          padding: 10px 20px;
+          border-radius: 10px;
+          font-size: 13.5px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .review-modal-close-action-btn:hover {
+          border-color: #cbd5e1;
+          color: #0f172a;
+        }
+
+        .review-modal-publish-btn {
+          background: #E8A317;
+          color: #ffffff;
+          border: none;
+          padding: 10px 22px;
+          border-radius: 10px;
+          font-size: 13.5px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: background 0.2s;
+        }
+
+        .review-modal-publish-btn:hover:not(:disabled) {
+          background: #d69110;
+        }
+
+        .review-modal-publish-btn:disabled {
+          background: #f5f5f4;
+          color: #a8a29e;
+          cursor: not-allowed;
         }
       `}</style>
     </div>

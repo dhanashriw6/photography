@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import '../index.css';
 import ViewsLayout from '../Layout';
@@ -7,16 +7,77 @@ import {
   FiEdit2, FiHeart, FiStar, FiArrowRight, FiMove,
 } from 'react-icons/fi';
 import { draftOrder } from '../../services/order';
+import { getServiceProviders } from '../../services/booking';
+import { getCategory } from '../../services/common';
+import { AddressAutocomplete } from '../joinAsPhotographer/signUp';
 
 /* ── helpers ── */
 const fmtDate = (iso) => {
   if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 };
 const decodeFilters = (encoded) => {
   try {
     return encoded ? JSON.parse(decodeURIComponent(escape(atob(encoded)))) : null;
   } catch { return null; }
+};
+
+// Extract "HH:MM" out of an ISO datetime string
+const getTimeFromIso = (isoString) => {
+  if (!isoString) return '';
+  try {
+    const date = new Date(isoString);
+    if (isNaN(date.getTime())) return '';
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  } catch {
+    return '';
+  }
+};
+
+// Format "HH:MM" -> "h:MM AM/PM"
+const formatTime = (timeStr) => {
+  if (!timeStr) return '—';
+  const [h, m] = timeStr.split(':');
+  if (!h || !m) return timeStr;
+  const hrs = parseInt(h, 10);
+  const ampm = hrs >= 12 ? 'PM' : 'AM';
+  const displayHrs = hrs % 12 || 12;
+  return `${displayHrs}:${m} ${ampm}`;
+};
+
+// Combine a "YYYY-MM-DD" date and "HH:MM" time into an ISO datetime
+const buildDateTime = (date, time) => {
+  if (!date || !time) return null;
+  const dateTime = new Date(`${date}T${time}:00`);
+  if (isNaN(dateTime.getTime())) {
+    console.error('Invalid date/time:', date, time);
+    return null;
+  }
+  return dateTime.toISOString();
+};
+
+// Reconstruct an address object (for AddressAutocomplete) out of a filters object
+const getInitialAddress = (filters) => {
+  if (!filters || !filters.place_id) return null;
+  return {
+    lat: filters.lat,
+    lng: filters.lng,
+    place_id: filters.place_id,
+    address_line1: filters.address_line1 || '',
+    address_line2: filters.address_line2 || '',
+    address_line3: filters.address_line3 || '',
+    city: filters.city || '',
+    state: filters.state || '',
+    state_code: filters.state_code || '',
+    country: filters.country || '',
+    country_code: filters.country_code || '',
+    postal_code: filters.postal_code || '',
+    timezone: filters.timezone || '',
+  };
 };
 
 const SKILL_LABELS = {
@@ -79,125 +140,261 @@ const Stepper = () => (
   </div>
 );
 
-/* ── Event details bar ── */
-const EventDetailsBar = ({ filters, navigate }) => {
-  const days = filters?.start_datetime && filters?.end_datetime
-    ? Math.max(1, Math.round((new Date(filters.end_datetime) - new Date(filters.start_datetime)) / (1000 * 60 * 60 * 24)))
-    : null;
-
-  const items = [
-    { icon: <FiUsers size={15} />, label: 'Event Type', value: filters?.category_name || filters?.category?.name || '—' },
-    { icon: <FiCalendar size={15} />, label: 'Date', value: filters?.start_datetime ? `${fmtDate(filters.start_datetime)}${filters?.end_datetime ? ` – ${fmtDate(filters.end_datetime)}` : ''}` : '—' },
-    { icon: <FiMapPin size={15} />, label: 'Location', value: filters?.city ? `${filters.city}, ${filters.state || ''}` : (filters?.state || '—') },
-    { icon: <FiClock size={15} />, label: 'Duration', value: days ? `${days} Day${days > 1 ? 's' : ''}` : '—' },
-    { icon: <FiUsers size={15} />, label: 'Guests (Est.)', value: filters?.guests_min && filters?.guests_max ? `${filters.guests_min} – ${filters.guests_max}` : '—' },
-  ];
-
-  return (
-    <div className="fb-event-bar">
-      {items.map((it) => (
-        <div className="fb-event-item" key={it.label}>
-          <span className="fb-event-icon">{it.icon}</span>
-          <div>
-            <div className="fb-event-label">{it.label}</div>
-            <div className="fb-event-value">{it.value}</div>
-          </div>
-        </div>
-      ))}
-      <button className="fb-edit-btn" onClick={() => navigate(-1)}>
-        <FiEdit2 size={13} /> Edit Event Details
-      </button>
-    </div>
-  );
-};
-
-/* ── Sidebar ── */
+/* ── Sidebar (view/edit toggle, mirrors PackageSuggestion sidebar) ── */
 const Sidebar = ({
+  eventTypeName,
+  categories,
+  activeFilters,
+  summaryForm, setSummaryForm,
   search, setSearch,
   roleFilter, toggleRole,
   budgetRange, setBudgetRange,
-  availability, setAvailability,
-  isPackageMode, basePackagePrice, selectedTeamCost,
+  applying,
+  editingFilters,
+  onEditFilters,
+  onApplyFilters,
+  onResetFilters,
+  onCancelFilters,
 }) => (
   <aside className="fb-sidebar">
     <div className="fb-sidebar-card">
-      <span className="fb-sidebar-title">Search Providers</span>
-      <div className="fb-search-box">
-        <FiSearch size={14} color="#aaa" />
-        <input
-          type="text"
-          placeholder="Search by name or role..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </div>
-
-      <span className="fb-sidebar-title" style={{ marginTop: 18 }}>Filter by Role</span>
-      <div className="fb-role-list">
-        {ROLE_OPTIONS.map((r) => (
-          <label className="fb-role-check" key={r}>
-            <input type="checkbox" checked={roleFilter.has(r)} onChange={() => toggleRole(r)} />
-            {SKILL_LABELS[r]}
-          </label>
-        ))}
-      </div>
-
-      <span className="fb-sidebar-title" style={{ marginTop: 18 }}>Budget Range (per day)</span>
-      <div className="fb-range-wrap">
-        <input
-          type="range" min={0} max={25000} step={500}
-          value={budgetRange[0]}
-          onChange={(e) => setBudgetRange([Math.min(Number(e.target.value), budgetRange[1]), budgetRange[1]])}
-          className="fb-range fb-range--min"
-        />
-        <input
-          type="range" min={0} max={25000} step={500}
-          value={budgetRange[1]}
-          onChange={(e) => setBudgetRange([budgetRange[0], Math.max(Number(e.target.value), budgetRange[0])])}
-          className="fb-range fb-range--max"
-        />
-      </div>
-      <div className="fb-range-labels">
-        <span>₹{budgetRange[0].toLocaleString('en-IN')}</span>
-        <span>₹{budgetRange[1].toLocaleString('en-IN')}{budgetRange[1] >= 25000 ? '+' : ''}</span>
-      </div>
-
-      <span className="fb-sidebar-title" style={{ marginTop: 18 }}>Availability</span>
-      <div className="fb-pill-row">
-        {['any', 'available', 'limited', 'unavailable'].map((a) => (
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #f0f0f0', paddingBottom: '12px', marginBottom: '16px' }}>
+        <span style={{ fontSize: '15px', fontWeight: 800, color: '#1a1a1a' }}>Filters</span>
+        {!editingFilters ? (
           <button
-            key={a}
-            className={`fb-pill ${availability === a ? 'fb-pill--active' : ''}`}
-            onClick={() => setAvailability(a)}
-            title={a !== 'any' ? "Not yet wired to live availability data" : undefined}
+            onClick={onEditFilters}
+            style={{ fontSize: '12px', color: '#ff9c2b', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}
           >
-            {a === 'any' ? 'Any' : a.charAt(0).toUpperCase() + a.slice(1)}
+            ✏️ Edit
           </button>
-        ))}
+        ) : (
+          <button
+            onClick={onResetFilters}
+            style={{ fontSize: '12px', color: '#888', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}
+          >
+            Reset All
+          </button>
+        )}
       </div>
-    </div>
 
-    {/* {isPackageMode && (
-      <div className="fb-sidebar-card fb-summary-card">
-        <div className="fb-summary-header">
-          Package Summary
-          <span className="fb-summary-badge">Package #1</span>
+      {!editingFilters ? (
+        /* ── View Mode: read-only filter summary ── */
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div className="fb-filter-summary-item">
+            <span className="fb-filter-summary-label">Event Type</span>
+            <span className="fb-filter-summary-value">{eventTypeName}</span>
+          </div>
+          <div className="fb-filter-summary-item">
+            <span className="fb-filter-summary-label">Start Date & Time</span>
+            <span className="fb-filter-summary-value">
+              {fmtDate(activeFilters?.start_datetime)} at {formatTime(getTimeFromIso(activeFilters?.start_datetime))}
+            </span>
+          </div>
+          <div className="fb-filter-summary-item">
+            <span className="fb-filter-summary-label">End Date & Time</span>
+            <span className="fb-filter-summary-value">
+              {fmtDate(activeFilters?.end_datetime)} at {formatTime(getTimeFromIso(activeFilters?.end_datetime))}
+            </span>
+          </div>
+          <div className="fb-filter-summary-item">
+            <span className="fb-filter-summary-label">Location</span>
+            <span
+              className="fb-filter-summary-value"
+              style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+              title={activeFilters?.address_line1 || activeFilters?.city || activeFilters?.state || '—'}
+            >
+              {activeFilters?.city || activeFilters?.state || activeFilters?.address_line1 || '—'}
+            </span>
+          </div>
+          <div className="fb-filter-summary-item">
+            <span className="fb-filter-summary-label">Search</span>
+            <span className="fb-filter-summary-value">{search ? search : 'Any'}</span>
+          </div>
+          <div className="fb-filter-summary-item">
+            <span className="fb-filter-summary-label">Roles</span>
+            <span className="fb-filter-summary-value">
+              {roleFilter.size === ROLE_OPTIONS.length
+                ? 'All Roles'
+                : roleFilter.size === 0
+                  ? 'None Selected'
+                  : [...roleFilter].map((r) => SKILL_LABELS[r]).join(', ')}
+            </span>
+          </div>
+          <div className="fb-filter-summary-item">
+            <span className="fb-filter-summary-label">Budget Range (per day)</span>
+            <span className="fb-filter-summary-value">
+              ₹{budgetRange[0].toLocaleString('en-IN')} – ₹{budgetRange[1].toLocaleString('en-IN')}{budgetRange[1] >= 25000 ? '+' : ''}
+            </span>
+          </div>
+
+          <button className="fb-edit-filters-btn" onClick={onEditFilters}>
+            ✏️ Edit Filters
+          </button>
         </div>
-        <div className="fb-summary-row">
-          <span>Base Package Price</span>
-          <span>₹{basePackagePrice.toLocaleString('en-IN')}</span>
+      ) : (
+        /* ── Edit Mode: the actual controls ── */
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* Event Type */}
+          <div>
+            <span className="fb-sidebar-title">Event Type</span>
+            <select
+              className="fb-edit-input"
+              value={summaryForm.categoryId}
+              onChange={(e) => setSummaryForm((f) => ({ ...f, categoryId: e.target.value }))}
+            >
+              <option value="">Select Event</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Dates */}
+          <div className="fb-edit-grid">
+            <div>
+              <span className="fb-sidebar-title">Start Date</span>
+              <input
+                type="date"
+                className="fb-edit-input"
+                value={summaryForm.startDate}
+                min={new Date().toISOString().split('T')[0]}
+                onChange={(e) => setSummaryForm((f) => ({ ...f, startDate: e.target.value }))}
+              />
+            </div>
+            <div>
+              <span className="fb-sidebar-title">End Date</span>
+              <input
+                type="date"
+                className="fb-edit-input"
+                value={summaryForm.endDate}
+                min={summaryForm.startDate || new Date().toISOString().split('T')[0]}
+                onChange={(e) => setSummaryForm((f) => ({ ...f, endDate: e.target.value }))}
+              />
+            </div>
+          </div>
+
+          {/* Times */}
+          <div className="fb-edit-grid">
+            <div>
+              <span className="fb-sidebar-title">Start Time</span>
+              <input
+                type="time"
+                className="fb-edit-input"
+                value={summaryForm.startTime}
+                onChange={(e) => setSummaryForm((f) => ({ ...f, startTime: e.target.value }))}
+              />
+            </div>
+            <div>
+              <span className="fb-sidebar-title">End Time</span>
+              <input
+                type="time"
+                className="fb-edit-input"
+                value={summaryForm.endTime}
+                onChange={(e) => setSummaryForm((f) => ({ ...f, endTime: e.target.value }))}
+              />
+            </div>
+          </div>
+
+          {/* Location */}
+          <div>
+            <span className="fb-sidebar-title">Event Location</span>
+            <AddressAutocomplete
+              label="Event Location"
+              value={summaryForm.address}
+              onAddressSelect={(val) => setSummaryForm((f) => ({ ...f, address: val }))}
+            />
+          </div>
+
+          {/* Search */}
+          <div>
+            <span className="fb-sidebar-title">Search Providers</span>
+            <div className="fb-search-box">
+              <FiSearch size={14} color="#aaa" />
+              <input
+                type="text"
+                placeholder="Search by name or role..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Filter by Role */}
+          <div>
+            <span className="fb-sidebar-title">Filter by Role</span>
+            <div className="fb-role-list">
+              {ROLE_OPTIONS.map((r) => (
+                <label className="fb-role-check" key={r}>
+                  <input type="checkbox" checked={roleFilter.has(r)} onChange={() => toggleRole(r)} />
+                  {SKILL_LABELS[r]}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Budget Range – single max slider, same pattern as packageSuggestion */}
+          <div>
+            <span className="fb-sidebar-title">Budget Range (per day)</span>
+            <input
+              type="range"
+              min={0}
+              max={25000}
+              step={500}
+              value={budgetRange[1]}
+              onChange={(e) => setBudgetRange([budgetRange[0], Number(e.target.value)])}
+              className="fb-range-single"
+              style={{ width: '100%', accentColor: '#ff9c2b', marginBottom: '6px' }}
+            />
+            <div className="fb-range-labels">
+              <span>₹0</span>
+              <span>₹25,000+</span>
+            </div>
+            <div style={{ fontSize: '11px', color: '#777', marginTop: '4px' }}>
+              Selected: ₹{budgetRange[0].toLocaleString('en-IN')} – ₹{budgetRange[1].toLocaleString('en-IN')}{budgetRange[1] >= 25000 ? '+' : ''}
+            </div>
+          </div>
+
+          {/* Apply / Cancel buttons */}
+          <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
+            <button
+              onClick={onApplyFilters}
+              disabled={applying}
+              style={{
+                flex: 1,
+                background: applying ? '#ffd08a' : '#ff9c2b',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '10px',
+                padding: '11px',
+                fontSize: '13.5px',
+                fontWeight: 700,
+                cursor: applying ? 'not-allowed' : 'pointer',
+                transition: 'background 0.2s',
+              }}
+            >
+              {applying ? 'Applying…' : '⚙ Apply Filters'}
+            </button>
+            <button
+              onClick={onCancelFilters}
+              style={{
+                flex: 1,
+                background: '#fff',
+                color: '#555',
+                border: '1.5px solid #e5e7eb',
+                borderRadius: '10px',
+                padding: '11px',
+                fontSize: '13.5px',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              Cancel
+            </button>
+          </div>
         </div>
-        <div className="fb-summary-row">
-          <span>Selected Team</span>
-          <span>₹{selectedTeamCost.toLocaleString('en-IN')}</span>
-        </div>
-        <div className="fb-summary-total">
-          <span>Total Team Cost</span>
-          <span>₹{(basePackagePrice + selectedTeamCost).toLocaleString('en-IN')}</span>
-        </div>
-        <div className="fb-summary-note">(Inclusive of all days)</div>
-      </div>
-    )} */}
+      )}
+    </div>
   </aside>
 );
 
@@ -291,6 +488,8 @@ const FindBest = () => {
   const [bulkLoading, setBulkLoading] = useState(false);
   const [providers, setProviders] = useState([]);
   const [restoring, setRestoring] = useState(false);
+  const [applying, setApplying] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   const [manuallyAdded, setManuallyAdded] = useState(new Set());
   const [selected, setSelected] = useState(new Map());
@@ -300,13 +499,30 @@ const FindBest = () => {
   const [budgetRange, setBudgetRange] = useState([0, 25000]);
   const [availability, setAvailability] = useState('any'); // UI-only: no live data field yet
 
+  // View/Edit toggle for the sidebar filters (mirrors PackageSuggestion sidebar)
+  const [editingFilters, setEditingFilters] = useState(false);
+  const filterSnapshotRef = useRef(null);
+
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const filtersFromState = location.state?.filters ?? null;
   const filtersFromUrl = decodeFilters(searchParams.get('f'));
-  const filters = filtersFromState ?? filtersFromUrl;
+  const initialFilters = filtersFromState ?? filtersFromUrl;
+
+  // The currently-applied filters (event type, dates, location, etc.)
+  const [activeFilters, setActiveFilters] = useState(initialFilters);
+
+  // Draft form used while editing in the sidebar
+  const [summaryForm, setSummaryForm] = useState({
+    categoryId: initialFilters?.category_id || '',
+    startDate: initialFilters?.start_datetime ? initialFilters.start_datetime.split('T')[0] : (initialFilters?.date || ''),
+    endDate: initialFilters?.end_datetime ? initialFilters.end_datetime.split('T')[0] : '',
+    startTime: getTimeFromIso(initialFilters?.start_datetime),
+    endTime: getTimeFromIso(initialFilters?.end_datetime),
+    address: getInitialAddress(initialFilters),
+  });
 
   const statePackage = location.state?.package ?? null;
   const pkgIdFromUrl = searchParams.get('pkgId');
@@ -319,20 +535,114 @@ const FindBest = () => {
       setProviders(location.state.providers);
       return;
     }
-    if (!filters) return;
+    if (!initialFilters) return;
     setRestoring(true);
-    const { getServiceProviders } = require('../../services/booking');
     getServiceProviders({
-      category_id: filters.category_id,
-      lat: filters.lat,
-      lng: filters.lng,
-      start_datetime: filters.start_datetime,
-      end_datetime: filters.end_datetime,
+      category_id: initialFilters.category_id,
+      lat: initialFilters.lat,
+      lng: initialFilters.lng,
+      start_datetime: initialFilters.start_datetime,
+      end_datetime: initialFilters.end_datetime,
     })
       .then((res) => setProviders(res?.data?.data || []))
       .catch(console.error)
       .finally(() => setRestoring(false));
   }, []);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const res = await getCategory();
+        setCategories(res?.data?.data?.event_categories || []);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  const handleEditFilters = () => {
+    filterSnapshotRef.current = {
+      search,
+      roleFilter: new Set(roleFilter),
+      budgetRange: [...budgetRange],
+      summaryForm: { ...summaryForm, address: summaryForm.address ? { ...summaryForm.address } : null },
+    };
+    setEditingFilters(true);
+  };
+
+  const handleCancelFilters = () => {
+    if (filterSnapshotRef.current) {
+      setSearch(filterSnapshotRef.current.search);
+      setRoleFilter(filterSnapshotRef.current.roleFilter);
+      setBudgetRange(filterSnapshotRef.current.budgetRange);
+      setSummaryForm(filterSnapshotRef.current.summaryForm);
+    }
+    setEditingFilters(false);
+  };
+
+  const handleApplyFilters = async () => {
+    setApplying(true);
+    try {
+      const newStartDatetime = buildDateTime(summaryForm.startDate, summaryForm.startTime);
+      const newEndDatetime = buildDateTime(summaryForm.endDate, summaryForm.endTime);
+
+      const newFilters = {
+        ...activeFilters,
+        category_id: summaryForm.categoryId,
+        start_datetime: newStartDatetime,
+        end_datetime: newEndDatetime,
+        ...(summaryForm.address
+          ? {
+              lat: summaryForm.address.lat,
+              lng: summaryForm.address.lng,
+              place_id: summaryForm.address.place_id,
+              address_line1: summaryForm.address.address_line1,
+              address_line2: summaryForm.address.address_line2,
+              address_line3: summaryForm.address.address_line3,
+              city: summaryForm.address.city,
+              state: summaryForm.address.state,
+              state_code: summaryForm.address.state_code,
+              country: summaryForm.address.country,
+              country_code: summaryForm.address.country_code,
+              postal_code: summaryForm.address.postal_code,
+              timezone: summaryForm.address.timezone,
+            }
+          : {}),
+      };
+
+      const selectedRoles = [...roleFilter];
+      const response = await getServiceProviders({
+  category_id: newFilters.category_id,
+  lat: newFilters.lat,
+  lng: newFilters.lng,
+  start_datetime: newFilters.start_datetime,
+  end_datetime: newFilters.end_datetime,
+});
+
+setProviders(response?.data?.data || []);
+      setActiveFilters(newFilters);
+      setEditingFilters(false);
+    } catch (err) {
+      console.error('handleApplyFilters failed:', err);
+    } finally {
+      setApplying(false);
+    }
+  };
+
+  const handleResetFilters = () => {
+    setBudgetRange([0, 25000]);
+    setRoleFilter(new Set(ROLE_OPTIONS));
+    setSearch('');
+    setSummaryForm({
+      categoryId: initialFilters?.category_id || '',
+      startDate: initialFilters?.start_datetime ? initialFilters.start_datetime.split('T')[0] : (initialFilters?.date || ''),
+      endDate: initialFilters?.end_datetime ? initialFilters.end_datetime.split('T')[0] : '',
+      startTime: getTimeFromIso(initialFilters?.start_datetime),
+      endTime: getTimeFromIso(initialFilters?.end_datetime),
+      address: getInitialAddress(initialFilters),
+    });
+  };
 
   const toggleRole = (r) => {
     setRoleFilter((prev) => {
@@ -359,7 +669,13 @@ const FindBest = () => {
   });
 
   const matchesSearch = (name) => name.toLowerCase().includes(search.toLowerCase());
-  const matchesBudget = (unitPrice) => unitPrice == null ? true : (unitPrice >= budgetRange[0] && unitPrice <= budgetRange[1]);
+const matchesBudget = (unitPrice) => {
+  if (unitPrice == null) return true;
+
+  const max = budgetRange[1] >= 25000 ? Infinity : budgetRange[1];
+
+  return unitPrice >= budgetRange[0] && unitPrice <= max;
+};
 
   /* ── Package mode ── */
   const packageProviderIds = new Set(
@@ -381,7 +697,7 @@ const FindBest = () => {
     return (
       matchesSearch(name) &&
       (p.skills || []).some((s) => roleFilter.has(s.skill)) &&
-      matchesBudget(primaryPkg?.unit_price)
+     matchesBudget(primaryPkg?.price_with_commission)
     );
   });
 
@@ -411,14 +727,14 @@ const FindBest = () => {
     try {
       setLoadingKey(key);
       const payload = {
-        event_category_id: filters?.category_id ?? null,
-        start_at: filters?.start_datetime ?? null,
-        end_at: filters?.end_datetime ?? null,
-        address: buildAddress(filters),
+        event_category_id: activeFilters?.category_id ?? null,
+        start_at: activeFilters?.start_datetime ?? null,
+        end_at: activeFilters?.end_datetime ?? null,
+        address: buildAddress(activeFilters),
         service_providers: [{ service_provider_id: provider.id, skill: provider.skills?.[0]?.skill ?? 'photographer' }],
       };
       const response = await draftOrder(payload);
-      navigate('/requestBook', { state: { order: response?.data?.data, payload, person: provider, filters } });
+      navigate('/requestBook', { state: { order: response?.data?.data, payload, person: provider, filters: activeFilters } });
     } catch (err) {
       console.error('draftOrder failed:', err);
     } finally {
@@ -447,7 +763,7 @@ const FindBest = () => {
   const unselectedRows = allRows.filter((r) => {
     if (selectedKeys.has(r.key)) return false;
     const name = `${r.provider.first_name} ${r.provider.last_name}`;
-    return matchesSearch(name) && roleFilter.has(r.skill) && matchesBudget(r.pkg?.unit_price);
+    return matchesSearch(name) && roleFilter.has(r.skill) && matchesBudget(r.pkg?.price_with_commission);
   });
 
   const handleToggleSelect = (row) => {
@@ -474,14 +790,14 @@ const FindBest = () => {
     try {
       setLoadingKey(key);
       const payload = {
-        event_category_id: filters?.category_id ?? null,
-        start_at: filters?.start_datetime ?? null,
-        end_at: filters?.end_datetime ?? null,
-        address: buildAddress(filters),
+        event_category_id: activeFilters?.category_id ?? null,
+        start_at: activeFilters?.start_datetime ?? null,
+        end_at: activeFilters?.end_datetime ?? null,
+        address: buildAddress(activeFilters),
         service_providers: [{ service_provider_id: row.provider.id, skill: row.skill }],
       };
       const response = await draftOrder(payload);
-      navigate('/requestBook', { state: { order: response?.data?.data, payload, person: row.provider, skill: row.skill, filters } });
+      navigate('/requestBook', { state: { order: response?.data?.data, payload, person: row.provider, skill: row.skill, filters: activeFilters } });
     } catch (err) {
       console.error('draftOrder failed:', err);
     } finally {
@@ -505,7 +821,7 @@ const FindBest = () => {
       state: {
         package: statePackage,
         packageId,
-        filters,
+        filters: activeFilters,
         serviceProviders,
         teamProviders: selectedProviders,
       },
@@ -525,7 +841,7 @@ const FindBest = () => {
       state: {
         package: null,
         packageId: null,
-        filters,
+        filters: activeFilters,
         serviceProviders,
         teamProviders: rows.map((r) => ({ ...r.provider, _bookedSkill: r.skill })),
       },
@@ -540,8 +856,8 @@ const FindBest = () => {
     });
   };
 
-  const days = filters?.start_datetime && filters?.end_datetime
-    ? Math.max(1, Math.round((new Date(filters.end_datetime) - new Date(filters.start_datetime)) / (1000 * 60 * 60 * 24)))
+  const days = activeFilters?.start_datetime && activeFilters?.end_datetime
+    ? Math.max(1, Math.round((new Date(activeFilters.end_datetime) - new Date(activeFilters.start_datetime)) / (1000 * 60 * 60 * 24)))
     : 1;
 
   const basePackagePrice = (statePackage?.team || []).reduce(
@@ -555,6 +871,12 @@ const FindBest = () => {
     ? selectedProviders.length + otherProviders.length
     : selectedRows.length + unselectedRows.length;
 
+  const eventTypeName =
+    categories.find((c) => String(c.id) === String(activeFilters?.category_id))?.name ||
+    activeFilters?.category_name ||
+    activeFilters?.category?.name ||
+    '—';
+
   return (
     <ViewsLayout>
       <style>{STYLES}</style>
@@ -564,17 +886,21 @@ const FindBest = () => {
         <h1 className="fb-heading">Build Your Custom Team</h1>
         <p className="fb-subheading">Handpick the best professionals for your event. You can replace or add providers to suit your needs.</p>
 
-        <EventDetailsBar filters={filters} navigate={navigate} />
-
         <div className="fb-layout">
           <Sidebar
+            eventTypeName={eventTypeName}
+            categories={categories}
+            activeFilters={activeFilters}
+            summaryForm={summaryForm} setSummaryForm={setSummaryForm}
             search={search} setSearch={setSearch}
             roleFilter={roleFilter} toggleRole={toggleRole}
             budgetRange={budgetRange} setBudgetRange={setBudgetRange}
-            availability={availability} setAvailability={setAvailability}
-            isPackageMode={isPackageMode}
-            basePackagePrice={basePackagePrice}
-            selectedTeamCost={selectedTeamCost}
+            applying={applying}
+            editingFilters={editingFilters}
+            onEditFilters={handleEditFilters}
+            onApplyFilters={handleApplyFilters}
+            onResetFilters={handleResetFilters}
+            onCancelFilters={handleCancelFilters}
           />
 
           <main className="fb-main">
@@ -754,10 +1080,10 @@ const STYLES = `
 .fb-edit-btn { margin-left: auto; display: flex; align-items: center; gap: 6px; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px 14px; font-size: 12.5px; font-weight: 600; color: #1a1a1a; cursor: pointer; }
 
 /* Layout */
-.fb-layout { display: grid; grid-template-columns: 280px 1fr; gap: 24px; align-items: start; }
+.fb-layout { display: grid; grid-template-columns: 320px 1fr; gap: 24px; align-items: start; }
 .fb-sidebar { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 20px; }
-.fb-sidebar-card { background: #fff; border: 1px solid #f0f0f0; border-radius: 14px; padding: 18px; }
-.fb-sidebar-title { display: block; font-size: 13px; font-weight: 700; color: #1a1a1a; margin-bottom: 10px; }
+.fb-sidebar-card { background: #fff; border: 1px solid #f0f0f0; border-radius: 14px; padding: 18px; max-height: calc(100vh - 40px); overflow-y: auto; }
+.fb-sidebar-title { display: block; font-size: 12px; font-weight: 600; color: #666; margin-bottom: 6px; }
 .fb-search-box { display: flex; align-items: center; gap: 8px; border: 1px solid #e5e7eb; border-radius: 10px; padding: 9px 12px; }
 .fb-search-box input { border: none; outline: none; font-size: 13px; flex: 1; background: transparent; }
 
@@ -774,6 +1100,39 @@ const STYLES = `
 .fb-pill-row { display: flex; flex-wrap: wrap; gap: 8px; }
 .fb-pill { border: 1px solid #e2e2e2; background: #fff; border-radius: 20px; padding: 6px 13px; font-size: 12px; font-weight: 500; color: #444; cursor: pointer; }
 .fb-pill--active { background: #fff7ea; border-color: #ff9c2b; color: #ff9c2b; font-weight: 700; }
+
+/* Edit-mode inputs */
+.fb-edit-input {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid #e2e2e2;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-family: inherit;
+  background: #fff;
+  color: #1a1a1a;
+}
+.fb-edit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* Filter summary (view mode) */
+.fb-filter-summary-item { display: flex; flex-direction: column; gap: 2px; padding: 8px 0; border-bottom: 1px solid #f5f5f5; }
+.fb-filter-summary-item:last-of-type { border-bottom: none; }
+.fb-filter-summary-label { font-size: 11px; color: #999; }
+.fb-filter-summary-value { font-size: 13px; font-weight: 600; color: #1a1a1a; word-break: break-word; }
+.fb-edit-filters-btn {
+  width: 100%;
+  margin-top: 10px;
+  background: #fff;
+  color: #ff9c2b;
+  border: 1.5px solid #ff9c2b;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.fb-edit-filters-btn:hover { background: #fff7ea; }
 
 .fb-summary-card { background: #fffaf2; border-color: #fde8c8; }
 .fb-summary-header { display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 700; color: #1a1a1a; margin-bottom: 12px; }
@@ -850,10 +1209,12 @@ const STYLES = `
 @media (max-width: 980px) {
   .fb-layout { grid-template-columns: 1fr; }
   .fb-sidebar { position: static; }
+  .fb-sidebar-card { max-height: none; }
 }
 @media (max-width: 600px) {
   .fb-event-bar { flex-direction: column; align-items: flex-start; }
   .fb-edit-btn { margin-left: 0; }
+  .fb-edit-grid { grid-template-columns: 1fr; }
 }
 `;
 

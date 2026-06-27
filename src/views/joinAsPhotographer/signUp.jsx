@@ -229,6 +229,9 @@ export const AddressAutocomplete = ({ label, hint, value, onAddressSelect, error
   const debounceRef = useRef(null);
   const containerRef = useRef(null);
 
+  const lastSelectedAddress = useRef(value);
+  const isTyping = useRef(false);
+
   // Close on outside click
   useEffect(() => {
     const handler = (e) => {
@@ -238,12 +241,26 @@ export const AddressAutocomplete = ({ label, hint, value, onAddressSelect, error
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  // Sync postal_code display when address is set externally
+  // Sync postal_code and address display when address is set externally
   useEffect(() => {
-    if (value?.postal_code !== undefined) {
-      setPostalCode(value.postal_code);
+    if (isTyping.current) {
+      if (value === null) {
+        isTyping.current = false;
+        lastSelectedAddress.current = null;
+        return;
+      }
     }
-  }, [value?.postal_code]);
+    lastSelectedAddress.current = value;
+    if (value) {
+      setInputValue(value.address_line1 || value.city || '');
+      if (value.postal_code !== undefined) {
+        setPostalCode(value.postal_code);
+      }
+    } else {
+      setInputValue('');
+      setPostalCode('');
+    }
+  }, [value]);
 
   const fetchSuggestions = useCallback(async (query) => {
     if (!query || query.length < 2) { setSuggestions([]); setOpen(false); return; }
@@ -269,6 +286,7 @@ export const AddressAutocomplete = ({ label, hint, value, onAddressSelect, error
 
   const handleInputChange = (e) => {
     const val = e.target.value;
+    isTyping.current = true;
     setInputValue(val);
     // Clear selected address when user types again
     onAddressSelect(null);

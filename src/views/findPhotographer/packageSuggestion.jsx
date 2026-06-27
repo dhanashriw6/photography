@@ -4,6 +4,8 @@ import ViewsLayout from '../Layout';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getServiceProviders, getPackage } from '../../services/booking';
 import { createPortal } from 'react-dom';
+import { getCategory } from '../../services/common';
+import { AddressAutocomplete } from '../joinAsPhotographer/signUp';
 
 const encodeFilters = (filters) => {
   try {
@@ -21,6 +23,26 @@ const formatDate = (iso) => {
   if (isNaN(d.getTime())) return '—';
   return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 };
+
+const replaceDatePart = (originalIso, newDateStr) => {
+  if (!originalIso || !newDateStr) return originalIso;
+  const orig = new Date(originalIso);
+  const [y, m, d] = newDateStr.split('-').map(Number);
+  const replaced = new Date(orig);
+  replaced.setFullYear(y, m - 1, d);
+  return replaced.toISOString();
+};
+
+const getPackageTotal = (pkg) =>
+  (pkg.team || []).reduce(
+    (sum, t) =>
+      sum + (t.providers || []).reduce((ps, p) => ps + (p.price_with_commission || 0), 0),
+    0
+  );
+
+const getPackageDurationDays = (pkg) =>
+  pkg.time_unit?.toLowerCase().includes('day') ? pkg.time_required : null;
+
 
 const initials = (f, l) => ((f?.[0] || '') + (l?.[0] || '')).toUpperCase();
 
@@ -59,11 +81,7 @@ const PackageCard = ({ pkg, index, onBookInstantly, onCustomizeTeam }) => {
     .filter((t) => t.skill?.toLowerCase() === 'cinematographer')
     .reduce((sum, t) => sum + (t.providers?.length || 0), 0);
 
-  const total = (pkg.team || []).reduce(
-    (sum, t) =>
-      sum + (t.providers || []).reduce((ps, p) => ps + (p.price_with_commission || 0), 0),
-    0
-  );
+  const total = getPackageTotal(pkg);
   const nextImage = () => {
     setSelectedImage((prev) =>
       prev === images.length - 1 ? 0 : prev + 1
@@ -230,116 +248,304 @@ const PackageCard = ({ pkg, index, onBookInstantly, onCustomizeTeam }) => {
         </div>
       </div>
       {showGallery &&
-  createPortal(
-    <div
-      className="gallery-modal"
-      onClick={() => setShowGallery(false)}
-    >
-      <div
-        className="gallery-modal-content"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          className="gallery-close"
-          onClick={() => setShowGallery(false)}
-        >
-          ✕
-        </button>
+        createPortal(
+          <div
+            className="gallery-modal"
+            onClick={() => setShowGallery(false)}
+          >
+            <div
+              className="gallery-modal-content"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                className="gallery-close"
+                onClick={() => setShowGallery(false)}
+              >
+                ✕
+              </button>
 
-        <button
-          className="gallery-arrow gallery-arrow-left"
-          onClick={prevImage}
-        >
-          ❮
-        </button>
+              <button
+                className="gallery-arrow gallery-arrow-left"
+                onClick={prevImage}
+              >
+                ❮
+              </button>
 
-        <img
-          src={images[selectedImage]?.url}
-          alt=""
-          className="gallery-full-image"
-        />
+              <img
+                src={images[selectedImage]?.url}
+                alt=""
+                className="gallery-full-image"
+              />
 
-        <button
-          className="gallery-arrow gallery-arrow-right"
-          onClick={nextImage}
-        >
-          ❯
-        </button>
-      </div>
-    </div>,
-    document.body
-  )}
+              <button
+                className="gallery-arrow gallery-arrow-right"
+                onClick={nextImage}
+              >
+                ❯
+              </button>
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 };
 
-/* ─── Main Component ─────────────────────────────────────────────── */
 const packageSuggestion = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
   const initialPackages = location.state?.packages || [];
-  const filters = location.state?.filters;
+  const initialFilters = location.state?.filters || {};
 
   const [packages, setPackages] = useState(initialPackages);
-  const [budgetRange, setBudgetRange] = useState([5000, 50000]);
-  const [duration, setDuration] = useState(null);
+  const [activeFilters, setActiveFilters] = useState(initialFilters);
+  const [categories, setCategories] = useState([]);
+  const [editingSummary, setEditingSummary] = useState(false);
   const [applying, setApplying] = useState(false);
 
+  // Reconstruct address from filters
+  const getInitialAddress = (filters) => {
+    if (!filters || !filters.place_id) return null;
+    return {
+      lat: filters.lat,
+      lng: filters.lng,
+      place_id: filters.place_id,
+      address_line1: filters.address_line1 || '',
+      address_line2: filters.address_line2 || '',
+      address_line3: filters.address_line3 || '',
+      city: filters.city || '',
+      state: filters.state || '',
+      state_code: filters.state_code || '',
+      country: filters.country || '',
+      country_code: filters.country_code || '',
+      postal_code: filters.postal_code || '',
+      timezone: filters.timezone || '',
+    };
+  };
+
+  // Helper to extract time (HH:MM) from ISO string
+  const getTimeFromIso = (isoString) => {
+    if (!isoString) return '';
+    try {
+      const date = new Date(isoString);
+      if (isNaN(date.getTime())) return '';
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${hours}:${minutes}`;
+    } catch {
+      return '';
+    }
+  };
+
+  const initialAddress = getInitialAddress(initialFilters);
+  const [summaryForm, setSummaryForm] = useState({
+    categoryId: initialFilters.category_id || '',
+    startDate: initialFilters.start_datetime
+      ? initialFilters.start_datetime.split('T')[0]
+      : (initialFilters.date || ''),
+    endDate: initialFilters.end_datetime
+      ? initialFilters.end_datetime.split('T')[0]
+      : '',
+    startTime: getTimeFromIso(initialFilters.start_datetime),
+    endTime: getTimeFromIso(initialFilters.end_datetime),
+    address: initialAddress,
+  });
+
+  const [budgetRange, setBudgetRange] = useState([
+    initialFilters.budget_min || 5000,
+    initialFilters.budget_max || 50000,
+  ]);
+  const [duration, setDuration] = useState(initialFilters.duration || null);
+
+  // Helper to format times nicely for display
+  const formatTime = (timeStr) => {
+    if (!timeStr) return '—';
+    const [h, m] = timeStr.split(':');
+    if (!h || !m) return timeStr;
+    const hrs = parseInt(h, 10);
+    const ampm = hrs >= 12 ? 'PM' : 'AM';
+    const displayHrs = hrs % 12 || 12;
+    return `${displayHrs}:${m} ${ampm}`;
+  };
+
+  const buildDateTime = (date, time) => {
+    if (!date || !time) {
+      return null;
+    }
+    const dateTime = new Date(`${date}T${time}:00`);
+    if (isNaN(dateTime.getTime())) {
+      console.error("Invalid date/time:", date, time);
+      return null;
+    }
+    return dateTime.toISOString();
+  };
+
+  const matchesBudget = (pkg) => {
+    const total = getPackageTotal(pkg);
+    const max = budgetRange[1] >= 50000 ? Infinity : budgetRange[1];
+    return total >= budgetRange[0] && total <= max;
+  };
+
+  const matchesDuration = (pkg) => {
+    if (!duration) return true;
+    const days = getPackageDurationDays(pkg);
+    if (days == null) return true;
+    if (duration === '4+ Days') return days >= 4;
+    return days === parseInt(duration, 10);
+  };
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const res = await getCategory();
+        setCategories(res?.data?.data?.event_categories || []);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    loadCategories();
+  }, []);
 
   const handleApplyFilters = async () => {
     setApplying(true);
     try {
-      // NOTE: budget/duration are UI-only for now — getPackage currently
-      // only accepts the same params used on the "Tell Us" step
-      // (category_id, lat/lng, dates, etc). Wire budget_min/budget_max
-      // and duration into params once the backend supports them.
-      const response = await getPackage({ ...filters });
-      setPackages(response?.data?.data || []);
+      const newStartDatetime = buildDateTime(summaryForm.startDate, summaryForm.startTime);
+      const newEndDatetime = buildDateTime(summaryForm.endDate, summaryForm.endTime);
+
+      const params = {
+        ...activeFilters,
+        category_id: summaryForm.categoryId,
+        date: summaryForm.startDate,
+        start_datetime: newStartDatetime,
+        end_datetime: newEndDatetime,
+        ...(summaryForm.address
+          ? {
+              lat: summaryForm.address.lat,
+              lng: summaryForm.address.lng,
+              place_id: summaryForm.address.place_id,
+              address_line1: summaryForm.address.address_line1,
+              address_line2: summaryForm.address.address_line2,
+              address_line3: summaryForm.address.address_line3,
+              city: summaryForm.address.city,
+              state: summaryForm.address.state,
+              state_code: summaryForm.address.state_code,
+              country: summaryForm.address.country,
+              country_code: summaryForm.address.country_code,
+              postal_code: summaryForm.address.postal_code,
+              timezone: summaryForm.address.timezone,
+            }
+          : {
+              lat: undefined,
+              lng: undefined,
+              place_id: undefined,
+              address_line1: undefined,
+              address_line2: undefined,
+              address_line3: undefined,
+              city: undefined,
+              state: undefined,
+              state_code: undefined,
+              country: undefined,
+              country_code: undefined,
+              postal_code: undefined,
+              timezone: undefined,
+            }),
+        budget_min: budgetRange[0],
+        budget_max: budgetRange[1] >= 50000 ? undefined : budgetRange[1],
+        duration: duration || undefined,
+      };
+
+      const response = await getPackage(params);
+      let result = response?.data?.data || [];
+
+      result = result.filter((pkg) => {
+        const total = getPackageTotal(pkg);
+        const maxBudget = budgetRange[1] >= 50000 ? Infinity : budgetRange[1];
+        const matchesB = total >= budgetRange[0] && total <= maxBudget;
+
+        let matchesD = true;
+        if (duration) {
+          const days = getPackageDurationDays(pkg);
+          if (days != null) {
+            if (duration === '4+ Days') {
+              matchesD = days >= 4;
+            } else {
+              matchesD = days === parseInt(duration, 10);
+            }
+          }
+        }
+        return matchesB && matchesD;
+      });
+
+      setPackages(result);
+      setActiveFilters(params);
     } catch (err) {
       console.error(err);
     } finally {
       setApplying(false);
+      setEditingSummary(false);
     }
+  };
+
+  const handleCancelEdit = () => {
+    setSummaryForm({
+      categoryId: activeFilters?.category_id || '',
+      startDate: activeFilters?.start_datetime
+        ? activeFilters.start_datetime.split('T')[0]
+        : (activeFilters?.date || ''),
+      endDate: activeFilters?.end_datetime
+        ? activeFilters.end_datetime.split('T')[0]
+        : '',
+      startTime: getTimeFromIso(activeFilters?.start_datetime),
+      endTime: getTimeFromIso(activeFilters?.end_datetime),
+      address: getInitialAddress(activeFilters),
+    });
+    setBudgetRange([
+      activeFilters?.budget_min || 5000,
+      activeFilters?.budget_max || 50000,
+    ]);
+    setDuration(activeFilters?.duration || null);
+    setEditingSummary(false);
   };
 
   const handleClearAll = () => {
     setBudgetRange([5000, 50000]);
     setDuration(null);
+    const origAddress = getInitialAddress(location.state?.filters);
+    setSummaryForm({
+      categoryId: location.state?.filters?.category_id || '',
+      startDate: location.state?.filters?.start_datetime
+        ? location.state.filters.start_datetime.split('T')[0]
+        : (location.state?.filters?.date || ''),
+      endDate: location.state?.filters?.end_datetime
+        ? location.state.filters.end_datetime.split('T')[0]
+        : '',
+      startTime: getTimeFromIso(location.state?.filters?.start_datetime),
+      endTime: getTimeFromIso(location.state?.filters?.end_datetime),
+      address: origAddress,
+    });
+    setEditingSummary(false);
     setPackages(initialPackages);
+    setActiveFilters(location.state?.filters || {});
   };
 
   const handleBookInstantly = (pkg) => {
-    const params = new URLSearchParams({
-      f: encodeFilters(filters),
-      pkgId: pkg.id,
-    });
-    navigate(`/select-package?${params.toString()}`, {
-      state: { package: pkg, filters },
-    });
+    const params = new URLSearchParams({ f: encodeFilters(activeFilters), pkgId: pkg.id });
+    navigate(`/select-package?${params.toString()}`, { state: { package: pkg, filters: activeFilters } });
   };
 
   const handleCustomizeTeam = async (pkg) => {
     try {
       const response = await getServiceProviders({
-        category_id: filters?.category_id,
-        lat: filters?.lat,
-        lng: filters?.lng,
-        start_datetime: filters?.start_datetime,
-        end_datetime: filters?.end_datetime,
+        category_id: activeFilters?.category_id,
+        lat: activeFilters?.lat,
+        lng: activeFilters?.lng,
+        start_datetime: activeFilters?.start_datetime,
+        end_datetime: activeFilters?.end_datetime,
       });
-      const params = new URLSearchParams({
-        f: encodeFilters(filters),
-        pkgId: pkg.id,
-        mode: 'customize',
-      });
+      const params = new URLSearchParams({ f: encodeFilters(activeFilters), pkgId: pkg.id, mode: 'customize' });
       navigate(`/find-best?${params.toString()}`, {
-        state: {
-          providers: response?.data?.data,
-          filters,
-          package: pkg,
-          mode: 'customize',
-        },
+        state: { providers: response?.data?.data, filters: activeFilters, package: pkg, mode: 'customize' },
       });
     } catch (err) {
       console.error(err);
@@ -349,16 +555,14 @@ const packageSuggestion = () => {
   const handleSkip = async () => {
     try {
       const response = await getServiceProviders({
-        category_id: filters?.category_id,
-        lat: filters?.lat,
-        lng: filters?.lng,
-        start_datetime: filters?.start_datetime,
-        end_datetime: filters?.end_datetime,
+        category_id: activeFilters?.category_id,
+        lat: activeFilters?.lat,
+        lng: activeFilters?.lng,
+        start_datetime: activeFilters?.start_datetime,
+        end_datetime: activeFilters?.end_datetime,
       });
-      const params = new URLSearchParams({ f: encodeFilters(filters) });
-      navigate(`/find-best?${params.toString()}`, {
-        state: { providers: response?.data?.data, filters },
-      });
+      const params = new URLSearchParams({ f: encodeFilters(activeFilters) });
+      navigate(`/find-best?${params.toString()}`, { state: { providers: response?.data?.data, filters: activeFilters } });
     } catch (err) {
       console.error(err);
     }
@@ -375,99 +579,212 @@ const packageSuggestion = () => {
           {/* ── Left sidebar ── */}
           <aside className="pkg-sidebar-h">
             <div className="pkg-sidebar-card-h">
-              <div className="pkg-sidebar-header-h">
-                <span>Your Event Summary</span>
-                <button className="pkg-edit-btn-h" onClick={() => navigate(-1)}>
-                  ✎ Edit
-                </button>
+              <div className="pkg-sidebar-header-h" style={{ borderBottom: '1px solid #f0f0f0', paddingBottom: '12px', marginBottom: '16px' }}>
+                <span style={{ fontSize: '15px', fontWeight: 800 }}>Filters</span>
+                {!editingSummary ? (
+                  <button
+                    className="pkg-edit-btn-h"
+                    onClick={() => setEditingSummary(true)}
+                    style={{ color: '#ff9c2b', display: 'flex', alignItems: 'center', gap: '4px' }}
+                  >
+                    ✏️ Edit
+                  </button>
+                ) : (
+                  <button
+                    className="pkg-clear-btn-h"
+                    onClick={handleClearAll}
+                    style={{ color: '#888' }}
+                  >
+                    Reset All
+                  </button>
+                )}
               </div>
 
-              <div className="pkg-summary-item-h">
-                <span className="pkg-summary-label-h">Event Type</span>
-                <span className="pkg-summary-value-h">{eventTypeName}</span>
-              </div>
-              <div className="pkg-summary-item-h">
-                <span className="pkg-summary-label-h">Date</span>
-                <span className="pkg-summary-value-h">{formatDate(filters?.start_datetime)}</span>
-              </div>
-              <div className="pkg-summary-item-h">
-                <span className="pkg-summary-label-h">Location</span>
-                <span className="pkg-summary-value-h">
-                  {filters?.city || filters?.state || '—'}
-                </span>
-              </div>
-              <div className="pkg-summary-item-h">
-                <span className="pkg-summary-label-h">Duration</span>
-                <span className="pkg-summary-value-h">
-                  {filters?.start_datetime && filters?.end_datetime
-                    ? `${Math.max(
-                      1,
-                      Math.round(
-                        (new Date(filters.end_datetime) - new Date(filters.start_datetime)) /
-                        (1000 * 60 * 60 * 24)
-                      )
-                    )} Days`
-                    : '—'}
-                </span>
-              </div>
+              {!editingSummary ? (
+                // View Mode
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div className="pkg-summary-item-h">
+                    <span className="pkg-summary-label-h">Event Type</span>
+                    <span className="pkg-summary-value-h">{eventTypeName}</span>
+                  </div>
+                  <div className="pkg-summary-item-h">
+                    <span className="pkg-summary-label-h">Start Date & Time</span>
+                    <span className="pkg-summary-value-h">
+                      {formatDate(activeFilters?.start_datetime)} at {formatTime(getTimeFromIso(activeFilters?.start_datetime))}
+                    </span>
+                  </div>
+                  <div className="pkg-summary-item-h">
+                    <span className="pkg-summary-label-h">End Date & Time</span>
+                    <span className="pkg-summary-value-h">
+                      {formatDate(activeFilters?.end_datetime)} at {formatTime(getTimeFromIso(activeFilters?.end_datetime))}
+                    </span>
+                  </div>
+                  <div className="pkg-summary-item-h">
+                    <span className="pkg-summary-label-h">Location</span>
+                    <span className="pkg-summary-value-h text-ellipsis" style={{ maxWidth: '280px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={activeFilters?.address_line1 || activeFilters?.city || activeFilters?.state || '—'}>
+                      {activeFilters?.city || activeFilters?.state || activeFilters?.address_line1 || '—'}
+                    </span>
+                  </div>
+                  <div className="pkg-summary-item-h">
+                    <span className="pkg-summary-label-h">Budget Range</span>
+                    <span className="pkg-summary-value-h">
+                      ₹{budgetRange[0].toLocaleString('en-IN')} – ₹{budgetRange[1].toLocaleString('en-IN')}+
+                    </span>
+                  </div>
+                  <div className="pkg-summary-item-h">
+                    <span className="pkg-summary-label-h">Duration Filter</span>
+                    <span className="pkg-summary-value-h">
+                      {duration || 'Any Duration'}
+                    </span>
+                  </div>
 
-              <div className="pkg-info-banner-h">
-                ✨ These packages are suggested by our admin team based on your event details and
-                requirements.
-              </div>
-            </div>
-
-            <div className="pkg-sidebar-card-h">
-              <div className="pkg-sidebar-header-h">
-                <span>Refine Your Preferences</span>
-                <button className="pkg-clear-btn-h" onClick={handleClearAll}>
-                  Clear all
-                </button>
-              </div>
-
-              <div className="pkg-filter-group-h">
-                <span className="pkg-filter-label-h">Budget Range</span>
-                <input
-                  type="range"
-                  min={5000}
-                  max={50000}
-                  step={1000}
-                  value={budgetRange[1]}
-                  onChange={(e) => setBudgetRange([budgetRange[0], Number(e.target.value)])}
-                  className="pkg-range-h"
-                />
-                <div className="pkg-range-labels-h">
-                  <span>₹5,000</span>
-                  <span>₹50,000+</span>
+                  <button
+                    className="su-btn-primary-outline"
+                    onClick={() => setEditingSummary(true)}
+                    style={{ width: '100%', marginTop: '10px' }}
+                  >
+                    ✏️ Edit Filters
+                  </button>
                 </div>
-                <div className="pkg-range-selected-h">
-                  Selected: ₹{budgetRange[0].toLocaleString('en-IN')} – ₹
-                  {budgetRange[1].toLocaleString('en-IN')}+
-                </div>
-              </div>
-
-              <div className="pkg-filter-group-h">
-                <span className="pkg-filter-label-h">Duration</span>
-                <div className="pkg-pill-row-h">
-                  {['1 Day', '2 Days', '3 Days', '4+ Days'].map((label) => (
-                    <button
-                      key={label}
-                      className={`pkg-pill-h ${duration === label ? 'pkg-pill-h--active' : ''}`}
-                      onClick={() => setDuration(label)}
+              ) : (
+                // Edit Mode
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {/* Event Type */}
+                  <div className="su-field">
+                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#666' }}>Event Type</label>
+                    <select
+                      className="pkg-summary-edit-input-h"
+                      value={summaryForm.categoryId}
+                      onChange={(e) => setSummaryForm((f) => ({ ...f, categoryId: e.target.value }))}
+                      style={{ marginTop: '4px' }}
                     >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
+                      <option value="">Select Event</option>
+                      {categories.map((cat) => (
+                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                      ))}
+                    </select>
+                  </div>
 
-              <button
-                className="su-btn-primary pkg-apply-btn-h"
-                onClick={handleApplyFilters}
-                disabled={applying}
-              >
-                ⚙ {applying ? 'Applying…' : 'Apply Filters'}
-              </button>
+                  {/* Dates Grid */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <div className="su-field">
+                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#666' }}>Start Date</label>
+                      <input
+                        type="date"
+                        className="pkg-summary-edit-input-h"
+                        value={summaryForm.startDate}
+                        min={new Date().toISOString().split('T')[0]}
+                        onChange={(e) => setSummaryForm((f) => ({ ...f, startDate: e.target.value }))}
+                        style={{ marginTop: '4px' }}
+                      />
+                    </div>
+                    <div className="su-field">
+                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#666' }}>End Date</label>
+                      <input
+                        type="date"
+                        className="pkg-summary-edit-input-h"
+                        value={summaryForm.endDate}
+                        min={summaryForm.startDate || new Date().toISOString().split('T')[0]}
+                        onChange={(e) => setSummaryForm((f) => ({ ...f, endDate: e.target.value }))}
+                        style={{ marginTop: '4px' }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Times Grid */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <div className="su-field">
+                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#666' }}>Start Time</label>
+                      <input
+                        type="time"
+                        className="pkg-summary-edit-input-h"
+                        value={summaryForm.startTime}
+                        onChange={(e) => setSummaryForm((f) => ({ ...f, startTime: e.target.value }))}
+                        style={{ marginTop: '4px' }}
+                      />
+                    </div>
+                    <div className="su-field">
+                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#666' }}>End Time</label>
+                      <input
+                        type="time"
+                        className="pkg-summary-edit-input-h"
+                        value={summaryForm.endTime}
+                        onChange={(e) => setSummaryForm((f) => ({ ...f, endTime: e.target.value }))}
+                        style={{ marginTop: '4px' }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Location */}
+                  <div className="su-field">
+                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#666' }}>Event Location</label>
+                    <div style={{ marginTop: '4px' }}>
+                      <AddressAutocomplete
+                        label="Event Location"
+                        value={summaryForm.address}
+                        onAddressSelect={(val) => setSummaryForm((f) => ({ ...f, address: val }))}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Budget */}
+                  <div className="pkg-filter-group-h" style={{ marginBottom: 0, marginTop: '8px' }}>
+                    <span className="pkg-filter-label-h" style={{ fontSize: '12px', fontWeight: 600, color: '#666', marginBottom: '6px' }}>Budget Range</span>
+                    <input
+                      type="range"
+                      min={5000}
+                      max={50000}
+                      step={1000}
+                      value={budgetRange[1]}
+                      onChange={(e) => setBudgetRange([budgetRange[0], Number(e.target.value)])}
+                      className="pkg-range-h"
+                    />
+                    <div className="pkg-range-labels-h">
+                      <span>₹5,000</span>
+                      <span>₹50,000+</span>
+                    </div>
+                    <div className="pkg-range-selected-h" style={{ fontSize: '11px', color: '#777', marginTop: '4px' }}>
+                      ₹{budgetRange[0].toLocaleString('en-IN')} – ₹{budgetRange[1].toLocaleString('en-IN')}+
+                    </div>
+                  </div>
+
+                  {/* Duration */}
+                  <div className="pkg-filter-group-h" style={{ marginBottom: 0 }}>
+                    <span className="pkg-filter-label-h" style={{ fontSize: '12px', fontWeight: 600, color: '#666', marginBottom: '6px' }}>Duration</span>
+                    <div className="pkg-pill-row-h">
+                      {['1 Day', '2 Days', '3 Days', '4+ Days'].map((label) => (
+                        <button
+                          key={label}
+                          className={`pkg-pill-h ${duration === label ? 'pkg-pill-h--active' : ''}`}
+                          onClick={() => setDuration(label)}
+                          style={{ padding: '5px 10px', fontSize: '11px' }}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                    <button
+                      className="su-btn-primary pkg-apply-btn-h"
+                      onClick={handleApplyFilters}
+                      disabled={applying}
+                      style={{ flex: 1, margin: 0, padding: '10px' }}
+                    >
+                      {applying ? 'Applying…' : 'Apply'}
+                    </button>
+                    <button
+                      className="su-btn-primary-outline"
+                      onClick={handleCancelEdit}
+                      style={{ flex: 1, padding: '10px' }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </aside>
 
@@ -507,10 +824,10 @@ const packageSuggestion = () => {
         <div className="pkg-bottom-bar-h">
           <div className="pkg-bottom-section-h">
             <span className="pkg-bottom-label-h">Your Selection</span>
-            <span className="pkg-bottom-value-h">
-              {eventTypeName} · {formatDate(filters?.start_datetime)} ·{' '}
-              {filters?.city || filters?.state || '—'}
-            </span>
+          <span className="pkg-bottom-value-h">
+  {eventTypeName} · {formatDate(activeFilters?.start_datetime)} ·{' '}
+  {activeFilters?.city || activeFilters?.state || '—'}
+</span>
           </div>
           <div className="pkg-bottom-section-h">
             <span className="pkg-bottom-label-h">Budget Range</span>
@@ -617,7 +934,7 @@ const STYLES = `
 
 .pkg-layout-h {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: 340px 1fr;
   gap: 24px;
   align-items: start;
   padding: 20px 24px;
@@ -819,6 +1136,15 @@ const STYLES = `
   background: #f5f5f5;
   border-radius: 10px;
   overflow: hidden;
+}
+  .pkg-summary-edit-input-h {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #e2e2e2;
+  border-radius: 8px;
+  font-size: 12.5px;
+  margin-top: 4px;
+  font-family: inherit;
 }
 .pkg-gallery-thumb img {
   width: 100%;
