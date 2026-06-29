@@ -10,6 +10,7 @@ import {
     FiEdit3,
     FiArrowRight,
 } from 'react-icons/fi';
+import Select from "react-select";
 
 const DISPUTE_TYPES = [
     'Poor Image Quality',
@@ -100,7 +101,10 @@ const UserDispute = () => {
     };
 
     const removeFile = (i) => setFiles(prev => prev.filter((_, idx) => idx !== i));
-
+const disputeOptions = DISPUTE_TYPES.map((t) => ({
+  value: t.toLowerCase(),
+  label: t,
+}));
     const handleSubmit = () => {
         setError('');
         if (!form.bookingId.trim()) return setError('Booking ID is required.');
@@ -116,12 +120,12 @@ const UserDispute = () => {
 
     return (
 
-        <div style={{ width: '100%',  margin: '0 auto', padding: '0 20px 60px' }}>
+        <div style={{ width: '100%', margin: '0 auto', padding: '0 20px 60px' }}>
 
             {/* Header */}
             <div style={{ marginBottom: '36px', marginTop: "10px" }}>
-               
-            <h2 style={{ margin: '0 0 6px', fontSize: '28px', fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.02em' }}>
+
+                <h2 style={{ margin: '0 0 6px', fontSize: '28px', fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.02em' }}>
                     Dispute Your Order
                 </h2>
                 <p style={{ margin: 0, fontSize: '14.5px', color: '#888' }}>
@@ -139,7 +143,7 @@ const UserDispute = () => {
                 </div>
             ) : (
                 <div
-                  
+
                 >
                     {/* Booking ID */}
                     <FieldRow icon={<FiClipboard size={19} />} label="Booking ID" description="Enter your booking reference ID.">
@@ -168,20 +172,52 @@ const UserDispute = () => {
                     </FieldRow>
 
                     {/* Dispute Type */}
-                    <FieldRow icon={<FiList size={19} />} label="Dispute Type" description="Select the reason for your dispute.">
-                        <select
-                            value={form.disputeType}
-                            onChange={set('disputeType')}
-                            onFocus={onFocus}
-                            onBlur={onBlur}
-                            style={{ ...inputStyle, cursor: 'pointer', color: form.disputeType ? '#1a1a1a' : '#9ca3af' }}
-                        >
-                            <option value="" disabled>Select dispute type</option>
-                            {DISPUTE_TYPES.map(t => (
-                                <option key={t} value={t.toLowerCase()} style={{ color: '#1a1a1a' }}>{t}</option>
-                            ))}
-                        </select>
-                    </FieldRow>
+               <FieldRow
+  icon={<FiList size={19} />}
+  label="Dispute Type"
+  description="Select the reason for your dispute."
+>
+  <Select
+    options={disputeOptions}
+    value={
+      disputeOptions.find(
+        (option) => option.value === form.disputeType
+      ) || null
+    }
+    onChange={(selected) =>
+      setForm((prev) => ({
+        ...prev,
+        disputeType: selected?.value || "",
+      }))
+    }
+    onFocus={onFocus}
+    onBlur={onBlur}
+    placeholder="Select dispute type"
+    isSearchable
+    menuPortalTarget={document.body}
+    menuPosition="fixed"
+    styles={{
+      control: (base, state) => ({
+        ...base,
+        minHeight: "48px",
+        borderRadius: "10px",
+        borderColor: state.isFocused ? "#f59e0b" : "#d1d5db",
+        boxShadow: "none",
+        "&:hover": {
+          borderColor: "#f59e0b",
+        },
+      }),
+      menuPortal: (base) => ({
+        ...base,
+        zIndex: 9999,
+      }),
+      menu: (base) => ({
+        ...base,
+        zIndex: 9999,
+      }),
+    }}
+  />
+</FieldRow>
 
                     {/* Description */}
                     <FieldRow icon={<FiEdit3 size={19} />} label="Description of Dispute" description="Provide details about the issue.">

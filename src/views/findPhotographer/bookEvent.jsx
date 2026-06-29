@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { getCategory } from '../../services/common';
 import { AddressAutocomplete } from '../joinAsPhotographer/signUp';
 import { getPackage } from '../../services/booking';
+import Select from "react-select";
+
 import {
     FiShield,
     FiCalendar,
@@ -199,22 +201,44 @@ const BookEvent = () => {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
                         {/* Select Your Event */}
-                        <div className="su-field">
-                            <label>Select Your Event</label>
-                            <select
-                                value={form.categoryId}
-                                onChange={(e) => handleChange("categoryId", e.target.value)}
-                                style={errorBorderStyle('categoryId')}
-                            >
-                                <option value="">Select Event</option>
-                                {categories.map((cat) => (
-                                    <option key={cat.id} value={cat.id}>
-                                        {cat.name}
-                                    </option>
-                                ))}
-                            </select>
-                            {errors.categoryId && <span style={errorTextStyle}>{errors.categoryId}</span>}
-                        </div>
+                          <div className="su-field">
+                                     <label>Select Your Event</label>
+                     
+                                     <Select
+                                       options={categories.map((cat) => ({
+                                         value: cat.id,
+                                         label: cat.name,
+                                       }))}
+                                       value={
+                                         categories
+                                           .map((cat) => ({
+                                             value: cat.id,
+                                             label: cat.name,
+                                           }))
+                                           .find((option) => option.value === form.categoryId) || null
+                                       }
+                                       onChange={(selected) =>
+                                         handleChange("categoryId", selected?.value || "")
+                                       }
+                                       placeholder="Search or select an event"
+                                       isSearchable
+                                       menuPortalTarget={document.body}
+                                       menuPosition="fixed"
+                                       styles={{
+                                         control: (base) => ({
+                                           ...base,
+                                           minHeight: "48px",
+                                           borderColor: errors.categoryId ? "#ef4444" : "#ddd",
+                                         }),
+                                      
+                                       
+                                       }}
+                                     />
+                     
+                                     {errors.categoryId && (
+                                       <span style={errorTextStyle}>{errors.categoryId}</span>
+                                     )}
+                                   </div>
 
                         {/* Start / End Date */}
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '20px' }}>

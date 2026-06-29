@@ -719,7 +719,7 @@ const UserProfileInfo = ({ onSave, onCancel }) => {
             </div>
 
             {/* ── Permanent Address ── */}
-            <h2 style={{ margin: '40px 0 8px', fontSize: '22px', fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.01em' }}>
+            {/* <h2 style={{ margin: '40px 0 8px', fontSize: '22px', fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.01em' }}>
                 Permanent Address
             </h2>
             <p style={{ margin: '0 0 20px', fontSize: '12px', color: '#aaa' }}>Search and select to auto-fill, or update the pincode manually.</p>
@@ -743,7 +743,7 @@ const UserProfileInfo = ({ onSave, onCancel }) => {
                     <label>Country / Region</label>
                     <input type="text" value={permanentAddress.country} onChange={e => setPermanentAddress(p => ({ ...p, country: e.target.value }))} placeholder="Country" />
                 </div>
-            </div>
+            </div> */}
 
             {/* ── Single Save button ── */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '40px' }}>

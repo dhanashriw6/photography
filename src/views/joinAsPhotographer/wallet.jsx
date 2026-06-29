@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { getWalletBalance } from '../../services/wallet';
 
 const BANKS = [
     'State Bank of India', 'HDFC Bank', 'ICICI Bank', 'Axis Bank',
@@ -76,6 +77,20 @@ const CashWithdrawal = ({ balance = 1234.50, onWithdraw }) => {
 
     const totalPages = Math.ceil(filtered.length / 6) || 1;
 
+    const [walletBalance, setWalletBalance] = useState(0);
+
+    useEffect(() => {
+        const fetchWalletBalance = async () => {
+            try {
+                const res = await getWalletBalance();
+                setWalletBalance(res.data.data);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        fetchWalletBalance();
+    }, []);
+
     return (
         <div style={{ fontFamily: "'Inter', 'Segoe UI', sans-serif", padding: '0', maxWidth: '100%' }}>
 
@@ -108,10 +123,10 @@ const CashWithdrawal = ({ balance = 1234.50, onWithdraw }) => {
 
             {/* Stat Cards */}
             <div style={{ display: 'flex', gap: '14px', marginBottom: '24px', flexWrap: 'wrap' }}>
-                <StatCard icon="👛" label="Total Balance" value={`$${balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}`} sub="All time balance" iconBg="#FFF3E0" />
-                <StatCard icon="💵" label="Available to Withdraw" value="$876.25" sub="Ready for withdrawal" iconBg="#E8F5E9" />
-                <StatCard icon="🕐" label="Pending Clearance" value="$358.25" sub="Clearing (hold period)" iconBg="#EDE7F6" />
-                <StatCard icon="📊" label="Total Earnings" value="$4,812.75" sub="Lifetime earnings" iconBg="#E3F2FD" />
+                <StatCard icon="👛" label="Total Balance" value={`${walletBalance.currency} ${walletBalance.total_balance}`} sub="All time balance" iconBg="#FFF3E0" />
+                <StatCard icon="💵" label="Available to Withdraw" value={`${walletBalance.currency} ${walletBalance.withdrawable_balance}`} sub="Ready for withdrawal" iconBg="#E8F5E9" />
+                <StatCard icon="🕐" label="Locked Balance" value={`${walletBalance.currency} ${walletBalance.locked_balance}`} sub="Clearing (hold period)" iconBg="#EDE7F6" />
+                {/* <StatCard icon="📊" label="Total Earnings" value="$4,812.75" sub="Lifetime earnings" iconBg="#E3F2FD" /> */}
             </div>
 
             {/* Bank Details Form (toggleable) */}

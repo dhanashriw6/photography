@@ -433,12 +433,12 @@ const ProviderCard = ({
         <span className="fb-card-chip" style={{ background: colors.bg, color: colors.text }}>
           {SKILL_LABELS[skill] || skill}
         </span>
-        <button
+        {/* <button
           className={`fb-card-heart ${isFavorite ? 'fb-card-heart--active' : ''}`}
           onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
         >
           <FiHeart size={14} fill={isFavorite ? '#ef4444' : 'none'} />
-        </button>
+        </button> */}
       </div>
 
       <div className="fb-card-body">

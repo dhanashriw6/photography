@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { FiEye, FiEyeOff, FiChevronDown, FiX, FiCheck, FiMapPin, FiLoader } from 'react-icons/fi';
 import PhotographerLayout from './PhotographerLayout';
 import { signUpAsPhotographer } from '../../services/auth';
+import Select from "react-select";
 
 const GOOGLE_API_KEY = 'AIzaSyAqSdUC-vQRcFGmucESKRQmDCvzhfUel4c';
 
@@ -176,9 +177,9 @@ const parseGeocodeResult = (result, placeId) => {
   };
 
   const sublocality = get(['sublocality_level_1']) || get(['sublocality']) || '';
-  const premise      = get(['premise']) || '';
+  const premise = get(['premise']) || '';
   const streetNumber = get(['street_number']) || '';
-  const route        = get(['route']) || '';
+  const route = get(['route']) || '';
   const address_line1 =
     [premise, streetNumber, route, sublocality].filter(Boolean).join(', ') ||
     result.formatted_address?.split(',')[0] || '';
@@ -188,15 +189,15 @@ const parseGeocodeResult = (result, placeId) => {
     get(['administrative_area_level_3', 'political']) ||
     get(['administrative_area_level_2', 'political']) || '';
 
-  const state        = get(['administrative_area_level_1', 'political']) || '';
-  const state_code   = get(['administrative_area_level_1', 'political'], 'short_name') || '';
-  const country      = get(['country', 'political']) || '';
+  const state = get(['administrative_area_level_1', 'political']) || '';
+  const state_code = get(['administrative_area_level_1', 'political'], 'short_name') || '';
+  const country = get(['country', 'political']) || '';
   const country_code = get(['country', 'political'], 'short_name') || '';
-  const postal_code  = get(['postal_code']) || '';
-  const lat          = result.geometry?.location?.lat || 0;
-  const lng          = result.geometry?.location?.lng || 0;
+  const postal_code = get(['postal_code']) || '';
+  const lat = result.geometry?.location?.lat || 0;
+  const lng = result.geometry?.location?.lng || 0;
 
-  const timezoneMap  = {
+  const timezoneMap = {
     India: 'Asia/Kolkata',
     'United States': 'America/New_York',
     'United Kingdom': 'Europe/London',
@@ -706,11 +707,79 @@ const SignUpPhotographer = () => {
               </div>
 
               {/* Skills */}
-              <div className="su-field" style={{ gridColumn: 'span 2' }}>
-                <label>Skills<sup style={{ color: '#ef4444' }}>*</sup></label>
-                <MultiSkillSelect selected={skills} onChange={setSkills} />
-                <p className="su-field-hint">Select one or more skills that apply to you.</p>
-                {fieldErrors.skills && <p className="su-error">{fieldErrors.skills}</p>}
+              <div className="su-field" style={{ gridColumn: "span 2" }}>
+                <label>
+                  Skills<sup style={{ color: "#ef4444" }}>*</sup>
+                </label>
+
+                <Select
+                  isMulti
+                  options={SKILL_OPTIONS}
+                  value={SKILL_OPTIONS.filter((option) =>
+                    skills.includes(option.value)
+                  )}
+                  onChange={(selected) =>
+                    setSkills(selected ? selected.map((item) => item.value) : [])
+                  }
+                  placeholder="Search or select skills..."
+                  closeMenuOnSelect={false}
+                  hideSelectedOptions={false}
+                  menuPortalTarget={document.body}
+                  menuPosition="fixed"
+                  styles={{
+                    control: (base, state) => ({
+                      ...base,
+                      minHeight: 46,
+                      borderRadius: 8,
+                      borderColor: state.isFocused ? "#f5a623" : "#d1d5db",
+                      boxShadow: state.isFocused
+                        ? "0 0 0 3px rgba(245,166,35,0.15)"
+                        : "none",
+                      "&:hover": {
+                        borderColor: "#f5a623",
+                      },
+                    }),
+
+                    multiValue: (base) => ({
+                      ...base,
+                      background: "#FFF3D6",
+                      borderRadius: 6,
+                    }),
+
+                    multiValueLabel: (base) => ({
+                      ...base,
+                      color: "#1a1a1a",
+                      fontWeight: 600,
+                    }),
+
+                    multiValueRemove: (base) => ({
+                      ...base,
+                      cursor: "pointer",
+                      ":hover": {
+                        background: "#FFE5A3",
+                        color: "#000",
+                      },
+                    }),
+
+                    menuPortal: (base) => ({
+                      ...base,
+                      zIndex: 9999,
+                    }),
+
+                    menu: (base) => ({
+                      ...base,
+                      zIndex: 9999,
+                    }),
+                  }}
+                />
+
+                <p className="su-field-hint">
+                  Select one or more skills that apply to you.
+                </p>
+
+                {fieldErrors.skills && (
+                  <p className="su-error">{fieldErrors.skills}</p>
+                )}
               </div>
 
               {/* ── Current Address ── */}
@@ -734,17 +803,17 @@ const SignUpPhotographer = () => {
               />
 
               {/* Submit */}
-                              <button className='su-btn-primary' onClick={() => navigate('/')}>Back</button>
+              <button className='su-btn-primary' onClick={() => navigate('/')}>Back</button>
 
               {/* <div style={{ gridColumn: 'span 2', marginTop: '4px' }}> */}
-                <button
-                  type="submit"
-                  className="su-btn-primary"
-                  style={{ width: '100%', opacity: loading ? 0.7 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
-                  disabled={loading}
-                >
-                  {loading ? 'Creating account…' : 'Sign Up'}
-                </button>
+              <button
+                type="submit"
+                className="su-btn-primary"
+                style={{ width: '100%', opacity: loading ? 0.7 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
+                disabled={loading}
+              >
+                {loading ? 'Creating account…' : 'Sign Up'}
+              </button>
               {/* </div> */}
             </div>
           </form>

@@ -8,6 +8,7 @@ import {
     getAllPackages,
 } from '../../services/package';
 import { getCategory } from '../../services/common';
+import Select from "react-select";
 
 /* ─── Add / Edit Package Modal ─────────────────────────────────────────── */
 
@@ -156,12 +157,50 @@ const PackageModal = ({ open, onClose, onSaved, editData, categories, userSkills
                         {/* Category dropdown */}
                         <div className="su-field">
                             <label>Category</label>
-                            <select value={form.category_id} onChange={set('category_id')}>
-                                <option value="">Select Category</option>
-                                {categories.map(cat => (
-                                    <option key={cat.id ?? cat.name} value={cat.id}>{cat.name}</option>
-                                ))}
-                            </select>
+                        <Select
+  options={categories.map((cat) => ({
+    value: cat.id,
+    label: cat.name,
+  }))}
+  value={
+    categories
+      .map((cat) => ({
+        value: cat.id,
+        label: cat.name,
+      }))
+      .find((option) => option.value === form.category_id) || null
+  }
+  onChange={(selected) =>
+    setForm((prev) => ({
+      ...prev,
+      category_id: selected?.value || "",
+    }))
+  }
+  placeholder="Select Category"
+  isSearchable
+  menuPortalTarget={document.body}
+  menuPosition="fixed"
+  styles={{
+    control: (base, state) => ({
+      ...base,
+      minHeight: 44,
+      borderRadius: 8,
+      borderColor: state.isFocused ? "#f5a623" : "#d1d5db",
+      boxShadow: "none",
+      "&:hover": {
+        borderColor: "#f5a623",
+      },
+    }),
+    menuPortal: (base) => ({
+      ...base,
+      zIndex: 9999,
+    }),
+    menu: (base) => ({
+      ...base,
+      zIndex: 9999,
+    }),
+  }}
+/>
                         </div>
 
                         {/* Skill dropdown */}

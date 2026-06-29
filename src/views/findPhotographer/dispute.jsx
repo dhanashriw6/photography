@@ -10,6 +10,8 @@ import {
     FiEdit3,
     FiArrowRight,
 } from 'react-icons/fi';
+import Select from "react-select";
+
 
 const DISPUTE_TYPES = [
     'Poor Image Quality',
@@ -113,6 +115,10 @@ const RaiseDispute = () => {
 
     const onFocus = (e) => { e.target.style.borderColor = '#f5a623'; };
     const onBlur = (e) => { e.target.style.borderColor = '#e5e7eb'; };
+    const disputeOptions = DISPUTE_TYPES.map((t) => ({
+  value: t.toLowerCase(),
+  label: t,
+}));
 
     return (
         <ViewsLayout>
@@ -188,20 +194,52 @@ const RaiseDispute = () => {
                         </FieldRow>
 
                         {/* Dispute Type */}
-                        <FieldRow icon={<FiList size={19} />} label="Dispute Type" description="Select the reason for your dispute.">
-                            <select
-                                value={form.disputeType}
-                                onChange={set('disputeType')}
-                                onFocus={onFocus}
-                                onBlur={onBlur}
-                                style={{ ...inputStyle, cursor: 'pointer', color: form.disputeType ? '#1a1a1a' : '#9ca3af' }}
-                            >
-                                <option value="" disabled>Select dispute type</option>
-                                {DISPUTE_TYPES.map(t => (
-                                    <option key={t} value={t.toLowerCase()} style={{ color: '#1a1a1a' }}>{t}</option>
-                                ))}
-                            </select>
-                        </FieldRow>
+                       <FieldRow
+  icon={<FiList size={19} />}
+  label="Dispute Type"
+  description="Select the reason for your dispute."
+>
+  <Select
+    options={disputeOptions}
+    value={
+      disputeOptions.find(
+        (option) => option.value === form.disputeType
+      ) || null
+    }
+    onChange={(selected) =>
+      setForm((prev) => ({
+        ...prev,
+        disputeType: selected?.value || "",
+      }))
+    }
+    onFocus={onFocus}
+    onBlur={onBlur}
+    placeholder="Select dispute type"
+    isSearchable
+    menuPortalTarget={document.body}
+    menuPosition="fixed"
+    styles={{
+      control: (base, state) => ({
+        ...base,
+        minHeight: "48px",
+        borderRadius: "10px",
+        borderColor: state.isFocused ? "#f59e0b" : "#d1d5db",
+        boxShadow: "none",
+        "&:hover": {
+          borderColor: "#f59e0b",
+        },
+      }),
+      menuPortal: (base) => ({
+        ...base,
+        zIndex: 9999,
+      }),
+      menu: (base) => ({
+        ...base,
+        zIndex: 9999,
+      }),
+    }}
+  />
+</FieldRow>
 
                         {/* Description */}
                         <FieldRow icon={<FiEdit3 size={19} />} label="Description of Dispute" description="Provide details about the issue.">

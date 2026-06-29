@@ -3,7 +3,7 @@ import '../index.css';
 import { LuCamera } from 'react-icons/lu';
 import { getProfile, updateProfile } from '../../services/profile';
 import { getCasteList, getLanguagesList, getCategory, getUploadLink } from '../../services/common';
-
+import Select from "react-select";
 const GOOGLE_API_KEY = 'AIzaSyAqSdUC-vQRcFGmucESKRQmDCvzhfUel4c';
 
 /* ─── Upload helper ───────────────────────────────────────────────────────── */
@@ -686,7 +686,7 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
             )}
 
             {/* ── Personal fields ── */}
-           <div className="profile-grid">
+            <div className="profile-grid">
                 <div className="su-field">
                     <label>First Name</label>
                     <input type="text" value={form.firstName} onChange={set('firstName')} />
@@ -751,8 +751,66 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
                 {/* Skills multi-select */}
                 <div className="su-field full-width-field">
                     <label>Skills<sup style={{ color: '#ef4444' }}>*</sup></label>
-                    <MultiSkillSelect selected={skills} onChange={setSkills} />
-                    <p className="su-field-hint">Select one or more skills that apply to you.</p>
+                    <Select
+                        isMulti
+                        options={SKILL_OPTIONS}
+                        value={SKILL_OPTIONS.filter((option) =>
+                            skills.includes(option.value)
+                        )}
+                        onChange={(selected) =>
+                            setSkills(selected ? selected.map((item) => item.value) : [])
+                        }
+                        placeholder="Search or select skills..."
+                        closeMenuOnSelect={false}
+                        hideSelectedOptions={false}
+                        menuPortalTarget={document.body}
+                        menuPosition="fixed"
+                        styles={{
+                            control: (base, state) => ({
+                                ...base,
+                                minHeight: 46,
+                                borderRadius: 8,
+                                borderColor: state.isFocused ? "#f5a623" : "#d1d5db",
+                                boxShadow: state.isFocused
+                                    ? "0 0 0 3px rgba(245,166,35,0.15)"
+                                    : "none",
+                                "&:hover": {
+                                    borderColor: "#f5a623",
+                                },
+                            }),
+
+                            multiValue: (base) => ({
+                                ...base,
+                                background: "#FFF3D6",
+                                borderRadius: 6,
+                            }),
+
+                            multiValueLabel: (base) => ({
+                                ...base,
+                                color: "#1a1a1a",
+                                fontWeight: 600,
+                            }),
+
+                            multiValueRemove: (base) => ({
+                                ...base,
+                                cursor: "pointer",
+                                ":hover": {
+                                    background: "#FFE5A3",
+                                    color: "#000",
+                                },
+                            }),
+
+                            menuPortal: (base) => ({
+                                ...base,
+                                zIndex: 9999,
+                            }),
+
+                            menu: (base) => ({
+                                ...base,
+                                zIndex: 9999,
+                            }),
+                        }}
+                    />
                 </div>
 
                 <div className="full-width-field">

@@ -33,6 +33,7 @@ import SelectPackage from './views/findPhotographer/selectPackage';
 import DraftOrders from './views/findPhotographer/draftOrders';
 import LegalPage from './views/LegalPage';
 import CustomerEditProfile from './views/findPhotographer/customerEditProfile';
+import AvailabilityCalendarPage from './views/joinAsPhotographer/AvailabilityCalendar';
 
 function App() {
   return (

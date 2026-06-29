@@ -43,6 +43,8 @@ export const packagesEndpoint = {
 export const bookingEndpoint={
   getPackage:`${baseUrl}/booking/package_suggestions`,
   getServiceProviders:`${baseUrl}/booking/service_providers`,
+  getBookingCounts:`${baseUrl}/booking/counts`,
+  getUpcomingBookings : `${baseUrl}/booking/upcoming`
   
 }
 
@@ -65,4 +67,10 @@ export const calendarEndpoint = {
   getBlocks : `${baseUrl}/calendar/blocks`,
   addBlocks : `${baseUrl}/calendar/blocks`,
   deleteBlocks: (id) => `${baseUrl}/calendar/blocks/${id}`,
+}
+
+export const walletEndpoint = {
+  getWalletBalance: `${baseUrl}/wallet/balances`,
+  getWalletTransactions: `${baseUrl}/wallet/transactions`,
+  
 }
