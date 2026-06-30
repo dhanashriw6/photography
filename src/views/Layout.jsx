@@ -8,7 +8,7 @@ import { FiUser, FiEdit2, FiCalendar, FiLogOut, FiAlertCircle, FiMenu, FiX, FiSh
 
 
 /* ── Avatar Dropdown (desktop only) ── */
-const AvatarDropdown = ({ menuItems }) => {
+const AvatarDropdown = ({ menuItems, firstName, lastName }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -67,8 +67,7 @@ const AvatarDropdown = ({ menuItems }) => {
                   <FiUser size={16} />
                 </div>
                 <div>
-                  <p style={{ margin: 0, fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>John Doe</p>
-                  <p style={{ margin: 0, fontSize: '11px', color: '#999', fontWeight: 500 }}>john@example.com</p>
+                  <p style={{ margin: 0, fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>{firstName} {lastName}</p>
                 </div>
               </div>
             </div>
@@ -104,7 +103,7 @@ const AvatarDropdown = ({ menuItems }) => {
 };
 
 /* ── Mobile Drawer (nav links + profile menu, mobile only) ── */
-const MobileDrawer = ({ open, onClose, navItems, menuItems }) => {
+const MobileDrawer = ({ open, onClose, navItems, menuItems,firstName,lastName }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -273,6 +272,8 @@ const ViewsLayout = ({ children }) => {
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const isLoggedIn = !!localStorage.getItem('authToken');
+  const firstName = localStorage.getItem('firstName') || '';
+const lastName = localStorage.getItem('lastName') || '';
   const navItems = isLoggedIn
   ? [
       { label: 'Home', to: '/home' },
@@ -340,7 +341,7 @@ const ViewsLayout = ({ children }) => {
             </nav>
 
             {/* Avatar dropdown — desktop only */}
-          {isLoggedIn &&   <AvatarDropdown menuItems={menuItems} />}
+          {isLoggedIn &&   <AvatarDropdown menuItems={menuItems} firstName={firstName} lastName={lastName} />}
 
             {/* Hamburger — mobile only, single entry point to nav + profile */}
             {isLoggedIn &&  <button
@@ -365,6 +366,8 @@ const ViewsLayout = ({ children }) => {
         onClose={() => setDrawerOpen(false)}
         navItems={navItems}
         menuItems={menuItems}
+        firstName={firstName}
+        lastName={lastName}
       />
 
       {/* ── Main ── */}

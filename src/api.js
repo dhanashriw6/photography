@@ -74,3 +74,14 @@ export const walletEndpoint = {
   getWalletTransactions: `${baseUrl}/wallet/transactions`,
   
 }
+
+export const reviewEndpoint = {
+  postReview: (orderId) => `${baseUrl}/reviews/order/${orderId}`,
+ 
+  
+}
+
+export const disputeEndpoint = {
+  postDispute: `${baseUrl}/disputes`,
+  getDisputes : `${baseUrl}/disputes`
+}

@@ -7,7 +7,7 @@ import { BsInstagram } from 'react-icons/bs';
 import { FiUser, FiEdit2, FiCalendar, FiLogOut, FiAlertCircle, FiMenu, FiX, FiShield } from 'react-icons/fi';
 
 /* ── Avatar Dropdown (desktop only) ── */
-const AvatarDropdown = ({ menuItems }) => {
+const AvatarDropdown = ({ menuItems, firstName, lastName }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -66,8 +66,7 @@ const AvatarDropdown = ({ menuItems }) => {
                   <FiUser size={16} />
                 </div>
                 <div>
-                  <p style={{ margin: 0, fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>John Doe</p>
-                  <p style={{ margin: 0, fontSize: '11px', color: '#999', fontWeight: 500 }}>john@example.com</p>
+                  <p style={{ margin: 0, fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>{firstName} {lastName}</p>
                 </div>
               </div>
             </div>
@@ -113,7 +112,7 @@ const footerLinkStyle = {
 };
 
 /* ── Mobile Drawer (nav links + profile menu, mobile only) ── */
-const MobileDrawer = ({ open, onClose, navItems, menuItems }) => {
+const MobileDrawer = ({ open, onClose, navItems, menuItems,firstName,lastName }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -184,8 +183,7 @@ const MobileDrawer = ({ open, onClose, navItems, menuItems }) => {
                   <FiUser size={18} />
                 </div>
                 <div>
-                  <p style={{ margin: 0, fontSize: '13.5px', fontWeight: 700, color: '#1a1a1a' }}>John Doe</p>
-                  <p style={{ margin: 0, fontSize: '11.5px', color: '#999', fontWeight: 500 }}>john@example.com</p>
+                  <p style={{ margin: 0, fontSize: '13.5px', fontWeight: 700, color: '#1a1a1a' }}>{firstName} {lastName}</p>
                 </div>
               </div>
             </div>
@@ -272,6 +270,8 @@ const PhotographerLayout = ({ children }) => {
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const isLoggedIn = !!localStorage.getItem('authToken');
+  const firstName = localStorage.getItem('firstName') || '';
+const lastName = localStorage.getItem('lastName') || '';
 
   const navItems = isLoggedIn
     ? [
@@ -343,7 +343,7 @@ const PhotographerLayout = ({ children }) => {
             </nav>
 
             {/* Avatar dropdown — desktop only */}
-        {isLoggedIn &&     <AvatarDropdown menuItems={menuItems} />}
+        {isLoggedIn &&     <AvatarDropdown menuItems={menuItems} firstName={firstName} lastName={lastName} />}
 
             {/* Hamburger — mobile only, single entry point to nav + profile */}
             {isLoggedIn && <button
@@ -368,6 +368,8 @@ const PhotographerLayout = ({ children }) => {
         onClose={() => setDrawerOpen(false)}
         navItems={navItems}
         menuItems={menuItems}
+        firstName={firstName}
+        lastName={lastName}
       />
 
       {/* ── Main ── */}

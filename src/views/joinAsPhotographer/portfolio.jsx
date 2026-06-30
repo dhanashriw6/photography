@@ -49,7 +49,7 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
     const [videoLinks, setVideoLinks]             = useState([{ url: '', title: 'video' }]);
     const [originalVideoLinks, setOriginalVideoLinks] = useState([]);
 
-    const [awards, setAwards] = useState('');
+    const [awards, setAwards] = useState([{ title: '', year: '', details: '' }]);
 
     const [saving, setSaving]   = useState(false);
     const [saveErr, setSaveErr] = useState('');
@@ -91,7 +91,9 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
                     setOriginalVideoLinks(mapped);
                 }
 
-                if (user.awards) setAwards(user.awards);
+                if (user.awards?.length) {
+                    setAwards(user.awards.map(a => ({ title: a.title || '', year: a.year ? String(a.year) : '', details: a.details || '' })));
+                }
             } catch (err) {
                 console.error('Portfolio profile fetch error:', err);
             }
@@ -229,7 +231,16 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
             ...(portfolioDiff.length && { portfolio_documents: portfolioDiff }),
             ...(socialsDiff.length   && { social_links: socialsDiff }),
             ...(videoDiff.length     && { video_links: videoDiff }),
-            ...(awards.trim()        && { awards: awards.trim() }),
+            ...(awards.some(a => a.title.trim()) && {
+                awards: awards
+                    .filter(a => a.title.trim())
+                    .map(a => ({
+                        type: 'insert',
+                        title: a.title.trim(),
+                        year: a.year ? Number(a.year) : undefined,
+                        details: a.details.trim() || undefined,
+                    }))
+            }),
         };
 
         if (!Object.keys(payload).length) {
@@ -502,7 +513,69 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
                 {/* Awards */}
                 <div className="su-field">
                     <label>Add Awards</label>
-                    <input type="text" value={awards} onChange={e => setAwards(e.target.value)} placeholder="e.g. Best Wedding Photographer 2023" />
+                    {awards.map((award, i) => (
+                        <div key={i} style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '14px 16px', marginBottom: i < awards.length - 1 ? '12px' : 0, background: '#fafafa', position: 'relative' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
+                                <div>
+                                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#555', display: 'block', marginBottom: '4px' }}>Award Title *</label>
+                                    <input
+                                        type="text"
+                                        value={award.title}
+                                        onChange={e => setAwards(prev => prev.map((a, idx) => idx === i ? { ...a, title: e.target.value } : a))}
+                                        placeholder="e.g. Best Wedding Photographer"
+                                        style={{ width: '100%', boxSizing: 'border-box' }}
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#555', display: 'block', marginBottom: '4px' }}>Year *</label>
+                                    <input
+                                        type="number"
+                                        value={award.year}
+                                        onChange={e => setAwards(prev => prev.map((a, idx) => idx === i ? { ...a, year: e.target.value } : a))}
+                                        placeholder="e.g. 2023"
+                                        min="1900"
+                                        max={new Date().getFullYear() + 1}
+                                        style={{ width: '100%', boxSizing: 'border-box' }}
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label style={{ fontSize: '12px', fontWeight: 600, color: '#555', display: 'block', marginBottom: '4px' }}>Awarded By</label>
+                                <input
+                                    type="text"
+                                    value={award.details}
+                                    onChange={e => setAwards(prev => prev.map((a, idx) => idx === i ? { ...a, details: e.target.value } : a))}
+                                    placeholder="Award Details"
+                                    style={{ width: '100%', boxSizing: 'border-box' }}
+                                />
+                            </div>
+                            {awards.length > 1 && (
+                                <button
+                                    type="button"
+                                    onClick={() => setAwards(prev => prev.filter((_, idx) => idx !== i))}
+                                    style={{
+                                        position: 'absolute', top: '10px', right: '10px',
+                                        background: '#fee2e2', border: 'none', borderRadius: '6px',
+                                        color: '#ef4444', cursor: 'pointer', padding: '4px 8px', fontSize: '12px',
+                                    }}
+                                >
+                                    Remove
+                                </button>
+                            )}
+                        </div>
+                    ))}
+                    <button
+                        type="button"
+                        onClick={() => setAwards(prev => [...prev, { title: '', year: '', details: '' }])}
+                        style={{
+                            marginTop: '10px', display: 'flex', alignItems: 'center', gap: '6px',
+                            background: 'none', border: '1.5px dashed #f5a623', borderRadius: '8px',
+                            color: '#f5a623', cursor: 'pointer', padding: '8px 16px', fontSize: '13px', fontWeight: 600,
+                            width: '100%', justifyContent: 'center',
+                        }}
+                    >
+                        <FiPlus size={15} /> Add Another Award
+                    </button>
                 </div>
 
             </div>

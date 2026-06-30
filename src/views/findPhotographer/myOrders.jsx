@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { getCustomerOrders } from '../../services/order';
-import { 
-  FiGrid, FiList, FiSearch, FiCalendar, FiClock, FiMapPin, 
-  FiX, FiUploadCloud, FiLink, FiSend, FiEye, FiChevronDown, 
-  FiChevronUp, FiFilter, FiRefreshCw, FiStar 
+import {
+  FiGrid, FiList, FiSearch, FiCalendar, FiClock, FiMapPin,
+  FiX, FiUploadCloud, FiLink, FiSend, FiEye, FiChevronDown,
+  FiChevronUp, FiFilter, FiRefreshCw, FiStar
 } from 'react-icons/fi';
 import { BsCurrencyRupee } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
+import { getUploadLink } from '../../services/common';
+import { postReview } from '../../services/review';
 
 
 
@@ -39,51 +41,51 @@ const MyOrders = () => {
   // Toast / Status messages
   const [toastMessage, setToastMessage] = useState(null);
 
- useEffect(() => {
-  const fetchOrders = async () => {
-    try {
-      setLoading(true);
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        setLoading(true);
 
-      const response = await getCustomerOrders();
+        const response = await getCustomerOrders();
 
-      console.log(response);
+        console.log(response);
 
-      const orders = response?.data?.data || [];
-      console.log("API Orders:", orders);
-console.log("Length:", orders.length);
+        const orders = response?.data?.data || [];
+        console.log("API Orders:", orders);
+        console.log("Length:", orders.length);
 
-      if (orders.length) {
-        setOrders(orders.map(parseApiOrder));
-      } else {
+        if (orders.length) {
+          setOrders(orders.map(parseApiOrder));
+        } else {
+          setOrders([]);
+        }
+      } catch (error) {
+        console.error(error);
         setOrders([]);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error(error);
-      setOrders([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  fetchOrders();
-}, []);
+    fetchOrders();
+  }, []);
 
   // Helper to parse API order into clean client UI structure
   const parseApiOrder = (order) => {
     let dateObj = null;
     if (order.event_date) dateObj = new Date(order.event_date);
     else if (order.created_at) dateObj = new Date(order.created_at);
-    
+
     const dateDisplay = dateObj && !isNaN(dateObj)
       ? dateObj.toLocaleDateString("en-IN", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        })
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
       : "Date not set";
 
     const eventName = order.event_name || order.category_name || "Photoshoot";
-    
+
     // Map categories to high-quality Unsplash image URLs
     let categoryImage = "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=500&auto=format&fit=crop&q=60";
     const nameLower = eventName.toLowerCase();
@@ -120,19 +122,19 @@ console.log("Length:", orders.length);
         status === "CONFIRMED" || status === "COMPLETED"
           ? "PAID"
           : status === "CANCELLED"
-          ? "REFUNDED"
-          : "PENDING",
+            ? "REFUNDED"
+            : "PENDING",
 
       paidAmount,
       dueAmount,
       totalAmount,
 
-    //   teamName: "Amit & Team",
-    //   avatars: [
-    //     "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=60",
-    //     "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=60",
-    //     "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=60"
-    //   ],
+      //   teamName: "Amit & Team",
+      //   avatars: [
+      //     "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=60",
+      //     "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=60",
+      //     "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=60"
+      //   ],
 
       image: categoryImage,
       rawOrder: order,
@@ -190,7 +192,7 @@ console.log("Length:", orders.length);
     title: '',
     reviewText: '',
     photos: [],
-    publicShare: true,
+    is_recommended: true,
     submitting: false
   });
 
@@ -228,33 +230,82 @@ console.log("Length:", orders.length);
     updateReviewForOrder(orderId, { reviewText: text.slice(0, 1000) });
   };
 
-  const togglePublicShare = (orderId) => {
+  const toggleIsRecommended = (orderId) => {
     const current = getReviewForOrder(orderId);
-    updateReviewForOrder(orderId, { publicShare: !current.publicShare });
+    updateReviewForOrder(orderId, { is_recommended: !current.is_recommended });
   };
 
-  const handleReviewPhotoUpload = (orderId, files) => {
+const updateReviewPhotoById = (orderId, photoId, patch) => {
+    setReviewState(prev => {
+      const currentReview = prev[orderId] || getDefaultReview();
+      const updatedPhotos = currentReview.photos.map((p) =>
+        p.id === photoId ? { ...p, ...patch } : p
+      );
+      return {
+        ...prev,
+        [orderId]: { ...currentReview, photos: updatedPhotos }
+      };
+    });
+  };
+
+  const removeReviewPhotoById = (orderId, photoId) => {
+    setReviewState(prev => {
+      const currentReview = prev[orderId] || getDefaultReview();
+      return {
+        ...prev,
+        [orderId]: {
+          ...currentReview,
+          photos: currentReview.photos.filter(p => p.id !== photoId)
+        }
+      };
+    });
+  };
+
+  const processAndUploadReviewPhoto = async (orderId, file, tempId) => {
+    try {
+      const linkRes = await getUploadLink({
+        document_for: 'review',
+        document_type: 'image',
+        mimetype: file.type,
+      });
+
+      const { presignedUrl, key } = linkRes.data.data;
+
+      await fetch(presignedUrl, { method: 'PUT', body: file });
+
+      updateReviewPhotoById(orderId, tempId, { key, uploading: false });
+    } catch (err) {
+      console.error('Review photo upload failed', err);
+      removeReviewPhotoById(orderId, tempId);
+      showToast('Failed to upload photo. Please try again.');
+    }
+  };
+
+const handleReviewPhotoUpload = (orderId, files) => {
     const current = getReviewForOrder(orderId);
     if (current.photos.length >= 5) {
       showToast("Maximum 5 photos allowed per review");
       return;
     }
-    const newPhotos = Array.from(files).map((file, index) => ({
+
+    const filesArr = Array.from(files).slice(0, 5 - current.photos.length);
+
+    const newPhotos = filesArr.map((file, index) => ({
       id: `${Date.now()}-${index}`,
       previewUrl: URL.createObjectURL(file),
-      name: file.name
+      key: null,
+      uploading: true,
     }));
-    const updatedPhotos = [...current.photos, ...newPhotos].slice(0, 5);
-    updateReviewForOrder(orderId, { photos: updatedPhotos });
+
+    updateReviewForOrder(orderId, { photos: [...current.photos, ...newPhotos] });
+
+    newPhotos.forEach((p, i) => processAndUploadReviewPhoto(orderId, filesArr[i], p.id));
   };
 
   const removeReviewPhoto = (orderId, photoId) => {
-    const current = getReviewForOrder(orderId);
-    const updatedPhotos = current.photos.filter(p => p.id !== photoId);
-    updateReviewForOrder(orderId, { photos: updatedPhotos });
+    removeReviewPhotoById(orderId, photoId);
   };
-
-  const publishReview = (orderId) => {
+  const publishReview = async (orderId) => {
     const current = getReviewForOrder(orderId);
 
     if (current.rating === 0) {
@@ -265,15 +316,35 @@ console.log("Length:", orders.length);
       showToast("Please write a few words about your experience");
       return;
     }
+    if (current.photos.some(p => p.uploading)) {
+      showToast("Please wait for photos to finish uploading");
+      return;
+    }
 
     updateReviewForOrder(orderId, { submitting: true });
 
-    // Simulated submit — replace with real API call
-    setTimeout(() => {
+    try {
+      const payload = {
+        rating: current.rating,
+        comment: current.reviewText,
+        is_recommended: current.is_recommended,
+        images: current.photos.map((p) => ({
+          type: "insert",
+          key: p.key,
+          document_type: "image",
+        })),
+      };
+
+      await postReview(orderId, payload);
+
       updateReviewForOrder(orderId, { submitting: false });
       showToast("Review published successfully!");
       closeReviewModal();
-    }, 900);
+    } catch (error) {
+      console.error(error);
+      updateReviewForOrder(orderId, { submitting: false });
+      showToast(error?.response?.data?.message || "Failed to publish review. Please try again.");
+    }
   };
   // ---------- End Review Modal helpers ----------
 
@@ -339,20 +410,20 @@ console.log("Length:", orders.length);
   // Simulated Reference Uploads
   const handleFileDrop = (orderId, files, type) => {
     const currentRef = loadReferenceForOrder(orderId);
-    
+
     if (type === 'image') {
       if (currentRef.inspirationPhotos.length >= 10) {
         showToast("Maximum 10 inspiration photos allowed");
         return;
       }
-      
+
       const newPhotos = Array.from(files).map((file, index) => {
         const id = `${Date.now()}-${index}`;
         const previewUrl = URL.createObjectURL(file);
-        
+
         // Start simulated upload progress
         simulateUpload(orderId, id, 'image');
-        
+
         return {
           id,
           name: file.name,
@@ -370,7 +441,7 @@ console.log("Length:", orders.length);
     } else if (type === 'video') {
       if (files.length === 0) return;
       const file = files[0];
-      
+
       if (file.size > 100 * 1024 * 1024) {
         showToast("Video size must be less than 100MB");
         return;
@@ -402,7 +473,7 @@ console.log("Length:", orders.length);
         progress = 100;
         clearInterval(interval);
       }
-      
+
       setReferenceState(prev => {
         const currentRef = prev[orderId];
         if (!currentRef) return prev;
@@ -467,7 +538,7 @@ console.log("Length:", orders.length);
 
   const sendReferenceToPhotographer = (orderId) => {
     const currentRef = loadReferenceForOrder(orderId);
-    
+
     // Set loading indicator
     saveReferenceForOrder(orderId, {
       ...currentRef,
@@ -550,7 +621,7 @@ console.log("Length:", orders.length);
             Showing 1 – {filteredOrders.length} of {orders.length} bookings
           </span>
           <div className="view-toggle-buttons">
-            <button 
+            <button
               type="button"
               className={`toggle-btn ${!isGridView ? 'active' : ''}`}
               onClick={() => setIsGridView(false)}
@@ -558,7 +629,7 @@ console.log("Length:", orders.length);
             >
               <FiList size={18} />
             </button>
-            <button 
+            <button
               type="button"
               className={`toggle-btn ${isGridView ? 'active' : ''}`}
               onClick={() => setIsGridView(true)}
@@ -572,13 +643,13 @@ console.log("Length:", orders.length);
 
       {/* Main Grid: Filters on left, Bookings on right */}
       <div className="bookings-layout-grid">
-        
+
         {/* Left Column: Filters Sidebar */}
         <aside className="filters-sidebar">
           <div className="filters-sidebar-header">
             <span className="filters-title">Filters</span>
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="reset-filters-btn"
               onClick={resetFilters}
             >
@@ -589,7 +660,7 @@ console.log("Length:", orders.length);
 
           <div className="filter-group">
             <label className="filter-label">Booking Status</label>
-            <select 
+            <select
               className="filter-select"
               value={uiFilters.bookingStatus}
               onChange={(e) => handleFilterChange('bookingStatus', e.target.value)}
@@ -604,7 +675,7 @@ console.log("Length:", orders.length);
 
           <div className="filter-group">
             <label className="filter-label">Payment Status</label>
-            <select 
+            <select
               className="filter-select"
               value={uiFilters.paymentStatus}
               onChange={(e) => handleFilterChange('paymentStatus', e.target.value)}
@@ -623,8 +694,8 @@ console.log("Length:", orders.length);
             <div className="date-range-inputs">
               <div className="date-input-wrapper">
                 <FiCalendar className="date-icon" />
-                <input 
-                  type="date" 
+                <input
+                  type="date"
                   className="filter-date-input"
                   placeholder="From"
                   value={uiFilters.startDate}
@@ -633,8 +704,8 @@ console.log("Length:", orders.length);
               </div>
               <div className="date-input-wrapper" style={{ marginTop: '8px' }}>
                 <FiCalendar className="date-icon" />
-                <input 
-                  type="date" 
+                <input
+                  type="date"
                   className="filter-date-input"
                   placeholder="To"
                   value={uiFilters.endDate}
@@ -646,7 +717,7 @@ console.log("Length:", orders.length);
 
           <div className="filter-group">
             <label className="filter-label">Event Category</label>
-            <select 
+            <select
               className="filter-select"
               value={uiFilters.category}
               onChange={(e) => handleFilterChange('category', e.target.value)}
@@ -659,7 +730,7 @@ console.log("Length:", orders.length);
 
           <div className="filter-group">
             <label className="filter-label">City</label>
-            <select 
+            <select
               className="filter-select"
               value={uiFilters.city}
               onChange={(e) => handleFilterChange('city', e.target.value)}
@@ -672,7 +743,7 @@ console.log("Length:", orders.length);
 
           <div className="filter-group">
             <label className="filter-label">Sort By</label>
-            <select 
+            <select
               className="filter-select"
               value={uiFilters.sortBy}
               onChange={(e) => handleFilterChange('sortBy', e.target.value)}
@@ -684,8 +755,8 @@ console.log("Length:", orders.length);
             </select>
           </div>
 
-          <button 
-            type="button" 
+          <button
+            type="button"
             className="apply-filters-btn"
             onClick={applyFilters}
           >
@@ -707,8 +778,8 @@ console.log("Length:", orders.length);
               </div>
               <h3>No Bookings Found</h3>
               <p>Try modifying your filter settings to view other orders.</p>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="reset-filters-btn-accent"
                 onClick={resetFilters}
               >
@@ -726,22 +797,22 @@ console.log("Length:", orders.length);
                   creativeNotes: '',
                   shared: false
                 };
-                
+
                 const bStyle = getBookingStatusStyle(order.bookingStatus);
                 const pStyle = getPaymentStatusStyle(order.paymentStatus);
 
                 return (
-                  <div 
-                    key={order.id} 
+                  <div
+                    key={order.id}
                     className={`order-card-wrapper ${isExpanded ? 'expanded' : ''}`}
                   >
                     {/* Main Card Content */}
                     <div className="order-card-main">
                       {/* Left: Thumbnail Image */}
                       <div className="card-thumbnail-section">
-                        <img 
-                          src={order.image} 
-                          alt={order.eventName} 
+                        <img
+                          src={order.image}
+                          alt={order.eventName}
                           className="card-thumbnail"
                         />
                       </div>
@@ -750,7 +821,7 @@ console.log("Length:", orders.length);
                       <div className="card-details-section">
                         <span className="card-order-number">{order.orderNumber}</span>
                         <h3 className="card-event-name">{order.eventName}</h3>
-                        
+
                         <div className="card-meta-info-row">
                           <span className="meta-info-item">
                             <FiCalendar size={13} className="meta-icon" />
@@ -767,13 +838,13 @@ console.log("Length:", orders.length);
 
                       {/* Status Badges Section */}
                       <div className="card-status-section">
-                        <span 
+                        <span
                           className="status-pill"
                           style={{ background: bStyle.bg, color: bStyle.color }}
                         >
                           {order.bookingStatus}
                         </span>
-                        <span 
+                        <span
                           className="status-pill"
                           style={{ background: pStyle.bg, color: pStyle.color, marginTop: '6px' }}
                         >
@@ -821,8 +892,8 @@ console.log("Length:", orders.length);
                         </div> */}
 
                         <div className="button-group">
-                          <button 
-                            type="button" 
+                          <button
+                            type="button"
                             className="view-details-action-btn"
                             onClick={() => navigate(`/booking-summary?orderId=${order.id}`)}
                           >
@@ -830,8 +901,8 @@ console.log("Length:", orders.length);
                             View Details
                           </button>
 
-                          <button 
-                            type="button" 
+                          <button
+                            type="button"
                             className="add-review-action-btn"
                             onClick={() => openReviewModal(order.id)}
                           >
@@ -839,8 +910,8 @@ console.log("Length:", orders.length);
                             Add Review
                           </button>
 
-                          <button 
-                            type="button" 
+                          <button
+                            type="button"
                             className={`expand-toggle-btn ${isExpanded ? 'active' : ''}`}
                             onClick={() => toggleExpand(order.id)}
                             title={isExpanded ? "Collapse" : "Share References"}
@@ -875,9 +946,9 @@ console.log("Length:", orders.length);
                             <span className="col-hint">Upload reference images (Max 10 images, up to 10MB each)</span>
 
                             <label className="drag-drop-uploader">
-                              <input 
-                                type="file" 
-                                accept="image/*" 
+                              <input
+                                type="file"
+                                accept="image/*"
                                 multiple
                                 style={{ display: 'none' }}
                                 onChange={(e) => handleFileDrop(order.id, e.target.files, 'image')}
@@ -906,8 +977,8 @@ console.log("Length:", orders.length);
                                         </div>
                                       )}
                                       {!refData.shared && (
-                                        <button 
-                                          type="button" 
+                                        <button
+                                          type="button"
                                           className="remove-thumb-btn"
                                           onClick={() => removePhotoReference(order.id, photo.id)}
                                         >
@@ -928,9 +999,9 @@ console.log("Length:", orders.length);
 
                             {refData.sampleReels.length === 0 ? (
                               <label className="drag-drop-uploader">
-                                <input 
-                                  type="file" 
-                                  accept="video/*" 
+                                <input
+                                  type="file"
+                                  accept="video/*"
                                   style={{ display: 'none' }}
                                   onChange={(e) => handleFileDrop(order.id, e.target.files, 'video')}
                                   disabled={refData.shared}
@@ -950,14 +1021,14 @@ console.log("Length:", orders.length);
                                 </div>
                                 {refData.sampleReels[0].uploading && (
                                   <div className="video-progress-bar">
-                                    <div 
-                                      className="video-progress-fill" 
+                                    <div
+                                      className="video-progress-fill"
                                       style={{ width: `${refData.sampleReels[0].progress}%` }}
                                     />
                                   </div>
                                 )}
                                 {!refData.shared && (
-                                  <button 
+                                  <button
                                     type="button"
                                     className="remove-video-btn"
                                     onClick={() => removeVideoReference(order.id)}
@@ -974,8 +1045,8 @@ console.log("Length:", orders.length);
 
                             <div className="link-input-wrapper">
                               <FiLink className="input-link-icon" />
-                              <input 
-                                type="url" 
+                              <input
+                                type="url"
                                 className="video-link-input"
                                 placeholder="Paste Instagram or YouTube link here"
                                 value={refData.videoLink}
@@ -990,7 +1061,7 @@ console.log("Length:", orders.length);
                             <h5 className="col-title">Creative Notes / Expectations</h5>
                             <span className="col-hint">Share your ideas, must-have shots, moods, colors, etc.</span>
 
-                            <textarea 
+                            <textarea
                               className="creative-notes-textarea"
                               placeholder="Describe your creative notes or shot expectations here..."
                               value={refData.creativeNotes}
@@ -999,7 +1070,7 @@ console.log("Length:", orders.length);
                               maxLength={1000}
                               rows={5}
                             />
-                            
+
                             <div className="character-count-row">
                               <span>{refData.creativeNotes.length} / 1000 characters</span>
                             </div>
@@ -1042,9 +1113,9 @@ console.log("Length:", orders.length);
                     Share your experience and help others make the right choice.
                   </p>
                 </div>
-                <button 
-                  type="button" 
-                  className="review-modal-close-btn" 
+                <button
+                  type="button"
+                  className="review-modal-close-btn"
                   onClick={closeReviewModal}
                 >
                   <FiX size={20} />
@@ -1055,10 +1126,10 @@ console.log("Length:", orders.length);
               <div className="review-modal-body">
                 {/* Left: Order summary */}
                 <div className="review-modal-left">
-                  <img 
-                    src={reviewModalOrder.image} 
-                    alt={reviewModalOrder.eventName} 
-                    className="review-order-image" 
+                  <img
+                    src={reviewModalOrder.image}
+                    alt={reviewModalOrder.eventName}
+                    className="review-order-image"
                   />
                   <h4 className="review-order-name">{reviewModalOrder.eventName}</h4>
                   <div className="review-order-meta-row">
@@ -1087,17 +1158,9 @@ console.log("Length:", orders.length);
                     ))}
                   </div>
 
-                  <label className="review-field-label">Review Title</label>
-                  <input 
-                    type="text"
-                    className="review-title-input"
-                    placeholder="e.g. Beautiful Memories, Perfectly Captured"
-                    value={rData.title}
-                    onChange={(e) => setReviewTitle(reviewModalOrderId, e.target.value)}
-                  />
 
                   <label className="review-field-label">Your Review</label>
-                  <textarea 
+                  <textarea
                     className="review-text-area"
                     placeholder="Tell us about your experience with the team, the shoot, and the final photos..."
                     value={rData.reviewText}
@@ -1110,13 +1173,12 @@ console.log("Length:", orders.length);
                   </div>
 
                   <label className="review-field-label">Add Photos (Optional)</label>
-                  <span className="review-field-hint">Upload up to 5 photos from your event</span>
 
                   <div className="review-photos-grid">
                     <label className="review-upload-tile">
-                      <input 
-                        type="file" 
-                        accept="image/*" 
+                      <input
+                        type="file"
+                        accept="image/*"
                         multiple
                         style={{ display: 'none' }}
                         onChange={(e) => handleReviewPhotoUpload(reviewModalOrderId, e.target.files)}
@@ -1129,9 +1191,21 @@ console.log("Length:", orders.length);
 
                     {rData.photos.map((photo) => (
                       <div key={photo.id} className="review-photo-tile">
-                        <img src={photo.previewUrl} alt="review upload" />
-                        <button 
-                          type="button" 
+                        <img src={photo.previewUrl} alt="selected" style={{ opacity: photo.uploading ? 0.5 : 1 }} />
+                        {photo.uploading && (
+                          <div style={{
+                            position: 'absolute', inset: 0,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          }}>
+                            <div style={{
+                              width: '16px', height: '16px', border: '2px solid #E8A317',
+                              borderTopColor: 'transparent', borderRadius: '50%',
+                              animation: 'spin 0.7s linear infinite',
+                            }} />
+                          </div>
+                        )}
+                        <button
+                          type="button"
                           className="remove-review-photo-btn"
                           onClick={() => removeReviewPhoto(reviewModalOrderId, photo.id)}
                         >
@@ -1142,17 +1216,17 @@ console.log("Length:", orders.length);
                   </div>
 
                   <label className="review-public-checkbox-row">
-                    <input 
+                    <input
                       type="checkbox"
-                      checked={rData.publicShare}
-                      onChange={() => togglePublicShare(reviewModalOrderId)}
+                      checked={rData.is_recommended}
+                      onChange={() => toggleIsRecommended(reviewModalOrderId)}
                     />
                     <div>
                       <span className="review-public-checkbox-title">
-                        Allow this review to be shown publicly
+                        I would recommend this photographer
                       </span>
                       <span className="review-public-checkbox-desc">
-                        Your name and review may be displayed on our platform.
+                        Let others know if you'd book this photographer again.
                       </span>
                     </div>
                   </label>
@@ -1161,15 +1235,15 @@ console.log("Length:", orders.length);
 
               {/* Footer */}
               <div className="review-modal-footer">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="review-modal-close-action-btn"
                   onClick={closeReviewModal}
                 >
                   Close
                 </button>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="review-modal-publish-btn"
                   onClick={() => publishReview(reviewModalOrderId)}
                   disabled={rData.submitting}

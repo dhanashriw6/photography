@@ -46,9 +46,11 @@ const LoginPhotographer = () => {
       setLoading(true);
       const res = await loginAsPhotographer(payload);
 
-      const { access_token, refresh_token } = res?.data?.data || {};
+      const { access_token, refresh_token, user } = res?.data?.data || {};
       if (access_token) localStorage.setItem('authToken', access_token);
       if (refresh_token) localStorage.setItem('refreshToken', refresh_token);
+      if (user?.first_name) localStorage.setItem('firstName', user.first_name);
+if (user?.last_name) localStorage.setItem('lastName', user.last_name);
 
       // Check KYC status and route accordingly
       try {
