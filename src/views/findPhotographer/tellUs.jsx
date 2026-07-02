@@ -426,6 +426,7 @@ const TellUs = () => {
                   Event Location<span style={{ color: '#e53935' }}>*</span>
                 </label>
                 <AddressAutocomplete
+                  showPin={false}
                   label="Event Location"
                   value={address}
                   onAddressSelect={(val) => {

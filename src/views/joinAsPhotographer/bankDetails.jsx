@@ -490,9 +490,9 @@ const AddBankDetails = ({ onSave, onCancel }) => {
                                 )}
 
                                 <div style={{ display: 'flex', gap: '16px', marginLeft: 'auto', flexShrink: 0 }}>
-                                    <button onClick={() => startEdit(acc)} style={btnGhostStyle}>
+                                    {/* <button onClick={() => startEdit(acc)} style={btnGhostStyle}>
                                         <EditIcon /> Edit
-                                    </button>
+                                    </button> */}
                                     {!acc.is_primary && (
                                         <button onClick={() => handleMakePrimary(acc)} style={btnGhostStyle}>
                                             <StarIcon /> Make Primary

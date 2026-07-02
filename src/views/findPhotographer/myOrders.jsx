@@ -809,13 +809,13 @@ const handleReviewPhotoUpload = (orderId, files) => {
                     {/* Main Card Content */}
                     <div className="order-card-main">
                       {/* Left: Thumbnail Image */}
-                      <div className="card-thumbnail-section">
+                      {/* <div className="card-thumbnail-section">
                         <img
                           src={order.image}
                           alt={order.eventName}
                           className="card-thumbnail"
                         />
-                      </div>
+                      </div> */}
 
                       {/* Middle: Details */}
                       <div className="card-details-section">
@@ -837,7 +837,7 @@ const handleReviewPhotoUpload = (orderId, files) => {
                       </div>
 
                       {/* Status Badges Section */}
-                      <div className="card-status-section">
+                      {/* <div className="card-status-section">
                         <span
                           className="status-pill"
                           style={{ background: bStyle.bg, color: bStyle.color }}
@@ -850,7 +850,7 @@ const handleReviewPhotoUpload = (orderId, files) => {
                         >
                           {order.paymentStatus}
                         </span>
-                      </div>
+                      </div> */}
 
                       {/* Right: Payment pricing */}
                       <div className="card-pricing-section">
@@ -860,12 +860,7 @@ const handleReviewPhotoUpload = (orderId, files) => {
                             ₹{order.paidAmount.toLocaleString('en-IN')}
                           </span>
                         </div>
-                        <div className="pricing-col">
-                          <span className="price-label">Due</span>
-                          <span className="price-value due">
-                            ₹{order.dueAmount.toLocaleString('en-IN')}
-                          </span>
-                        </div>
+                   
                       </div>
 
                       {/* Far Right: Actions */}
@@ -910,14 +905,14 @@ const handleReviewPhotoUpload = (orderId, files) => {
                             Add Review
                           </button>
 
-                          <button
+                          {/* <button
                             type="button"
                             className={`expand-toggle-btn ${isExpanded ? 'active' : ''}`}
                             onClick={() => toggleExpand(order.id)}
                             title={isExpanded ? "Collapse" : "Share References"}
                           >
                             {isExpanded ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
-                          </button>
+                          </button> */}
                         </div>
                       </div>
                     </div>

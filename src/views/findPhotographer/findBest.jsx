@@ -7,7 +7,7 @@ import {
   FiEdit2, FiHeart, FiStar, FiArrowRight, FiMove,
 } from 'react-icons/fi';
 import { draftOrder } from '../../services/order';
-import { getServiceProviders } from '../../services/booking';
+import { getServiceProviders,getServiceProviderDetails  } from '../../services/booking';
 import { getCategory } from '../../services/common';
 import { AddressAutocomplete } from '../joinAsPhotographer/signUp';
 
@@ -423,7 +423,7 @@ const SelectedTeamRow = ({ name, src, skill, price, days, isLead, location, onRe
 const ProviderCard = ({
   name, src, skill, city, state, rating, reviewCount, distanceKm,
   price, isSelected, isLoading, showReplace, isFavorite, onToggleFavorite,
-  onAdd, onRemove, onReplace, onBookNow,
+  onAdd, onRemove, onReplace, onBookNow, durationType,onViewDetails
 }) => {
   const colors = SKILL_COLORS[skill] || { bg: '#f3f4f6', text: '#374151' };
   return (
@@ -442,7 +442,8 @@ const ProviderCard = ({
       </div>
 
       <div className="fb-card-body">
-        <h3 className="fb-card-name">{name}</h3>
+        <h3 className="fb-card-name" style={{ cursor: 'pointer' }}
+    onClick={onViewDetails}>{name}</h3>
         <div className="fb-card-loc"><FiMapPin size={11} /> {city}, {state}</div>
 
         <div className="fb-card-rating">
@@ -455,8 +456,7 @@ const ProviderCard = ({
         </div>
 
         <div className="fb-card-price-row">
-          <span className="fb-card-price">₹{price != null ? price.toLocaleString('en-IN') : '—'}<span className="fb-card-price-unit">/day</span></span>
-          <span className="fb-avail-badge">Available</span>
+          <span className="fb-card-price">₹{price != null ? price.toLocaleString('en-IN') : '—'}<span className="fb-card-price-unit">/{durationType || 'day'}</span></span>          <span className="fb-avail-badge">Available</span>
         </div>
       </div>
 
@@ -594,33 +594,33 @@ const FindBest = () => {
         end_datetime: newEndDatetime,
         ...(summaryForm.address
           ? {
-              lat: summaryForm.address.lat,
-              lng: summaryForm.address.lng,
-              place_id: summaryForm.address.place_id,
-              address_line1: summaryForm.address.address_line1,
-              address_line2: summaryForm.address.address_line2,
-              address_line3: summaryForm.address.address_line3,
-              city: summaryForm.address.city,
-              state: summaryForm.address.state,
-              state_code: summaryForm.address.state_code,
-              country: summaryForm.address.country,
-              country_code: summaryForm.address.country_code,
-              postal_code: summaryForm.address.postal_code,
-              timezone: summaryForm.address.timezone,
-            }
+            lat: summaryForm.address.lat,
+            lng: summaryForm.address.lng,
+            place_id: summaryForm.address.place_id,
+            address_line1: summaryForm.address.address_line1,
+            address_line2: summaryForm.address.address_line2,
+            address_line3: summaryForm.address.address_line3,
+            city: summaryForm.address.city,
+            state: summaryForm.address.state,
+            state_code: summaryForm.address.state_code,
+            country: summaryForm.address.country,
+            country_code: summaryForm.address.country_code,
+            postal_code: summaryForm.address.postal_code,
+            timezone: summaryForm.address.timezone,
+          }
           : {}),
       };
 
       const selectedRoles = [...roleFilter];
       const response = await getServiceProviders({
-  category_id: newFilters.category_id,
-  lat: newFilters.lat,
-  lng: newFilters.lng,
-  start_datetime: newFilters.start_datetime,
-  end_datetime: newFilters.end_datetime,
-});
+        category_id: newFilters.category_id,
+        lat: newFilters.lat,
+        lng: newFilters.lng,
+        start_datetime: newFilters.start_datetime,
+        end_datetime: newFilters.end_datetime,
+      });
 
-setProviders(response?.data?.data || []);
+      setProviders(response?.data?.data || []);
       setActiveFilters(newFilters);
       setEditingFilters(false);
     } catch (err) {
@@ -669,13 +669,13 @@ setProviders(response?.data?.data || []);
   });
 
   const matchesSearch = (name) => name.toLowerCase().includes(search.toLowerCase());
-const matchesBudget = (unitPrice) => {
-  if (unitPrice == null) return true;
+  const matchesBudget = (unitPrice) => {
+    if (unitPrice == null) return true;
 
-  const max = budgetRange[1] >= 25000 ? Infinity : budgetRange[1];
+    const max = budgetRange[1] >= 25000 ? Infinity : budgetRange[1];
 
-  return unitPrice >= budgetRange[0] && unitPrice <= max;
-};
+    return unitPrice >= budgetRange[0] && unitPrice <= max;
+  };
 
   /* ── Package mode ── */
   const packageProviderIds = new Set(
@@ -697,7 +697,7 @@ const matchesBudget = (unitPrice) => {
     return (
       matchesSearch(name) &&
       (p.skills || []).some((s) => roleFilter.has(s.skill)) &&
-     matchesBudget(primaryPkg?.price_with_commission)
+      matchesBudget(primaryPkg?.price_with_commission)
     );
   });
 
@@ -721,7 +721,9 @@ const matchesBudget = (unitPrice) => {
       return next;
     });
   };
-
+const handleViewProvider = (providerId) => {
+  navigate(`/service-provider/${providerId}`, { state: { filters: activeFilters } });
+};
   const handleBookSingle = async (provider) => {
     const key = `${provider.id}-single`;
     try {
@@ -1003,6 +1005,7 @@ const matchesBudget = (unitPrice) => {
                             reviewCount={p.reviews?.count || 0}
                             distanceKm={p.distance_meters != null ? (p.distance_meters / 1000).toFixed(1) : null}
                             price={pkg?.price_with_commission}
+                            durationType={pkg?.duration_type}
                             isSelected={false}
                             isLoading={isLoading}
                             showReplace={showReplace}
@@ -1011,6 +1014,8 @@ const matchesBudget = (unitPrice) => {
                             onAdd={() => handleToggleAdd(p.id)}
                             onReplace={() => handleReplaceInPackage(p)}
                             onBookNow={() => handleBookSingle(p)}
+                              onViewDetails={() => handleViewProvider(p.id)}
+
                           />
                         );
                       })
@@ -1030,6 +1035,7 @@ const matchesBudget = (unitPrice) => {
                             distanceKm={r.provider.distance_meters != null ? (r.provider.distance_meters / 1000).toFixed(1) : null}
                             price={r.pkg?.price_with_commission}
                             isSelected={false}
+                            durationType={r.pkg?.duration_type}
                             isLoading={isLoading}
                             showReplace={showReplace}
                             isFavorite={favorites.has(r.key)}
@@ -1037,6 +1043,7 @@ const matchesBudget = (unitPrice) => {
                             onAdd={() => handleToggleSelect(r)}
                             onReplace={() => handleReplaceInCategory(r)}
                             onBookNow={() => handleBookNow(r)}
+                            onViewDetails={() => handleViewProvider(r.provider.id)}
                           />
                         );
                       })}

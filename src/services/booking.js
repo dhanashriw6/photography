@@ -36,3 +36,7 @@ export const getUpcomingBookings = async (params) => {
     }
   );
 };
+
+export const getServiceProviderDetails = async (id) => {
+  return await httpServices.get(bookingEndpoint.getServiceProviderDetails(id));
+};

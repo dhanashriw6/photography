@@ -44,7 +44,8 @@ export const bookingEndpoint={
   getPackage:`${baseUrl}/booking/package_suggestions`,
   getServiceProviders:`${baseUrl}/booking/service_providers`,
   getBookingCounts:`${baseUrl}/booking/counts`,
-  getUpcomingBookings : `${baseUrl}/booking/upcoming`
+  getUpcomingBookings : `${baseUrl}/booking/upcoming`,
+  getServiceProviderDetails: (id) => `${baseUrl}/user/service-provider/${id}`,
   
 }
 
@@ -60,7 +61,8 @@ export const orderEndpoint = {
   cancelPayment: (orderId) => `${baseUrl}/order/${orderId}/cancel-payment`,
   getOrderDetails: (orderId) => `${baseUrl}/order/${orderId}`,
   getDraftOrders : `${baseUrl}/order/draft`,
-  getCustomerOrder: `${baseUrl}/order/list-customer-orders`
+  getCustomerOrder: `${baseUrl}/order/list-customer-orders`,
+  
 }
 
 export const calendarEndpoint = {

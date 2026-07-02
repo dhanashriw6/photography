@@ -20,6 +20,7 @@ import {
 } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { getCustomerOrders } from '../../services/order';
+import ServerError from '../ServerError';
 
 // TODO: replace with real data once the orders API is wired up.
 const STATIC_ORDERS = [
@@ -421,267 +422,268 @@ const YourOrderList = () => {
     const totalCount = STATIC_ORDERS.length;
 
     return (
-        <div>
-            <h2 className="pe-title" style={{ marginBottom: '4px' }}>
-                Order Management
-            </h2>
-            <p style={{ color: '#888', fontSize: '14px', margin: '0 0 22px' }}>
-                Track and manage all your photography orders in one place.
-            </p>
+        // <div>
+        //     <h2 className="pe-title" style={{ marginBottom: '4px' }}>
+        //         Order Management
+        //     </h2>
+        //     <p style={{ color: '#888', fontSize: '14px', margin: '0 0 22px' }}>
+        //         Track and manage all your photography orders in one place.
+        //     </p>
 
-            {/* Stat cards */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', marginBottom: '22px' }}>
-                <StatCard
-                    icon={<FiClipboard size={18} />}
-                    iconBg="#FFF3D6" iconColor="#B7791F"
-                    value={stats.total} label="Total Orders" sub="All time orders"
-                />
-                <StatCard
-                    icon={<FiClock size={18} />}
-                    iconBg="#FFF3D6" iconColor="#B7791F"
-                    value={stats.pending} label="Pending Approval" sub="Awaiting your approval"
-                />
-                <StatCard
-                    icon={<FiCalendar size={18} />}
-                    iconBg="#FFF3D6" iconColor="#B7791F"
-                    value={stats.upcoming} label="Upcoming Shoots" sub="In the next 30 days"
-                />
-                <StatCard
-                    icon={<FiCheckCircle size={18} />}
-                    iconBg="#E2F6EE" iconColor="#0D9488"
-                    value={stats.completed} label="Completed" sub="Successfully completed"
-                />
-                <StatCard
-                    icon={<FiXCircle size={18} />}
-                    iconBg="#FDE6E5" iconColor="#E0473C"
-                    value={stats.cancelled} label="Cancelled" sub="Cancelled orders"
-                />
-            </div>
+        //     {/* Stat cards */}
+        //     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', marginBottom: '22px' }}>
+        //         <StatCard
+        //             icon={<FiClipboard size={18} />}
+        //             iconBg="#FFF3D6" iconColor="#B7791F"
+        //             value={stats.total} label="Total Orders" sub="All time orders"
+        //         />
+        //         <StatCard
+        //             icon={<FiClock size={18} />}
+        //             iconBg="#FFF3D6" iconColor="#B7791F"
+        //             value={stats.pending} label="Pending Approval" sub="Awaiting your approval"
+        //         />
+        //         <StatCard
+        //             icon={<FiCalendar size={18} />}
+        //             iconBg="#FFF3D6" iconColor="#B7791F"
+        //             value={stats.upcoming} label="Upcoming Shoots" sub="In the next 30 days"
+        //         />
+        //         <StatCard
+        //             icon={<FiCheckCircle size={18} />}
+        //             iconBg="#E2F6EE" iconColor="#0D9488"
+        //             value={stats.completed} label="Completed" sub="Successfully completed"
+        //         />
+        //         <StatCard
+        //             icon={<FiXCircle size={18} />}
+        //             iconBg="#FDE6E5" iconColor="#E0473C"
+        //             value={stats.cancelled} label="Cancelled" sub="Cancelled orders"
+        //         />
+        //     </div>
 
-            {/* Filter bar */}
-            <div
-                style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    alignItems: 'flex-end',
-                    gap: '12px',
-                    background: '#fff',
-                    border: '1px solid #f1f1f1',
-                    borderRadius: '14px',
-                    padding: '14px 16px',
-                    marginBottom: '18px',
-                }}
-            >
-                <div style={{ flex: 2, minWidth: '220px' }}>
-                    <div style={{ fontSize: '11px', color: '#999', marginBottom: '4px', fontWeight: 600 }}>&nbsp;</div>
-                    <div
-                        style={{
-                            display: 'flex', alignItems: 'center', gap: '10px',
-                            border: '1.5px solid #e2e2e2', borderRadius: '8px',
-                            padding: '9px 12px',
-                        }}
-                    >
-                        <FiSearch color="#999" size={15} />
-                        <input
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Search by order ID, event or client..."
-                            style={{ border: 'none', outline: 'none', width: '100%', fontSize: '13px', background: 'transparent' }}
-                        />
-                    </div>
-                </div>
+        //     {/* Filter bar */}
+        //     <div
+        //         style={{
+        //             display: 'flex',
+        //             flexWrap: 'wrap',
+        //             alignItems: 'flex-end',
+        //             gap: '12px',
+        //             background: '#fff',
+        //             border: '1px solid #f1f1f1',
+        //             borderRadius: '14px',
+        //             padding: '14px 16px',
+        //             marginBottom: '18px',
+        //         }}
+        //     >
+        //         <div style={{ flex: 2, minWidth: '220px' }}>
+        //             <div style={{ fontSize: '11px', color: '#999', marginBottom: '4px', fontWeight: 600 }}>&nbsp;</div>
+        //             <div
+        //                 style={{
+        //                     display: 'flex', alignItems: 'center', gap: '10px',
+        //                     border: '1.5px solid #e2e2e2', borderRadius: '8px',
+        //                     padding: '9px 12px',
+        //                 }}
+        //             >
+        //                 <FiSearch color="#999" size={15} />
+        //                 <input
+        //                     value={search}
+        //                     onChange={(e) => setSearch(e.target.value)}
+        //                     placeholder="Search by order ID, event or client..."
+        //                     style={{ border: 'none', outline: 'none', width: '100%', fontSize: '13px', background: 'transparent' }}
+        //                 />
+        //             </div>
+        //         </div>
 
-                <Dropdown label="Sort by" value={sortBy} options={SORT_OPTIONS} onChange={setSortBy} />
-                <Dropdown label="Event Type" value={eventType} options={EVENT_TYPE_OPTIONS} onChange={setEventType} />
-                <Dropdown label="Payout Status" value={payoutStatus} options={PAYOUT_OPTIONS} onChange={setPayoutStatus} />
+        //         <Dropdown label="Sort by" value={sortBy} options={SORT_OPTIONS} onChange={setSortBy} />
+        //         <Dropdown label="Event Type" value={eventType} options={EVENT_TYPE_OPTIONS} onChange={setEventType} />
+        //         <Dropdown label="Payout Status" value={payoutStatus} options={PAYOUT_OPTIONS} onChange={setPayoutStatus} />
 
-                <div style={{ display: 'flex', gap: '4px', background: '#f4f4f4', borderRadius: '8px', padding: '4px' }}>
-                    {['upcoming', 'past'].map((t) => (
-                        <button
-                            key={t}
-                            type="button"
-                            onClick={() => { setTab(t); setPage(1); }}
-                            style={{
-                                border: 'none',
-                                borderRadius: '6px',
-                                padding: '8px 16px',
-                                fontSize: '13px',
-                                fontWeight: 700,
-                                cursor: 'pointer',
-                                textTransform: 'capitalize',
-                                background: tab === t ? '#fff' : 'transparent',
-                                color: tab === t ? ACCENT : '#777',
-                                boxShadow: tab === t ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
-                            }}
-                        >
-                            {t}
-                        </button>
-                    ))}
-                </div>
-            </div>
+        //         <div style={{ display: 'flex', gap: '4px', background: '#f4f4f4', borderRadius: '8px', padding: '4px' }}>
+        //             {['upcoming', 'past'].map((t) => (
+        //                 <button
+        //                     key={t}
+        //                     type="button"
+        //                     onClick={() => { setTab(t); setPage(1); }}
+        //                     style={{
+        //                         border: 'none',
+        //                         borderRadius: '6px',
+        //                         padding: '8px 16px',
+        //                         fontSize: '13px',
+        //                         fontWeight: 700,
+        //                         cursor: 'pointer',
+        //                         textTransform: 'capitalize',
+        //                         background: tab === t ? '#fff' : 'transparent',
+        //                         color: tab === t ? ACCENT : '#777',
+        //                         boxShadow: tab === t ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
+        //                     }}
+        //                 >
+        //                     {t}
+        //                 </button>
+        //             ))}
+        //         </div>
+        //     </div>
 
-            {/* Table */}
-            <div style={{ background: '#fff', border: '1px solid #f1f1f1', borderRadius: '14px', overflow: 'hidden' }}>
-                <div
-                    style={{
-                        display: 'grid',
-                        gridTemplateColumns: '110px 1.3fr 1.1fr 1.1fr 1fr 0.9fr 1.1fr 110px',
-                        gap: '8px',
-                        padding: '12px 18px',
-                        background: '#FAFAFA',
-                        borderBottom: '1px solid #f1f1f1',
-                        fontSize: '11px',
-                        fontWeight: 700,
-                        color: '#999',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.04em',
-                    }}
-                >
-                    <div>Order ID</div>
-                    <div>Event Name</div>
-                    <div>Client</div>
-                    <div>Date</div>
-                    <div>Package</div>
-                    <div>Amount</div>
-                    <div>Status</div>
-                    <div style={{ textAlign: 'right' }}>Actions</div>
-                </div>
+        //     {/* Table */}
+        //     <div style={{ background: '#fff', border: '1px solid #f1f1f1', borderRadius: '14px', overflow: 'hidden' }}>
+        //         <div
+        //             style={{
+        //                 display: 'grid',
+        //                 gridTemplateColumns: '110px 1.3fr 1.1fr 1.1fr 1fr 0.9fr 1.1fr 110px',
+        //                 gap: '8px',
+        //                 padding: '12px 18px',
+        //                 background: '#FAFAFA',
+        //                 borderBottom: '1px solid #f1f1f1',
+        //                 fontSize: '11px',
+        //                 fontWeight: 700,
+        //                 color: '#999',
+        //                 textTransform: 'uppercase',
+        //                 letterSpacing: '0.04em',
+        //             }}
+        //         >
+        //             <div>Order ID</div>
+        //             <div>Event Name</div>
+        //             <div>Client</div>
+        //             <div>Date</div>
+        //             <div>Package</div>
+        //             <div>Amount</div>
+        //             <div>Status</div>
+        //             <div style={{ textAlign: 'right' }}>Actions</div>
+        //         </div>
 
-                {filtered.length === 0 ? (
-                    <div style={{ padding: '48px 0', textAlign: 'center', color: '#bbb', fontSize: '14px' }}>
-                        No orders found.
-                    </div>
-                ) : (
-                    filtered.map((order) => {
-                        const { date, time } = formatDate(order.date);
-                        const badge = STATUS_STYLES[order.status] || STATUS_STYLES.Upcoming;
-                        return (
-                            <div
-                                key={order.id}
-                                style={{
-                                    display: 'grid',
-                                    gridTemplateColumns: '110px 1.3fr 1.1fr 1.1fr 1fr 0.9fr 1.1fr 110px',
-                                    gap: '8px',
-                                    padding: '14px 18px',
-                                    borderBottom: '1px solid #f5f5f5',
-                                    alignItems: 'center',
-                                    fontSize: '13px',
-                                    color: '#333',
-                                }}
-                            >
-                                <div style={{ fontWeight: 600, color: '#444' }}>{order.id}</div>
-                                <div style={{ fontWeight: 600, color: '#1a1a1a' }}>{order.eventName}</div>
-                                <div>{order.client}</div>
-                                <div>
-                                    <div>{date}</div>
-                                    <div style={{ fontSize: '11px', color: '#999' }}>{time}</div>
-                                </div>
-                                <div>{order.package}</div>
-                                <div style={{ fontWeight: 700 }}>₹{order.amount.toLocaleString('en-US')}.00</div>
-                                <div>
-                                    <span
-                                        style={{
-                                            ...badge,
-                                            fontSize: '11px',
-                                            fontWeight: 700,
-                                            padding: '4px 10px',
-                                            borderRadius: '999px',
-                                            whiteSpace: 'nowrap',
-                                        }}
-                                    >
-                                        {order.status}
-                                    </span>
-                                </div>
-                                <RowActions order={order} onView={() => navigate('/order-summary')} />
-                            </div>
-                        );
-                    })
-                )}
-            </div>
+        //         {filtered.length === 0 ? (
+        //             <div style={{ padding: '48px 0', textAlign: 'center', color: '#bbb', fontSize: '14px' }}>
+        //                 No orders found.
+        //             </div>
+        //         ) : (
+        //             filtered.map((order) => {
+        //                 const { date, time } = formatDate(order.date);
+        //                 const badge = STATUS_STYLES[order.status] || STATUS_STYLES.Upcoming;
+        //                 return (
+        //                     <div
+        //                         key={order.id}
+        //                         style={{
+        //                             display: 'grid',
+        //                             gridTemplateColumns: '110px 1.3fr 1.1fr 1.1fr 1fr 0.9fr 1.1fr 110px',
+        //                             gap: '8px',
+        //                             padding: '14px 18px',
+        //                             borderBottom: '1px solid #f5f5f5',
+        //                             alignItems: 'center',
+        //                             fontSize: '13px',
+        //                             color: '#333',
+        //                         }}
+        //                     >
+        //                         <div style={{ fontWeight: 600, color: '#444' }}>{order.id}</div>
+        //                         <div style={{ fontWeight: 600, color: '#1a1a1a' }}>{order.eventName}</div>
+        //                         <div>{order.client}</div>
+        //                         <div>
+        //                             <div>{date}</div>
+        //                             <div style={{ fontSize: '11px', color: '#999' }}>{time}</div>
+        //                         </div>
+        //                         <div>{order.package}</div>
+        //                         <div style={{ fontWeight: 700 }}>₹{order.amount.toLocaleString('en-US')}.00</div>
+        //                         <div>
+        //                             <span
+        //                                 style={{
+        //                                     ...badge,
+        //                                     fontSize: '11px',
+        //                                     fontWeight: 700,
+        //                                     padding: '4px 10px',
+        //                                     borderRadius: '999px',
+        //                                     whiteSpace: 'nowrap',
+        //                                 }}
+        //                             >
+        //                                 {order.status}
+        //                             </span>
+        //                         </div>
+        //                         <RowActions order={order} onView={() => navigate('/order-summary')} />
+        //                     </div>
+        //                 );
+        //             })
+        //         )}
+        //     </div>
 
-            {/* Pagination */}
-            <div
-                style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '12px',
-                    marginTop: '18px',
-                }}
-            >
-                <div style={{ fontSize: '13px', color: '#888' }}>
-                    Showing 1 to {filtered.length} of {totalCount} orders
-                </div>
+        //     {/* Pagination */}
+        //     <div
+        //         style={{
+        //             display: 'flex',
+        //             flexWrap: 'wrap',
+        //             alignItems: 'center',
+        //             justifyContent: 'space-between',
+        //             gap: '12px',
+        //             marginTop: '18px',
+        //         }}
+        //     >
+        //         <div style={{ fontSize: '13px', color: '#888' }}>
+        //             Showing 1 to {filtered.length} of {totalCount} orders
+        //         </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    <Dropdown value={pageSize} options={PAGE_SIZE_OPTIONS} onChange={setPageSize} />
+        //         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+        //             <Dropdown value={pageSize} options={PAGE_SIZE_OPTIONS} onChange={setPageSize} />
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        {[FiChevronsLeft, FiChevronLeft].map((Icon, i) => (
-                            <button
-                                key={i}
-                                type="button"
-                                style={{
-                                    width: '32px', height: '32px', border: '1px solid #e2e2e2',
-                                    borderRadius: '8px', background: '#fff', color: '#999',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    cursor: 'pointer',
-                                }}
-                            >
-                                <Icon size={14} />
-                            </button>
-                        ))}
+        //             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+        //                 {[FiChevronsLeft, FiChevronLeft].map((Icon, i) => (
+        //                     <button
+        //                         key={i}
+        //                         type="button"
+        //                         style={{
+        //                             width: '32px', height: '32px', border: '1px solid #e2e2e2',
+        //                             borderRadius: '8px', background: '#fff', color: '#999',
+        //                             display: 'flex', alignItems: 'center', justifyContent: 'center',
+        //                             cursor: 'pointer',
+        //                         }}
+        //                     >
+        //                         <Icon size={14} />
+        //                     </button>
+        //                 ))}
 
-                        {[1, 2, 3].map((p) => (
-                            <button
-                                key={p}
-                                type="button"
-                                onClick={() => setPage(p)}
-                                style={{
-                                    width: '32px', height: '32px',
-                                    border: page === p ? `1px solid ${ACCENT}` : '1px solid #e2e2e2',
-                                    borderRadius: '8px',
-                                    background: page === p ? '#FFF3D6' : '#fff',
-                                    color: page === p ? ACCENT_TEXT : '#666',
-                                    fontWeight: 700, fontSize: '13px',
-                                    cursor: 'pointer',
-                                }}
-                            >
-                                {p}
-                            </button>
-                        ))}
-                        <span style={{ color: '#bbb', fontSize: '13px', padding: '0 2px' }}>...</span>
-                        <button
-                            type="button"
-                            onClick={() => setPage(13)}
-                            style={{
-                                width: '32px', height: '32px', border: '1px solid #e2e2e2',
-                                borderRadius: '8px', background: '#fff', color: '#666',
-                                fontWeight: 700, fontSize: '13px', cursor: 'pointer',
-                            }}
-                        >
-                            13
-                        </button>
+        //                 {[1, 2, 3].map((p) => (
+        //                     <button
+        //                         key={p}
+        //                         type="button"
+        //                         onClick={() => setPage(p)}
+        //                         style={{
+        //                             width: '32px', height: '32px',
+        //                             border: page === p ? `1px solid ${ACCENT}` : '1px solid #e2e2e2',
+        //                             borderRadius: '8px',
+        //                             background: page === p ? '#FFF3D6' : '#fff',
+        //                             color: page === p ? ACCENT_TEXT : '#666',
+        //                             fontWeight: 700, fontSize: '13px',
+        //                             cursor: 'pointer',
+        //                         }}
+        //                     >
+        //                         {p}
+        //                     </button>
+        //                 ))}
+        //                 <span style={{ color: '#bbb', fontSize: '13px', padding: '0 2px' }}>...</span>
+        //                 <button
+        //                     type="button"
+        //                     onClick={() => setPage(13)}
+        //                     style={{
+        //                         width: '32px', height: '32px', border: '1px solid #e2e2e2',
+        //                         borderRadius: '8px', background: '#fff', color: '#666',
+        //                         fontWeight: 700, fontSize: '13px', cursor: 'pointer',
+        //                     }}
+        //                 >
+        //                     13
+        //                 </button>
 
-                        {[FiChevronRight, FiChevronsRight].map((Icon, i) => (
-                            <button
-                                key={i}
-                                type="button"
-                                style={{
-                                    width: '32px', height: '32px', border: '1px solid #e2e2e2',
-                                    borderRadius: '8px', background: '#fff', color: '#999',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    cursor: 'pointer',
-                                }}
-                            >
-                                <Icon size={14} />
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            </div>
-        </div>
+        //                 {[FiChevronRight, FiChevronsRight].map((Icon, i) => (
+        //                     <button
+        //                         key={i}
+        //                         type="button"
+        //                         style={{
+        //                             width: '32px', height: '32px', border: '1px solid #e2e2e2',
+        //                             borderRadius: '8px', background: '#fff', color: '#999',
+        //                             display: 'flex', alignItems: 'center', justifyContent: 'center',
+        //                             cursor: 'pointer',
+        //                         }}
+        //                     >
+        //                         <Icon size={14} />
+        //                     </button>
+        //                 ))}
+        //             </div>
+        //         </div>
+        //     </div>
+        // </div>
+        <ServerError />
     );
 };
 

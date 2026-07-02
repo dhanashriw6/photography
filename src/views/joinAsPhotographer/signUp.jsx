@@ -220,7 +220,7 @@ const parseGeocodeResult = (result, placeId) => {
     timezone,
   };
 };
-export const AddressAutocomplete = ({ label, hint, value, onAddressSelect, error, isCurrentAddress }) => {
+export const AddressAutocomplete = ({ label, hint, value, onAddressSelect, error, isCurrentAddress, showPin = true }) => {
   const [inputValue, setInputValue] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [open, setOpen] = useState(false);
@@ -415,9 +415,9 @@ export const AddressAutocomplete = ({ label, hint, value, onAddressSelect, error
 
       {hint && <p className="su-field-hint">{hint}</p>}
       {error && <p className="su-error">{error}</p>}
+      
 
-      {/* Pincode — shown after address is selected, prefilled from geocode */}
-      {(value || postalCode !== '') && (
+      {showPin && (value || postalCode !== '') && (
         <div style={{ marginTop: '12px' }}>
           <label style={{ fontSize: '13px' }}>
             Pincode / Zipcode

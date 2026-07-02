@@ -21,7 +21,6 @@ import { useNavigate } from 'react-router-dom';
 // There's no explicit expiry field from the API yet, so we derive it
 // from created_at. Swap this out once the backend sends a real
 // `expires_at` field.
-const DRAFT_LIFETIME_MS = 60 * 60 * 1000;
 const EXPIRING_SOON_THRESHOLD_MS = 20 * 60 * 1000;
 
 const ACCENT = '#E8A317';
@@ -48,16 +47,20 @@ const formatTime = (date) => {
 
 const pad = (n) => String(Math.max(0, n)).padStart(2, '0');
 
-const getExpiryInfo = (createdAt, now) => {
+const getExpiryInfo = (createdAt, expiresAt, now) => {
     const createdMs = new Date(createdAt).getTime();
-    const expiresAtMs = createdMs + DRAFT_LIFETIME_MS;
+    const expiresAtMs = new Date(expiresAt).getTime();
+
+    const totalLifetime = Math.max(1, expiresAtMs - createdMs);
     const remainingMs = expiresAtMs - now;
+
     const percentRemaining = Math.min(
         100,
-        Math.max(0, (remainingMs / DRAFT_LIFETIME_MS) * 100)
+        Math.max(0, (remainingMs / totalLifetime) * 100)
     );
 
     const clamped = Math.max(0, remainingMs);
+
     const hrs = Math.floor(clamped / (1000 * 60 * 60));
     const mins = Math.floor((clamped % (1000 * 60 * 60)) / (1000 * 60));
     const secs = Math.floor((clamped % (1000 * 60)) / 1000);
@@ -66,7 +69,9 @@ const getExpiryInfo = (createdAt, now) => {
         remainingMs: clamped,
         percentRemaining,
         expired: remainingMs <= 0,
-        isExpiringSoon: remainingMs > 0 && remainingMs <= EXPIRING_SOON_THRESHOLD_MS,
+        isExpiringSoon:
+            remainingMs > 0 &&
+            remainingMs <= EXPIRING_SOON_THRESHOLD_MS,
         label: `${pad(hrs)} : ${pad(mins)} : ${pad(secs)}`,
     };
 };
@@ -207,7 +212,11 @@ const DraftOrders = () => {
         () =>
             draftOrders.map((order) => ({
                 ...order,
-                __expiry: getExpiryInfo(order.created_at, now),
+                __expiry: getExpiryInfo(
+                    order.created_at,
+                    order.expires_at,
+                    now
+                ),
             })),
         [draftOrders, now]
     );
@@ -315,12 +324,7 @@ const DraftOrders = () => {
                                 label="Drafts in progress"
                                 accent={{ bg: '#FFF4D6', fg: ACCENT_DARK }}
                             />
-                            <StatCard
-                                icon={<FiClock size={18} />}
-                                value={stats.expiringSoonCount}
-                                label="Expire less than 20 mins"
-                                accent={{ bg: '#FFF4D6', fg: ACCENT_DARK }}
-                            />
+
                             <StatCard
                                 icon={<BsCurrencyRupee size={18} />}
                                 value={`₹${stats.totalValue.toLocaleString('en-IN')}`}
@@ -680,9 +684,9 @@ const DraftOrders = () => {
                                                         lineHeight: 1.3,
                                                     }}
                                                 >
-                                                    Auto-delete
-                                                    <br />
-                                                    in 1 hour
+                                                   Auto-delete
+<br />
+on expiry
                                                 </span>
                                             </div>
                                         </div>
@@ -719,7 +723,7 @@ const DraftOrders = () => {
                                                 </span>
                                             </div>
 
-                                           
+
 
                                             <button
                                                 onClick={() =>
