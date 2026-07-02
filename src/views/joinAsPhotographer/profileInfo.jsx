@@ -19,6 +19,151 @@ const uploadFileToAWS = async (file, documentFor = 'profile') => {
     return key;
 };
 
+/* ─── Google Maps JS API loader (singleton) ──────────────────────────────── */
+let googleMapsPromise = null;
+const loadGoogleMaps = () => {
+    if (typeof window !== 'undefined' && window.google?.maps) return Promise.resolve(window.google);
+    if (googleMapsPromise) return googleMapsPromise;
+    googleMapsPromise = new Promise((resolve, reject) => {
+        const existing = document.getElementById('gmaps-js-sdk');
+        if (existing) {
+            existing.addEventListener('load', () => resolve(window.google));
+            existing.addEventListener('error', reject);
+            return;
+        }
+        const script = document.createElement('script');
+        script.id = 'gmaps-js-sdk';
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}`;
+        script.async = true;
+        script.defer = true;
+        script.onload = () => resolve(window.google);
+        script.onerror = (err) => { googleMapsPromise = null; reject(err); };
+        document.head.appendChild(script);
+    });
+    return googleMapsPromise;
+};
+
+/* ─── Radius Map Picker ───────────────────────────────────────────────────
+ * Renders a live Google Map with a marker + circle overlay showing the
+ * shooting radius (in km) around the given lat/lng.
+ * ─────────────────────────────────────────────────────────────────────── */
+const DEFAULT_MAP_CENTER = { lat: 22.3039, lng: 70.8022 }; // Rajkot fallback
+
+const RadiusMapPicker = ({ lat, lng, radiusKm }) => {
+    const mapRef = useRef(null);
+    const mapObjRef = useRef(null);
+    const circleRef = useRef(null);
+    const markerRef = useRef(null);
+    const [ready, setReady] = useState(false);
+    const [loadErr, setLoadErr] = useState(false);
+
+    useEffect(() => {
+        let cancelled = false;
+        loadGoogleMaps()
+            .then(() => { if (!cancelled) setReady(true); })
+            .catch(() => { if (!cancelled) setLoadErr(true); });
+        return () => { cancelled = true; };
+    }, []);
+
+    useEffect(() => {
+        if (!ready || !mapRef.current || !window.google?.maps) return;
+
+        const hasCoords = typeof lat === 'number' && typeof lng === 'number' && lat !== 0 && lng !== 0;
+        const center = hasCoords ? { lat, lng } : DEFAULT_MAP_CENTER;
+        const radiusMeters = Math.max(0, (Number(radiusKm) || 0) * 1000);
+
+        if (!mapObjRef.current) {
+            mapObjRef.current = new window.google.maps.Map(mapRef.current, {
+                center,
+                zoom: 10,
+                streetViewControl: false,
+                fullscreenControl: true,
+                mapTypeControl: false,
+            });
+        } else {
+            mapObjRef.current.setCenter(center);
+        }
+
+        if (!markerRef.current) {
+            markerRef.current = new window.google.maps.Marker({ position: center, map: mapObjRef.current });
+        } else {
+            markerRef.current.setPosition(center);
+        }
+
+        if (!circleRef.current) {
+            circleRef.current = new window.google.maps.Circle({
+                strokeColor: '#f5a623',
+                strokeOpacity: 0.9,
+                strokeWeight: 2,
+                fillColor: '#f5a623',
+                fillOpacity: 0.15,
+                map: mapObjRef.current,
+                center,
+                radius: radiusMeters,
+            });
+        } else {
+            circleRef.current.setCenter(center);
+            circleRef.current.setRadius(radiusMeters);
+        }
+
+        if (radiusMeters > 0) {
+            mapObjRef.current.fitBounds(circleRef.current.getBounds());
+        } else {
+            mapObjRef.current.setZoom(10);
+        }
+    }, [ready, lat, lng, radiusKm]);
+
+    return (
+        <div style={{
+            width: '100%', height: '320px', borderRadius: '10px', overflow: 'hidden',
+            border: '1px solid #e5e7eb', marginTop: '12px', background: '#f5f5f5',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+            {loadErr && (
+                <span style={{ fontSize: '12px', color: '#b91c1c' }}>Could not load map. Please refresh.</span>
+            )}
+            {!loadErr && (
+                <div ref={mapRef} style={{ width: '100%', height: '100%' }} />
+            )}
+        </div>
+    );
+};
+
+/* ─── Shooting Radius Field (slider + map) ────────────────────────────────── */
+const ShootRadiusField = ({ value, onChange, lat, lng }) => {
+    const hasCoords = typeof lat === 'number' && typeof lng === 'number' && lat !== 0 && lng !== 0;
+
+    return (
+        <div className="su-field full-width-field" style={{ gridColumn: 'span 2' }}>
+            <label>Shooting Radius<sup style={{ color: '#ef4444' }}>*</sup></label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginTop: '6px' }}>
+                <input
+                    type="range"
+                    min={1}
+                    max={300}
+                    step={1}
+                    value={value}
+                    onChange={(e) => onChange(Number(e.target.value))}
+                    style={{ flex: 1, accentColor: '#f5a623', height: '6px', cursor: 'pointer' }}
+                />
+                <span style={{
+                    minWidth: '72px', textAlign: 'center', padding: '6px 10px',
+                    borderRadius: '6px', background: '#FFF3D6', color: '#1a1a1a',
+                    fontWeight: 700, fontSize: '13px', flexShrink: 0,
+                }}>
+                    {value} km
+                </span>
+            </div>
+            <p className="su-field-hint">
+                {hasCoords
+                    ? 'How far are you willing to travel for a shoot? (Max 300 km)'
+                    : 'Search and select your current address above to preview the radius on the map.'}
+            </p>
+            <RadiusMapPicker lat={lat} lng={lng} radiusKm={value} />
+        </div>
+    );
+};
+
 /* ─── Skills Multi-Select ─────────────────────────────────────────────────── */
 const SKILL_OPTIONS = [
     { value: 'photographer', label: 'Photographer' },
@@ -403,6 +548,10 @@ const addressFromApi = (apiAddr) => {
     };
 };
 
+// Default shooting radius (km) used when a profile has none saved yet.
+// 50 km == the previous hardcoded 50000 meter default.
+const DEFAULT_SHOOT_RADIUS_KM = 50;
+
 /* ─── Main Component ─────────────────────────────────────────────────────── */
 const PhotographerProfileInfo = ({ onSave, onCancel }) => {
     const fileRef = useRef();
@@ -446,6 +595,10 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
     // Address state — full objects ready to send in payload
     const [currentAddress, setCurrentAddress] = useState(emptyAddress());
     const [permanentAddress, setPermanentAddress] = useState(emptyAddress());
+
+    // How far (km) the photographer is willing to travel for a shoot.
+    // Converted to meters as service_area_radius_meters on save.
+    const [shootRadiusKm, setShootRadiusKm] = useState(DEFAULT_SHOOT_RADIUS_KM);
 
     const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
 
@@ -513,7 +666,8 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
                 lat: currentAddress.lat,
                 lng: currentAddress.lng,
                 timezone: currentAddress.timezone || 'Asia/Kolkata',
-                service_area_radius_meters: 50000,
+                // Shooting radius: convert the km value chosen on the slider to meters.
+                service_area_radius_meters: Math.round((Number(shootRadiusKm) || 0) * 1000),
                 ...(currentAddress.place_id && { place_id: currentAddress.place_id }),
             };
         }
@@ -573,7 +727,13 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
                     if (user.profile_document?.url) setPhoto(user.profile_document.url);
 
                     // Pre-fill addresses
-                    if (user.current_address) setCurrentAddress(addressFromApi(user.current_address));
+                    if (user.current_address) {
+                        setCurrentAddress(addressFromApi(user.current_address));
+                        // Pre-fill the shooting radius slider from the saved meters value.
+                        if (user.current_address.service_area_radius_meters) {
+                            setShootRadiusKm(Math.round(user.current_address.service_area_radius_meters / 1000));
+                        }
+                    }
                     if (user.permanent_address) setPermanentAddress(addressFromApi(user.permanent_address));
 
                     if (user.casts?.length) {
@@ -852,6 +1012,14 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
                     <label>Country / Region</label>
                     <input type="text" value={currentAddress.country} onChange={e => setCurrentAddress(p => ({ ...p, country: e.target.value }))} placeholder="Country" />
                 </div>
+
+                {/* Shooting radius slider + live map preview, centered on the current address */}
+                <ShootRadiusField
+                    value={shootRadiusKm}
+                    onChange={setShootRadiusKm}
+                    lat={currentAddress.lat}
+                    lng={currentAddress.lng}
+                />
             </div>
 
             {/* ── Permanent Address ── */}

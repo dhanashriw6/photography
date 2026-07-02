@@ -23,8 +23,10 @@ const uploadFileToAWS = async (file, documentFor = 'portfolio', side = 'front') 
 /* ─── Main Component ─────────────────────────────────────────────────────── */
 const PhotographerPortfolio = ({ onSave, onCancel }) => {
     const portfolioRef = useRef();
+    const awardFileRefs = useRef({});
 
     const [bio, setBio] = useState('');
+    const [equipment, setEquipment] = useState('');
 
     /*
      * portfolioFiles: existing docs from API  →  { id, key, document_type, previewUrl, source: 'existing' }
@@ -49,7 +51,11 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
     const [videoLinks, setVideoLinks]             = useState([{ url: '', title: 'video' }]);
     const [originalVideoLinks, setOriginalVideoLinks] = useState([]);
 
-    const [awards, setAwards] = useState([{ title: '', year: '', details: '' }]);
+    /*
+     * awards: [{ id?, title, imageFile, previewUrl, key, uploading, uploadError }]
+     * id present = existing award loaded from API
+     */
+    const [awards, setAwards] = useState([{ title: '', imageFile: null, previewUrl: null, key: null, uploading: false, uploadError: null }]);
 
     const [saving, setSaving]   = useState(false);
     const [saveErr, setSaveErr] = useState('');
@@ -64,6 +70,7 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
                 if (!user) return;
 
                 if (user.bio) setBio(user.bio);
+                if (user.equipment) setEquipment(user.equipment);
 
                 // Portfolio docs
                 if (user.portfolio_documents?.length) {
@@ -92,7 +99,15 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
                 }
 
                 if (user.awards?.length) {
-                    setAwards(user.awards.map(a => ({ title: a.title || '', year: a.year ? String(a.year) : '', details: a.details || '' })));
+                    setAwards(user.awards.map(a => ({
+                        id: a.id,
+                        title: a.title || '',
+                        imageFile: null,
+                        previewUrl: a.image_url || a.key || null,
+                        key: a.key || null,
+                        uploading: false,
+                        uploadError: null,
+                    })));
                 }
             } catch (err) {
                 console.error('Portfolio profile fetch error:', err);
@@ -147,6 +162,31 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
     const removeVideoLink = (i) => setVideoLinks(v => v.filter((_, idx) => idx !== i));
     const updateVideoLink = (i, field, val) =>
         setVideoLinks(v => v.map((x, idx) => idx === i ? { ...x, [field]: val } : x));
+
+    /* ── Award image upload (mirrors portfolio upload, one image per award) ── */
+    const handleAwardImage = async (index, file) => {
+        if (!file) return;
+        const previewUrl = file.type.startsWith('image/') ? URL.createObjectURL(file) : null;
+        setAwards(prev => prev.map((a, idx) => idx === index
+            ? { ...a, imageFile: file, previewUrl, key: null, uploading: true, uploadError: null }
+            : a));
+
+        try {
+            const key = await uploadFileToAWS(file, 'award');
+            setAwards(prev => prev.map((a, idx) => idx === index ? { ...a, key, uploading: false } : a));
+        } catch (err) {
+            console.error('Award image upload failed:', file.name, err);
+            setAwards(prev => prev.map((a, idx) => idx === index
+                ? { ...a, uploading: false, uploadError: 'Upload failed' }
+                : a));
+        }
+    };
+
+    const removeAwardImage = (index) => {
+        setAwards(prev => prev.map((a, idx) => idx === index
+            ? { ...a, imageFile: null, previewUrl: null, key: null, uploadError: null }
+            : a));
+    };
 
     /* ── Build social_links diff ── */
     const buildSocialsDiff = () => {
@@ -211,12 +251,12 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
         setSaveErr('');
         setSaveOk('');
 
-        const stillUploading = newFiles.some(f => f.uploading);
+        const stillUploading = newFiles.some(f => f.uploading) || awards.some(a => a.uploading);
         if (stillUploading) {
             setSaveErr('Please wait for all files to finish uploading.');
             return;
         }
-        const hasErrors = newFiles.some(f => f.uploadError);
+        const hasErrors = newFiles.some(f => f.uploadError) || awards.some(a => a.uploadError);
         if (hasErrors) {
             setSaveErr('One or more files failed to upload. Remove them and try again.');
             return;
@@ -228,6 +268,7 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
 
         const payload = {
             ...(bio.trim() && { bio: bio.trim() }),
+            ...(equipment.trim() && { equipment: equipment.trim() }),
             ...(portfolioDiff.length && { portfolio_documents: portfolioDiff }),
             ...(socialsDiff.length   && { social_links: socialsDiff }),
             ...(videoDiff.length     && { video_links: videoDiff }),
@@ -237,8 +278,7 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
                     .map(a => ({
                         type: 'insert',
                         title: a.title.trim(),
-                        year: a.year ? Number(a.year) : undefined,
-                        details: a.details.trim() || undefined,
+                        ...(a.key && { key: a.key }),
                     }))
             }),
         };
@@ -274,7 +314,7 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
         }
     };
 
-    const anyUploading = newFiles.some(f => f.uploading);
+    const anyUploading = newFiles.some(f => f.uploading) || awards.some(a => a.uploading);
 
     return (
         <div>
@@ -301,6 +341,14 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
                     <textarea value={bio} onChange={e => setBio(e.target.value)}
                         placeholder="Add About You" rows={4}
                         style={{ resize: 'vertical', minHeight: '100px' }} />
+                </div>
+
+                {/* Equipment */}
+                <div className="su-field">
+                    <label>Equipment</label>
+                    <textarea value={equipment} onChange={e => setEquipment(e.target.value)}
+                        placeholder="List the cameras, lenses, lighting, and other gear you use" rows={3}
+                        style={{ resize: 'vertical', minHeight: '80px' }} />
                 </div>
 
                 {/* ── Portfolio Upload ── */}
@@ -515,40 +563,83 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
                     <label>Add Awards</label>
                     {awards.map((award, i) => (
                         <div key={i} style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '14px 16px', marginBottom: i < awards.length - 1 ? '12px' : 0, background: '#fafafa', position: 'relative' }}>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
-                                <div>
-                                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#555', display: 'block', marginBottom: '4px' }}>Award Title *</label>
-                                    <input
-                                        type="text"
-                                        value={award.title}
-                                        onChange={e => setAwards(prev => prev.map((a, idx) => idx === i ? { ...a, title: e.target.value } : a))}
-                                        placeholder="e.g. Best Wedding Photographer"
-                                        style={{ width: '100%', boxSizing: 'border-box' }}
-                                    />
-                                </div>
-                                <div>
-                                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#555', display: 'block', marginBottom: '4px' }}>Year *</label>
-                                    <input
-                                        type="number"
-                                        value={award.year}
-                                        onChange={e => setAwards(prev => prev.map((a, idx) => idx === i ? { ...a, year: e.target.value } : a))}
-                                        placeholder="e.g. 2023"
-                                        min="1900"
-                                        max={new Date().getFullYear() + 1}
-                                        style={{ width: '100%', boxSizing: 'border-box' }}
-                                    />
-                                </div>
-                            </div>
-                            <div>
-                                <label style={{ fontSize: '12px', fontWeight: 600, color: '#555', display: 'block', marginBottom: '4px' }}>Awarded By</label>
+                            <div style={{ marginBottom: '12px' }}>
+                                <label style={{ fontSize: '12px', fontWeight: 600, color: '#555', display: 'block', marginBottom: '4px' }}>Award Name *</label>
                                 <input
                                     type="text"
-                                    value={award.details}
-                                    onChange={e => setAwards(prev => prev.map((a, idx) => idx === i ? { ...a, details: e.target.value } : a))}
-                                    placeholder="Award Details"
+                                    value={award.title}
+                                    onChange={e => setAwards(prev => prev.map((a, idx) => idx === i ? { ...a, title: e.target.value } : a))}
+                                    placeholder="e.g. Best Wedding Photographer"
                                     style={{ width: '100%', boxSizing: 'border-box' }}
                                 />
                             </div>
+
+                            {/* Award image upload — single image, mirrors portfolio upload */}
+                            <div>
+                                <label style={{ fontSize: '12px', fontWeight: 600, color: '#555', display: 'block', marginBottom: '4px' }}>Award Image</label>
+                                <div style={{ position: 'relative', display: 'inline-block' }}>
+                                    {award.previewUrl ? (
+                                        <div style={{ position: 'relative' }}>
+                                            <img src={award.previewUrl} alt="" style={{
+                                                width: '80px', height: '80px', objectFit: 'cover',
+                                                borderRadius: '8px',
+                                                border: award.uploadError ? '2px solid #ef4444' : '2px solid #f5a623',
+                                                display: 'block', opacity: award.uploading ? 0.5 : 1,
+                                            }} />
+                                            {award.uploading && (
+                                                <div style={{
+                                                    position: 'absolute', inset: 0,
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    borderRadius: '8px', background: 'rgba(255,255,255,0.6)',
+                                                }}>
+                                                    <div style={{
+                                                        width: '18px', height: '18px', border: '2px solid #f5a623',
+                                                        borderTopColor: 'transparent', borderRadius: '50%',
+                                                        animation: 'spin 0.7s linear infinite',
+                                                    }} />
+                                                </div>
+                                            )}
+                                            <button type="button" onClick={() => removeAwardImage(i)}
+                                                style={{
+                                                    position: 'absolute', top: '-7px', right: '-7px',
+                                                    width: '20px', height: '20px', borderRadius: '50%',
+                                                    background: '#ef4444', border: 'none', cursor: 'pointer',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    padding: 0, color: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+                                                }}>
+                                                <FiX size={11} />
+                                            </button>
+                                            {award.uploadError && !award.uploading && (
+                                                <div style={{ position: 'absolute', bottom: '-18px', left: 0, right: 0, fontSize: '9px', color: '#ef4444', textAlign: 'center' }}>
+                                                    Failed
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <div
+                                            onClick={() => awardFileRefs.current[i]?.click()}
+                                            style={{
+                                                width: '80px', height: '80px', border: '1.5px dashed #d1d5db',
+                                                borderRadius: '8px', display: 'flex', alignItems: 'center',
+                                                justifyContent: 'center', color: '#bbb', fontSize: '22px',
+                                                background: '#fff', cursor: 'pointer', transition: 'border-color 0.2s',
+                                            }}
+                                            onMouseEnter={e => { e.currentTarget.style.borderColor = '#f5a623'; }}
+                                            onMouseLeave={e => { e.currentTarget.style.borderColor = '#d1d5db'; }}
+                                        >
+                                            <FiUpload size={18} />
+                                        </div>
+                                    )}
+                                    <input
+                                        ref={el => awardFileRefs.current[i] = el}
+                                        type="file"
+                                        accept="image/*"
+                                        style={{ display: 'none' }}
+                                        onChange={e => { handleAwardImage(i, e.target.files?.[0]); e.target.value = ''; }}
+                                    />
+                                </div>
+                            </div>
+
                             {awards.length > 1 && (
                                 <button
                                     type="button"
@@ -564,9 +655,9 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
                             )}
                         </div>
                     ))}
-                    <button
+                    {/* <button
                         type="button"
-                        onClick={() => setAwards(prev => [...prev, { title: '', year: '', details: '' }])}
+                        onClick={() => setAwards(prev => [...prev, { title: '', imageFile: null, previewUrl: null, key: null, uploading: false, uploadError: null }])}
                         style={{
                             marginTop: '10px', display: 'flex', alignItems: 'center', gap: '6px',
                             background: 'none', border: '1.5px dashed #f5a623', borderRadius: '8px',
@@ -575,7 +666,7 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
                         }}
                     >
                         <FiPlus size={15} /> Add Another Award
-                    </button>
+                    </button> */}
                 </div>
 
             </div>
