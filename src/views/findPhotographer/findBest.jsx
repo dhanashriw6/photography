@@ -697,7 +697,7 @@ const FindBest = () => {
     return (
       matchesSearch(name) &&
       (p.skills || []).some((s) => roleFilter.has(s.skill)) &&
-      matchesBudget(primaryPkg?.price_with_commission)
+      matchesBudget(primaryPkg?.unit_price)
     );
   });
 
@@ -765,7 +765,7 @@ const handleViewProvider = (providerId) => {
   const unselectedRows = allRows.filter((r) => {
     if (selectedKeys.has(r.key)) return false;
     const name = `${r.provider.first_name} ${r.provider.last_name}`;
-    return matchesSearch(name) && roleFilter.has(r.skill) && matchesBudget(r.pkg?.price_with_commission);
+    return matchesSearch(name) && roleFilter.has(r.skill) && matchesBudget(r.pkg?.unit_price);
   });
 
   const handleToggleSelect = (row) => {
@@ -863,11 +863,11 @@ const handleViewProvider = (providerId) => {
     : 1;
 
   const basePackagePrice = (statePackage?.team || []).reduce(
-    (sum, t) => sum + (t.providers || []).reduce((s, p) => s + (p.price_with_commission || 0), 0), 0
+    (sum, t) => sum + (t.providers || []).reduce((s, p) => s + (p.unit_price || 0), 0), 0
   );
   const selectedTeamCost = isPackageMode
-    ? selectedProviders.reduce((s, p) => s + (p.packages?.[0]?.price_with_commission || 0), 0)
-    : selectedRows.reduce((s, r) => s + (r.pkg?.price_with_commission || 0), 0);
+    ? selectedProviders.reduce((s, p) => s + (p.packages?.[0]?.unit_price || 0), 0)
+    : selectedRows.reduce((s, r) => s + (r.pkg?.unit_price || 0), 0);
 
   const totalRows = isPackageMode
     ? selectedProviders.length + otherProviders.length
@@ -944,7 +944,7 @@ const handleViewProvider = (providerId) => {
                               name={`${p.first_name} ${p.last_name}`}
                               src={p.profile_picture}
                               skill={skill}
-                              price={p.packages?.[0]?.price_with_commission}
+                              price={p.packages?.[0]?.unit_price}
                               days={days}
                               isLead={isLead}
                               location={`${p.city}, ${p.state}`}
@@ -961,7 +961,7 @@ const handleViewProvider = (providerId) => {
                               name={`${r.provider.first_name} ${r.provider.last_name}`}
                               src={r.provider.profile_picture}
                               skill={r.skill}
-                              price={r.pkg?.price_with_commission}
+                              price={r.pkg?.unit_price}
                               days={days}
                               isLead={isLead}
                               location={`${r.provider.city}, ${r.provider.state}`}
@@ -1004,7 +1004,7 @@ const handleViewProvider = (providerId) => {
                             rating={p.reviews?.avg_rating}
                             reviewCount={p.reviews?.count || 0}
                             distanceKm={p.distance_meters != null ? (p.distance_meters / 1000).toFixed(1) : null}
-                            price={pkg?.price_with_commission}
+                            price={pkg?.unit_price}
                             durationType={pkg?.duration_type}
                             isSelected={false}
                             isLoading={isLoading}
@@ -1033,7 +1033,7 @@ const handleViewProvider = (providerId) => {
                             rating={r.provider.reviews?.avg_rating}
                             reviewCount={r.provider.reviews?.count || 0}
                             distanceKm={r.provider.distance_meters != null ? (r.provider.distance_meters / 1000).toFixed(1) : null}
-                            price={r.pkg?.price_with_commission}
+                            price={r.pkg?.unit_price}
                             isSelected={false}
                             durationType={r.pkg?.duration_type}
                             isLoading={isLoading}

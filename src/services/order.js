@@ -38,3 +38,11 @@ export const getCustomerOrders = async () => {
     `${orderEndpoint.getCustomerOrder}`
   );
 };
+
+
+export const updateDraftOrder = async (orderId, data) => {
+  return await httpServices.patch(
+    `${orderEndpoint.updateDraftOrder(orderId)}`,
+    data
+  );
+};

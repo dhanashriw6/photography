@@ -511,7 +511,6 @@ const UserProfileInfo = ({ onSave, onCancel }) => {
         try {
             setSaving(true);
             await updateProfile(profilePayload);
-            localStorage.setItem('photographer_skills', JSON.stringify(skills));
             setSaveOk('Profile saved successfully!');
             onSave?.();
         } catch (err) {

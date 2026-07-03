@@ -7,7 +7,7 @@ import { FiEdit2, FiMapPin, FiCheck } from 'react-icons/fi';
 import { LuCalendar, LuClock } from 'react-icons/lu';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useRazorpay } from '../../hooks/useRazorpay';
-import { placeOrder, getOrderDetails } from '../../services/order';
+import { placeOrder, getOrderDetails, updateDraftOrder } from '../../services/order';
 import { getProfile } from '../../services/profile';
 
 /* ── Helpers ── */
@@ -25,10 +25,10 @@ const money = (val) => `₹${parseFloat(val || 0).toLocaleString('en-IN')}`;
 const getFeatureIcon = (key) => {
   switch (key) {
     case 'edited_photos': return '📸';
-    case 'reels':         return '🎬';
-    case 'highlight':     return '✨';
-    case 'video':         return '🎥';
-    default:              return '✔️';
+    case 'reels': return '🎬';
+    case 'highlight': return '✨';
+    case 'video': return '🎥';
+    default: return '✔️';
   }
 };
 const formatFeatureName = (key) => key?.replaceAll('_', ' ')?.replace(/\b\w/g, (c) => c.toUpperCase());
@@ -86,7 +86,7 @@ const MapPreview = ({ lat, lng }) => {
 /* ── Single provider card ── */
 const SingleProviderCard = ({ item }) => {
   const name = item.snapshot_photographer_name || 'Photographer';
-  const avatar = item.profile_picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`;
+  const avatar = item.profile_picture?.url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`;
 
   return (
     <div className="rb-card rb-single-provider">
@@ -117,10 +117,10 @@ const SingleProviderCard = ({ item }) => {
         </div>
 
         <div className="rb-mini-summary">
-          <InfoRow label="Package"    value={fmt(item.snapshot_package_name)} />
-          <InfoRow label="Price"      value={money(item.snapshot_price)} />
+          <InfoRow label="Package" value={fmt(item.snapshot_package_name)} />
+          <InfoRow label="Price" value={money(item.snapshot_price)} />
           <InfoRow label="Commission" value={money(item.commission_amount)} />
-          <InfoRow label="Tax"        value={money(item.tax_amount)} />
+          <InfoRow label="Tax" value={money(item.tax_amount)} />
           <div className="rb-mini-total">
             <span>Total</span>
             <span>{money(item.total_amount)}</span>
@@ -134,7 +134,7 @@ const SingleProviderCard = ({ item }) => {
 /* ── Bulk provider row ── */
 const BulkProviderRow = ({ item }) => {
   const name = item.snapshot_photographer_name || 'Photographer';
-  const avatar = item.profile_picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`;
+  const avatar = item.profile_picture?.url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`;
 
   return (
     <div className="rb-bulk-row">
@@ -163,7 +163,7 @@ const EditingItemCard = ({ item }) => {
   const tierName = item.snapshot_package_name || 'Editing Package';
   const tierKey =
     tierName.toLowerCase().includes('platinum') ? 'platinum' :
-    tierName.toLowerCase().includes('gold')     ? 'gold' : 'silver';
+      tierName.toLowerCase().includes('gold') ? 'gold' : 'silver';
 
   return (
     <div className={`rb-card rb-editing-card rb-editing-card--${tierKey}`}>
@@ -218,6 +218,19 @@ const RequestBook = () => {
   const [addons, setAddons] = useState('');
   const [venue, setVenue] = useState('');
   const [addressDetail, setAddressDetail] = useState('');
+  const [noteStatus, setNoteStatus] = useState({ type: '', msg: '' });
+
+const handleUpdateDraft = async () => {
+  setNoteStatus({ type: '', msg: '' });
+  const payload = { note: addons };
+  try {
+    await updateDraftOrder(order.id, payload);
+    setNoteStatus({ type: 'ok', msg: 'Note added successfully!' });
+  } catch (error) {
+    console.error('Error updating draft:', error);
+    setNoteStatus({ type: 'err', msg: 'Failed to add note. Please try again.' });
+  }
+};
 
   useEffect(() => {
     if (!orderId) return;
@@ -253,6 +266,7 @@ const RequestBook = () => {
       [order.event_address?.address_line2, order.event_address?.city, order.event_address?.state]
         .filter(Boolean).join(', ')
     );
+    setAddons(order.notes ?? '');
   }, [order]);
 
   const handlePay = async () => {
@@ -265,8 +279,8 @@ const RequestBook = () => {
       openCheckout({
         ...data,
         prefill: {
-          name:    user ? `${user.first_name || ''} ${user.last_name || ''}`.trim() : 'Customer',
-          email:   user?.email    || '',
+          name: user ? `${user.first_name || ''} ${user.last_name || ''}`.trim() : 'Customer',
+          email: user?.email || '',
           contact: user?.phone_no || '',
         },
         onSuccess: () => navigate('/thank-you', { state: { order } }),
@@ -280,22 +294,22 @@ const RequestBook = () => {
     }
   };
 
-  const isBulk       = (order.service_provider_items?.length ?? 0) > 1 || !!order.event_package_id;
+  const isBulk = (order.service_provider_items?.length ?? 0) > 1 || !!order.event_package_id;
   const serviceItems = order.service_provider_items || [];
   const editingItems = order.editing_items || [];
-  const hasEditing    = editingItems.length > 0;
+  const hasEditing = editingItems.length > 0;
 
   const lat = order.event_lat ?? order.event_address?.lat;
   const lng = order.event_lng ?? order.event_address?.lng;
 
-  const category       = order.category?.name ?? '—';
-  const orderNumber    = order.order_number    ?? '—';
-  const status         = order.status          ?? '—';
-  const currency       = order.currency        ?? 'INR';
-  const subtotal       = order.subtotal        ?? '0';
+  const category = order.category?.name ?? '—';
+  const orderNumber = order.order_number ?? '—';
+  const status = order.status ?? '—';
+  const currency = order.currency ?? 'INR';
+  const subtotal = order.subtotal ?? '0';
   const discountAmount = order.discount_amount ?? '0';
-  const taxAmount      = order.tax_amount      ?? '0';
-  const totalAmount    = order.total_amount    ?? '0';
+  const taxAmount = order.tax_amount ?? '0';
+  const totalAmount = order.total_amount ?? '0';
 
   if (orderFetching) {
     return (
@@ -305,6 +319,8 @@ const RequestBook = () => {
       </ViewsLayout>
     );
   }
+
+
 
   return (
     <ViewsLayout>
@@ -369,7 +385,7 @@ const RequestBook = () => {
                   </FieldBox>
                 )}
 
-                <FieldBox label="AddOns">
+                <FieldBox label="Add a Note">
                   <div className="rb-field-display rb-field-display--textarea">
                     <textarea
                       className="rb-inline-textarea"
@@ -380,6 +396,17 @@ const RequestBook = () => {
                     <FiEdit2 size={13} className="rb-field-edit" />
                   </div>
                 </FieldBox>
+              <button className='su-btn-primary' onClick={handleUpdateDraft}>Add Note</button>
+{noteStatus.msg && (
+  <p style={{
+    marginTop: '8px',
+    fontSize: '12.5px',
+    fontWeight: 600,
+    color: noteStatus.type === 'ok' ? '#15803d' : '#b91c1c',
+  }}>
+    {noteStatus.msg}
+  </p>
+)}
               </div>
 
               {isBulk ? (
@@ -407,9 +434,9 @@ const RequestBook = () => {
                 <MapPreview lat={lat} lng={lng} />
                 {(order.event_address?.city || order.event_address?.state) && (
                   <div className="rb-address-list">
-                    <InfoRow label="City"        value={fmt(order.event_address?.city)} />
-                    <InfoRow label="State"       value={fmt(order.event_address?.state)} />
-                    <InfoRow label="Country"     value={fmt(order.event_address?.country)} />
+                    <InfoRow label="City" value={fmt(order.event_address?.city)} />
+                    <InfoRow label="State" value={fmt(order.event_address?.state)} />
+                    <InfoRow label="Country" value={fmt(order.event_address?.country)} />
                     <InfoRow label="Postal Code" value={fmt(order.event_address?.postal_code)} />
                   </div>
                 )}
