@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BsInstagram } from 'react-icons/bs';
 import { FiUser, FiEdit2, FiCalendar, FiLogOut, FiAlertCircle, FiMenu, FiX, FiShield } from 'react-icons/fi';
+import { getKycStatus } from '../../services/kyc'; // <-- adjust this import path to match your project
 
 /* ── Avatar Dropdown (desktop only) ── */
 const AvatarDropdown = ({ menuItems, firstName, lastName }) => {
@@ -271,12 +272,35 @@ const PhotographerLayout = ({ children }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const isLoggedIn = !!localStorage.getItem('authToken');
   const firstName = localStorage.getItem('firstName') || '';
-const lastName = localStorage.getItem('lastName') || '';
+  const lastName = localStorage.getItem('lastName') || '';
 
-  const navItems = isLoggedIn
+  // KYC status - stays null until fetched. While null, hide Home nav / avatar / hamburger.
+  const [kycStatus, setKycStatus] = useState(null);
+
+  const fetchKycStatus = async () => {
+    try {
+      const kycRes = await getKycStatus();
+      const status = kycRes?.data?.data?.status;
+      setKycStatus(status ?? null);
+    } catch (error) {
+      console.error(error);
+      setKycStatus(null);
+    }
+  };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchKycStatus();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Only show the authenticated header controls once we actually know the KYC status
+  const showAuthHeaderControls = isLoggedIn && kycStatus !== null;
+
+  const navItems = showAuthHeaderControls
     ? [
       { label: 'Home', to: '/join-as-photographer/home' },
-
     ]
     : [];
 
@@ -327,37 +351,40 @@ const lastName = localStorage.getItem('lastName') || '';
 
           {/* Desktop nav + avatar */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
-            <nav className="hidden md:flex items-center gap-7">
-              {navItems.map((item) => {
-                const active = location.pathname === item.to;
-                return (
-                  <button
-                    key={item.to} type="button"
-                    onClick={() => navigate(item.to)}
-                    className={`views-nav-link${active ? ' views-nav-link--active' : ''}`}
-                  >
-                    {item.label}
-                  </button>
-                );
-              })}
-            </nav>
+            {showAuthHeaderControls && (
+              <>
+                <nav className="hidden md:flex items-center gap-7">
+                  {navItems.map((item) => {
+                    const active = location.pathname === item.to;
+                    return (
+                      <button
+                        key={item.to} type="button"
+                        onClick={() => navigate(item.to)}
+                        className={`views-nav-link${active ? ' views-nav-link--active' : ''}`}
+                      >
+                        {item.label}
+                      </button>
+                    );
+                  })}
+                </nav>
 
-            {/* Avatar dropdown — desktop only */}
-        {isLoggedIn &&     <AvatarDropdown menuItems={menuItems} firstName={firstName} lastName={lastName} />}
+                {/* Avatar dropdown — desktop only */}
+                <AvatarDropdown menuItems={menuItems} firstName={firstName} lastName={lastName} />
 
-            {/* Hamburger — mobile only, single entry point to nav + profile */}
-            {isLoggedIn && <button
-              type="button"
-              onClick={() => setDrawerOpen(true)}
-              className="flex md:hidden"
-              style={{
-                background: 'none', border: 'none', cursor: 'pointer',
-                color: '#555', padding: '4px', alignItems: 'center',
-              }}
-            >
-              <FiMenu size={24} />
-            </button>}
-
+                {/* Hamburger — mobile only, single entry point to nav + profile */}
+                <button
+                  type="button"
+                  onClick={() => setDrawerOpen(true)}
+                  className="flex md:hidden"
+                  style={{
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    color: '#555', padding: '4px', alignItems: 'center',
+                  }}
+                >
+                  <FiMenu size={24} />
+                </button>
+              </>
+            )}
           </div>
         </div>
       </motion.header>

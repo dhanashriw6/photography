@@ -88,5 +88,8 @@ export const reviewEndpoint = {
 
 export const disputeEndpoint = {
   postDispute: `${baseUrl}/disputes`,
-  getDisputes : `${baseUrl}/disputes`
+  getDisputes : `${baseUrl}/disputes`,
+  listProviders:(orderId) => `${baseUrl}/order/${orderId}/service-providers`,
+  getDisputeDetails:(disputeId) => `${baseUrl}/disputes`,
+  
 }

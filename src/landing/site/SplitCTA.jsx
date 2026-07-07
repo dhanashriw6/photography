@@ -1,12 +1,14 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Camera, UserPlus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { IMG } from "@/data/site";
 import { fadeUp, inView, stagger } from "@/landing/lib/motion";
 const cards = [
-    { title: "Hire a Photographer", text: "Find the perfect photographer for your event, project, or special moment.", cta: "Find a Photographer", image: IMG.splitClient, Icon: Camera },
-    { title: "Join as Photographer", text: "Showcase your talent, manage bookings, and grow your creative business.", cta: "Create Profile", image: IMG.splitPhotographer, Icon: UserPlus },
+    { title: "Hire a Photographer", text: "Find the perfect photographer for your event, project, or special moment.", cta: "Find a Photographer", image: IMG.splitClient, Icon: Camera, href: "/find-photographer" },
+    { title: "Join as Photographer", text: "Showcase your talent, manage bookings, and grow your creative business.", cta: "Create Profile", image: IMG.splitPhotographer, Icon: UserPlus, href: "/join-as-photographer" },
 ];
 export function SplitCTA() {
+    const navigate = useNavigate();
     return (<section id="pricing" className="py-20 md:py-28 bg-bg">
       <div className="mx-auto max-w-[1280px] px-6 md:px-10 lg:px-14">
         <motion.div variants={stagger} {...inView} className="grid md:grid-cols-2 gap-5">
@@ -21,7 +23,7 @@ export function SplitCTA() {
                   <span className="text-gradient-yellow">{c.title.split(" ")[0]}</span> {c.title.split(" ").slice(1).join(" ")}
                 </h3>
                 <p className="mt-3 text-white/75 max-w-md">{c.text}</p>
-                <button className="mt-6 inline-flex items-center gap-2 self-start rounded-full bg-white text-black px-6 py-3 text-sm font-semibold hover:bg-yellow transition">
+                <button onClick={() => navigate(c.href)} className="mt-6 inline-flex items-center gap-2 self-start rounded-full bg-white text-black px-6 py-3 text-sm font-semibold hover:bg-yellow transition">
                   {c.cta} <ArrowRight size={14}/>
                 </button>
               </div>

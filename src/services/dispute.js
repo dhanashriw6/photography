@@ -13,3 +13,16 @@ export const getDisputes = async () => {
     disputeEndpoint.getDisputes
   );
 };
+
+
+export const getDisputeProviders = async (orderId) => {
+  return await httpServices.get(
+    disputeEndpoint.listProviders(orderId)
+  );
+};
+
+export const getDisputeDetails = async (disputeId) => {
+  return await httpServices.get(
+    disputeEndpoint.getDisputeDetails(disputeId)
+  );
+};

@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+
+import {  getDisputeDetails } from '../../services/dispute';
+
 
 const StarRating = ({ rating = 5 }) => (
     <span style={{ color: '#f5a623', fontSize: '14px', letterSpacing: '1px' }}>
@@ -71,6 +74,9 @@ const ReviewCard = ({ name, avatar, text, time, rating, liked, onLike }) => (
 );
  
 const Reviews = ({ reviews: initialReviews }) => {
+
+
+   
     const defaultReviews = [
         { id: 1, name: 'John', text: 'Lorem Ipsum...', time: '2 hours ago', rating: 5, liked: false },
         { id: 2, name: 'John', text: 'Lorem Ipsum...', time: '2 hours ago', rating: 5, liked: false },
@@ -78,6 +84,14 @@ const Reviews = ({ reviews: initialReviews }) => {
     ];
  
     const [reviews, setReviews] = useState(initialReviews || defaultReviews);
+
+     const getDisputes = async () => {
+        const res = await getDisputeDetails();
+        console.log(res.data)
+    };
+    useEffect(() => {
+        getDisputes();
+    }, []);
  
     const toggleLike = (id) =>
         setReviews(rs => rs.map(r => r.id === id ? { ...r, liked: !r.liked } : r));

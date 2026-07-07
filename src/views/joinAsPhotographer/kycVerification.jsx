@@ -1,9 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import '../index.css';
 import { useNavigate } from 'react-router-dom';
 import { FiUploadCloud, FiX, FiFile, FiLoader } from 'react-icons/fi';
 import PhotographerLayout from './PhotographerLayout';
-import { submitKyc } from '../../services/kyc';
+import { getKycStatus, submitKyc } from '../../services/kyc';
 import { getUploadLink, uploadtoAWS } from '../../services/common'; // adjust import path as needed
 
 const KYCVerification = () => {
@@ -161,6 +161,9 @@ const KYCVerification = () => {
     }
   };
 
+
+
+
   return (
     <PhotographerLayout>
       <div className="w-full" style={{ maxWidth: '640px' }}>
@@ -260,7 +263,7 @@ const KYCVerification = () => {
                       Click to upload or drag &amp; drop
                     </p>
                     <p style={{ margin: 0, fontSize: '12px', color: '#bbb', textAlign: 'center' }}>
-                     Upload front &amp; back image of your {docType}
+                      Upload front &amp; back image of your {docType}
                     </p>
                   </>
                 ) : (
@@ -350,14 +353,14 @@ const KYCVerification = () => {
                   </div>
                 )}
               </div>
-             <input
-    ref={fileRef}
-    type="file"
-    accept=".jpg,.jpeg,.png,.pdf,.txt,.mp4,.mov,.avi,.mp3,.wav,.doc,.docx"
-    multiple
-    style={{ display: 'none' }}
-    onChange={handleFiles}
-/>
+              <input
+                ref={fileRef}
+                type="file"
+                accept=".jpg,.jpeg,.png,.pdf,.txt,.mp4,.mov,.avi,.mp3,.wav,.doc,.docx"
+                multiple
+                style={{ display: 'none' }}
+                onChange={handleFiles}
+              />
               <p className="su-field-hint">Upload front &amp; back of your {docType} if applicable.</p>
             </div>
 
@@ -366,7 +369,7 @@ const KYCVerification = () => {
 
             {/* Action buttons */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '4px' }}>
-              <button onClick={() => navigate(-1)} className="su-btn-primary-outline" disabled={loading}>Cancel</button>
+              <button onClick={() => navigate('/join-as-photographer')} className="su-btn-primary-outline" disabled={loading}>Cancel</button>
               <button
                 onClick={handleSubmit}
                 className="su-btn-primary"

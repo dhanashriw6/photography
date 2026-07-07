@@ -10,6 +10,7 @@ import { BsCurrencyRupee } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
 import { getUploadLink } from '../../services/common';
 import { postReview } from '../../services/review';
+import DisputeModal from './DisputeModal ';
 
 
 
@@ -19,6 +20,7 @@ const MyOrders = () => {
   const [loading, setLoading] = useState(true);
   const [isGridView, setIsGridView] = useState(false);
   const [expandedOrderId, setExpandedOrderId] = useState(null);
+  const [disputeModalOrderId, setDisputeModalOrderId] = useState(null);
 
   // Filters State
   const [uiFilters, setUiFilters] = useState({
@@ -236,7 +238,7 @@ const MyOrders = () => {
     updateReviewForOrder(orderId, { is_recommended: !current.is_recommended });
   };
 
-const updateReviewPhotoById = (orderId, photoId, patch) => {
+  const updateReviewPhotoById = (orderId, photoId, patch) => {
     setReviewState(prev => {
       const currentReview = prev[orderId] || getDefaultReview();
       const updatedPhotos = currentReview.photos.map((p) =>
@@ -282,7 +284,7 @@ const updateReviewPhotoById = (orderId, photoId, patch) => {
     }
   };
 
-const handleReviewPhotoUpload = (orderId, files) => {
+  const handleReviewPhotoUpload = (orderId, files) => {
     const current = getReviewForOrder(orderId);
     if (current.photos.length >= 5) {
       showToast("Maximum 5 photos allowed per review");
@@ -861,7 +863,7 @@ const handleReviewPhotoUpload = (orderId, files) => {
                             ₹{order.paidAmount.toLocaleString('en-IN')}
                           </span>
                         </div>
-                   
+
                       </div>
 
                       {/* Far Right: Actions */}
@@ -908,7 +910,7 @@ const handleReviewPhotoUpload = (orderId, files) => {
                           <button
                             type="button"
                             className="dispute-action-btn"
-                            onClick={() => openReviewModal(order.id)}
+                            onClick={() => setDisputeModalOrderId(order.id)}
                           >
                             <FiAlertCircle size={14} style={{ marginRight: '6px' }} />
                             Add Dispute
@@ -1259,6 +1261,14 @@ const handleReviewPhotoUpload = (orderId, files) => {
           </div>
         );
       })()}
+
+      {disputeModalOrderId && (
+        <DisputeModal
+          order={orders.find(o => o.id === disputeModalOrderId)}
+          onClose={() => setDisputeModalOrderId(null)}
+          showToast={showToast}
+        />
+      )}
 
       {/* Styled JSX (incorporating premium aesthetics, clean shadows, smooth transitions, and exact styling matching the screenshot) */}
       <style>{`

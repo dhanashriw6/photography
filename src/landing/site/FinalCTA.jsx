@@ -4,7 +4,9 @@ import { Button } from "./Button";
 import { FloatingIcon } from "./FloatingIcon";
 import { fadeUp, inView, stagger } from "@/landing/lib/motion";
 import { ScrollFloat } from "./ScrollFloat";
+import { useNavigate } from "react-router-dom";
 export function FinalCTA() {
+    const navigate = useNavigate();
     return (<section className="relative py-24 md:py-32 overflow-hidden noise-bg" style={{ background: "linear-gradient(135deg, #FFC21A 0%, #F6B800 45%, #1A1208 100%)" }}>
       <FloatingIcon Icon={Camera} className="top-12 left-[8%]" color="#000"/>
       <FloatingIcon Icon={Sparkles} className="top-16 right-[12%]" delay={0.4} color="#000"/>
@@ -21,8 +23,8 @@ export function FinalCTA() {
           Find verified photographers or join the creative network today.
         </motion.p>
         <motion.div variants={fadeUp} className="mt-9 flex flex-wrap gap-3 justify-center">
-          <Button variant="dark" icon={<ArrowRight size={16}/>}>Find a Photographer</Button>
-          <button className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold border-2 border-black text-black hover:bg-black hover:text-yellow transition">
+          <Button variant="dark" icon={<ArrowRight size={16}/>} onClick={() => navigate("/find-photographer")}>Find a Photographer</Button>
+          <button onClick={() => navigate("/join-as-photographer")} className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold border-2 border-black text-black hover:bg-black hover:text-yellow transition">
             Join as Photographer
           </button>
         </motion.div>

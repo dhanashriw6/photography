@@ -4,6 +4,7 @@ import { LuCalendar, LuClock, LuStar } from 'react-icons/lu';
 import { FiMapPin } from 'react-icons/fi';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getPhotographerOrderDetails } from '@/services/order';
+import PhotographerLayout from './PhotographerLayout';
 
 /* ── Info row used inside detail cards ── */
 const InfoRow = ({ icon, label, value, bold }) => (
@@ -158,11 +159,11 @@ const OrderSummary = () => {
 
     if (error || !booking) {
         return (
-            <ViewsLayout>
+            <PhotographerLayout>
                 <div style={{ background: '#f7f7f5', minHeight: '100vh', padding: '80px 0', textAlign: 'center', color: '#E0473C' }}>
                     {error || 'Order not found.'}
                 </div>
-            </ViewsLayout>
+            </PhotographerLayout>
         );
     }
 
