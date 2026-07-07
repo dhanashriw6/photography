@@ -17,6 +17,7 @@
     "axios": "^1.16.0",
     "crypto-js": "^4.2.0",
     "framer-motion": "^12.23.26",
+    "gsap": "^3.13.0",
     "jquery": "^4.0.0",
     "lucide-react": "^0.562.0",
     "razorpay": "^2.9.6",

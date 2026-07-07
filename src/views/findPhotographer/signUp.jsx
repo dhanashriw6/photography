@@ -9,20 +9,20 @@ const SignUp = () => {
   const navigate = useNavigate();
 
   // ── Form state ──────────────────────────────────────────────
-  const [firstName, setFirstName]   = useState('');
-  const [lastName, setLastName]     = useState('');
-  const [email, setEmail]           = useState('');
-  const [password, setPassword]     = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [phoneCode, setPhoneCode]   = useState('+91');
-  const [phoneNo, setPhoneNo]       = useState('');
+  const [phoneCode, setPhoneCode] = useState('+91');
+  const [phoneNo, setPhoneNo] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
 
   // ── UI state ────────────────────────────────────────────────
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [errorType, setErrorType] = useState('');
-  const [success, setSuccess]   = useState('');
+  const [success, setSuccess] = useState('');
 
   // ── Submit ──────────────────────────────────────────────────
   const handleSignup = async (e) => {
@@ -47,11 +47,9 @@ const SignUp = () => {
       errors.lastName = 'Only alphabets are allowed';
     }
 
-    if (!email.trim()) {
-      errors.email = 'Email is required';
-    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email)) {
-      errors.email = 'Enter a valid email address';
-    }
+   if (email.trim() && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email.trim())) {
+  errors.email = 'Enter a valid email address';
+}
 
     if (!password.trim()) {
       errors.password = 'Password is required';
@@ -77,11 +75,11 @@ const SignUp = () => {
     const payload = {
       first_name: firstName.trim(),
       last_name: lastName.trim(),
-      email: email.trim(),
       password,
       phone_code: phoneCode,
       phone_no: phoneNo.trim(),
       user_type: 'customer',
+       ...(email.trim() && { email: email.trim() }),
     };
 
     try {
@@ -252,21 +250,21 @@ const SignUp = () => {
               </div>
 
               {/* Submit */}
-               <button className='su-btn-primary' onClick={() => navigate('/')}>Back</button>
-              
-                <button
-                  type="submit"
-                  className="su-btn-primary"
-                  style={{
-                    width: '100%',
-                    opacity: loading ? 0.7 : 1,
-                    cursor: loading ? 'not-allowed' : 'pointer',
-                  }}
-                  disabled={loading}
-                >
-                  {loading ? 'Creating account…' : 'Sign Up'}
-                </button>
-              
+              <button className='su-btn-primary' onClick={() => navigate('/')}>Back</button>
+
+              <button
+                type="submit"
+                className="su-btn-primary"
+                style={{
+                  width: '100%',
+                  opacity: loading ? 0.7 : 1,
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                }}
+                disabled={loading}
+              >
+                {loading ? 'Creating account…' : 'Sign Up'}
+              </button>
+
 
             </div>
           </form>

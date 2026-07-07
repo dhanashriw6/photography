@@ -295,8 +295,8 @@ const lastName = localStorage.getItem('lastName') || '';
           label: 'Edit Profile',
           action: () => navigate('/customer/edit-profile'),
         },
-        { divider: true },
-        { icon: <FiAlertCircle size={15} />, label: 'Raise a Dispute', action: () => navigate('/dispute'), danger: true },
+        // { divider: true },
+        // { icon: <FiAlertCircle size={15} />, label: 'Raise a Dispute', action: () => navigate('/dispute'), danger: true },
       ]
       : []),
     { divider: true },

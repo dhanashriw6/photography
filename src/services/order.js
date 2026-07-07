@@ -46,3 +46,15 @@ export const updateDraftOrder = async (orderId, data) => {
     data
   );
 };
+
+export const getPhotographerBookings = async () => {
+  return await httpServices.get(
+    `${orderEndpoint.getPhotographerBookings}`
+  );
+};
+
+export const getPhotographerOrderDetails = async (bookingId) => {
+  return await httpServices.get(
+    `${orderEndpoint.getPhotographerOrderDetails(bookingId)}`
+  );
+};

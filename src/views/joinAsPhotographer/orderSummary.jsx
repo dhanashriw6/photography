@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ViewsLayout from '../Layout';
-import { BsCameraFill, BsStarFill } from 'react-icons/bs';
 import { LuCalendar, LuClock, LuStar } from 'react-icons/lu';
 import { FiMapPin } from 'react-icons/fi';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { getPhotographerOrderDetails } from '@/services/order';
 
 /* ── Info row used inside detail cards ── */
 const InfoRow = ({ icon, label, value, bold }) => (
@@ -21,6 +21,31 @@ const DetailPair = ({ label, value }) => (
         <span style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 600 }}>{value}</span>
     </div>
 );
+
+/* ── Status badge ── */
+const STATUS_COLORS = {
+    scheduled: { background: '#E3EEFF', color: '#2563EB' },
+    confirmed: { background: '#E2F6EE', color: '#0D9488' },
+    completed: { background: '#E2F6EE', color: '#0D9488' },
+    cancelled: { background: '#FDE6E5', color: '#E0473C' },
+};
+const StatusBadge = ({ status }) => {
+    if (!status) return null;
+    const style = STATUS_COLORS[status.toLowerCase()] || { background: '#F0F0F0', color: '#666' };
+    return (
+        <span style={{
+            ...style,
+            fontSize: '11px',
+            fontWeight: 700,
+            padding: '4px 10px',
+            borderRadius: '999px',
+            textTransform: 'capitalize',
+            whiteSpace: 'nowrap',
+        }}>
+            {status}
+        </span>
+    );
+};
 
 /* ── Map placeholder ── */
 const MapPreview = () => (
@@ -42,7 +67,7 @@ const MapPreview = () => (
 );
 
 /* ── Card wrapper ── */
-const Card = ({ title, children, style = {} }) => (
+const Card = ({ title, right, children, style = {} }) => (
     <div style={{
         background: '#fff',
         borderRadius: '16px',
@@ -50,15 +75,121 @@ const Card = ({ title, children, style = {} }) => (
         boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
         ...style,
     }}>
-        {title && (
-            <p style={{ margin: '0 0 16px', fontWeight: 700, fontSize: '15px', color: '#1a1a1a' }}>{title}</p>
+        {(title || right) && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                {title && <p style={{ margin: 0, fontWeight: 700, fontSize: '15px', color: '#1a1a1a' }}>{title}</p>}
+                {right}
+            </div>
         )}
         {children}
     </div>
 );
 
+const formatDateTime = (iso) => {
+    if (!iso) return { date: '-', time: '-' };
+    const d = new Date(iso);
+    return {
+        date: d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+        time: d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }),
+    };
+};
+
+const formatCurrency = (amount, currency = 'INR') => {
+    const num = Number(amount);
+    if (Number.isNaN(num)) return '-';
+    try {
+        return new Intl.NumberFormat('en-IN', { style: 'currency', currency }).format(num);
+    } catch {
+        return `${currency} ${num.toFixed(2)}`;
+    }
+};
+
 const OrderSummary = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // The booking id is passed via router state from YourOrderList
+    // (navigate('/order-summary', { state: { orderId } })) rather than a URL param.
+    const orderId = location.state?.orderId;
+
+    const [booking, setBooking] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        if (!orderId) {
+            setLoading(false);
+            setError('No order selected.');
+            return;
+        }
+
+        let cancelled = false;
+
+        const fetchOrderDetails = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const response = await getPhotographerOrderDetails(orderId);
+                // Handle either an axios response ({ data: { data: {...} } })
+                // or an already-unwrapped body ({ data: {...} }).
+                const payload = response?.data?.data ?? response?.data ?? response ?? null;
+                if (!cancelled) setBooking(payload);
+            } catch (err) {
+                console.error('Failed to fetch order details:', err);
+                if (!cancelled) setError('Failed to load order details.');
+            } finally {
+                if (!cancelled) setLoading(false);
+            }
+        };
+
+        fetchOrderDetails();
+        return () => { cancelled = true; };
+    }, [orderId]);
+
+    if (loading) {
+        return (
+            <ViewsLayout>
+                <div style={{ background: '#f7f7f5', minHeight: '100vh', padding: '80px 0', textAlign: 'center', color: '#999' }}>
+                    Loading order details...
+                </div>
+            </ViewsLayout>
+        );
+    }
+
+    if (error || !booking) {
+        return (
+            <ViewsLayout>
+                <div style={{ background: '#f7f7f5', minHeight: '100vh', padding: '80px 0', textAlign: 'center', color: '#E0473C' }}>
+                    {error || 'Order not found.'}
+                </div>
+            </ViewsLayout>
+        );
+    }
+
+    const order = booking.order || {};
+    const orderItem = booking.order_item || {};
+    const customer = booking.customer || {};
+    const address = booking.event_address || {};
+    const currency = order.currency || 'INR';
+
+    const start = formatDateTime(booking.event_start_at);
+    const end = formatDateTime(booking.event_end_at);
+    const bookingCreated = formatDateTime(booking.created_at);
+
+    const eventTypeName = order.category?.name || orderItem.snapshot_package_name || '-';
+    const packageName = orderItem.snapshot_package_name || order.snapshot_event_package_name || 'Package';
+    const packagePrice = formatCurrency(orderItem.snapshot_price, currency);
+    const totalPrice = formatCurrency(orderItem.snapshot_price, currency);
+
+    const customerName = [customer.first_name, customer.last_name].filter(Boolean).join(' ') || 'Guest';
+    const customerPhoto = customer.profile_picture?.url;
+
+    const addressLines = [address.address_line1, address.address_line2, address.address_line3]
+        .filter(Boolean)
+        .join(', ');
+    const fullAddress = [addressLines, address.city, address.state, address.postal_code, address.country]
+        .filter(Boolean)
+        .join(', ') || booking.location_label || 'Address not available';
 
     return (
         <ViewsLayout>
@@ -84,8 +215,6 @@ const OrderSummary = () => {
                     display: 'grid',
                     gridTemplateColumns: '560px 560px',
                     gap: '20px',
-                    // alignItems: 'start',
-                    // maxWidth: '1100px',
                     margin: '0 auto',
                     padding: '0 40px',
                 }}>
@@ -94,12 +223,18 @@ const OrderSummary = () => {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
                         {/* Event Details */}
-                        <Card title="Event details">
-                            <InfoRow icon={<LuStar size={15} />} label="Event" value="wedding" />
-                            <InfoRow icon={<LuCalendar size={15} />} label="Start Date" value="29 May 2025" />
-                            <InfoRow icon={<LuCalendar size={15} />} label="End Date" value="31 May 2025" />
-                            <InfoRow icon={<LuClock size={15} />} label="Start Time" value="0500 Am" />
-                            <InfoRow icon={<LuClock size={15} />} label="End Time" value="12:00 Am" />
+                        <Card title="Event details" right={<StatusBadge status={booking.status} />}>
+                            <InfoRow icon={<LuStar size={15} />} label="Event" value={eventTypeName} />
+                            <InfoRow icon={<LuCalendar size={15} />} label="Start Date" value={start.date} />
+                            <InfoRow icon={<LuCalendar size={15} />} label="End Date" value={end.date} />
+                            <InfoRow icon={<LuClock size={15} />} label="Start Time" value={start.time} />
+                            <InfoRow icon={<LuClock size={15} />} label="End Time" value={end.time} />
+                            {booking.duration_type && (
+                                <InfoRow label="Duration Type" value={booking.duration_type} />
+                            )}
+                            {booking.customer_notes && (
+                                <InfoRow label="Customer Notes" value={booking.customer_notes} />
+                            )}
                         </Card>
 
                         {/* Package Details */}
@@ -111,18 +246,19 @@ const OrderSummary = () => {
                             }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
                                     <div>
-                                        <p style={{ margin: '0 0 4px', fontWeight: 700, fontSize: '14px', color: '#1a1a1a' }}>Full Package</p>
+                                        <p style={{ margin: '0 0 4px', fontWeight: 700, fontSize: '14px', color: '#1a1a1a' }}>{packageName}</p>
                                         <p style={{ margin: 0, fontSize: '12px', color: '#999', lineHeight: 1.6 }}>
-                                            package includes (1 highlight , 2 reels , 300edited photos)
+                                            {orderItem.snapshot_photographer_name ? `Photographer: ${orderItem.snapshot_photographer_name}` : ''}
+                                            {orderItem.duration_type ? ` · ${orderItem.duration_type}` : ''}
                                         </p>
                                     </div>
-                                    <span style={{ fontWeight: 800, fontSize: '15px', color: '#1a1a1a', whiteSpace: 'nowrap', marginLeft: '16px' }}>$124.00</span>
+                                    <span style={{ fontWeight: 800, fontSize: '15px', color: '#1a1a1a', whiteSpace: 'nowrap', marginLeft: '16px' }}>{packagePrice}</span>
                                 </div>
-
-                                <div style={{ borderTop: '1px dashed #eee', marginTop: '12px', paddingTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <span style={{ fontSize: '13px', color: '#555', fontWeight: 500 }}>Add ons (dron shoot)</span>
-                                    <span style={{ fontWeight: 700, fontSize: '14px', color: '#1a1a1a' }}>$10.00</span>
-                                </div>
+                                {orderItem.notes && (
+                                    <div style={{ borderTop: '1px dashed #eee', marginTop: '12px', paddingTop: '12px' }}>
+                                        <span style={{ fontSize: '13px', color: '#555' }}>{orderItem.notes}</span>
+                                    </div>
+                                )}
                             </div>
                         </Card>
 
@@ -130,7 +266,7 @@ const OrderSummary = () => {
                         <Card title="Event Address">
                             <p style={{ margin: '0 0 14px', fontSize: '13px', color: '#555', lineHeight: 1.6, display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
                                 <FiMapPin size={14} color="#E8A317" style={{ marginTop: '2px', flexShrink: 0 }} />
-                                4, Manhar Para -4 Near Thorala Police chowki, Rajkot, Gujarat - 360003, India
+                                {fullAddress}
                             </p>
                             <MapPreview />
                         </Card>
@@ -143,11 +279,15 @@ const OrderSummary = () => {
                         <Card title="Booking Details">
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                                 <span style={{ fontSize: '13px', color: '#999', fontWeight: 500 }}>Booking Id</span>
-                                <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>NH29248429752458</span>
+                                <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>{booking.booking_number || '-'}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                <span style={{ fontSize: '13px', color: '#999', fontWeight: 500 }}>Order Number</span>
+                                <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>{order.order_number || '-'}</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <span style={{ fontSize: '13px', color: '#999', fontWeight: 500 }}>Booking Date</span>
-                                <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>3 Oct 2025</span>
+                                <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>{bookingCreated.date}</span>
                             </div>
                         </Card>
 
@@ -159,18 +299,21 @@ const OrderSummary = () => {
                                     width: '48px', height: '48px', borderRadius: '50%',
                                     overflow: 'hidden', border: '2px solid #f0f0f0',
                                     flexShrink: 0,
+                                    background: '#f4f4f4',
                                 }}>
-                                    <img
-                                        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80"
-                                        alt="Guest"
-                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                    />
+                                    {customerPhoto && (
+                                        <img
+                                            src={customerPhoto}
+                                            alt={customerName}
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        />
+                                    )}
                                 </div>
-                                <span style={{ fontSize: '13px', fontWeight: 600, color: '#555' }}>Guest 1</span>
+                                <span style={{ fontSize: '13px', fontWeight: 600, color: '#555' }}>{customerName}</span>
                             </div>
-                            <DetailPair label="Name" value="John Doe" />
-                            <DetailPair label="Gender" value="Male" />
-                            <DetailPair label="Age" value="30" />
+                            <DetailPair label="Name" value={customerName} />
+                            <DetailPair label="Email" value={customer.email || '-'} />
+                            <DetailPair label="Phone" value={customer.phone_no || '-'} />
                         </Card>
 
                         {/* Pricing Details */}
@@ -181,27 +324,22 @@ const OrderSummary = () => {
                             </div>
 
                             <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                {[
-                                    { label: 'Full package', value: '$124.00' },
-                                    { label: 'Add ons', value: '$10.00' },
-                                ].map(row => (
-                                    <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontSize: '13px', color: '#555', fontWeight: 500 }}>{row.label}</span>
-                                        <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>{row.value}</span>
-                                    </div>
-                                ))}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span style={{ fontSize: '13px', color: '#555', fontWeight: 500 }}>{packageName}</span>
+                                    <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>{packagePrice}</span>
+                                </div>
                                 <div style={{
                                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                                     borderTop: '1px solid #f0f0f0', paddingTop: '10px', marginTop: '2px',
                                 }}>
                                     <span style={{ fontSize: '14px', fontWeight: 700, color: '#1a1a1a' }}>Total</span>
-                                    <span style={{ fontSize: '14px', fontWeight: 800, color: '#1a1a1a' }}>$134.00</span>
+                                    <span style={{ fontSize: '14px', fontWeight: 800, color: '#1a1a1a' }}>{totalPrice}</span>
                                 </div>
                             </div>
 
                             {/* Action buttons */}
                             <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
-                                <button
+                                {/* <button
                                     onClick={() => navigate(-1)}
                                     style={{
                                         flex: 1,
@@ -220,9 +358,9 @@ const OrderSummary = () => {
                                     onMouseLeave={e => { e.currentTarget.style.background = '#fff'; }}
                                 >
                                     Edit Order
-                                </button>
+                                </button> */}
                                 <button
-                                    onClick={() => navigate('/')}
+                                    onClick={() => navigate('/join-as-photographer/edit-profile')}
                                     style={{
                                         flex: 1,
                                         background: '#E8A317',

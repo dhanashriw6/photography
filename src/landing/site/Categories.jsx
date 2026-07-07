@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { categories } from "../data/site";
+import { categories } from "@/data/site";
 import { CategoryCard } from "./CategoryCard";
 import { SectionLabel } from "./SectionLabel";
-import { fadeUp, inView, stagger } from "../utils/motion";
-export default function Categories() {
+import { fadeUp, inView, stagger } from "@/landing/lib/motion";
+export function Categories() {
     return (<section id="categories" className="section-cream py-20 md:py-28">
       <div className="mx-auto max-w-[1280px] px-6 md:px-10 lg:px-14">
         <motion.div variants={stagger} {...inView} className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">

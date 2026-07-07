@@ -54,11 +54,23 @@
   --transition-normal: 0.3s ease-out;
 }
 
-* {
+/* Global reset for the existing app. The landing page (.ff-landing) is
+   excluded so it can use Tailwind's spacing/font utilities — otherwise this
+   unlayered rule would override every layered Tailwind utility (px-*, mx-auto,
+   mb-*, font-*) inside it. :where() keeps specificity at 0 so nothing else
+   about the existing app changes. */
+*:where(:not(.ff-landing, .ff-landing *)) {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: "Oswald", sans-serif;
+}
+/* Keep border-box inside the landing (also provided by Tailwind Preflight). */
+.ff-landing,
+.ff-landing *,
+.ff-landing *::before,
+.ff-landing *::after {
+  box-sizing: border-box;
 }
 
 body {
@@ -69,12 +81,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+:is(h1, h2, h3, h4, h5, h6):where(:not(.ff-landing *)) {
   font-family: 'Oswald', sans-serif;
   font-weight: 600;
   line-height: 1.1;
@@ -722,3 +729,19 @@ html {
 .pinterest-item:hover img {
   filter: brightness(0.9);
 }
+
+/* =====================================================================
+   Fulltime Photographers landing page — Tailwind color tokens.
+   Additive only: registers new utility colors used by the landing
+   components (bg-bg, bg-bg-soft, bg-card-dark, bg-yellow, text-muted-brand…).
+   These names are not used elsewhere in the app, so existing pages are
+   unaffected. Full landing styles live in src/landing/landing.css.
+   ===================================================================== */
+@theme {
+  --color-bg: #070707;
+  --color-bg-soft: #0d0d0b;
+  --color-card-dark: #121210;
+  --color-yellow: #ffc21a;
+  --color-muted-brand: #a8a8a0;
+}
+
