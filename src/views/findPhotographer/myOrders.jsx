@@ -3,7 +3,8 @@ import { getCustomerOrders } from '../../services/order';
 import {
   FiGrid, FiList, FiSearch, FiCalendar, FiClock, FiMapPin,
   FiX, FiUploadCloud, FiLink, FiSend, FiEye, FiChevronDown,
-  FiChevronUp, FiFilter, FiRefreshCw, FiStar
+  FiChevronUp, FiFilter, FiRefreshCw, FiStar,
+  FiAlertCircle
 } from 'react-icons/fi';
 import { BsCurrencyRupee } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
@@ -903,6 +904,14 @@ const handleReviewPhotoUpload = (orderId, files) => {
                           >
                             <FiStar size={14} style={{ marginRight: '6px' }} />
                             Add Review
+                          </button>
+                          <button
+                            type="button"
+                            className="dispute-action-btn"
+                            onClick={() => openReviewModal(order.id)}
+                          >
+                            <FiAlertCircle size={14} style={{ marginRight: '6px' }} />
+                            Add Dispute
                           </button>
 
                           {/* <button
@@ -1807,6 +1816,22 @@ const handleReviewPhotoUpload = (orderId, files) => {
           background: #FFF3D6;
           border: 1.5px solid #F6D98A;
           color: #B7791F;
+          padding: 8px 14px;
+          border-radius: 10px;
+          font-size: 13px;
+          font-weight: 700;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          transition: all 0.2s;
+          font-family: inherit;
+          white-space: nowrap;
+        }
+
+        .dispute-action-btn {
+          background: #ffe6f0;
+          border: 1.5px solid #ff9ebc;
+          color: #b71f1fff;
           padding: 8px 14px;
           border-radius: 10px;
           font-size: 13px;
