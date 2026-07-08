@@ -65,6 +65,8 @@ export const orderEndpoint = {
   updateDraftOrder : (orderId) => `${baseUrl}/order/${orderId}/draft`,
   getPhotographerBookings : `${baseUrl}/booking/list`,
   getPhotographerOrderDetails: (bookingId) => `${baseUrl}/booking/${bookingId}`,   
+  startOrder : (bookingId)=>`${baseUrl}/booking/${bookingId}/start`,
+  endOrder : (bookingId)=>`${baseUrl}/booking/${bookingId}/finish`,
   
 }
 

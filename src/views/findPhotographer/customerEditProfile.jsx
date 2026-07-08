@@ -26,7 +26,7 @@ const MENU = [
     { key: "draftOrders", label: "Draft Orders", icon: <FiEdit2 size={17} /> },
     // {key : 'bankDetails', label : 'Bank Details', icon : <FiCreditCard size={17} />},
     // { key: 'wallet',    label: 'Wallet',               icon: <FiCreditCard size={17} /> },
-    { key: 'dispute',   label: 'Raise a Dispute',   icon: <FiAlertTriangle      size={17} /> },
+    // { key: 'dispute',   label: 'Raise a Dispute',   icon: <FiAlertTriangle      size={17} /> },
     { key: 'password',  label: 'Change Password',      icon: <FiLock      size={17} /> },
     {key : 'support' , label : 'Support', icon : <FiMessageCircle size={17} />}
     

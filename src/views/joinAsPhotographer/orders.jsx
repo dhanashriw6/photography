@@ -17,10 +17,13 @@ import {
     FiChevronLeft,
     FiChevronRight,
     FiChevronsRight,
+    FiPlay,
+    FiStopCircle,
 } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
-import { getPhotographerBookings } from '../../services/order';
+import { getPhotographerBookings, startOrder, endOrder } from '../../services/order';
 import ServerError from '../ServerError';
+import { getCurrentLocation } from '@/utils/getLocation';
 
 const ACCENT = '#f5a623';
 const ACCENT_TEXT = '#B7791F';
@@ -198,7 +201,7 @@ const Dropdown = ({ label, value, options, onChange }) => {
     );
 };
 
-const RowActions = ({ order, onView }) => {
+const RowActions = ({ order, onView, onStart, onEnd, isLoading, actionError }) => {
     const [open, setOpen] = useState(false);
     const ref = useRef(null);
 
@@ -228,7 +231,26 @@ const RowActions = ({ order, onView }) => {
                 onMouseLeave={(e) => e.currentTarget.style.color = '#999'}>
                 <FiEye size={16} />
             </button>
-            <button type="button" title="Chat with client" style={iconBtnStyle}
+
+            <button
+                type="button"
+                title="Start Event"
+                onClick={onStart}
+                disabled={isLoading}
+                style={{ ...iconBtnStyle, opacity: isLoading ? 0.5 : 1, cursor: isLoading ? 'wait' : 'pointer' }}
+            >
+                <FiPlay size={16} />
+            </button>
+            <button
+                type="button"
+                title="End Event"
+                onClick={onEnd}
+                disabled={isLoading}
+                style={{ ...iconBtnStyle, opacity: isLoading ? 0.5 : 1, cursor: isLoading ? 'wait' : 'pointer' }}
+            >
+                <FiStopCircle size={16} />
+            </button>
+            {/* <button type="button" title="Chat with client" style={iconBtnStyle}
                 onMouseEnter={(e) => e.currentTarget.style.color = ACCENT}
                 onMouseLeave={(e) => e.currentTarget.style.color = '#999'}>
                 <FiMessageCircle size={16} />
@@ -237,7 +259,7 @@ const RowActions = ({ order, onView }) => {
                 onMouseEnter={(e) => e.currentTarget.style.color = ACCENT}
                 onMouseLeave={(e) => e.currentTarget.style.color = '#999'}>
                 <FiDownload size={16} />
-            </button>
+            </button> */}
 
             <div style={{ position: 'relative' }} ref={ref}>
                 <button type="button" onClick={() => setOpen((v) => !v)} style={iconBtnStyle}
@@ -262,10 +284,11 @@ const RowActions = ({ order, onView }) => {
                         }}
                     >
                         {[
-                            { icon: <FiEye size={14} />, label: 'View Details', onClick: onView },
-                            { icon: <FiMessageCircle size={14} />, label: 'Chat with Client' },
-                            { icon: <FiDownload size={14} />, label: 'Download Invoice' },
-                            { icon: <FiMoreHorizontal size={14} />, label: 'More Options' },
+                            { icon: <FiPlay size={14} />, label: 'Start Event', onClick: onView },
+                            { icon: <FiStopCircle size={14} />, label: 'End Event', onClick: onView },
+                            // { icon: <FiMessageCircle size={14} />, label: 'Chat with Client' },
+                            // { icon: <FiDownload size={14} />, label: 'Download Invoice' },
+                            // { icon: <FiMoreHorizontal size={14} />, label: 'More Options' },
                         ].map((item) => (
                             <button
                                 key={item.label}
@@ -293,6 +316,7 @@ const RowActions = ({ order, onView }) => {
                     </div>
                 )}
             </div>
+
         </div>
     );
 };
@@ -307,10 +331,13 @@ const YourOrderList = () => {
     const [tab, setTab] = useState('upcoming'); // 'upcoming' | 'past'
     const [pageSize, setPageSize] = useState('10 per page');
     const [page, setPage] = useState(1);
-
+    const [actionLoadingId, setActionLoadingId] = useState(null);
     const [rawBookings, setRawBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [actionErrorId, setActionErrorId] = useState(null);
+    const [actionError, setActionError] = useState(null);
+
 
     useEffect(() => {
         let cancelled = false;
@@ -394,7 +421,50 @@ const YourOrderList = () => {
     }, [orders, search, sortBy, eventType, tab]);
 
     const totalCount = orders.length;
+    const handleStartEvent = async (order) => {
+        setActionError(null);
+        setActionLoadingId(order.bookingId);
+        try {
+            const { lat, lng } = await getCurrentLocation();
+            await startOrder(order.bookingId, { lat, lng });
+            // Optionally: refetch bookings, or optimistically update status locally
+            setRawBookings((prev) =>
+                prev.map((b) => (b.id === order.bookingId ? { ...b, status: 'In Progress' } : b))
+            );
+        } catch (err) {
+            setActionError(
+                err?.response?.data?.error?.message ||
+                err?.response?.data?.message ||
+                err?.message ||
+                "Failed to start event. Please try again."
+            );
+            setActionErrorId(order.bookingId);
+        } finally {
+            setActionLoadingId(null);
+        }
+    };
 
+    const handleEndEvent = async (order) => {
+        setActionError(null);
+        setActionLoadingId(order.bookingId);
+        try {
+            const { lat, lng } = await getCurrentLocation();
+            await endOrder(order.bookingId, { lat, lng });
+            setRawBookings((prev) =>
+                prev.map((b) => (b.id === order.bookingId ? { ...b, status: 'Completed' } : b))
+            );
+        } catch (err) {
+            setActionError(
+                err?.response?.data?.error?.message ||
+                err?.response?.data?.message ||
+                err?.message ||
+                "Failed to end event. Please try again."
+            );
+            setActionErrorId(order.bookingId);
+        } finally {
+            setActionLoadingId(null);
+        }
+    };
     return (
         <div>
             <h2 className="pe-title" style={{ marginBottom: '4px' }}>
@@ -539,49 +609,78 @@ const YourOrderList = () => {
                         const { date, time } = formatDate(order.date);
                         const badge = STATUS_STYLES[order.status] || STATUS_STYLES.Upcoming;
                         return (
-                            <div
-                                key={order.id}
-                                style={{
-                                    display: 'grid',
-                                    gridTemplateColumns: '110px 1.3fr 1.1fr 1.1fr 1fr 0.9fr 1.1fr 110px',
-                                    gap: '8px',
-                                    padding: '14px 18px',
-                                    borderBottom: '1px solid #f5f5f5',
-                                    alignItems: 'center',
-                                    fontSize: '13px',
-                                    color: '#333',
-                                }}
-                            >
-                                <div style={{ fontWeight: 600, color: '#444' }}>{order.id}</div>
-                                <div style={{ fontWeight: 600, color: '#1a1a1a' }}>{order.eventName}</div>
-                                <div>{order.client}</div>
-                                <div>
-                                    <div>{date}</div>
-                                    <div style={{ fontSize: '11px', color: '#999' }}>{time}</div>
+                            <>
+                                <div
+                                    style={{
+                                        display: 'grid',
+                                        gridTemplateColumns: '110px 1.3fr 1.1fr 1.1fr 1fr 0.9fr 1.1fr 110px',
+                                        gap: '8px',
+                                        padding: '14px 18px',
+                                        borderBottom: actionErrorId === order.bookingId ? 'none' : '1px solid #f5f5f5',
+                                        alignItems: 'center',
+                                        fontSize: '13px',
+                                        color: '#333',
+                                    }}
+                                >
+                                    <div style={{ fontWeight: 600, color: '#444' }}>{order.id}</div>
+                                    <div style={{ fontWeight: 600, color: '#1a1a1a' }}>{order.eventName}</div>
+                                    <div>{order.client}</div>
+                                    <div>
+                                        <div>{date}</div>
+                                        <div style={{ fontSize: '11px', color: '#999' }}>{time}</div>
+                                    </div>
+                                    <div>{order.package}</div>
+                                    <div style={{ fontWeight: 700 }}>
+                                        {order.amount != null ? `₹${order.amount.toLocaleString('en-US')}.00` : '-'}
+                                    </div>
+                                    <div>
+                                        <span
+                                            style={{
+                                                ...badge,
+                                                fontSize: '11px',
+                                                fontWeight: 700,
+                                                padding: '4px 10px',
+                                                borderRadius: '999px',
+                                                whiteSpace: 'nowrap',
+                                            }}
+                                        >
+                                            {order.status}
+                                        </span>
+                                    </div>
+                                    <RowActions
+                                        order={order}
+                                        onView={() => navigate('/order-summary', { state: { orderId: order.bookingId } })}
+                                        onStart={() => handleStartEvent(order)}
+                                        onEnd={() => handleEndEvent(order)}
+                                        isLoading={actionLoadingId === order.bookingId}
+                                        actionError={actionError}
+                                    />
                                 </div>
-                                <div>{order.package}</div>
-                                <div style={{ fontWeight: 700 }}>
-                                    {order.amount != null ? `₹${order.amount.toLocaleString('en-US')}.00` : '-'}
-                                </div>
-                                <div>
-                                    <span
+                                {actionErrorId === order.bookingId && actionError && (
+                                    <div
                                         style={{
-                                            ...badge,
-                                            fontSize: '11px',
-                                            fontWeight: 700,
-                                            padding: '4px 10px',
-                                            borderRadius: '999px',
-                                            whiteSpace: 'nowrap',
+                                            padding: '8px 18px 14px',
+                                            borderBottom: '1px solid #f5f5f5',
+                                            fontSize: '12.5px',
+                                            color: '#E0473C',
+                                            background: '#FEF6F5',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            gap: '8px',
                                         }}
                                     >
-                                        {order.status}
-                                    </span>
-                                </div>
-                                <RowActions
-                                    order={order}
-                                    onView={() => navigate('/order-summary', { state: { orderId: order.bookingId } })}
-                                />
-                            </div>
+                                        <span>{actionError}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => { setActionError(null); setActionErrorId(null); }}
+                                            style={{ border: 'none', background: 'none', color: '#E0473C', cursor: 'pointer', fontSize: '13px', fontWeight: 700 }}
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                )}
+                            </>
                         );
                     })
                 )}

@@ -33,10 +33,8 @@ export const getDraftOrders = async () => {
   );
 };
 
-export const getCustomerOrders = async () => {
-  return await httpServices.get(
-    `${orderEndpoint.getCustomerOrder}`
-  );
+export const getCustomerOrders = async (params = {}) => {
+  return await httpServices.get(orderEndpoint.getCustomerOrder, { params });
 };
 
 
@@ -56,5 +54,19 @@ export const getPhotographerBookings = async () => {
 export const getPhotographerOrderDetails = async (bookingId) => {
   return await httpServices.get(
     `${orderEndpoint.getPhotographerOrderDetails(bookingId)}`
+  );
+};
+
+export const startOrder = async (bookingId, { lat, lng }) => {
+  return await httpServices.post(
+    `${orderEndpoint.startOrder(bookingId)}`,
+    { lat, lng }
+  );
+};
+
+export const endOrder = async (bookingId, { lat, lng }) => {
+  return await httpServices.post(
+    `${orderEndpoint.endOrder(bookingId)}`,
+    { lat, lng }
   );
 };

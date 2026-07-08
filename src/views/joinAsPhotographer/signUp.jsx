@@ -642,7 +642,7 @@ const SignUpPhotographer = () => {
               {/* First Name */}
               <div className="su-field">
                 <label>First Name</label>
-                <input type="text" placeholder="John" value={firstName} onChange={e => setFirstName(e.target.value)} />
+                <input type="text" placeholder="Enter first name" value={firstName} onChange={e => setFirstName(e.target.value)} />
                 <p className="su-field-hint">Must match identification documents.</p>
                 {fieldErrors.firstName && <p className="su-error">{fieldErrors.firstName}</p>}
               </div>
@@ -650,7 +650,7 @@ const SignUpPhotographer = () => {
               {/* Last Name */}
               <div className="su-field">
                 <label>Last Name</label>
-                <input type="text" placeholder="Doe" value={lastName} onChange={e => setLastName(e.target.value)} />
+                <input type="text" placeholder="Enter last name" value={lastName} onChange={e => setLastName(e.target.value)} />
                 <p className="su-field-hint">Must match identification documents.</p>
                 {fieldErrors.lastName && <p className="su-error">{fieldErrors.lastName}</p>}
               </div>

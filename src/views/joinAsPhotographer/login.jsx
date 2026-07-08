@@ -59,6 +59,8 @@ if (user?.last_name) localStorage.setItem('lastName', user.last_name);
 
         if (kycStatus === 'pending') {
           navigate('/join-as-photographer/verification-ip');   // in progress page
+        } else if (kycStatus === 'approved') {
+          navigate('/join-as-photographer/home');  // dashboard page
         } else {
           navigate('/join-as-photographer/kyc-verification');  // normal kyc page
         }

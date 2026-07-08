@@ -52,10 +52,13 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
     const [originalVideoLinks, setOriginalVideoLinks] = useState([]);
 
     /*
-     * awards: [{ id?, title, imageFile, previewUrl, key, uploading, uploadError }]
-     * id present = existing award loaded from API
+     * awards: [{ id?, name, images: [ { id?, tempId?, previewUrl, key, uploading, uploadError, source } ] }]
+     * A single award has ONE name but can have MANY images — mirrors the Portfolio Upload
+     * section: existing images + newly uploaded images + a trailing "+" tile to add more.
+     * id on an image  = existing image loaded from API
+     * tempId on image = newly added, not yet (or currently) uploading
      */
-    const [awards, setAwards] = useState([{ title: '', imageFile: null, previewUrl: null, key: null, uploading: false, uploadError: null }]);
+    const [awards, setAwards] = useState([{ name: '', images: [] }]);
 
     const [saving, setSaving]   = useState(false);
     const [saveErr, setSaveErr] = useState('');
@@ -74,14 +77,14 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
 
                 // Portfolio docs
                 if (user.portfolio_documents?.length) {
-    setPortfolioFiles(user.portfolio_documents.map(d => ({
-        id: d.id,
-        key: d.key || d.document_key,
-        document_type: d.document_type || 'image',
-        previewUrl: d.url || d.key,
-        source: 'existing',
-    })));
-}
+                    setPortfolioFiles(user.portfolio_documents.map(d => ({
+                        id: d.id,
+                        key: d.key || d.document_key,
+                        document_type: d.document_type || 'image',
+                        previewUrl: d.url || d.key,
+                        source: 'existing',
+                    })));
+                }
 
                 // Social links — API returns array [{link_type, url}]
                 const socialsFromApi = {};
@@ -98,15 +101,19 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
                     setOriginalVideoLinks(mapped);
                 }
 
+                // Awards — each award may have multiple images (a.images / a.award_images)
                 if (user.awards?.length) {
                     setAwards(user.awards.map(a => ({
                         id: a.id,
-                        title: a.title || '',
-                        imageFile: null,
-                        previewUrl: a.image_url || a.key || null,
-                        key: a.key || null,
-                        uploading: false,
-                        uploadError: null,
+                        name: a.name || '',
+                        images: (a.images || a.award_images || []).map(img => ({
+                            id: img.id,
+                            previewUrl: img.url || img.image_url || img.key,
+                            key: img.key,
+                            uploading: false,
+                            uploadError: null,
+                            source: 'existing',
+                        })),
                     })));
                 }
             } catch (err) {
@@ -163,30 +170,50 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
     const updateVideoLink = (i, field, val) =>
         setVideoLinks(v => v.map((x, idx) => idx === i ? { ...x, [field]: val } : x));
 
-    /* ── Award image upload (mirrors portfolio upload, one image per award) ── */
-    const handleAwardImage = async (index, file) => {
-        if (!file) return;
-        const previewUrl = file.type.startsWith('image/') ? URL.createObjectURL(file) : null;
-        setAwards(prev => prev.map((a, idx) => idx === index
-            ? { ...a, imageFile: file, previewUrl, key: null, uploading: true, uploadError: null }
-            : a));
+    /* ── Award images upload — multiple images per award, same pattern as Portfolio Upload ── */
+    const handleAwardImages = (awardIndex, files) => {
+        Array.from(files || []).forEach((file, i) => {
+            const tempId = `award-${awardIndex}-${Date.now()}-${i}`;
+            const entry = {
+                tempId,
+                previewUrl: file.type.startsWith('image/') ? URL.createObjectURL(file) : null,
+                key: null,
+                uploading: true,
+                uploadError: null,
+            };
+            setAwards(prev => prev.map((a, idx) =>
+                idx === awardIndex ? { ...a, images: [...a.images, entry] } : a
+            ));
 
-        try {
-            const key = await uploadFileToAWS(file, 'award');
-            setAwards(prev => prev.map((a, idx) => idx === index ? { ...a, key, uploading: false } : a));
-        } catch (err) {
-            console.error('Award image upload failed:', file.name, err);
-            setAwards(prev => prev.map((a, idx) => idx === index
-                ? { ...a, uploading: false, uploadError: 'Upload failed' }
-                : a));
-        }
+            uploadFileToAWS(file, 'award')
+                .then(key => {
+                    setAwards(prev => prev.map((a, idx) =>
+                        idx === awardIndex
+                            ? { ...a, images: a.images.map(img => img.tempId === tempId ? { ...img, key, uploading: false } : img) }
+                            : a
+                    ));
+                })
+                .catch(err => {
+                    console.error('Award image upload failed:', file.name, err);
+                    setAwards(prev => prev.map((a, idx) =>
+                        idx === awardIndex
+                            ? { ...a, images: a.images.map(img => img.tempId === tempId ? { ...img, uploading: false, uploadError: 'Upload failed' } : img) }
+                            : a
+                    ));
+                });
+        });
     };
 
-    const removeAwardImage = (index) => {
-        setAwards(prev => prev.map((a, idx) => idx === index
-            ? { ...a, imageFile: null, previewUrl: null, key: null, uploadError: null }
-            : a));
+    const removeAwardImage = (awardIndex, identifier) => {
+        setAwards(prev => prev.map((a, idx) =>
+            idx === awardIndex
+                ? { ...a, images: a.images.filter(img => (img.tempId || img.id) !== identifier) }
+                : a
+        ));
     };
+
+    const addAward    = () => setAwards(a => [...a, { name: '', images: [] }]);
+    const removeAward = (i) => setAwards(a => a.filter((_, idx) => idx !== i));
 
     /* ── Build social_links diff ── */
     const buildSocialsDiff = () => {
@@ -246,17 +273,29 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
         return result;
     };
 
+    /* ── Build awards payload (each award: one name, many image keys) ── */
+    const buildAwardsPayload = () =>
+        awards
+            .filter(a => a.name.trim())
+            .map(a => ({
+                type: 'insert',
+                name: a.name.trim(),
+                keys: a.images.filter(img => img.key && !img.uploading && !img.uploadError).map(img => img.key),
+            }));
+
     /* ── Save ── */
     const handleSave = async () => {
         setSaveErr('');
         setSaveOk('');
 
-        const stillUploading = newFiles.some(f => f.uploading) || awards.some(a => a.uploading);
+        const awardImagesUploading = awards.some(a => a.images.some(img => img.uploading));
+        const stillUploading = newFiles.some(f => f.uploading) || awardImagesUploading;
         if (stillUploading) {
             setSaveErr('Please wait for all files to finish uploading.');
             return;
         }
-        const hasErrors = newFiles.some(f => f.uploadError) || awards.some(a => a.uploadError);
+        const awardImagesErrored = awards.some(a => a.images.some(img => img.uploadError));
+        const hasErrors = newFiles.some(f => f.uploadError) || awardImagesErrored;
         if (hasErrors) {
             setSaveErr('One or more files failed to upload. Remove them and try again.');
             return;
@@ -265,6 +304,7 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
         const portfolioDiff = buildPortfolioDiff();
         const socialsDiff   = buildSocialsDiff();
         const videoDiff     = buildVideoDiff();
+        const awardsPayload = buildAwardsPayload();
 
         const payload = {
             ...(bio.trim() && { bio: bio.trim() }),
@@ -272,15 +312,7 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
             ...(portfolioDiff.length && { portfolio_documents: portfolioDiff }),
             ...(socialsDiff.length   && { social_links: socialsDiff }),
             ...(videoDiff.length     && { video_links: videoDiff }),
-            ...(awards.some(a => a.title.trim()) && {
-                awards: awards
-                    .filter(a => a.title.trim())
-                    .map(a => ({
-                        type: 'insert',
-                        title: a.title.trim(),
-                        ...(a.key && { key: a.key }),
-                    }))
-            }),
+            ...(awardsPayload.length && { awards: awardsPayload }),
         };
 
         if (!Object.keys(payload).length) {
@@ -314,7 +346,7 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
         }
     };
 
-    const anyUploading = newFiles.some(f => f.uploading) || awards.some(a => a.uploading);
+    const anyUploading = newFiles.some(f => f.uploading) || awards.some(a => a.images.some(img => img.uploading));
 
     return (
         <div>
@@ -524,7 +556,8 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
                 </div>
 
                 {/* ── Social Links — 2 column grid ── */}
-<div className="profile-grid">                    <div className="su-field">
+                <div className="profile-grid">
+                    <div className="su-field">
                         <label>Instagram Profile Link</label>
                         <input type="url" value={socials.instagram}
                             onChange={e => setSocials(s => ({ ...s, instagram: e.target.value }))}
@@ -558,114 +591,149 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
                         placeholder="https://drive.google.com/…" />
                 </div>
 
-                {/* Awards */}
+                {/* ── Awards — one name, many images (mirrors Portfolio Upload) ── */}
                 <div className="su-field">
                     <label>Add Awards</label>
-                    {awards.map((award, i) => (
-                        <div key={i} style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '14px 16px', marginBottom: i < awards.length - 1 ? '12px' : 0, background: '#fafafa', position: 'relative' }}>
-                            <div style={{ marginBottom: '12px' }}>
-                                <label style={{ fontSize: '12px', fontWeight: 600, color: '#555', display: 'block', marginBottom: '4px' }}>Award Name *</label>
-                                <input
-                                    type="text"
-                                    value={award.title}
-                                    onChange={e => setAwards(prev => prev.map((a, idx) => idx === i ? { ...a, title: e.target.value } : a))}
-                                    placeholder="e.g. Best Wedding Photographer"
-                                    style={{ width: '100%', boxSizing: 'border-box' }}
-                                />
-                            </div>
-
-                            {/* Award image upload — single image, mirrors portfolio upload */}
-                            <div>
-                                <label style={{ fontSize: '12px', fontWeight: 600, color: '#555', display: 'block', marginBottom: '4px' }}>Award Image</label>
-                                <div style={{ position: 'relative', display: 'inline-block' }}>
-                                    {award.previewUrl ? (
-                                        <div style={{ position: 'relative' }}>
-                                            <img src={award.previewUrl} alt="" style={{
-                                                width: '80px', height: '80px', objectFit: 'cover',
-                                                borderRadius: '8px',
-                                                border: award.uploadError ? '2px solid #ef4444' : '2px solid #f5a623',
-                                                display: 'block', opacity: award.uploading ? 0.5 : 1,
-                                            }} />
-                                            {award.uploading && (
-                                                <div style={{
-                                                    position: 'absolute', inset: 0,
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    borderRadius: '8px', background: 'rgba(255,255,255,0.6)',
-                                                }}>
-                                                    <div style={{
-                                                        width: '18px', height: '18px', border: '2px solid #f5a623',
-                                                        borderTopColor: 'transparent', borderRadius: '50%',
-                                                        animation: 'spin 0.7s linear infinite',
-                                                    }} />
-                                                </div>
-                                            )}
-                                            <button type="button" onClick={() => removeAwardImage(i)}
-                                                style={{
-                                                    position: 'absolute', top: '-7px', right: '-7px',
-                                                    width: '20px', height: '20px', borderRadius: '50%',
-                                                    background: '#ef4444', border: 'none', cursor: 'pointer',
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    padding: 0, color: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
-                                                }}>
-                                                <FiX size={11} />
-                                            </button>
-                                            {award.uploadError && !award.uploading && (
-                                                <div style={{ position: 'absolute', bottom: '-18px', left: 0, right: 0, fontSize: '9px', color: '#ef4444', textAlign: 'center' }}>
-                                                    Failed
-                                                </div>
-                                            )}
-                                        </div>
-                                    ) : (
-                                        <div
-                                            onClick={() => awardFileRefs.current[i]?.click()}
-                                            style={{
-                                                width: '80px', height: '80px', border: '1.5px dashed #d1d5db',
-                                                borderRadius: '8px', display: 'flex', alignItems: 'center',
-                                                justifyContent: 'center', color: '#bbb', fontSize: '22px',
-                                                background: '#fff', cursor: 'pointer', transition: 'border-color 0.2s',
-                                            }}
-                                            onMouseEnter={e => { e.currentTarget.style.borderColor = '#f5a623'; }}
-                                            onMouseLeave={e => { e.currentTarget.style.borderColor = '#d1d5db'; }}
-                                        >
-                                            <FiUpload size={18} />
-                                        </div>
-                                    )}
+                    {awards.map((award, i) => {
+                        const hasImages = award.images.length > 0;
+                        return (
+                            <div key={i} style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '14px 16px', marginBottom: i < awards.length - 1 ? '12px' : 0, background: '#fafafa', position: 'relative' }}>
+                                <div style={{ marginBottom: '12px' }}>
                                     <input
-                                        ref={el => awardFileRefs.current[i] = el}
-                                        type="file"
-                                        accept="image/*"
-                                        style={{ display: 'none' }}
-                                        onChange={e => { handleAwardImage(i, e.target.files?.[0]); e.target.value = ''; }}
+                                        type="text"
+                                        value={award.name}
+                                        onChange={e => setAwards(prev => prev.map((a, idx) => idx === i ? { ...a, name: e.target.value } : a))}
+                                        placeholder="e.g. Best Wedding Photographer"
+                                        style={{ width: '100%', boxSizing: 'border-box' }}
                                     />
                                 </div>
-                            </div>
 
-                            {awards.length > 1 && (
-                                <button
-                                    type="button"
-                                    onClick={() => setAwards(prev => prev.filter((_, idx) => idx !== i))}
+                                {/* Award images upload — multiple images, same pattern as Portfolio Upload */}
+                                <div
+                                    onClick={() => awardFileRefs.current[i]?.click()}
                                     style={{
-                                        position: 'absolute', top: '10px', right: '10px',
-                                        background: '#fee2e2', border: 'none', borderRadius: '6px',
-                                        color: '#ef4444', cursor: 'pointer', padding: '4px 8px', fontSize: '12px',
+                                        border: '1.5px solid #d1d5db', borderRadius: '8px',
+                                        padding: hasImages ? '14px' : '20px 16px',
+                                        display: 'flex', flexDirection: 'column',
+                                        alignItems: 'center', justifyContent: 'center', gap: '10px',
+                                        cursor: 'pointer', background: '#fff', minHeight: '90px',
+                                        transition: 'border-color 0.2s, box-shadow 0.2s',
                                     }}
+                                    onMouseEnter={e => { e.currentTarget.style.borderColor = '#f5a623'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(245,166,35,0.15)'; }}
+                                    onMouseLeave={e => { e.currentTarget.style.borderColor = '#d1d5db'; e.currentTarget.style.boxShadow = 'none'; }}
                                 >
-                                    Remove
-                                </button>
-                            )}
-                        </div>
-                    ))}
+                                    {!hasImages ? (
+                                        <>
+                                            <FiUpload size={20} color="#bbb" />
+                                            <p style={{ margin: 0, fontSize: '13px', color: '#aaa', textAlign: 'center' }}>
+                                                Click to upload award images
+                                            </p>
+                                        </>
+                                    ) : (
+                                        <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
+                                            {award.images.map((img) => {
+                                                const identifier = img.tempId || img.id;
+                                                return (
+                                                    <div key={identifier} style={{ position: 'relative', flexShrink: 0 }}>
+                                                        {img.previewUrl ? (
+                                                            <img src={img.previewUrl} alt="" style={{
+                                                                width: '80px', height: '80px', objectFit: 'cover',
+                                                                borderRadius: '8px',
+                                                                border: img.uploadError ? '2px solid #ef4444' : '2px solid #f5a623',
+                                                                display: 'block', opacity: img.uploading ? 0.5 : 1,
+                                                            }} />
+                                                        ) : (
+                                                            <div style={{
+                                                                width: '80px', height: '80px', borderRadius: '8px',
+                                                                border: img.uploadError ? '2px solid #ef4444' : '2px solid #f5a623',
+                                                                background: '#FFF3D6',
+                                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                                opacity: img.uploading ? 0.5 : 1,
+                                                            }}>
+                                                                <FiFile size={24} color="#f5a623" />
+                                                            </div>
+                                                        )}
+
+                                                        {img.uploading && (
+                                                            <div style={{
+                                                                position: 'absolute', inset: 0,
+                                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                                borderRadius: '8px', background: 'rgba(255,255,255,0.6)',
+                                                            }}>
+                                                                <div style={{
+                                                                    width: '18px', height: '18px', border: '2px solid #f5a623',
+                                                                    borderTopColor: 'transparent', borderRadius: '50%',
+                                                                    animation: 'spin 0.7s linear infinite',
+                                                                }} />
+                                                            </div>
+                                                        )}
+
+                                                        {img.uploadError && !img.uploading && (
+                                                            <div style={{ position: 'absolute', bottom: '-18px', left: 0, right: 0, fontSize: '9px', color: '#ef4444', textAlign: 'center' }}>
+                                                                Failed
+                                                            </div>
+                                                        )}
+
+                                                        <button type="button" onClick={ev => { ev.stopPropagation(); removeAwardImage(i, identifier); }}
+                                                            style={{
+                                                                position: 'absolute', top: '-7px', right: '-7px',
+                                                                width: '20px', height: '20px', borderRadius: '50%',
+                                                                background: '#ef4444', border: 'none', cursor: 'pointer',
+                                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                                padding: 0, color: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+                                                            }}>
+                                                            <FiX size={11} />
+                                                        </button>
+                                                    </div>
+                                                );
+                                            })}
+
+                                            {/* Add more tile */}
+                                            <div style={{
+                                                width: '80px', height: '80px', border: '2px dashed #f5a623',
+                                                borderRadius: '8px', display: 'flex', alignItems: 'center',
+                                                justifyContent: 'center', color: '#f5a623', fontSize: '26px',
+                                                background: '#fff', flexShrink: 0,
+                                            }}>+</div>
+                                        </div>
+                                    )}
+                                </div>
+                                <input
+                                    ref={el => awardFileRefs.current[i] = el}
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    style={{ display: 'none' }}
+                                    onChange={e => { handleAwardImages(i, e.target.files); e.target.value = ''; }}
+                                />
+
+                                {awards.length > 1 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => removeAward(i)}
+                                        style={{
+                                            position: 'absolute', top: '10px', right: '10px',
+                                            background: '#fee2e2', border: 'none', borderRadius: '6px',
+                                            color: '#ef4444', cursor: 'pointer', padding: '4px 8px', fontSize: '12px',
+                                        }}
+                                    >
+                                        Remove
+                                    </button>
+                                )}
+                            </div>
+                        );
+                    })}
+
                     {/* <button
                         type="button"
-                        onClick={() => setAwards(prev => [...prev, { title: '', imageFile: null, previewUrl: null, key: null, uploading: false, uploadError: null }])}
+                        onClick={addAward}
                         style={{
-                            marginTop: '10px', display: 'flex', alignItems: 'center', gap: '6px',
-                            background: 'none', border: '1.5px dashed #f5a623', borderRadius: '8px',
-                            color: '#f5a623', cursor: 'pointer', padding: '8px 16px', fontSize: '13px', fontWeight: 600,
-                            width: '100%', justifyContent: 'center',
+                            marginTop: '12px', display: 'flex', alignItems: 'center', gap: '6px',
+                            background: 'none', border: '1px dashed #f5a623', borderRadius: '8px',
+                            color: '#f5a623', cursor: 'pointer', padding: '8px 14px', fontSize: '13px',
                         }}
                     >
-                        <FiPlus size={15} /> Add Another Award
+                        <FiPlus size={14} /> Add another award
                     </button> */}
                 </div>
 

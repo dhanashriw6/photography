@@ -20,10 +20,9 @@ const KYCVerification = () => {
   const getDocTypeEnum = (type) => {
     switch (type) {
       case 'Aadhaar Card': return 'aadhar';
-      // case 'PAN Card': return 'pan';
-      // case 'Passport': return 'passport';
-      // case 'Driving Licence': return 'driving_license';
-      // case 'Voter ID': return 'voter_id';
+      case 'PAN Card': return 'pan_card';
+      case 'Passport': return 'passport';
+      case 'Driving Licence': return 'driving_licence';
       default: return 'aadhar';
     }
   };

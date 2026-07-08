@@ -24,13 +24,8 @@ const MyOrders = () => {
 
   // Filters State
   const [uiFilters, setUiFilters] = useState({
-    bookingStatus: 'AllStatuses',
-    paymentStatus: 'AllStatuses',
-    startDate: '',
-    endDate: '',
-    category: 'AllCategories',
-    city: 'AllCities',
-    sortBy: 'Most Recent'
+    status: '',
+    sort_order: 'desc'
   });
   const [appliedFilters, setAppliedFilters] = useState({ ...uiFilters });
 
@@ -49,19 +44,14 @@ const MyOrders = () => {
       try {
         setLoading(true);
 
-        const response = await getCustomerOrders();
+        const params = {};
+        if (appliedFilters.status) params.status = appliedFilters.status;
+        if (appliedFilters.sort_order) params.sort_order = appliedFilters.sort_order;
 
-        console.log(response);
-
+        const response = await getCustomerOrders(params);
         const orders = response?.data?.data || [];
-        console.log("API Orders:", orders);
-        console.log("Length:", orders.length);
 
-        if (orders.length) {
-          setOrders(orders.map(parseApiOrder));
-        } else {
-          setOrders([]);
-        }
+        setOrders(orders.length ? orders.map(parseApiOrder) : []);
       } catch (error) {
         console.error(error);
         setOrders([]);
@@ -71,7 +61,7 @@ const MyOrders = () => {
     };
 
     fetchOrders();
-  }, []);
+  }, [appliedFilters]);
 
   // Helper to parse API order into clean client UI structure
   const parseApiOrder = (order) => {
@@ -106,7 +96,7 @@ const MyOrders = () => {
 
     const durationVal = order.duration_value || 1;
     const durationType = order.duration_type || "days";
-    const status = (order.status || "draft").toUpperCase();
+    const status = order.status
 
     // Dynamically calculate paid & due amounts based on status for realistic display
     const totalAmount = parseFloat(order.total_amount || 25000);
@@ -351,31 +341,7 @@ const MyOrders = () => {
   };
   // ---------- End Review Modal helpers ----------
 
-  // Filter & Sort logic
-  const filteredOrders = useMemo(() => {
-    let result = [...orders];
-
-    // Sorting
-    if (appliedFilters.sortBy === 'Most Recent') {
-      result.sort((a, b) => {
-        const dateA = a.dateTime ? new Date(a.dateTime.split(' • ')[0]) : new Date(0);
-        const dateB = b.dateTime ? new Date(b.dateTime.split(' • ')[0]) : new Date(0);
-        return dateB - dateA;
-      });
-    } else if (appliedFilters.sortBy === 'Oldest First') {
-      result.sort((a, b) => {
-        const dateA = a.dateTime ? new Date(a.dateTime.split(' • ')[0]) : new Date(0);
-        const dateB = b.dateTime ? new Date(b.dateTime.split(' • ')[0]) : new Date(0);
-        return dateA - dateB;
-      });
-    } else if (appliedFilters.sortBy === 'Price: High to Low') {
-      result.sort((a, b) => b.totalAmount - a.totalAmount);
-    } else if (appliedFilters.sortBy === 'Price: Low to High') {
-      result.sort((a, b) => a.totalAmount - b.totalAmount);
-    }
-
-    return result;
-  }, [orders, appliedFilters.sortBy]);
+  const filteredOrders = orders;
 
   // Handle filter changes
   const handleFilterChange = (field, value) => {
@@ -387,15 +353,7 @@ const MyOrders = () => {
   };
 
   const resetFilters = () => {
-    const defaults = {
-      bookingStatus: 'AllStatuses',
-      paymentStatus: 'AllStatuses',
-      startDate: '',
-      endDate: '',
-      category: 'AllCategories',
-      city: 'AllCities',
-      sortBy: 'Most Recent'
-    };
+    const defaults = { status: '', sort_order: 'desc' };
     setUiFilters(defaults);
     setAppliedFilters(defaults);
   };
@@ -564,23 +522,7 @@ const MyOrders = () => {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  // Get status pill styling
-  const getBookingStatusStyle = (status) => {
-    switch (status) {
-      case 'CONFIRMED':
-        return { bg: '#FEF3C7', color: '#D97706' }; // Yellow/Orange
-      case 'PENDING':
-        return { bg: '#FFF8E6', color: '#B7791F' }; // Lighter Yellow
-      case 'COMPLETED':
-        return { bg: '#E2F6EE', color: '#0D9488' }; // Green
-      case 'CANCELLED':
-        return { bg: '#FDE6E5', color: '#E0473C' }; // Red
-      case 'DRAFT':
-        return { bg: '#E0F2FE', color: '#0369A1' }; // Sky Blue
-      default:
-        return { bg: '#F3F4F6', color: '#4B5563' };
-    }
-  };
+ 
 
   const getPaymentStatusStyle = (status) => {
     switch (status) {
@@ -602,6 +544,36 @@ const MyOrders = () => {
     if (!reviewModalOrderId) return null;
     return orders.find(o => o.id === reviewModalOrderId) || null;
   }, [reviewModalOrderId, orders]);
+
+  const getBookingStatusStyle = (status) => {
+    switch (status) {
+      case 'draft':
+        return { bg: '#E0F2FE', color: '#0369A1' }; // Sky Blue
+      case 'pending_payment':
+        return { bg: '#FFF8E6', color: '#B7791F' }; // Light Yellow
+      case 'confirmed':
+        return { bg: '#FEF3C7', color: '#D97706' }; // Orange
+      case 'in_progress':
+        return { bg: '#EDE9FE', color: '#7C3AED' }; // Purple
+      case 'partially_delivered':
+        return { bg: '#DBEAFE', color: '#2563EB' }; // Blue
+      case 'completed':
+        return { bg: '#E2F6EE', color: '#0D9488' }; // Green
+      case 'cancelled':
+        return { bg: '#FDE6E5', color: '#E0473C' }; // Red
+      case 'refunded':
+        return { bg: '#F3F4F6', color: '#4B5563' }; // Grey
+      default:
+        return { bg: '#F3F4F6', color: '#4B5563' };
+    }
+  };
+
+  // Helper to make "pending_payment" -> "Pending Payment" for display
+  const formatStatusLabel = (status) =>
+    status
+      ?.split('_')
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ') || '';
 
   return (
     <div className="bookings-page-container">
@@ -662,99 +634,33 @@ const MyOrders = () => {
           </div>
 
           <div className="filter-group">
-            <label className="filter-label">Booking Status</label>
+            <label className="filter-label">Status</label>
             <select
               className="filter-select"
-              value={uiFilters.bookingStatus}
-              onChange={(e) => handleFilterChange('bookingStatus', e.target.value)}
+              value={uiFilters.status}
+              onChange={(e) => handleFilterChange('status', e.target.value)}
             >
-              <option value="AllStatuses">All Statuses</option>
-              <option value="CONFIRMED">Confirmed</option>
-              <option value="PENDING">Pending</option>
-              <option value="COMPLETED">Completed</option>
-              <option value="CANCELLED">Cancelled</option>
+              <option value="">All Statuses</option>
+              <option value="draft">Draft</option>
+              <option value="pending_payment">Pending Payment</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="in_progress">In Progress</option>
+              <option value="partially_delivered">Partially Delivered</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+              <option value="refunded">Refunded</option>
             </select>
           </div>
 
           <div className="filter-group">
-            <label className="filter-label">Payment Status</label>
+            <label className="filter-label">Sort Order</label>
             <select
               className="filter-select"
-              value={uiFilters.paymentStatus}
-              onChange={(e) => handleFilterChange('paymentStatus', e.target.value)}
+              value={uiFilters.sort_order}
+              onChange={(e) => handleFilterChange('sort_order', e.target.value)}
             >
-              <option value="AllStatuses">All Statuses</option>
-              <option value="PAID">Paid</option>
-              <option value="PARTIALLY PAID">Partially Paid</option>
-              <option value="REFUNDED">Refunded</option>
-              <option value="PENDING">Pending</option>
-              <option value="FAILED">Failed</option>
-            </select>
-          </div>
-
-          <div className="filter-group">
-            <label className="filter-label">Date Range</label>
-            <div className="date-range-inputs">
-              <div className="date-input-wrapper">
-                <FiCalendar className="date-icon" />
-                <input
-                  type="date"
-                  className="filter-date-input"
-                  placeholder="From"
-                  value={uiFilters.startDate}
-                  onChange={(e) => handleFilterChange('startDate', e.target.value)}
-                />
-              </div>
-              <div className="date-input-wrapper" style={{ marginTop: '8px' }}>
-                <FiCalendar className="date-icon" />
-                <input
-                  type="date"
-                  className="filter-date-input"
-                  placeholder="To"
-                  value={uiFilters.endDate}
-                  onChange={(e) => handleFilterChange('endDate', e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="filter-group">
-            <label className="filter-label">Event Category</label>
-            <select
-              className="filter-select"
-              value={uiFilters.category}
-              onChange={(e) => handleFilterChange('category', e.target.value)}
-            >
-              {categories.map((cat, i) => (
-                <option key={i} value={cat}>{cat}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="filter-group">
-            <label className="filter-label">City</label>
-            <select
-              className="filter-select"
-              value={uiFilters.city}
-              onChange={(e) => handleFilterChange('city', e.target.value)}
-            >
-              {cities.map((city, i) => (
-                <option key={i} value={city}>{city}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="filter-group">
-            <label className="filter-label">Sort By</label>
-            <select
-              className="filter-select"
-              value={uiFilters.sortBy}
-              onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-            >
-              <option value="Most Recent">Most Recent</option>
-              <option value="Oldest First">Oldest First</option>
-              <option value="Price: High to Low">Price: High to Low</option>
-              <option value="Price: Low to High">Price: Low to High</option>
+              <option value="desc">Newest First</option>
+              <option value="asc">Oldest First</option>
             </select>
           </div>
 
@@ -822,7 +728,15 @@ const MyOrders = () => {
 
                       {/* Middle: Details */}
                       <div className="card-details-section">
-                        <span className="card-order-number">{order.orderNumber}</span>
+                        <div className="card-header-row">
+                          <span className="card-order-number">{order.orderNumber}</span>
+                          <span
+                            className="status-badge-pill"
+                            style={{ background: bStyle.bg, color: bStyle.color }}
+                          >
+                            {formatStatusLabel(order.bookingStatus)}
+                          </span>
+                        </div>
                         <h3 className="card-event-name">{order.eventName}</h3>
 
                         <div className="card-meta-info-row">
@@ -838,7 +752,6 @@ const MyOrders = () => {
 
                         <span className="card-package-tag">{order.packageName}</span>
                       </div>
-
                       {/* Status Badges Section */}
                       {/* <div className="card-status-section">
                         <span
@@ -1288,7 +1201,24 @@ const MyOrders = () => {
           flex-wrap: wrap;
           gap: 16px;
         }
+.card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+}
 
+.status-badge-pill {
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 99px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
         .bookings-title {
           font-size: 28px;
           font-weight: 800;
@@ -1339,6 +1269,11 @@ const MyOrders = () => {
           color: #0f172a;
           box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
+          .card-booking-status{
+            color:blue;
+            font-weight: 700;
+            font-size: 12px;
+          }
 
         .bookings-layout-grid {
           display: grid;

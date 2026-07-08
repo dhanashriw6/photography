@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import ViewsLayout from '../Layout';
 import { LuCalendar, LuClock, LuStar } from 'react-icons/lu';
 import { FiMapPin } from 'react-icons/fi';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getPhotographerOrderDetails } from '@/services/order';
 import PhotographerLayout from './PhotographerLayout';
+import { getPhotographerOrderDetails, startOrder, endOrder } from '@/services/order';
+import { getCurrentLocation } from '@/utils/getLocation';
+import { FiPlay, FiStopCircle } from 'react-icons/fi';
 
 /* ── Info row used inside detail cards ── */
 const InfoRow = ({ icon, label, value, bold }) => (
@@ -116,6 +117,46 @@ const OrderSummary = () => {
     const [booking, setBooking] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [actionLoading, setActionLoading] = useState(false); // 'start' | 'end' | false
+const [actionError, setActionError] = useState(null);
+
+const handleStartEvent = async () => {
+    setActionError(null);
+    setActionLoading('start');
+    try {
+        const { lat, lng } = await getCurrentLocation();
+        await startOrder(booking.id, { lat, lng });
+        setBooking((prev) => ({ ...prev, status: 'In Progress' }));
+    } catch (err) {
+        setActionError(
+            err?.response?.data?.error?.message ||
+            err?.response?.data?.message ||
+            err?.message ||
+            'Failed to start event. Please try again.'
+        );
+    } finally {
+        setActionLoading(false);
+    }
+};
+
+const handleEndEvent = async () => {
+    setActionError(null);
+    setActionLoading('end');
+    try {
+        const { lat, lng } = await getCurrentLocation();
+        await endOrder(booking.id, { lat, lng });
+        setBooking((prev) => ({ ...prev, status: 'Completed' }));
+    } catch (err) {
+        setActionError(
+            err?.response?.data?.error?.message ||
+            err?.response?.data?.message ||
+            err?.message ||
+            'Failed to end event. Please try again.'
+        );
+    } finally {
+        setActionLoading(false);
+    }
+};
 
     useEffect(() => {
         if (!orderId) {
@@ -149,11 +190,11 @@ const OrderSummary = () => {
 
     if (loading) {
         return (
-            <ViewsLayout>
+            <PhotographerLayout>
                 <div style={{ background: '#f7f7f5', minHeight: '100vh', padding: '80px 0', textAlign: 'center', color: '#999' }}>
                     Loading order details...
                 </div>
-            </ViewsLayout>
+            </PhotographerLayout>
         );
     }
 
@@ -193,7 +234,7 @@ const OrderSummary = () => {
         .join(', ') || booking.location_label || 'Address not available';
 
     return (
-        <ViewsLayout>
+        <PhotographerLayout>
             <div style={{
                 background: '#f7f7f5',
                 minHeight: '100vh',
@@ -224,7 +265,54 @@ const OrderSummary = () => {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
                         {/* Event Details */}
-                        <Card title="Event details" right={<StatusBadge status={booking.status} />}>
+                        <Card title="Event details"right={
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <StatusBadge status={booking.status} />
+            <button
+                onClick={handleStartEvent}
+                disabled={!!actionLoading}
+                title="Start Event"
+                style={{
+                    display: 'flex', alignItems: 'center', gap: '6px',
+                    border: 'none', borderRadius: '8px',
+                    background: '#E2F6EE', color: '#0D9488',
+                    padding: '7px 12px', fontSize: '12px', fontWeight: 700,
+                    cursor: actionLoading ? 'wait' : 'pointer',
+                    opacity: actionLoading ? 0.6 : 1,
+                }}
+            >
+                <FiPlay size={13} /> {actionLoading === 'start' ? 'Starting...' : 'Start'}
+            </button>
+            <button
+                onClick={handleEndEvent}
+                disabled={!!actionLoading}
+                title="End Event"
+                style={{
+                    display: 'flex', alignItems: 'center', gap: '6px',
+                    border: 'none', borderRadius: '8px',
+                    background: '#FDE6E5', color: '#E0473C',
+                    padding: '7px 12px', fontSize: '12px', fontWeight: 700,
+                    cursor: actionLoading ? 'wait' : 'pointer',
+                    opacity: actionLoading ? 0.6 : 1,
+                }}
+            >
+                <FiStopCircle size={13} /> {actionLoading === 'end' ? 'Ending...' : 'End'}
+            </button>
+            {actionError && (
+    <div style={{
+        marginBottom: '14px',
+        padding: '10px 14px',
+        borderRadius: '8px',
+        background: '#FEF6F5',
+        color: '#E0473C',
+        fontSize: '12.5px',
+        fontWeight: 600,
+    }}>
+        {actionError}
+    </div>
+)}
+        </div>
+    }>
                             <InfoRow icon={<LuStar size={15} />} label="Event" value={eventTypeName} />
                             <InfoRow icon={<LuCalendar size={15} />} label="Start Date" value={start.date} />
                             <InfoRow icon={<LuCalendar size={15} />} label="End Date" value={end.date} />
@@ -386,7 +474,7 @@ const OrderSummary = () => {
                     </div>
                 </div>
             </div>
-        </ViewsLayout>
+        </PhotographerLayout>
     );
 };
 
