@@ -417,7 +417,7 @@ export const AddressAutocomplete = ({ label, hint, value, onAddressSelect, error
       {error && <p className="su-error">{error}</p>}
       
 
-      {showPin && (value || postalCode !== '') && (
+      {/* {showPin && (value || postalCode !== '') && (
         <div style={{ marginTop: '12px' }}>
           <label style={{ fontSize: '13px' }}>
             Pincode / Zipcode
@@ -437,7 +437,7 @@ export const AddressAutocomplete = ({ label, hint, value, onAddressSelect, error
             }}
           />
         </div>
-      )}
+      )} */}
     </div>
   );
 };

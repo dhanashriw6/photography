@@ -279,7 +279,7 @@ const BookingSummary = () => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                   {serviceItems.map((item, idx) => {
                     const name   = item.snapshot_photographer_name || 'Photographer';
-                    const avatar = item.profile_picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`;
+                    const avatar = item.profile_picture.url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`;
                     return (
                       <div key={item.id} style={{
                         border: '1.5px solid #f0f0f0', borderRadius: '14px',
@@ -313,8 +313,8 @@ const BookingSummary = () => {
                         {/* Provider details */}
                         <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '0' }}>
                           {item.snapshot_package_name && <Row label="Package"  value={item.snapshot_package_name} />}
-                          <Row label="Price"      value={fmtMoney(item.snapshot_price)} />
-                          <Row label="Commission" value={fmtMoney(item.commission_amount)} />
+                          <Row label="Price"      value={fmtMoney(item.price)} />
+                          {/* <Row label="Commission" value={fmtMoney(item.commission_amount)} /> */}
                           <Row label="Tax"        value={fmtMoney(item.tax_amount)} />
                           <Row label="Duration"   value={fmt(item.duration_type)} />
                           <Row label="Joined"     value={fmtDate(item.joined_date)} />
@@ -487,7 +487,7 @@ const BookingSummary = () => {
               <Card title="Provider Information" icon={<BsCameraFill size={14} />} accent="#E8A317">
                 {serviceItems.map((item, idx) => {
                   const name   = item.snapshot_photographer_name || 'Photographer';
-                  const avatar = item.profile_picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`;
+                  const avatar = item.profile_picture.url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`;
                   return (
                     <div key={item.id} style={{ marginBottom: idx < serviceItems.length - 1 ? '16px' : '0', borderBottom: idx < serviceItems.length - 1 ? '1px solid #eee' : 'none', paddingBottom: idx < serviceItems.length - 1 ? '16px' : '0' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
@@ -570,7 +570,7 @@ const BookingSummary = () => {
 
                 <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: '10px', display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
                   <Row label="Subtotal" value={fmtMoney(order.subtotal)} />
-                  <Row label="Discount" value={fmtMoney(order.discount_amount)} />
+                  {/* <Row label="Discount" value={fmtMoney(order.discount_amount)} /> */}
                   <Row label="Tax"      value={fmtMoney(order.tax_amount)} />
                 </div>
 

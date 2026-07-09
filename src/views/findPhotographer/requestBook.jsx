@@ -118,8 +118,8 @@ const SingleProviderCard = ({ item }) => {
 
         <div className="rb-mini-summary">
           <InfoRow label="Package" value={fmt(item.snapshot_package_name)} />
-          <InfoRow label="Price" value={money(item.snapshot_price)} />
-          <InfoRow label="Commission" value={money(item.commission_amount)} />
+          <InfoRow label="Price" value={money(item.price)} />
+          {/* <InfoRow label="Commission" value={money(item.commission_amount)} /> */}
           <InfoRow label="Tax" value={money(item.tax_amount)} />
           <div className="rb-mini-total">
             <span>Total</span>
@@ -192,7 +192,7 @@ const EditingItemCard = ({ item }) => {
       )}
 
       <div className="rb-editing-totals">
-        <InfoRow label="Package Price" value={money(item.snapshot_price)} />
+<InfoRow label="Package Price" value={money(item.snapshot_price)} />
         <InfoRow label="Tax" value={money(item.tax_amount)} />
         <div className="rb-mini-total">
           <span>Total</span>
@@ -488,7 +488,7 @@ const handleUpdateDraft = async () => {
 
                   <div className="rb-price-breakdown">
                     <div className="rb-price-line"><span>Subtotal</span><strong>{money(subtotal)}</strong></div>
-                    <div className="rb-price-line"><span>Discount</span><strong>{money(discountAmount)}</strong></div>
+                    {/* <div className="rb-price-line"><span>Discount</span><strong>{money(discountAmount)}</strong></div> */}
                     <div className="rb-price-line"><span>Tax</span><strong>{money(taxAmount)}</strong></div>
                   </div>
 

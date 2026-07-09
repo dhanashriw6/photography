@@ -126,49 +126,49 @@ const EditingPackageCard = ({ pkg, index, onBookNow, bookingId }) => {
           <div className="ep-gallery-seg ep-gallery-seg--empty">No image</div>
         )}
         {showGallery &&
-  createPortal(
-    <div
-      className="gallery-modal"
-      onClick={() => setShowGallery(false)}
-    >
-      <div
-        className="gallery-modal-content"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          className="gallery-close"
-          onClick={() => setShowGallery(false)}
-        >
-          ✕
-        </button>
+          createPortal(
+            <div
+              className="gallery-modal"
+              onClick={() => setShowGallery(false)}
+            >
+              <div
+                className="gallery-modal-content"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  className="gallery-close"
+                  onClick={() => setShowGallery(false)}
+                >
+                  ✕
+                </button>
 
-        <button
-          className="gallery-arrow gallery-arrow-left"
-          onClick={prevImage}
-        >
-          ❮
-        </button>
+                <button
+                  className="gallery-arrow gallery-arrow-left"
+                  onClick={prevImage}
+                >
+                  ❮
+                </button>
 
-        <img
-          src={images[selectedImage]?.url}
-          alt=""
-          className="gallery-full-image"
-        />
+                <img
+                  src={images[selectedImage]?.url}
+                  alt=""
+                  className="gallery-full-image"
+                />
 
-        <button
-          className="gallery-arrow gallery-arrow-right"
-          onClick={nextImage}
-        >
-          ❯
-        </button>
+                <button
+                  className="gallery-arrow gallery-arrow-right"
+                  onClick={nextImage}
+                >
+                  ❯
+                </button>
 
-        <div className="gallery-counter">
-          {selectedImage + 1} / {images.length}
-        </div>
-      </div>
-    </div>,
-    document.body
-  )}
+                <div className="gallery-counter">
+                  {selectedImage + 1} / {images.length}
+                </div>
+              </div>
+            </div>,
+            document.body
+          )}
       </div>
 
       <div className="ep-body">
@@ -298,7 +298,7 @@ const SelectEditingPackage = () => {
   const [editingPackages, setEditingPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [bookingId, setBookingId] = useState(null);
-
+  const [skipLoading, setSkipLoading] = useState(false);
   const photographyPackage = location.state?.package;
   const filters = location.state?.filters;
   const packageId = location.state?.packageId ?? photographyPackage?.id ?? null;
@@ -380,6 +380,61 @@ const SelectEditingPackage = () => {
       setBookingId(null);
     }
   };
+  const handleSkipEditing = async () => {
+    try {
+      setSkipLoading(true);
+      const payload = {
+        ...(packageId
+          ? { event_package_id: packageId }
+          : { event_category_id: filters?.category_id ?? null }),
+        start_at: filters?.start_datetime ?? null,
+        end_at: filters?.end_datetime ?? null,
+        address: {
+          lat: filters?.lat ?? null,
+          lng: filters?.lng ?? null,
+          place_id: filters?.place_id || undefined,
+          address_line1: filters?.address_line1 || undefined,
+          address_line2: filters?.address_line2 || undefined,
+          address_line3: filters?.address_line3 || undefined,
+          city: filters?.city || undefined,
+          state: filters?.state || undefined,
+          state_code: filters?.state_code || undefined,
+          country: filters?.country || undefined,
+          country_code: filters?.country_code || undefined,
+          postal_code: filters?.postal_code || undefined,
+          timezone: filters?.timezone || undefined,
+        },
+        service_providers:
+          customServiceProviders?.length > 0
+            ? customServiceProviders
+            : photographyPackage?.team?.flatMap(
+              (tm) =>
+                tm.providers?.map((p) => ({
+                  service_provider_id: p.id,
+                  skill: tm.skill ?? 'photographer',
+                })) || []
+            ) ?? [],
+        // no editing_items key at all — skipped by the user
+      };
+
+      const response = await draftOrder(payload);
+
+      navigate('/requestBook', {
+        state: {
+          order: response?.data?.data,
+          payload,
+          editingPackage: null,
+          package: photographyPackage,
+          teamProviders,
+          filters,
+        },
+      });
+    } catch (err) {
+      console.error('draftOrder (skip editing) failed:', err);
+    } finally {
+      setSkipLoading(false);
+    }
+  };
 
   return (
     <ViewsLayout>
@@ -396,6 +451,19 @@ const SelectEditingPackage = () => {
               Professional editing that brings your memories to life. Select the perfect package
               that matches your needs and storytelling style.
             </p>
+
+            <div className="ep-skip-bar">
+              <span className="ep-skip-text">
+                Editing package is optional
+              </span>
+              <button
+                className="su-btn-primary-outline ep-skip-btn"
+                disabled={skipLoading || bookingId}
+                onClick={handleSkipEditing}
+              >
+                {skipLoading ? 'Processing…' : 'Skip and Continue →'}
+              </button>
+            </div>
 
             {loading ? (
               <div className="ep-loading">
@@ -476,7 +544,27 @@ const STYLES = `
   gap: 24px;
   align-items: start;
 }
-
+.ep-skip-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #fafafa;
+  border: 1px dashed #e5e7eb;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.ep-skip-text {
+  font-size: 12.5px;
+  color: #888;
+}
+.ep-skip-btn {
+  white-space: nowrap;
+  padding: 9px 16px;
+  font-size: 13px;
+}
 /* ── Sidebar ── */
 .ep-sidebar { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 20px; }
 .ep-sidebar-card {

@@ -17,7 +17,7 @@ export function VideoPreview() {
     };
     return (<section className="section-cream py-20 md:py-28 relative">
       <svg className="absolute -top-px left-0 right-0 w-full h-12 text-bg" preserveAspectRatio="none" viewBox="0 0 1440 60">
-        <path d="M0,60 C360,0 1080,80 1440,20 L1440,0 L0,0 Z" fill="currentColor"/>
+        {/* <path d="M0,60 C360,0 1080,80 1440,20 L1440,0 L0,0 Z" fill="currentColor"/> */}
       </svg>
       <div className="mx-auto max-w-[1280px] px-6 md:px-10 lg:px-14">
         <motion.div variants={stagger} {...inView} className="text-center mb-12">

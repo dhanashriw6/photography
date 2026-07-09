@@ -36,10 +36,9 @@ const replaceDatePart = (originalIso, newDateStr) => {
 const getPackageTotal = (pkg) =>
   (pkg.team || []).reduce(
     (sum, t) =>
-      sum + (t.providers || []).reduce((ps, p) => ps + (p.price_with_commission || 0), 0),
+      sum + (t.providers || []).reduce((ps, p) => ps + (p.total_price || 0), 0),
     0
   );
-
 const getPackageDurationDays = (pkg) =>
   pkg.time_unit?.toLowerCase().includes('day') ? pkg.time_required : null;
 
@@ -223,18 +222,20 @@ const PackageCard = ({ pkg, index, onBookInstantly, onCustomizeTeam }) => {
         {pkg.team && pkg.team.length > 0 && (
           <div className="pkg-breakdown-h">
             <span className="pkg-breakdown-title-h">Price Breakdown</span>
-            {pkg.team.map((t, i) => {
-              const skillTotal = (t.providers || []).reduce(
-                (s, p) => s + (p.price_with_commission || 0),
-                0
-              );
-              return (
-                <div key={i} className="pkg-breakdown-row-h">
-                  <span>{t.skill?.charAt(0).toUpperCase() + t.skill?.slice(1)}</span>
-                  <span>₹{skillTotal.toLocaleString('en-IN')}</span>
-                </div>
-              );
-            })}
+         {pkg.team.map((t, i) =>
+  (t.providers || []).map((provider) => (
+    <div key={`${t.skill}-${provider.id}`} className="pkg-breakdown-row-h">
+      <span>
+        {provider.first_name} {provider.last_name}
+        <small style={{ display: 'block', color: '#888', fontSize: '11px' }}>
+          {t.skill.replace(/_/g, ' ')}
+        </small>
+      </span>
+
+      <span>₹{provider.total_price.toLocaleString('en-IN')}</span>
+    </div>
+  ))
+)}
           </div>
         )}
 

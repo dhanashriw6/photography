@@ -32,7 +32,7 @@ const Home = () => {
   <div id="stats"><ScrollReveal><Stats /></ScrollReveal></div>
   <Suspense fallback={<SectionFallback />}>
     <div id="process"><ScrollReveal><HowItWorks /></ScrollReveal></div>
-    <div id="portfolio"><ScrollReveal><FeaturedPhotographers /></ScrollReveal></div>
+    {/* <div id="portfolio"><ScrollReveal><FeaturedPhotographers /></ScrollReveal></div> */}
     <ScrollReveal><VideoPreview /></ScrollReveal>
     <div id="choose-your-path"><ScrollReveal><SplitCTA /></ScrollReveal></div>
     <div id="gallery"><ScrollReveal><Gallery /></ScrollReveal></div>
