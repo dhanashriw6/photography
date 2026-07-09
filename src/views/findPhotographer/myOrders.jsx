@@ -96,13 +96,16 @@ const MyOrders = () => {
 
     const durationVal = order.duration_value || 1;
     const durationType = order.duration_type || "days";
-    const status = order.status
+    const status = (order.status || "").toLowerCase();
 
-    // Dynamically calculate paid & due amounts based on status for realistic display
-    const totalAmount = parseFloat(order.total_amount || 25000);
-    const paidAmount = status === "CONFIRMED" || status === "COMPLETED" ? totalAmount : 0;
-    const dueAmount = totalAmount - paidAmount;
+const totalAmount = parseFloat(order.total_amount || 0);
 
+const paidAmount =
+  status === "confirmed" || status === "completed"
+    ? totalAmount
+    : 0;
+
+const dueAmount = totalAmount - paidAmount;
     return {
       id: order.id,
       orderNumber: order.order_number || `ORD-${order.id}`,
