@@ -118,45 +118,45 @@ const OrderSummary = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [actionLoading, setActionLoading] = useState(false); // 'start' | 'end' | false
-const [actionError, setActionError] = useState(null);
+    const [actionError, setActionError] = useState(null);
 
-const handleStartEvent = async () => {
-    setActionError(null);
-    setActionLoading('start');
-    try {
-        const { lat, lng } = await getCurrentLocation();
-        await startOrder(booking.id, { lat, lng });
-        setBooking((prev) => ({ ...prev, status: 'In Progress' }));
-    } catch (err) {
-        setActionError(
-            err?.response?.data?.error?.message ||
-            err?.response?.data?.message ||
-            err?.message ||
-            'Failed to start event. Please try again.'
-        );
-    } finally {
-        setActionLoading(false);
-    }
-};
+    const handleStartEvent = async () => {
+        setActionError(null);
+        setActionLoading('start');
+        try {
+            const { lat, lng } = await getCurrentLocation();
+            await startOrder(booking.id, { lat, lng });
+            setBooking((prev) => ({ ...prev, status: 'In Progress' }));
+        } catch (err) {
+            setActionError(
+                err?.response?.data?.error?.message ||
+                err?.response?.data?.message ||
+                err?.message ||
+                'Failed to start event. Please try again.'
+            );
+        } finally {
+            setActionLoading(false);
+        }
+    };
 
-const handleEndEvent = async () => {
-    setActionError(null);
-    setActionLoading('end');
-    try {
-        const { lat, lng } = await getCurrentLocation();
-        await endOrder(booking.id, { lat, lng });
-        setBooking((prev) => ({ ...prev, status: 'Completed' }));
-    } catch (err) {
-        setActionError(
-            err?.response?.data?.error?.message ||
-            err?.response?.data?.message ||
-            err?.message ||
-            'Failed to end event. Please try again.'
-        );
-    } finally {
-        setActionLoading(false);
-    }
-};
+    const handleEndEvent = async () => {
+        setActionError(null);
+        setActionLoading('end');
+        try {
+            const { lat, lng } = await getCurrentLocation();
+            await endOrder(booking.id, { lat, lng });
+            setBooking((prev) => ({ ...prev, status: 'Completed' }));
+        } catch (err) {
+            setActionError(
+                err?.response?.data?.error?.message ||
+                err?.response?.data?.message ||
+                err?.message ||
+                'Failed to end event. Please try again.'
+            );
+        } finally {
+            setActionLoading(false);
+        }
+    };
 
     useEffect(() => {
         if (!orderId) {
@@ -220,8 +220,8 @@ const handleEndEvent = async () => {
 
     const eventTypeName = order.category?.name || orderItem.snapshot_package_name || '-';
     const packageName = orderItem.snapshot_package_name || order.snapshot_event_package_name || 'Package';
-    const packagePrice = formatCurrency(orderItem.snapshot_price, currency);
-    const totalPrice = formatCurrency(orderItem.snapshot_price, currency);
+    const packagePrice = formatCurrency(orderItem.earning, currency);
+    const totalPrice = formatCurrency(orderItem.earning, currency);
 
     const customerName = [customer.first_name, customer.last_name].filter(Boolean).join(' ') || 'Guest';
     const customerPhoto = customer.profile_picture?.url;
@@ -265,54 +265,54 @@ const handleEndEvent = async () => {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
                         {/* Event Details */}
-                        <Card title="Event details"right={
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <StatusBadge status={booking.status} />
-            <button
-                onClick={handleStartEvent}
-                disabled={!!actionLoading}
-                title="Start Event"
-                style={{
-                    display: 'flex', alignItems: 'center', gap: '6px',
-                    border: 'none', borderRadius: '8px',
-                    background: '#E2F6EE', color: '#0D9488',
-                    padding: '7px 12px', fontSize: '12px', fontWeight: 700,
-                    cursor: actionLoading ? 'wait' : 'pointer',
-                    opacity: actionLoading ? 0.6 : 1,
-                }}
-            >
-                <FiPlay size={13} /> {actionLoading === 'start' ? 'Starting...' : 'Start'}
-            </button>
-            <button
-                onClick={handleEndEvent}
-                disabled={!!actionLoading}
-                title="End Event"
-                style={{
-                    display: 'flex', alignItems: 'center', gap: '6px',
-                    border: 'none', borderRadius: '8px',
-                    background: '#FDE6E5', color: '#E0473C',
-                    padding: '7px 12px', fontSize: '12px', fontWeight: 700,
-                    cursor: actionLoading ? 'wait' : 'pointer',
-                    opacity: actionLoading ? 0.6 : 1,
-                }}
-            >
-                <FiStopCircle size={13} /> {actionLoading === 'end' ? 'Ending...' : 'End'}
-            </button>
-            {actionError && (
-    <div style={{
-        marginBottom: '14px',
-        padding: '10px 14px',
-        borderRadius: '8px',
-        background: '#FEF6F5',
-        color: '#E0473C',
-        fontSize: '12.5px',
-        fontWeight: 600,
-    }}>
-        {actionError}
-    </div>
-)}
-        </div>
-    }>
+                        <Card title="Event details" right={
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <StatusBadge status={booking.status} />
+                                <button
+                                    onClick={handleStartEvent}
+                                    disabled={!!actionLoading}
+                                    title="Start Event"
+                                    style={{
+                                        display: 'flex', alignItems: 'center', gap: '6px',
+                                        border: 'none', borderRadius: '8px',
+                                        background: '#E2F6EE', color: '#0D9488',
+                                        padding: '7px 12px', fontSize: '12px', fontWeight: 700,
+                                        cursor: actionLoading ? 'wait' : 'pointer',
+                                        opacity: actionLoading ? 0.6 : 1,
+                                    }}
+                                >
+                                    <FiPlay size={13} /> {actionLoading === 'start' ? 'Starting...' : 'Start'}
+                                </button>
+                                <button
+                                    onClick={handleEndEvent}
+                                    disabled={!!actionLoading}
+                                    title="End Event"
+                                    style={{
+                                        display: 'flex', alignItems: 'center', gap: '6px',
+                                        border: 'none', borderRadius: '8px',
+                                        background: '#FDE6E5', color: '#E0473C',
+                                        padding: '7px 12px', fontSize: '12px', fontWeight: 700,
+                                        cursor: actionLoading ? 'wait' : 'pointer',
+                                        opacity: actionLoading ? 0.6 : 1,
+                                    }}
+                                >
+                                    <FiStopCircle size={13} /> {actionLoading === 'end' ? 'Ending...' : 'End'}
+                                </button>
+                                {actionError && (
+                                    <div style={{
+                                        marginBottom: '14px',
+                                        padding: '10px 14px',
+                                        borderRadius: '8px',
+                                        background: '#FEF6F5',
+                                        color: '#E0473C',
+                                        fontSize: '12.5px',
+                                        fontWeight: 600,
+                                    }}>
+                                        {actionError}
+                                    </div>
+                                )}
+                            </div>
+                        }>
                             <InfoRow icon={<LuStar size={15} />} label="Event" value={eventTypeName} />
                             <InfoRow icon={<LuCalendar size={15} />} label="Start Date" value={start.date} />
                             <InfoRow icon={<LuCalendar size={15} />} label="End Date" value={end.date} />

@@ -192,7 +192,7 @@ const EditingItemCard = ({ item }) => {
       )}
 
       <div className="rb-editing-totals">
-<InfoRow label="Package Price" value={money(item.snapshot_price)} />
+        <InfoRow label="Package Price" value={money(item.snapshot_price)} />
         <InfoRow label="Tax" value={money(item.tax_amount)} />
         <div className="rb-mini-total">
           <span>Total</span>
@@ -219,18 +219,6 @@ const RequestBook = () => {
   const [venue, setVenue] = useState('');
   const [addressDetail, setAddressDetail] = useState('');
   const [noteStatus, setNoteStatus] = useState({ type: '', msg: '' });
-
-const handleUpdateDraft = async () => {
-  setNoteStatus({ type: '', msg: '' });
-  const payload = { note: addons };
-  try {
-    await updateDraftOrder(order.id, payload);
-    setNoteStatus({ type: 'ok', msg: 'Note added successfully!' });
-  } catch (error) {
-    console.error('Error updating draft:', error);
-    setNoteStatus({ type: 'err', msg: 'Failed to add note. Please try again.' });
-  }
-};
 
   useEffect(() => {
     if (!orderId) return;
@@ -272,7 +260,22 @@ const handleUpdateDraft = async () => {
   const handlePay = async () => {
     if (!order.id) { alert('Order details are incomplete.'); return; }
     setLoading(true);
+    setNoteStatus({ type: '', msg: '' });
     try {
+      // If a note has been added/changed, save it before proceeding to payment
+      const trimmedNote = (addons ?? '').trim();
+      const originalNote = (order.notes ?? '').trim();
+      if (trimmedNote && trimmedNote !== originalNote) {
+        try {
+          await updateDraftOrder(order.id, { note: trimmedNote });
+        } catch (noteErr) {
+          console.error('Error updating draft note:', noteErr);
+          setNoteStatus({ type: 'err', msg: 'Failed to save your note. Please try again.' });
+          setLoading(false);
+          return;
+        }
+      }
+
       const response = await placeOrder(order.id);
       const data = response?.data?.data;
       if (!data) { alert('Failed to initiate payment. Please try again.'); return; }
@@ -396,17 +399,16 @@ const handleUpdateDraft = async () => {
                     <FiEdit2 size={13} className="rb-field-edit" />
                   </div>
                 </FieldBox>
-              <button className='su-btn-primary' onClick={handleUpdateDraft}>Add Note</button>
-{noteStatus.msg && (
-  <p style={{
-    marginTop: '8px',
-    fontSize: '12.5px',
-    fontWeight: 600,
-    color: noteStatus.type === 'ok' ? '#15803d' : '#b91c1c',
-  }}>
-    {noteStatus.msg}
-  </p>
-)}
+                {noteStatus.msg && (
+                  <p style={{
+                    marginTop: '8px',
+                    fontSize: '12.5px',
+                    fontWeight: 600,
+                    color: noteStatus.type === 'ok' ? '#15803d' : '#b91c1c',
+                  }}>
+                    {noteStatus.msg}
+                  </p>
+                )}
               </div>
 
               {isBulk ? (

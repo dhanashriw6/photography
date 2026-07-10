@@ -7,10 +7,12 @@ import { Categories } from '@/landing/site/Categories';
 import { TrustStrip } from '@/landing/site/TrustStrip';
 import { Stats } from '@/landing/site/Stats';
 import { ScrollReveal } from '@/landing/site/ScrollReveal';
+import FulltimeLogoLoader from '@/landing/site/LogoLoader';
 
 // Below-the-fold sections — code-split to shrink the initial bundle.
 const HowItWorks = lazy(() => import('@/landing/site/HowItWorks').then((m) => ({ default: m.HowItWorks })));
-const FeaturedPhotographers = lazy(() => import('@/landing/site/FeaturedPhotographers').then((m) => ({ default: m.FeaturedPhotographers })));
+// const FeaturedPhotographers = lazy(() => import('@/landing/site/FeaturedPhotographers').then((m) => ({ default: m.FeaturedPhotographers })));
+const LogoLoader = lazy(() => import('@/landing/site/LogoLoader'));
 const VideoPreview = lazy(() => import('@/landing/site/VideoPreview').then((m) => ({ default: m.VideoPreview })));
 const SplitCTA = lazy(() => import('@/landing/site/SplitCTA').then((m) => ({ default: m.SplitCTA })));
 const Gallery = lazy(() => import('@/landing/site/Gallery').then((m) => ({ default: m.Gallery })));
@@ -33,6 +35,7 @@ const Home = () => {
   <Suspense fallback={<SectionFallback />}>
     <div id="process"><ScrollReveal><HowItWorks /></ScrollReveal></div>
     {/* <div id="portfolio"><ScrollReveal><FeaturedPhotographers /></ScrollReveal></div> */}
+    {/* <div id="logo-loader">        <FulltimeLogoLoader /></div> */}
     <ScrollReveal><VideoPreview /></ScrollReveal>
     <div id="choose-your-path"><ScrollReveal><SplitCTA /></ScrollReveal></div>
     <div id="gallery"><ScrollReveal><Gallery /></ScrollReveal></div>

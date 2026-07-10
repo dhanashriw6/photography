@@ -36,12 +36,14 @@ import CustomerEditProfile from './views/findPhotographer/customerEditProfile';
 import AvailabilityCalendarPage from './views/joinAsPhotographer/AvailabilityCalendar';
 import ServiceProviderDetails from './views/findPhotographer/ServiceProviderDetails';
 import ServerError from './views/ServerError';
+import FulltimeLogoLoader from './landing/site/LogoLoader';
 
 function App() {
   return (
     <>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/loader" element={<FulltimeLogoLoader />} />
         <Route path="/find-photographer" element={<SignUp />} />
         <Route path="/v1" element={<ScrollSwirl />} />
         <Route path="/login" element={<Login />} />

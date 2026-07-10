@@ -3,6 +3,7 @@ import * as Icons from "lucide-react";
 import { clientSteps, photographerSteps } from "@/data/site";
 import { SectionLabel } from "./SectionLabel";
 import { fadeUp, inView, stagger } from "@/landing/lib/motion";
+import FulltimeLogoLoader from "./LogoLoader";
 function Card({ kind, title, subtitle, steps }) {
     const isClient = kind === "client";
     const accent = isClient ? "bg-black text-yellow" : "bg-yellow text-black";
