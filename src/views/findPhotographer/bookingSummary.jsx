@@ -279,7 +279,7 @@ const BookingSummary = () => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                   {serviceItems.map((item, idx) => {
                     const name   = item.snapshot_photographer_name || 'Photographer';
-                    const avatar = item.profile_picture.url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`;
+                    const avatar = item?.profile_picture?.url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`;
                     return (
                       <div key={item.id} style={{
                         border: '1.5px solid #f0f0f0', borderRadius: '14px',

@@ -34,21 +34,21 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
      * deletedIds:     ids of existing docs the user removed
      */
     const [portfolioFiles, setPortfolioFiles] = useState([]);
-    const [newFiles, setNewFiles]             = useState([]);
-    const [deletedIds, setDeletedIds]         = useState([]);
+    const [newFiles, setNewFiles] = useState([]);
+    const [deletedIds, setDeletedIds] = useState([]);
 
     /*
      * socialLinks: { instagram, facebook, telegram, pinterest }
      * originalSocials: same shape loaded from profile (to compute insert/update/delete diff)
      */
-    const [socials, setSocials]         = useState({ instagram: '', facebook: '', telegram: '', pinterest: '', googleDrive: '' });
+    const [socials, setSocials] = useState({ instagram: '', facebook: '', telegram: '', pinterest: '', googleDrive: '' });
     const [originalSocials, setOriginalSocials] = useState({});
 
     /*
      * videoLinks: [{ id?, url, title }]   (id present = existing from API)
      * originalVideoLinks: snapshot from API
      */
-    const [videoLinks, setVideoLinks]             = useState([{ url: '', title: 'video' }]);
+    const [videoLinks, setVideoLinks] = useState([{ url: '', title: 'video' }]);
     const [originalVideoLinks, setOriginalVideoLinks] = useState([]);
 
     /*
@@ -60,15 +60,18 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
      */
     const [awards, setAwards] = useState([{ name: '', images: [] }]);
 
-    const [saving, setSaving]   = useState(false);
+    const [saving, setSaving] = useState(false);
     const [saveErr, setSaveErr] = useState('');
-    const [saveOk, setSaveOk]   = useState('');
+    const [saveOk, setSaveOk] = useState('');
+    const [originalAwards, setOriginalAwards] = useState([]);
+    const [deletedAwardIds, setDeletedAwardIds] = useState([]);
+    const [deletedAwardImageIds, setDeletedAwardImageIds] = useState([]);
 
     /* ── Load existing profile data ── */
     useEffect(() => {
         const load = async () => {
             try {
-                const res  = await getProfile();
+                const res = await getProfile();
                 const user = res?.data?.data?.user;
                 if (!user) return;
 
@@ -103,7 +106,7 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
 
                 // Awards — each award may have multiple images (a.images / a.award_images)
                 if (user.awards?.length) {
-                    setAwards(user.awards.map(a => ({
+                    const mappedAwards = user.awards.map(a => ({
                         id: a.id,
                         name: a.name || '',
                         images: (a.images || a.award_images || []).map(img => ({
@@ -114,7 +117,9 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
                             uploadError: null,
                             source: 'existing',
                         })),
-                    })));
+                    }));
+                    setAwards(mappedAwards);
+                    setOriginalAwards(mappedAwards); // NEW
                 }
             } catch (err) {
                 console.error('Portfolio profile fetch error:', err);
@@ -165,7 +170,7 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
         setNewFiles(prev => prev.filter(f => f.tempId !== tempId));
 
     /* ── Video links helpers ── */
-    const addVideoLink    = () => setVideoLinks(v => [...v, { url: '', title: 'video' }]);
+    const addVideoLink = () => setVideoLinks(v => [...v, { url: '', title: 'video' }]);
     const removeVideoLink = (i) => setVideoLinks(v => v.filter((_, idx) => idx !== i));
     const updateVideoLink = (i, field, val) =>
         setVideoLinks(v => v.map((x, idx) => idx === i ? { ...x, [field]: val } : x));
@@ -205,15 +210,26 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
     };
 
     const removeAwardImage = (awardIndex, identifier) => {
+        const award = awards[awardIndex];
+        const img = award?.images.find(im => (im.tempId || im.id) === identifier);
+        if (img?.id) {
+            setDeletedAwardImageIds(ids => [...ids, img.id]); // NEW
+        }
         setAwards(prev => prev.map((a, idx) =>
             idx === awardIndex
-                ? { ...a, images: a.images.filter(img => (img.tempId || img.id) !== identifier) }
+                ? { ...a, images: a.images.filter(im => (im.tempId || im.id) !== identifier) }
                 : a
         ));
     };
 
-    const addAward    = () => setAwards(a => [...a, { name: '', images: [] }]);
-    const removeAward = (i) => setAwards(a => a.filter((_, idx) => idx !== i));
+    const addAward = () => setAwards(a => [...a, { name: '', images: [] }]);
+    const removeAward = (i) => {
+        const award = awards[i];
+        if (award?.id) {
+            setDeletedAwardIds(ids => [...ids, award.id]); // NEW
+        }
+        setAwards(a => a.filter((_, idx) => idx !== i));
+    };
 
     /* ── Build social_links diff ── */
     const buildSocialsDiff = () => {
@@ -221,9 +237,9 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
         const result = [];
         LINK_TYPES.forEach(type => {
             const apiKey = type === 'googleDrive' ? 'google_drive' : type;
-            const current  = socials[type]?.trim()        || '';
+            const current = socials[type]?.trim() || '';
             const original = originalSocials[apiKey]?.trim() || '';
-            if (current && !original)  result.push({ type: 'insert', link_type: apiKey, url: current });
+            if (current && !original) result.push({ type: 'insert', link_type: apiKey, url: current });
             if (current && original && current !== original) result.push({ type: 'update', link_type: apiKey, url: current });
             if (!current && original) result.push({ type: 'delete', link_type: apiKey });
         });
@@ -274,15 +290,52 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
     };
 
     /* ── Build awards payload (each award: one name, many image keys) ── */
-    const buildAwardsPayload = () =>
-        awards
-            .filter(a => a.name.trim())
-            .map(a => ({
-                type: 'insert',
-                name: a.name.trim(),
-                keys: a.images.filter(img => img.key && !img.uploading && !img.uploadError).map(img => img.key),
-            }));
+    const buildAwardsPayload = () => {
+        const result = [];
 
+        // Inserts: brand new awards (no id) with a name
+        awards.forEach(a => {
+            if (!a.id && a.name.trim()) {
+                result.push({
+                    type: 'insert',
+                    name: a.name.trim(),
+                    keys: a.images.filter(img => img.key && !img.uploading && !img.uploadError).map(img => img.key),
+                });
+            }
+        });
+
+        // Updates: existing awards whose name changed or that got new images
+        awards.forEach(a => {
+            if (a.id) {
+                const orig = originalAwards.find(o => o.id === a.id);
+                const nameChanged = orig && orig.name.trim() !== a.name.trim();
+                const newImageKeys = a.images
+                    .filter(img => img.key && !img.uploading && !img.uploadError && img.source !== 'existing')
+                    .map(img => img.key);
+
+                if (nameChanged || newImageKeys.length) {
+                    result.push({
+                        type: 'update',
+                        id: a.id,
+                        ...(nameChanged && { name: a.name.trim() }),
+                        ...(newImageKeys.length && { keys: newImageKeys }),
+                    });
+                }
+            }
+        });
+
+        // Deletes: whole awards removed by the user
+        deletedAwardIds.forEach(id => {
+            result.push({ type: 'delete', id });
+        });
+
+        // Deletes: individual existing images removed while the award itself stays
+        deletedAwardImageIds.forEach(id => {
+            result.push({ type: 'delete', image_id: id });
+        });
+
+        return result;
+    };
     /* ── Save ── */
     const handleSave = async () => {
         setSaveErr('');
@@ -302,16 +355,16 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
         }
 
         const portfolioDiff = buildPortfolioDiff();
-        const socialsDiff   = buildSocialsDiff();
-        const videoDiff     = buildVideoDiff();
+        const socialsDiff = buildSocialsDiff();
+        const videoDiff = buildVideoDiff();
         const awardsPayload = buildAwardsPayload();
 
         const payload = {
             ...(bio.trim() && { bio: bio.trim() }),
             ...(equipment.trim() && { equipment: equipment.trim() }),
             ...(portfolioDiff.length && { portfolio_documents: portfolioDiff }),
-            ...(socialsDiff.length   && { social_links: socialsDiff }),
-            ...(videoDiff.length     && { video_links: videoDiff }),
+            ...(socialsDiff.length && { social_links: socialsDiff }),
+            ...(videoDiff.length && { video_links: videoDiff }),
             ...(awardsPayload.length && { awards: awardsPayload }),
         };
 
@@ -323,6 +376,9 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
         try {
             setSaving(true);
             await updateProfile(payload);
+            setDeletedAwardIds([]);
+            setDeletedAwardImageIds([]);
+            setOriginalAwards(awards); // re-baseline so the next diff is accurate
             // Commit: move new files into existing, clear deleted
             setPortfolioFiles(prev => [
                 ...prev,
@@ -332,9 +388,11 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
             ]);
             setNewFiles([]);
             setDeletedIds([]);
-            setOriginalSocials({ ...originalSocials, ...Object.fromEntries(
-                socialsDiff.filter(s => s.type !== 'delete').map(s => [s.link_type, s.url])
-            )});
+            setOriginalSocials({
+                ...originalSocials, ...Object.fromEntries(
+                    socialsDiff.filter(s => s.type !== 'delete').map(s => [s.link_type, s.url])
+                )
+            });
             setOriginalVideoLinks(videoLinks.filter(v => v.url?.trim()));
             setSaveOk('Portfolio saved successfully!');
             onSave?.();
@@ -724,7 +782,7 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
                         );
                     })}
 
-                    {/* <button
+                    <button
                         type="button"
                         onClick={addAward}
                         style={{
@@ -734,7 +792,7 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
                         }}
                     >
                         <FiPlus size={14} /> Add another award
-                    </button> */}
+                    </button>
                 </div>
 
             </div>
