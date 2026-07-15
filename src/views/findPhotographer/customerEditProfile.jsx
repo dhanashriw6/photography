@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
     FiUser, FiLock, FiChevronRight, FiHome,
     FiImage, FiPackage, FiShoppingBag, FiCreditCard, FiStar, FiChevronDown,
@@ -12,7 +12,7 @@ import MyOrders from './myOrders';
 import ViewsLayout from '../Layout';
 import UserProfileInfo from './userProfileInfo';
 import DraftOrders from './userDraftOrders';
-import ChangePassword from '../joinAsPhotographer/changePassword';
+import ChangePassword from './changePassword';
 import UserDispute from './userDispute';
 import BookEvent from './bookEvent';
 
@@ -33,7 +33,9 @@ const MENU = [
 ];
 
 const CustomerEditProfile = () => {
-    const [active, setActive] = useState('profile');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const active = searchParams.get('tab') || 'profile';
+    const setActive = (newTab) => setSearchParams({ tab: newTab }, { replace: true });
     const navigate = useNavigate();
     const completion = 64;
 
@@ -60,7 +62,7 @@ const CustomerEditProfile = () => {
                 {/* Breadcrumb */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 0 20px', fontSize: '13px', color: '#888', flexWrap: 'wrap' }}>
                     <button
-                        onClick={() => navigate('/')}
+                        onClick={() => navigate('/home')}
                         style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888', fontFamily: 'inherit', fontSize: '13px', padding: 0, display: 'flex', alignItems: 'center', gap: '4px' }}
                     >
                         <FiHome size={13} /> Home

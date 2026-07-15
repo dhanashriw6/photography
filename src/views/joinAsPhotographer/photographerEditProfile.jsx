@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PhotographerLayout from './PhotographerLayout';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
     FiUser, FiLock, FiChevronRight, FiHome,
     FiImage, FiPackage, FiShoppingBag, FiCreditCard, FiStar, FiChevronDown
@@ -26,7 +26,9 @@ const MENU = [
 ];
 
 const PhotographerEditProfile = () => {
-    const [active, setActive]   = useState('profile');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const active = searchParams.get('tab') || 'profile';
+    const setActive = (newTab) => setSearchParams({ tab: newTab }, { replace: true });
     const navigate              = useNavigate();
     const completion            = 64;
 
@@ -53,7 +55,7 @@ const PhotographerEditProfile = () => {
                 {/* Breadcrumb */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 0 20px', fontSize: '13px', color: '#888', flexWrap: 'wrap' }}>
                     <button
-                        onClick={() => navigate('/')}
+                        onClick={() => navigate('/join-as-photographer/home')}
                         style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888', fontFamily: 'inherit', fontSize: '13px', padding: 0, display: 'flex', alignItems: 'center', gap: '4px' }}
                     >
                         <FiHome size={13} /> Home

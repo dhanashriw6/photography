@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { toast } from 'react-toastify';
 import { addBankDetails } from '../../services/bank';
 // NOTE: The following 3 are ASSUMED service functions for the saved-accounts list.
 // Add them to ../../services/bank.js (or rename the imports to match what you already have):
@@ -179,9 +180,21 @@ const AddBankDetails = ({ onSave, onCancel }) => {
         setSaveErr('');
         setSaveOk('');
 
-        if (!form.holderName.trim()) { setSaveErr('Account holder name is required.'); return; }
-        if (!form.accountNumber.trim()) { setSaveErr('Account number is required.'); return; }
-        if (!form.ifscCode.trim() || form.ifscCode.trim().length !== 11) { setSaveErr('A valid 11-character IFSC code is required.'); return; }
+        if (!form.holderName.trim()) {
+            setSaveErr('Account holder name is required.');
+            toast.error('Account holder name is required.');
+            return;
+        }
+        if (!form.accountNumber.trim()) {
+            setSaveErr('Account number is required.');
+            toast.error('Account number is required.');
+            return;
+        }
+        if (!form.ifscCode.trim() || form.ifscCode.trim().length !== 11) {
+            setSaveErr('A valid 11-character IFSC code is required.');
+            toast.error('A valid 11-character IFSC code is required.');
+            return;
+        }
 
         const payload = {
             account_holder_name: form.holderName.trim(),
@@ -197,9 +210,11 @@ const AddBankDetails = ({ onSave, onCancel }) => {
             if (form.id) {
                 // await updateBankDetails(form.id, payload);
                 setSaveOk('Bank details updated successfully!');
+                toast.success('Bank details updated successfully!');
             } else {
                 await addBankDetails(payload);
                 setSaveOk('Bank details saved successfully!');
+                toast.success('Bank details saved successfully!');
             }
             onSave?.(payload);
             resetForm();
@@ -210,6 +225,7 @@ const AddBankDetails = ({ onSave, onCancel }) => {
                 err?.response?.data?.message ||
                 'Failed to save bank details.';
             setSaveErr(msg);
+            toast.error(msg);
         } finally {
             setSaving(false);
         }
@@ -241,7 +257,7 @@ const AddBankDetails = ({ onSave, onCancel }) => {
                 🔒 This information can be changed later.
             </p>
 
-            {saveOk && (
+            {/* {saveOk && (
                 <div style={{ marginBottom: '16px', padding: '10px 14px', borderRadius: '8px', background: '#dcfce7', color: '#15803d', fontSize: '13px' }}>
                     {saveOk}
                 </div>
@@ -250,7 +266,7 @@ const AddBankDetails = ({ onSave, onCancel }) => {
                 <div style={{ marginBottom: '16px', padding: '10px 14px', borderRadius: '8px', background: '#fee2e2', border: '1px solid #fca5a5', color: '#b91c1c', fontSize: '13px' }}>
                     {saveErr}
                 </div>
-            )}
+            )} */}
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
 

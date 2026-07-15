@@ -3,7 +3,7 @@ import ViewsLayout from '../Layout';
 import '../index.css';
 import { BsCameraFill, BsStarFill } from 'react-icons/bs';
 import { MdVerified } from 'react-icons/md';
-import { FiEdit2, FiMapPin, FiCheck } from 'react-icons/fi';
+import { FiEdit2, FiMapPin, FiCheck, FiArrowLeft } from 'react-icons/fi';
 import { LuCalendar, LuClock } from 'react-icons/lu';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useRazorpay } from '../../hooks/useRazorpay';
@@ -331,6 +331,29 @@ const RequestBook = () => {
       <div className="rb-page">
         <div className="rb-page-inner">
           {/* <Stepper /> */}
+          <div style={{ marginBottom: "10px" }}>
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#fff',
+                border: '1px solid #eee',
+                borderRadius: '10px',
+                padding: '9px 16px',
+                fontSize: '13px',
+                fontWeight: 600,
+                color: '#1a1a1a',
+                cursor: 'pointer',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+              }}
+            >
+              <FiArrowLeft size={15} />
+              Back
+            </button>
+          </div>
 
           <h1 className="rb-title">Request to Booking</h1>
 

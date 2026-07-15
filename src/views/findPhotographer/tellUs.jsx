@@ -10,7 +10,7 @@ import {
   FiShield,
   FiCalendar,
   FiUsers,
-  FiHeadphones,
+  FiHeadphones,FiArrowLeft
 } from 'react-icons/fi';
 
 const TellUs = () => {
@@ -167,6 +167,28 @@ const TellUs = () => {
   return (
     <ViewsLayout>
       <div className="w-full" style={{ maxWidth: '1100px' }}>
+        <button
+          type="button"
+          onClick={() => navigate('/home')}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: '#fff',
+            border: '1px solid #eee',
+            borderRadius: '10px',
+            padding: '9px 16px',
+            fontSize: '13px',
+            fontWeight: 600,
+            color: '#1a1a1a',
+            cursor: 'pointer',
+            marginTop: '20px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+          }}
+        >
+          <FiArrowLeft size={15} />
+          Back to Home
+        </button>
         <div
           style={{
             display: 'flex',
@@ -175,7 +197,7 @@ const TellUs = () => {
             overflow: 'hidden',
             boxShadow: '0 12px 40px rgba(0,0,0,0.12)',
             background: '#fff',
-            marginTop: "20px",
+            marginTop: "16px",
             marginBottom: "20px",
           }}
         >

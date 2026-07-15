@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 import { FiEye, FiEyeOff, FiLock } from 'react-icons/fi';
 import { changePassword } from '../../services/profile';
 
@@ -22,9 +23,21 @@ const ChangePassword = () => {
 
         setError('');       // ← clear at START (before validation), not at end
         setSuccess(false);
-        if (!currentPassword) return setError('Please enter your current password.');
-        if (newPassword.length < 8) return setError('New password must be at least 8 characters.');
-        if (newPassword !== confirmPassword) return setError('Passwords do not match.');
+        if (!currentPassword) {
+            setError('Please enter your current password.');
+            toast.error('Please enter your current password.');
+            return;
+        }
+        if (newPassword.length < 8) {
+            setError('New password must be at least 8 characters.');
+            toast.error('New password must be at least 8 characters.');
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            setError('Passwords do not match.');
+            toast.error('Passwords do not match.');
+            return;
+        }
 
         const payload = {
             current_password: currentPassword,
@@ -41,6 +54,7 @@ const ChangePassword = () => {
             setConfirmPassword('');
 
             setSuccess(true);
+            toast.success('Password updated successfully!');
         } catch (error) {
             const msg =
                 error?.response?.data?.error?.message ||
@@ -49,6 +63,7 @@ const ChangePassword = () => {
                 "Something went wrong";
 
             setError(msg);
+            toast.error(msg);
         } finally {
             setLoading(false);
         }

@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { toast } from 'react-toastify';
 import '../index.css';
 import { LuCamera } from 'react-icons/lu';
 import { getProfile, updateProfile } from '../../services/profile';
@@ -166,10 +167,10 @@ const ShootRadiusField = ({ value, onChange, lat, lng }) => {
 
 /* ─── Skills Multi-Select ─────────────────────────────────────────────────── */
 const SKILL_OPTIONS = [
-    { value: 'photographer', label: 'Photographer' },
-    { value: 'videographer', label: 'Videographer' },
-    { value: 'cinematographer', label: 'Cinematographer' },
-    { value: 'drone_operator', label: 'Drone Operator' },
+    { value: "photographer", label: "Photographer" },
+    { value: "videographer", label: "Videographer" },
+    { value: "cinematographer", label: "Cinematographer" },
+    { value: "drone_operator", label: "Drone Operator" },
 ];
 
 const MultiSkillSelect = ({ selected, onChange }) => {
@@ -612,7 +613,10 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
         try {
             const key = await uploadFileToAWS(file, 'profile');
             setPhotoKey(key);
-        } catch { setSaveErr('Profile photo upload failed. Please try again.'); }
+        } catch {
+            setSaveErr('Profile photo upload failed. Please try again.');
+            toast.error('Profile photo upload failed. Please try again.');
+        }
         finally { setPhotoUploading(false); }
     };
 
@@ -645,7 +649,11 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
         setSaveErr('');
         setSaveOk('');
 
-        if (photoUploading) { setSaveErr('Profile photo is still uploading. Please wait.'); return; }
+        if (photoUploading) {
+            setSaveErr('Profile photo is still uploading. Please wait.');
+            toast.warning('Profile photo is still uploading. Please wait.');
+            return;
+        }
 
         const profilePayload = {
             first_name: form.firstName.trim(),
@@ -699,10 +707,12 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
             await updateProfile(profilePayload);
             localStorage.setItem('photographer_skills', JSON.stringify(skills));
             setSaveOk('Profile saved successfully!');
+            toast.success('Profile saved successfully!');
             onSave?.();
         } catch (err) {
             const msg = err?.response?.data?.error?.message || err?.response?.data?.message || 'Failed to save profile.';
             setSaveErr(msg);
+            toast.error(msg);
         } finally {
             setSaving(false);
         }
@@ -834,7 +844,7 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
             </div>
 
             {/* ── Banners ── */}
-            {saveOk && (
+            {/* {saveOk && (
                 <div style={{ marginBottom: '16px', padding: '10px 14px', borderRadius: '8px', background: '#dcfce7', color: '#15803d', fontSize: '13px' }}>
                     {saveOk}
                 </div>
@@ -843,7 +853,7 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
                 <div style={{ marginBottom: '16px', padding: '10px 14px', borderRadius: '8px', background: '#fee2e2', border: '1px solid #fca5a5', color: '#b91c1c', fontSize: '13px' }}>
                     {saveErr}
                 </div>
-            )}
+            )} */}
 
             {/* ── Personal fields ── */}
             <div className="profile-grid">
@@ -957,6 +967,20 @@ const PhotographerProfileInfo = ({ onSave, onCancel }) => {
                                 ":hover": {
                                     background: "#FFE5A3",
                                     color: "#000",
+                                },
+                            }),
+                            option: (base, state) => ({
+                                ...base,
+                                backgroundColor: state.isSelected
+                                    ? "#FFF3D6"        // selected option
+                                    : state.isFocused
+                                        ? "#FFFBF0"        // hover
+                                        : "#fff",
+                                color: "#1a1a1a",
+                                fontWeight: state.isSelected ? 600 : 400,
+                                cursor: "pointer",
+                                ":active": {
+                                    backgroundColor: "#FFE5A3",
                                 },
                             }),
 

@@ -1,22 +1,59 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 import { FiEye, FiEyeOff, FiLock } from 'react-icons/fi';
+import { changePassword } from '../../services/profile';
 
 const ChangePassword = () => {
     const [fields, setFields] = useState({ current: '', newPwd: '', confirm: '' });
     const [show, setShow] = useState({ current: false, newPwd: false, confirm: false });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const toggle = (k) => setShow(s => ({ ...s, [k]: !s[k] }));
     const set = (k) => (e) => setFields(f => ({ ...f, [k]: e.target.value }));
 
-    const handleSave = () => {
+    const handleSave = async () => {
         setError('');
-        if (!fields.current) return setError('Please enter your current password.');
-        if (fields.newPwd.length < 8) return setError('New password must be at least 8 characters.');
-        if (fields.newPwd !== fields.confirm) return setError('Passwords do not match.');
-        setSuccess(true);
-        setFields({ current: '', newPwd: '', confirm: '' });
+        setSuccess(false);
+        if (!fields.current) {
+            setError('Please enter your current password.');
+            toast.error('Please enter your current password.');
+            return;
+        }
+        if (fields.newPwd.length < 8) {
+            setError('New password must be at least 8 characters.');
+            toast.error('New password must be at least 8 characters.');
+            return;
+        }
+        if (fields.newPwd !== fields.confirm) {
+            setError('Passwords do not match.');
+            toast.error('Passwords do not match.');
+            return;
+        }
+
+        const payload = {
+            current_password: fields.current,
+            new_password: fields.newPwd,
+        };
+
+        try {
+            setLoading(true);
+            await changePassword(payload);
+            setSuccess(true);
+            toast.success('Password updated successfully!');
+            setFields({ current: '', newPwd: '', confirm: '' });
+        } catch (err) {
+            const msg =
+                err?.response?.data?.error?.message ||
+                err?.response?.data?.message ||
+                err?.message ||
+                "Something went wrong";
+            setError(msg);
+            toast.error(msg);
+        } finally {
+            setLoading(false);
+        }
     };
 
     /* Strength indicator */
@@ -38,11 +75,11 @@ const ChangePassword = () => {
             <h2 style={{ margin: '0 0 6px', fontSize: '36px', fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.02em' }}>Change Password</h2>
             <p style={{ margin: '0 0 32px', fontSize: '13px', color: '#888' }}>Keep your account secure by using a strong password.</p>
 
-            {success && (
+            {/* {success && (
                 <div style={{ background: '#F0FDF4', border: '1.5px solid #86EFAC', borderRadius: '10px', padding: '14px 18px', marginBottom: '24px', fontSize: '13px', color: '#16A34A', fontWeight: 600 }}>
                     ✓ Password updated successfully!
                 </div>
-            )}
+            )} */}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '480px' }}>
 
@@ -120,8 +157,10 @@ const ChangePassword = () => {
                 {error && <p style={{ margin: 0, fontSize: '12px', color: '#ef4444', fontWeight: 600 }}>{error}</p>}
 
                 <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-                    <button onClick={() => { setFields({ current: '', newPwd: '', confirm: '' }); setError(''); setSuccess(false); }} className="su-btn-primary-outline">Cancel</button>
-                    <button onClick={handleSave} className="su-btn-primary">Update Password</button>
+                    <button onClick={() => { setFields({ current: '', newPwd: '', confirm: '' }); setError(''); setSuccess(false); }} className="su-btn-primary-outline" disabled={loading}>Cancel</button>
+                    <button onClick={handleSave} className="su-btn-primary" disabled={loading}>
+                        {loading ? 'Updating...' : 'Update Password'}
+                    </button>
                 </div>
             </div>
         </div>

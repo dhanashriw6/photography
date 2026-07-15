@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import '../index.css';
 import { FiPlus, FiX, FiEdit2, FiTrash2, FiPackage } from 'react-icons/fi';
 import {
@@ -75,6 +76,7 @@ const PackageModal = ({ open, onClose, onSaved, editData, categories, userSkills
                 err?.response?.data?.message ||
                 'Failed to save package. Please try again.';
             setError(msg);
+            toast.error(msg);
         } finally {
             setLoading(false);
         }
@@ -143,14 +145,14 @@ const PackageModal = ({ open, onClose, onSaved, editData, categories, userSkills
                         </button>
                     </div>
 
-                    {error && (
+                    {/* {error && (
                         <div style={{
                             marginBottom: '16px', padding: '10px 14px', borderRadius: '8px',
                             background: '#fee2e2', color: '#b91c1c', fontSize: '13px',
                         }}>
                             {error}
                         </div>
-                    )}
+                    )} */}
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
@@ -337,10 +339,12 @@ const AddYourPackage = ({ onSave, onCancel }) => {
             await deletePackage(deleteModal.id);
             setPackages(prev => prev.filter(p => p.id !== deleteModal.id));
             setSuccess('Package deleted successfully!');
+            toast.success('Package deleted successfully!');
             setTimeout(() => setSuccess(''), 2500);
             setDeleteModal({ open: false, id: null });
         } catch {
             setError('Failed to delete package.');
+            toast.error('Failed to delete package.');
         } finally {
             setDeleteLoading(false);
         }
@@ -373,7 +377,7 @@ const AddYourPackage = ({ onSave, onCancel }) => {
                 </button>
             </div>
 
-            {success && (
+            {/* {success && (
                 <div style={{
                     background: '#F0FDF4', border: '1.5px solid #86EFAC',
                     borderRadius: '10px', padding: '14px 18px', marginBottom: '20px',
@@ -390,7 +394,7 @@ const AddYourPackage = ({ onSave, onCancel }) => {
                 }}>
                     {error}
                 </div>
-            )}
+            )} */}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
 
@@ -569,6 +573,7 @@ const AddYourPackage = ({ onSave, onCancel }) => {
                 onSaved={async (message) => {
                     await fetchPackages();
                     setSuccess(message);
+                    toast.success(message);
                     setTimeout(() => setSuccess(''), 2500);
                 }}
                 editData={editData}

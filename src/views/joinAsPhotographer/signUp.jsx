@@ -335,6 +335,7 @@ export const AddressAutocomplete = ({ label, hint, value, onAddressSelect, error
   };
 
   const isLoading = loadingSuggestions || loadingGeocode;
+  
 
   return (
     <div className="su-field" style={{ gridColumn: 'span 2' }}>

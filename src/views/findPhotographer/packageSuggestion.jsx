@@ -6,6 +6,7 @@ import { getServiceProviders, getPackage } from '../../services/booking';
 import { createPortal } from 'react-dom';
 import { getCategory } from '../../services/common';
 import { AddressAutocomplete } from '../joinAsPhotographer/signUp';
+import { FiArrowLeft } from 'react-icons/fi';
 
 const encodeFilters = (filters) => {
   try {
@@ -579,6 +580,29 @@ const packageSuggestion = () => {
         <div className="pkg-layout-h">
           {/* ── Left sidebar ── */}
           <aside className="pkg-sidebar-h">
+            <div>
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: '#fff',
+                  border: '1px solid #eee',
+                  borderRadius: '10px',
+                  padding: '9px 16px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: '#1a1a1a',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                }}
+              >
+                <FiArrowLeft size={15} />
+                Back
+              </button>
+            </div>
             <div className="pkg-sidebar-card-h">
               <div className="pkg-sidebar-header-h" style={{ borderBottom: '1px solid #f0f0f0', paddingBottom: '12px', marginBottom: '16px' }}>
                 <span style={{ fontSize: '15px', fontWeight: 800 }}>Filters</span>

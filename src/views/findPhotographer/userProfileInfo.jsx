@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { toast } from 'react-toastify';
 import '../index.css';
 import { LuCamera } from 'react-icons/lu';
 import { getProfile, updateProfile } from '../../services/profile';
@@ -446,7 +447,10 @@ const UserProfileInfo = ({ onSave, onCancel }) => {
         try {
             const key = await uploadFileToAWS(file, 'profile');
             setPhotoKey(key);
-        } catch { setSaveErr('Profile photo upload failed. Please try again.'); }
+        } catch {
+            setSaveErr('Profile photo upload failed. Please try again.');
+            toast.error('Profile photo upload failed. Please try again.');
+        }
         finally { setPhotoUploading(false); }
     };
 
@@ -464,7 +468,11 @@ const UserProfileInfo = ({ onSave, onCancel }) => {
         setSaveErr('');
         setSaveOk('');
 
-        if (photoUploading) { setSaveErr('Profile photo is still uploading. Please wait.'); return; }
+        if (photoUploading) {
+            setSaveErr('Profile photo is still uploading. Please wait.');
+            toast.warning('Profile photo is still uploading. Please wait.');
+            return;
+        }
 
         const profilePayload = {
             first_name: form.firstName.trim(),
@@ -512,11 +520,13 @@ const UserProfileInfo = ({ onSave, onCancel }) => {
             setSaving(true);
             await updateProfile(profilePayload);
             setSaveOk('Profile saved successfully!');
+            toast.success('Profile saved successfully!');
             onSave?.();
         } catch (err) {
-            const msg = err?.response?.data?.error?.message || err?.response?.data?.message;
+            const msg = err?.response?.data?.error?.message || err?.response?.data?.message || 'Failed to save profile.';
             console.log(msg)
             setSaveErr(msg);
+            toast.error(msg);
         } finally {
             setSaving(false);
         }
@@ -601,7 +611,7 @@ const UserProfileInfo = ({ onSave, onCancel }) => {
             </div>
 
             {/* ── Banners ── */}
-            {saveOk && (
+            {/* {saveOk && (
                 <div style={{ marginBottom: '16px', padding: '10px 14px', borderRadius: '8px', background: '#dcfce7', color: '#15803d', fontSize: '13px' }}>
                     {saveOk}
                 </div>
@@ -610,7 +620,7 @@ const UserProfileInfo = ({ onSave, onCancel }) => {
                 <div style={{ marginBottom: '16px', padding: '10px 14px', borderRadius: '8px', background: '#fee2e2', border: '1px solid #fca5a5', color: '#b91c1c', fontSize: '13px' }}>
                     {saveErr}
                 </div>
-            )}
+            )} */}
 
             {/* ── Personal fields ── */}
            <div className="profile-grid">

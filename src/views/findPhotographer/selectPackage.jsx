@@ -4,6 +4,7 @@ import ViewsLayout from '../Layout';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { draftOrder, getEditingPackage } from '../../services/order';
 import { createPortal } from 'react-dom';
+import { FiArrowLeft } from 'react-icons/fi';
 
 /* ─── Tier accent colors ─────────────────────────────────────────── */
 const TIER_COLORS = {
@@ -229,7 +230,7 @@ const EditingPackageCard = ({ pkg, index, onBookNow, bookingId }) => {
 };
 
 /* ─── Sidebar ─────────────────────────────────────────────────────── */
-const Sidebar = ({ photographyPackage, filters, navigate }) => {
+const Sidebar = ({ photographyPackage, filters, navigate, teamCost }) => {
   const coverImage = photographyPackage?.images?.[0]?.url;
   const days =
     filters?.start_datetime && filters?.end_datetime
@@ -243,6 +244,36 @@ const Sidebar = ({ photographyPackage, filters, navigate }) => {
 
   return (
     <aside className="ep-sidebar">
+      <div>
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: '#fff',
+            border: '1px solid #eee',
+            borderRadius: '10px',
+            padding: '9px 16px',
+            fontSize: '13px',
+            fontWeight: 600,
+            color: '#1a1a1a',
+            cursor: 'pointer',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+          }}
+        >
+          <FiArrowLeft size={15} />
+          Back
+        </button>
+      </div>
+      {teamCost != null && (
+        <div className="ep-sidebar-card ep-team-cost-card">
+          <span className="ep-sidebar-title">Selected Team Cost without Editing Package</span>
+          <div className="ep-team-cost-value">₹{teamCost.toLocaleString('en-IN')}</div>
+
+        </div>
+      )}
       <div className="ep-sidebar-card">
         <span className="ep-sidebar-title">Your Selected Photography Package</span>
 
@@ -304,6 +335,8 @@ const SelectEditingPackage = () => {
   const packageId = location.state?.packageId ?? photographyPackage?.id ?? null;
   const customServiceProviders = location.state?.serviceProviders;
   const teamProviders = location.state?.teamProviders;
+  const teamCost = location.state?.teamCost ?? null;      // ← new
+  const teamDays = location.state?.teamDays ?? null;
 
   useEffect(() => {
     let cancelled = false;
@@ -443,7 +476,7 @@ const SelectEditingPackage = () => {
         {/* <Stepper /> */}
 
         <div className="ep-layout">
-          <Sidebar photographyPackage={photographyPackage} filters={filters} navigate={navigate} />
+          <Sidebar photographyPackage={photographyPackage} filters={filters} navigate={navigate} teamCost={teamCost} />
 
           <main className="ep-main">
             <h1 className="ep-heading">Choose Your Editing Package</h1>
@@ -503,6 +536,9 @@ const STYLES = `
   width: 100%;
   padding: 20px 24px 60px;
 }
+  .ep-team-cost-card { background: #fff7ea; border-color: #ffe6bf; }
+.ep-team-cost-value { font-size: 24px; font-weight: 800; color: #1a1a1a; margin-bottom: 4px; }
+.ep-team-cost-sub { font-size: 11px; color: #a17a3a; }
 
 /* ── Stepper ── */
 .ep-stepper {

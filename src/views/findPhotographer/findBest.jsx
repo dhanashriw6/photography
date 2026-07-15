@@ -5,9 +5,10 @@ import ViewsLayout from '../Layout';
 import {
   FiSearch, FiCalendar, FiClock, FiMapPin, FiUsers, FiX,
   FiEdit2, FiHeart, FiStar, FiArrowRight, FiMove,
+  FiArrowLeft,
 } from 'react-icons/fi';
 import { draftOrder } from '../../services/order';
-import { getServiceProviders,getServiceProviderDetails  } from '../../services/booking';
+import { getServiceProviders, getServiceProviderDetails } from '../../services/booking';
 import { getCategory } from '../../services/common';
 import { AddressAutocomplete } from '../joinAsPhotographer/signUp';
 
@@ -413,9 +414,8 @@ const SelectedTeamRow = ({ name, src, skill, price, days, isLead, location, onRe
       <span className="fb-avail-badge">Available</span>
       <div className="fb-team-row-days">{days} Day{days !== 1 ? 's' : ''}</div>
     </div>
-    {!removeDisabled && (
-      <button className="fb-row-remove" onClick={onRemove}><FiX size={14} /></button>
-    )}
+
+    <button className="fb-row-remove" onClick={onRemove}><FiX size={14} /></button>
   </div>
 );
 
@@ -423,7 +423,7 @@ const SelectedTeamRow = ({ name, src, skill, price, days, isLead, location, onRe
 const ProviderCard = ({
   name, src, skill, city, state, rating, reviewCount, distanceKm,
   price, isSelected, isLoading, showReplace, isFavorite, onToggleFavorite,
-  onAdd, onRemove, onReplace, onBookNow, durationType,onViewDetails
+  onAdd, onRemove, onReplace, onBookNow, durationType, onViewDetails
 }) => {
   const colors = SKILL_COLORS[skill] || { bg: '#f3f4f6', text: '#374151' };
   return (
@@ -443,7 +443,7 @@ const ProviderCard = ({
 
       <div className="fb-card-body">
         <h3 className="fb-card-name" style={{ cursor: 'pointer' }}
-    onClick={onViewDetails}>{name}</h3>
+          onClick={onViewDetails}>{name}</h3>
         <div className="fb-card-loc"><FiMapPin size={11} /> {city}, {state}</div>
 
         <div className="fb-card-rating">
@@ -493,6 +493,7 @@ const FindBest = () => {
 
   const [manuallyAdded, setManuallyAdded] = useState(new Set());
   const [selected, setSelected] = useState(new Map());
+  const [removedFromPackage, setRemovedFromPackage] = useState(new Set());
   const [favorites, setFavorites] = useState(new Set());
 
   const [roleFilter, setRoleFilter] = useState(new Set(ROLE_OPTIONS));
@@ -684,7 +685,9 @@ const FindBest = () => {
   const providerIdToBaseSkill = new Map(
     statePackage?.team?.flatMap((tm) => tm.providers?.map((p) => [p.id, tm.skill]) || []) || []
   );
-  const allSelectedIds = new Set([...packageProviderIds, ...manuallyAdded]);
+  const allSelectedIds = new Set(
+    [...packageProviderIds, ...manuallyAdded].filter((id) => !removedFromPackage.has(id))
+  );
 
   const selectedProviders = providers.filter(
     (p) => allSelectedIds.has(p.id) && matchesSearch(`${p.first_name} ${p.last_name}`)
@@ -707,6 +710,16 @@ const FindBest = () => {
       next.has(providerId) ? next.delete(providerId) : next.add(providerId);
       return next;
     });
+    setRemovedFromPackage((prev) => {
+      if (!prev.has(providerId)) return prev;
+      const next = new Set(prev);
+      next.delete(providerId);
+      return next;
+    });
+  };
+
+  const handleRemoveFromPackage = (providerId) => {
+    setRemovedFromPackage((prev) => new Set(prev).add(providerId));
   };
 
   const handleReplaceInPackage = (provider) => {
@@ -721,9 +734,9 @@ const FindBest = () => {
       return next;
     });
   };
-const handleViewProvider = (providerId) => {
-  navigate(`/service-provider/${providerId}`, { state: { filters: activeFilters } });
-};
+  const handleViewProvider = (providerId) => {
+    navigate(`/service-provider/${providerId}`, { state: { filters: activeFilters } });
+  };
   const handleBookSingle = async (provider) => {
     const key = `${provider.id}-single`;
     try {
@@ -826,6 +839,8 @@ const handleViewProvider = (providerId) => {
         filters: activeFilters,
         serviceProviders,
         teamProviders: selectedProviders,
+        teamCost: selectedTeamCost,
+        teamDays: days,
       },
     });
   };
@@ -846,6 +861,8 @@ const handleViewProvider = (providerId) => {
         filters: activeFilters,
         serviceProviders,
         teamProviders: rows.map((r) => ({ ...r.provider, _bookedSkill: r.skill })),
+        teamCost: selectedTeamCost,   // ← new
+        teamDays: days,
       },
     });
   };
@@ -884,7 +901,29 @@ const handleViewProvider = (providerId) => {
       <style>{STYLES}</style>
       <div className="fb-page">
         {/* <Stepper /> */}
-
+        <div style={{marginBottom:"10px"}}>
+                    <button
+                      type="button"
+                      onClick={() => navigate(-1)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        background: '#fff',
+                        border: '1px solid #eee',
+                        borderRadius: '10px',
+                        padding: '9px 16px',
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        color: '#1a1a1a',
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                      }}
+                    >
+                      <FiArrowLeft size={15} />
+                      Back
+                    </button>
+                  </div>
         <h1 className="fb-heading">Build Your Custom Team</h1>
         <p className="fb-subheading">Handpick the best professionals for your event. You can replace or add providers to suit your needs.</p>
 
@@ -948,8 +987,7 @@ const handleViewProvider = (providerId) => {
                               days={days}
                               isLead={isLead}
                               location={`${p.city}, ${p.state}`}
-                              removeDisabled={isFromPackage}
-                              onRemove={() => handleToggleAdd(p.id)}
+                              onRemove={() => isFromPackage ? handleRemoveFromPackage(p.id) : handleToggleAdd(p.id)}
                             />
                           );
                         })
@@ -1014,7 +1052,7 @@ const handleViewProvider = (providerId) => {
                             onAdd={() => handleToggleAdd(p.id)}
                             onReplace={() => handleReplaceInPackage(p)}
                             onBookNow={() => handleBookSingle(p)}
-                              onViewDetails={() => handleViewProvider(p.id)}
+                            onViewDetails={() => handleViewProvider(p.id)}
 
                           />
                         );

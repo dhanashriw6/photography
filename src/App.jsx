@@ -1,6 +1,8 @@
 import React from 'react';
 import './App.css';
 import { Routes, Route } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import ScrollSwirl from './Components/Carousel';
 import Home from './views/Home';
 import SignUp from './views/findPhotographer/signUp';
@@ -85,6 +87,7 @@ function App() {
 
         <Route path="/order-summary" element={<OrderSummary />} />
       </Routes>
+      <ToastContainer position="top-right" autoClose={3000} />
     </>
   );
 }

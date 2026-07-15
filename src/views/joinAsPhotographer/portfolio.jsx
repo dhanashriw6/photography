@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import '../index.css';
 import { FiPlus, FiUpload, FiX, FiFile } from 'react-icons/fi';
 import { getProfile, updateProfile } from '../../services/profile';
@@ -336,7 +337,7 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
 
         return result;
     };
-    /* ── Save ── */
+    // ── Save ──
     const handleSave = async () => {
         setSaveErr('');
         setSaveOk('');
@@ -345,12 +346,14 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
         const stillUploading = newFiles.some(f => f.uploading) || awardImagesUploading;
         if (stillUploading) {
             setSaveErr('Please wait for all files to finish uploading.');
+            toast.warning('Please wait for all files to finish uploading.');
             return;
         }
         const awardImagesErrored = awards.some(a => a.images.some(img => img.uploadError));
         const hasErrors = newFiles.some(f => f.uploadError) || awardImagesErrored;
         if (hasErrors) {
             setSaveErr('One or more files failed to upload. Remove them and try again.');
+            toast.error('One or more files failed to upload. Remove them and try again.');
             return;
         }
 
@@ -370,6 +373,7 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
 
         if (!Object.keys(payload).length) {
             setSaveOk('Nothing to update.');
+            toast.info('Nothing to update.');
             return;
         }
 
@@ -395,10 +399,12 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
             });
             setOriginalVideoLinks(videoLinks.filter(v => v.url?.trim()));
             setSaveOk('Portfolio saved successfully!');
+            toast.success('Portfolio saved successfully!');
             onSave?.();
         } catch (err) {
             const msg = err?.response?.data?.error?.message || err?.response?.data?.message || 'Failed to save portfolio.';
             setSaveErr(msg);
+            toast.error(msg);
         } finally {
             setSaving(false);
         }
@@ -412,7 +418,7 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
                 Portfolio
             </h2>
 
-            {saveErr && (
+            {/* {saveErr && (
                 <div style={{ marginBottom: '16px', padding: '10px 14px', borderRadius: '8px', background: '#fee2e2', border: '1px solid #fca5a5', color: '#b91c1c', fontSize: '13px' }}>
                     {saveErr}
                 </div>
@@ -421,7 +427,7 @@ const PhotographerPortfolio = ({ onSave, onCancel }) => {
                 <div style={{ marginBottom: '16px', padding: '10px 14px', borderRadius: '8px', background: '#dcfce7', color: '#15803d', fontSize: '13px' }}>
                     {saveOk}
                 </div>
-            )}
+            )} */}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
