@@ -15,6 +15,7 @@ import DraftOrders from './userDraftOrders';
 import ChangePassword from './changePassword';
 import UserDispute from './userDispute';
 import BookEvent from './bookEvent';
+import DisputesRaised from './disputesRaised';
 
 
 const MENU = [
@@ -28,7 +29,8 @@ const MENU = [
     // { key: 'wallet',    label: 'Wallet',               icon: <FiCreditCard size={17} /> },
     // { key: 'dispute',   label: 'Raise a Dispute',   icon: <FiAlertTriangle      size={17} /> },
     { key: 'password',  label: 'Change Password',      icon: <FiLock      size={17} /> },
-    {key : 'support' , label : 'Support', icon : <FiMessageCircle size={17} />}
+    {key : 'support' , label : 'Support', icon : <FiMessageCircle size={17} />},
+    {key : 'disputes' , label : 'Disputes Raised', icon : <FiAlertTriangle size={17} />}
     
 ];
 
@@ -48,6 +50,7 @@ const CustomerEditProfile = () => {
             case 'password': return <ChangePassword />;
             case 'dispute': return <UserDispute />;
             case 'bookEvent': return <BookEvent />;
+            case 'disputes': return <DisputesRaised />;
 
             default: return null;
         }

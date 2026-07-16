@@ -84,6 +84,7 @@ export const walletEndpoint = {
 
 export const reviewEndpoint = {
   postReview: (orderId) => `${baseUrl}/reviews/order/${orderId}`,
+  getSPReviews : `${baseUrl}/reviews/provider/list`,
  
   
 }
@@ -93,5 +94,11 @@ export const disputeEndpoint = {
   getDisputes : `${baseUrl}/disputes`,
   listProviders:(orderId) => `${baseUrl}/order/${orderId}/service-providers`,
   getDisputeDetails:(disputeId) => `${baseUrl}/disputes`,
+  getSRDispute : `${baseUrl}/disputes/provider/list`,
+  
+}
+
+export const productEndpoint = {
+  listProducts : `${baseUrl}/products/list`,
   
 }

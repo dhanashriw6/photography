@@ -9,6 +9,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useRazorpay } from '../../hooks/useRazorpay';
 import { placeOrder, getOrderDetails, updateDraftOrder } from '../../services/order';
 import { getProfile } from '../../services/profile';
+import { getProductList } from '@/services/product';
 
 /* ── Helpers ── */
 const fmtDate = (iso) => {
@@ -219,6 +220,61 @@ const RequestBook = () => {
   const [venue, setVenue] = useState('');
   const [addressDetail, setAddressDetail] = useState('');
   const [noteStatus, setNoteStatus] = useState({ type: '', msg: '' });
+  const [addonProducts, setAddonProducts] = useState([]);
+const [addonsLoading, setAddonsLoading] = useState(true);
+const [selectedAddons, setSelectedAddons] = useState({}); // { [variantId]: addonInfo }
+
+useEffect(() => {
+  let cancelled = false;
+
+  const fetchAddons = async () => {
+    try {
+      setAddonsLoading(true);
+      const [usbRes, hddRes] = await Promise.all([
+        getProductList({ slug: 'usb-drive' }),
+        getProductList({ slug: 'hard-disk' }),
+      ]);
+
+      const products = [
+        ...(usbRes?.data?.data || []),
+        ...(hddRes?.data?.data || []),
+      ];
+
+      if (!cancelled) setAddonProducts(products);
+    } catch (err) {
+      console.error('Failed to fetch addon products:', err);
+    } finally {
+      if (!cancelled) setAddonsLoading(false);
+    }
+  };
+
+  fetchAddons();
+  return () => {
+    cancelled = true;
+  };
+}, []);
+
+const toggleAddon = (variant, product) => {
+  setSelectedAddons((prev) => {
+    const next = { ...prev };
+    if (next[variant.id]) {
+      delete next[variant.id];
+    } else {
+      next[variant.id] = {
+        variant_id: variant.id,
+        product_id: product.id,
+        category: product.name,
+        name: variant.name,
+        sku: variant.sku,
+        price: variant.price,
+      };
+    }
+    return next;
+  });
+};
+
+const addonItems = Object.values(selectedAddons);
+const addonsTotal = addonItems.reduce((sum, a) => sum + parseFloat(a.price || 0), 0);
 
   useEffect(() => {
     if (!orderId) return;
@@ -446,10 +502,52 @@ const RequestBook = () => {
               )}
 
               {hasEditing && (
-                <div className="rb-editing-list">
-                  {editingItems.map((item) => <EditingItemCard key={item.id} item={item} />)}
+  <div className="rb-editing-list">
+    {editingItems.map((item) => <EditingItemCard key={item.id} item={item} />)}
+  </div>
+)}
+
+{/* ── Addons ── */}
+<div className="rb-card">
+  <p className="rb-card-title">
+    Addons <span className="rb-addon-optional">Optional</span>
+  </p>
+
+  {addonsLoading ? (
+    <div className="rb-addon-loading">⏳ Loading addons…</div>
+  ) : addonProducts.length === 0 ? (
+    <div className="rb-addon-empty">No addons available.</div>
+  ) : (
+    <div className="rb-addon-grid">
+      {addonProducts.flatMap((product) =>
+        (product.variants || []).map((variant) => {
+          const isSelected = !!selectedAddons[variant.id];
+          return (
+            <div
+              key={variant.id}
+              className={`rb-addon-card ${isSelected ? 'rb-addon-card--selected' : ''}`}
+              onClick={() => toggleAddon(variant, product)}
+            >
+              <div className="rb-addon-card-top">
+                <span className="rb-addon-cat">{product.name}</span>
+                {isSelected && <FiCheck size={14} className="rb-addon-check" />}
+              </div>
+              <div className="rb-addon-name">{variant.name}</div>
+              {variant.specifications?.length > 0 && (
+                <div className="rb-addon-specs">
+                  {variant.specifications.map((s, i) => (
+                    <span key={i}>{s.label}: {s.value}</span>
+                  ))}
                 </div>
               )}
+              <div className="rb-addon-price">{money(variant.price)}</div>
+            </div>
+          );
+        })
+      )}
+    </div>
+  )}
+</div>
             </div>
 
             {/* ════ RIGHT COLUMN ════ */}
@@ -496,6 +594,17 @@ const RequestBook = () => {
                           <strong>{money(item.total_amount)}</strong>
                         </div>
                       ))}
+                      {addonItems.length > 0 && (
+  <div className="rb-price-section">
+    <div className="rb-price-section-label">Addons</div>
+    {addonItems.map((a) => (
+      <div key={a.variant_id} className="rb-price-line">
+        <span>{a.category} <em>· {a.name}</em></span>
+        <strong>{money(a.price)}</strong>
+      </div>
+    ))}
+  </div>
+)}
                     </div>
                   )}
 
@@ -575,7 +684,19 @@ const STYLES = `
 
 .rb-card { background: #fff; border-radius: 16px; padding: 22px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
 .rb-card-title { display: flex; align-items: center; gap: 6px; margin: 0 0 16px; font-weight: 700; font-size: 15px; color: #1a1a1a; }
-
+.rb-addon-optional { font-size: 10.5px; font-weight: 700; color: #999; text-transform: none; margin-left: 6px; background: #f3f4f6; padding: 2px 8px; border-radius: 20px; }
+.rb-addon-loading, .rb-addon-empty { color: #aaa; font-size: 13px; padding: 20px 0; text-align: center; }
+.rb-addon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+.rb-addon-card { border: 1.5px solid #eee; border-radius: 12px; padding: 12px 14px; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; background: #fafafa; }
+.rb-addon-card:hover { border-color: #ddd; }
+.rb-addon-card--selected { border-color: var(--color-orange); background: #FFF9EF; box-shadow: 0 0 0 3px rgba(255,156,43,0.12); }
+.rb-addon-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.rb-addon-cat { font-size: 10px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.05em; }
+.rb-addon-check { color: var(--color-orange); flex-shrink: 0; }
+.rb-addon-name { font-size: 14px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+.rb-addon-specs { display: flex; flex-direction: column; gap: 2px; margin-bottom: 8px; }
+.rb-addon-specs span { font-size: 11px; color: #999; }
+.rb-addon-price { font-size: 15px; font-weight: 800; color: #1a1a1a; }
 /* Fields */
 .rb-field { margin-bottom: 16px; }
 .rb-field:last-child { margin-bottom: 0; }

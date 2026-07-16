@@ -7,3 +7,9 @@ export const postReview = async (orderId, data) => {
     data
   );
 };
+
+export const getSPReviews = async () => {
+  return await httpServices.get(
+    reviewEndpoint.getSPReviews,
+  );
+};

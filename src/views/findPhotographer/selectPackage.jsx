@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { draftOrder, getEditingPackage } from '../../services/order';
 import { createPortal } from 'react-dom';
 import { FiArrowLeft } from 'react-icons/fi';
+import { getProductList } from '@/services/product';
 
 /* ─── Tier accent colors ─────────────────────────────────────────── */
 const TIER_COLORS = {
@@ -338,26 +339,57 @@ const SelectEditingPackage = () => {
   const teamCost = location.state?.teamCost ?? null;      // ← new
   const teamDays = location.state?.teamDays ?? null;
 
-  useEffect(() => {
-    let cancelled = false;
+useEffect(() => {
+  let cancelled = false;
 
-    const fetchPackages = async () => {
-      try {
-        setLoading(true);
-        const res = await getEditingPackage();
-        if (!cancelled) setEditingPackages(res?.data?.data || []);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        if (!cancelled) setLoading(false);
+  const fetchPackages = async () => {
+    try {
+      setLoading(true);
+
+      const res = await getProductList({
+        slug: 'editing-package',
+      });
+
+      const products = res?.data?.data || [];
+
+      // Flatten each product's variants into individual selectable packages
+      const flattened = products.flatMap((product) =>
+        (product.variants || []).map((variant) => ({
+          id: variant.id,
+          sku: variant.sku,
+          name: variant.name,
+          price: variant.price,
+          stock_quantity: variant.stock_quantity,
+          sort_order: variant.sort_order,
+          attributes: variant.attributes,
+          // normalize specifications -> features used by the card
+          features: (variant.specifications || []).map((spec, idx) => ({
+            id: `${variant.id}-${idx}`,
+            feature_key: spec.label,
+            label: spec.label,
+            quantity: spec.value,
+          })),
+          images: product.images || [],
+          product_id: product.id,
+          product_name: product.name,
+        }))
+      );
+
+      if (!cancelled) {
+        setEditingPackages(flattened);
       }
-    };
+    } catch (err) {
+      console.error(err);
+    } finally {
+      if (!cancelled) setLoading(false);
+    }
+  };
 
-    fetchPackages();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  fetchPackages();
+  return () => {
+    cancelled = true;
+  };
+}, []);
 
   const handleBookNow = async (editingPkg) => {
     try {

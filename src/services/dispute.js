@@ -26,3 +26,9 @@ export const getDisputeDetails = async (disputeId) => {
     disputeEndpoint.getDisputeDetails(disputeId)
   );
 };
+
+export const getSPDispute = async () => {
+  return await httpServices.get(
+    disputeEndpoint.getSRDispute,
+  );
+};
