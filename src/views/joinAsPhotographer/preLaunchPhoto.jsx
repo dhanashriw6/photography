@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import PhotographerLayout from './PhotographerLayout'
 import { joinPhotographerAndCustomer } from '../../services/preLaunch'
 import {
   FiUser,
@@ -9,13 +8,14 @@ import {
   FiCamera,
   FiAward,
   FiLink,
-  FiUserPlus,
   FiLock,
-  FiCheckCircle,
   FiAlertCircle,
-  FiLoader
+  FiLoader,
+  FiCheckCircle,
+  FiX
 } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'
+import '../index.css';
 
 const PHOTOGRAPHY_TYPES = [
   'Wedding',
@@ -62,11 +62,56 @@ const experienceToNumber = (label) => {
 
 const FIELD_SPACING = 24 // px of space below every field group
 
+const SuccessModal = ({ onClose, onGoHome }) => (
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center px-4 py-4"
+    style={{ background: 'rgba(15, 23, 42, 0.55)' }}
+    role="dialog"
+    aria-modal="true"
+    onClick={onClose}
+  >
+    <div
+      className="relative w-full max-w-sm rounded-2xl bg-white shadow-2xl px-6 py-8 text-center"
+      onClick={(e) => e.stopPropagation()}
+      style={{padding:'10px'}}
+    >
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Close"
+        className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+      >
+        <FiX size={20} />
+      </button>
+
+      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-50">
+        <FiCheckCircle className="text-green-600" size={30} />
+      </div>
+
+      <h3 className="text-lg font-bold text-slate-900 mb-2">
+        Application Received!
+      </h3>
+      <p className="text-sm text-gray-500 mb-6" style={{padding:'5px'}}>
+        Our team will review your details and contact you regarding the next steps.
+      </p>
+
+      <button
+        type="button"
+        onClick={onGoHome}
+        className="su-btn-primary w-full flex items-center justify-center "
+      >
+        Done
+      </button>
+    </div>
+  </div>
+)
+
 const PreLaunchPhoto = () => {
   const [form, setForm] = useState(initialState)
   const [errors, setErrors] = useState({})
   const [submitting, setSubmitting] = useState(false)
-  const [status, setStatus] = useState(null) // 'success' | 'error' | null
+  const [status, setStatus] = useState(null) // 'error' | null (success is handled by the modal)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
   const navigate = useNavigate()
 
   const handleChange = (field) => (e) => {
@@ -111,11 +156,18 @@ const PreLaunchPhoto = () => {
 
     try {
       setSubmitting(true)
-      await joinPhotographerAndCustomer(payload)
-      setStatus('success')
-      setForm(initialState)
+      const res = await joinPhotographerAndCustomer(payload)
+      const statusCode = res?.status ?? res?.data?.status
+
+      if (statusCode === 200 || statusCode === 201) {
+        setForm(initialState)
+        setShowSuccessModal(true)
+      } else {
+        setStatus('error')
+      }
     } catch (err) {
       console.error('Photographer lead submission failed:', err)
+      
       setStatus('error')
     } finally {
       setSubmitting(false)
@@ -123,7 +175,7 @@ const PreLaunchPhoto = () => {
   }
 
   return (
-    <div className="flex-1 flex justify-center px-4 py-10 md:py-14">
+    <div className="views-shell flex-1 flex justify-center px-4 py-10 md:py-14" style={{ fontFamily: "'Quicksand', sans-serif" }}>
       <div className="w-full max-w-xl mx-auto py-8 px-4">
         {/* Header Section */}
         <div className="text-center mb-8">
@@ -153,18 +205,6 @@ const PreLaunchPhoto = () => {
           </div>
 
           <div style={{ borderTop: '1px solid #f0f0f0', margin: '0 0 24px' }} />
-
-          {status === 'success' && (
-            <div className="mb-6 rounded-xl bg-green-50 border border-green-200 text-green-800 text-sm px-4 py-3.5 flex items-start gap-3">
-              <FiCheckCircle className="text-green-600 text-lg mt-0.5 shrink-0" />
-              <div>
-                <p className="font-semibold text-green-900">Registration Received!</p>
-                <p className="text-green-700 text-xs mt-0.5">
-                  Thanks! Your details have been received. We'll be in touch soon.
-                </p>
-              </div>
-            </div>
-          )}
 
           {status === 'error' && (
             <div className="mb-6 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm px-4 py-3.5 flex items-start gap-3">
@@ -312,28 +352,27 @@ const PreLaunchPhoto = () => {
             </div>
 
             {/* Submit Button */}
-              <div className='flex justify-center gap-2'>
+            <div className='flex justify-center gap-2'>
               <button type="button"
-                className="su-btn-primary w-full flex items-center justify-center gap-2"
+                className="su-btn-primary w-1/2 flex items-center justify-center gap-2"
                 style={{ marginTop: 8 }} onClick={() => { navigate('/') }}>Go Back</button>
-            <button
-              type="submit"
-              disabled={submitting}
-              className="su-btn-primary w-full flex items-center justify-center gap-2"
-              style={{ marginTop: 8 }}
-            >
-              {submitting ? (
-                <>
-                  <FiLoader className="animate-spin text-xl" />
-                  <span>Submitting...</span>
-                </>
-              ) : (
-                <>
-                  <FiUserPlus size={18} />
-                  <span>Join as a Photographer</span>
-                </>
-              )}
-            </button>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="su-btn-primary w-1/2 flex items-center justify-center gap-2"
+                style={{ marginTop: 8 }}
+              >
+                {submitting ? (
+                  <>
+                    <FiLoader className="animate-spin text-xl" />
+                    <span>Submitting...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Join as a Photographer</span>
+                  </>
+                )}
+              </button>
             </div>
 
             <div className="flex items-center justify-center gap-1.5 text-xs text-gray-400" style={{ marginTop: 14 }}>
@@ -343,6 +382,16 @@ const PreLaunchPhoto = () => {
           </form>
         </div>
       </div>
+
+      {showSuccessModal && (
+        <SuccessModal
+          onClose={() => setShowSuccessModal(false)}
+          onGoHome={() => {
+            setShowSuccessModal(false)
+            navigate('/')
+          }}
+        />
+      )}
     </div>
   )
 }

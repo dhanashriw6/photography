@@ -5,6 +5,14 @@
   --color-orange: #FFAE00;
 }
 
+body,
+input,
+select,
+textarea,
+button {
+  font-family: 'Quicksand', sans-serif;
+}
+
 .views-shell,
 .views-shell * {
   font-family: 'Quicksand', sans-serif;

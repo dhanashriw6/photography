@@ -204,21 +204,51 @@ export const faqs = [
     { q: "How can photographers join?", a: "Photographers can create a profile, upload portfolio and documents, complete verification, and start receiving bookings." },
     { q: "Can photographers manage availability?", a: "Yes. Photographers can update availability, block dates, and manage upcoming bookings through their dashboard." },
 ];
+// export const footerLinks = [
+//     {
+//         title: "For Clients",
+//         links: ["Browse Photographers", "How It Works", "Pricing", "Portfolio Gallery", "Help Center"],
+//     },
+//     {
+//         title: "For Photographers",
+//         links: ["Join Platform", "Photographer Tools", "Success Stories", "Resources", "Community"],
+//     },
+//     {
+//         title: "Company",
+//         links: ["About Us", "Careers", "Blog", "Contact Us"],
+//     },
+//     {
+//         title: "Support",
+//         links: ["FAQs", "Terms of Service", "Privacy Policy", "Refund Policy", "Trust & Safety"],
+//     },
+// ];
 export const footerLinks = [
     {
-        title: "For Clients",
-        links: ["Browse Photographers", "How It Works", "Pricing", "Portfolio Gallery", "Help Center"],
+        title: "Quick Links",
+        links: [
+            { label: "Home", href: "#" },
+            { label: "How It Works", href: "#process" },
+            { label: "Popular Categories", href: "#categories" },
+            { label: "FAQ", href: "#faqs" },
+        ],
     },
     {
         title: "For Photographers",
-        links: ["Join Platform", "Photographer Tools", "Success Stories", "Resources", "Community"],
+        links: [
+            { label: "Join as a Photographer", href: "/pre-launch/photographer" },
+        ],
     },
     {
-        title: "Company",
-        links: ["About Us", "Careers", "Blog", "Contact Us"],
+        title: "For Customers",
+        links: [
+            { label: "Find a Photographer", href: "/pre-launch/customer" },
+        ],
     },
     {
-        title: "Support",
-        links: ["FAQs", "Terms of Service", "Privacy Policy", "Refund Policy", "Trust & Safety"],
+        title: "Legal",
+        links: [
+            { label: "Terms & Conditions", href: "/legal" },
+            { label: "Privacy Policy", href: "/legal" },
+        ],
     },
 ];
