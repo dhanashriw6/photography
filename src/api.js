@@ -102,3 +102,8 @@ export const productEndpoint = {
   listProducts : `${baseUrl}/products/list`,
   
 }
+
+export const preLaunch = {
+  joinPhotographerAndCustomer: `${baseUrl}/pre-launch-leads`,
+  
+}

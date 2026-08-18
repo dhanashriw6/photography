@@ -4,8 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { IMG } from "@/data/site";
 import { fadeUp, inView, stagger } from "@/landing/lib/motion";
 const cards = [
-    { title: "Hire a Photographer", text: "Find the perfect photographer for your event, project, or special moment.", cta: "Find a Photographer", image: IMG.splitClient, Icon: Camera, href: "/find-photographer" },
-    { title: "Join as Photographer", text: "Showcase your talent, manage bookings, and grow your creative business.", cta: "Create Profile", image: IMG.splitPhotographer, Icon: UserPlus, href: "/join-as-photographer" },
+    // { title: "Hire a Photographer", text: "Find the perfect photographer for your event, project, or special moment.", cta: "Find a Photographer", image: IMG.splitClient, Icon: Camera, href: "/find-photographer" },
+    // { title: "Join as Photographer", text: "Showcase your talent, manage bookings, and grow your creative business.", cta: "Create Profile", image: IMG.splitPhotographer, Icon: UserPlus, href: "/join-as-photographer" },
+    { title: "Hire a Photographer", text: "Find the perfect photographer for your event, project, or special moment.", cta: "Find a Photographer", image: IMG.splitClient, Icon: Camera, href: "/pre-launch/customer" },
+    { title: "Join as Photographer", text: "Showcase your talent, manage bookings, and grow your creative business.", cta: "Create Profile", image: IMG.splitPhotographer, Icon: UserPlus, href: "/pre-launch/photographer" },
 ];
 export function SplitCTA() {
     const navigate = useNavigate();

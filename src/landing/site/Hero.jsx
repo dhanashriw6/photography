@@ -83,8 +83,10 @@ export function Hero() {
         </motion.p>
 
         <motion.div variants={fadeUp} className="hero-actions flex flex-wrap justify-center gap-3.5 mb-7">
-          <Button variant="primary" icon={<ArrowRight size={16}/>} onClick={() => navigate("/find-photographer")}>Find a Photographer</Button>
-          <Button variant="secondary" onClick={() => navigate("/join-as-photographer")}>Join as Photographer</Button>
+          {/* <Button variant="primary" icon={<ArrowRight size={16}/>} onClick={() => navigate("/find-photographer")}>Find a Photographer</Button>
+          <Button variant="secondary" onClick={() => navigate("/join-as-photographer")}>Join as Photographer</Button> */}
+          <Button variant="primary" icon={<ArrowRight size={16}/>} onClick={() => navigate("/pre-launch/customer")}>Find a Photographer</Button>
+          <Button variant="secondary" onClick={() => navigate("/pre-launch/photographer")}>Join as Photographer</Button>
         </motion.div>
 
         <motion.div variants={fadeUp} className="hero-trust flex items-center justify-center gap-4 mb-[34px]">

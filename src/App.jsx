@@ -39,6 +39,8 @@ import AvailabilityCalendarPage from './views/joinAsPhotographer/AvailabilityCal
 import ServiceProviderDetails from './views/findPhotographer/ServiceProviderDetails';
 import ServerError from './views/ServerError';
 import FulltimeLogoLoader from './landing/site/LogoLoader';
+import PreLaunchPhoto from './views/joinAsPhotographer/preLaunchPhoto';
+import PreLaunchCustomer from './views/findPhotographer/preLaunchCustomer';
 
 function App() {
   return (
@@ -64,6 +66,8 @@ function App() {
         <Route path="/review" element={<Review />} />
         <Route path="/dispute" element={<Dispute />} />
         <Route path="/legal" element={<LegalPage />}/>
+        <Route path="/pre-launch/photographer" element={<PreLaunchPhoto />}/>
+        <Route path="/pre-launch/customer" element={<PreLaunchCustomer />}/>
         <Route path="/customer/edit-profile" element={<CustomerEditProfile />} />
         <Route path="/service-provider/:id" element={<ServiceProviderDetails />} />
         <Route path="/500" element={<ServerError />} />
