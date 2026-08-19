@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   FiFileText,
   FiLock,
@@ -595,12 +595,17 @@ const LegalPage = () => {
   const location = useLocation();
   const initialTab = TABS.some(t => t.key === location.state?.tab) ? location.state.tab : 'terms';
   const [activeTab, setActiveTab] = useState(initialTab);
-
+  const navigate = useNavigate()
   const current = TABS.find(t => t.key === activeTab);
 
   return (
-    <ViewsLayout>
+  
+
       <div style={{ width: '100%', margin: '30px' }}>
+        <button type="button"
+          className="ml-2 su-btn-primary w-fit flex items-center justify-center gap-2"
+          style={{ marginTop: 8 }} onClick={() => { navigate('/') }}>Back
+        </button>
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <div
@@ -701,7 +706,9 @@ const LegalPage = () => {
           </div>
         </div>
       </div>
-    </ViewsLayout>
+    
+
+
   );
 };
 

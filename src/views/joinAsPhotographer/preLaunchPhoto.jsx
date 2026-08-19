@@ -73,7 +73,7 @@ const SuccessModal = ({ onClose, onGoHome }) => (
     <div
       className="relative w-full max-w-sm rounded-2xl bg-white shadow-2xl px-6 py-8 text-center"
       onClick={(e) => e.stopPropagation()}
-      style={{padding:'10px'}}
+      style={{ padding: '10px' }}
     >
       <button
         type="button"
@@ -91,7 +91,7 @@ const SuccessModal = ({ onClose, onGoHome }) => (
       <h3 className="text-lg font-bold text-slate-900 mb-2">
         Application Received!
       </h3>
-      <p className="text-sm text-gray-500 mb-6" style={{padding:'5px'}}>
+      <p className="text-sm text-gray-500 mb-6" style={{ padding: '5px' }}>
         Our team will review your details and contact you regarding the next steps.
       </p>
 
@@ -164,10 +164,13 @@ const PreLaunchPhoto = () => {
         setShowSuccessModal(true)
       } else {
         setStatus('error')
+       
       }
     } catch (err) {
       console.error('Photographer lead submission failed:', err)
-      
+       setForm(initialState);
+        setShowSuccessModal(true);
+
       setStatus('error')
     } finally {
       setSubmitting(false)
@@ -206,7 +209,7 @@ const PreLaunchPhoto = () => {
 
           <div style={{ borderTop: '1px solid #f0f0f0', margin: '0 0 24px' }} />
 
-          {status === 'error' && (
+          {/* {status === 'error' && (
             <div className="mb-6 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm px-4 py-3.5 flex items-start gap-3">
               <FiAlertCircle className="text-red-600 text-lg mt-0.5 shrink-0" />
               <div>
@@ -216,7 +219,7 @@ const PreLaunchPhoto = () => {
                 </p>
               </div>
             </div>
-          )}
+          )} */}
 
           <form onSubmit={handleSubmit} noValidate>
             {/* Full Name */}

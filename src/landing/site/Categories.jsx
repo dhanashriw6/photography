@@ -14,7 +14,8 @@ function chunk(arr, size) {
 
 export function Categories() {
   const trackRef = useRef(null);
-  const pages = chunk(categories, 5);
+  // more cards per page on larger screens so the pagination math feels right
+  const pages = chunk(categories, 6);
 
   const scrollByPage = (dir) => {
     const el = trackRef.current;
@@ -23,26 +24,26 @@ export function Categories() {
   };
 
   return (
-    <section id="categories" className="section-cream py-20 md:py-28">
-      <div className="mx-auto max-w-[1280px] px-6 md:px-10 lg:px-14">
+    <section id="categories" className="section-cream py-12 sm:py-16 md:py-20 lg:py-28">
+      <div className="mx-auto max-w-[1280px] px-4 sm:px-6 md:px-10 lg:px-14">
         <motion.div
           variants={stagger}
           {...inView}
-          className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12"
+          className="flex flex-col md:flex-row md:items-end md:justify-between gap-5 sm:gap-6 mb-8 sm:mb-10 md:mb-12"
         >
           <div>
             <motion.div variants={fadeUp}>
               <SectionLabel tone="light">Explore</SectionLabel>
             </motion.div>
-            <motion.h2 variants={fadeUp} className="font-display text-5xl md:text-7xl mt-4 text-black">
+            <motion.h2 className="font-display text-3xl sm:text-4xl md:text-6xl lg:text-7xl mt-3 sm:mt-4 text-black" variants={fadeUp}>
               Popular Categories
             </motion.h2>
-            <motion.p variants={fadeUp} className="mt-4 max-w-xl text-black/60">
+            <motion.p variants={fadeUp} className="mt-3 sm:mt-4 max-w-xl text-sm sm:text-base text-black/60">
               Explore photography services by occasion, style, and business need.
             </motion.p>
           </div>
 
-          <motion.div variants={fadeUp} className="flex items-center gap-3">
+          <motion.div variants={fadeUp} className="flex items-center justify-between md:justify-start gap-3">
             <a href="#" className="group inline-flex items-center gap-2 text-black font-semibold text-sm">
               Explore all categories
               <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
@@ -52,7 +53,7 @@ export function Categories() {
                 type="button"
                 onClick={() => scrollByPage(-1)}
                 aria-label="Previous categories"
-                className="w-10 h-10 rounded-full border border-black/15 flex items-center justify-center hover:bg-black hover:text-white transition-colors"
+                className="w-9 h-9 lg:w-10 lg:h-10 rounded-full border border-black/15 flex items-center justify-center hover:bg-black hover:text-white transition-colors"
               >
                 <ArrowLeft size={16} />
               </button>
@@ -60,7 +61,7 @@ export function Categories() {
                 type="button"
                 onClick={() => scrollByPage(1)}
                 aria-label="Next categories"
-                className="w-10 h-10 rounded-full border border-black/15 flex items-center justify-center hover:bg-black hover:text-white transition-colors"
+                className="w-9 h-9 lg:w-10 lg:h-10 rounded-full border border-black/15 flex items-center justify-center hover:bg-black hover:text-white transition-colors"
               >
                 <ArrowRight size={16} />
               </button>
@@ -77,7 +78,7 @@ export function Categories() {
           {pages.map((page, pageIdx) => (
             <div
               key={pageIdx}
-              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5 min-w-full snap-start pr-0"
+              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 md:gap-5 min-w-full snap-start pr-0"
             >
               {page.map((c) => (
                 <motion.div key={c.title} variants={fadeUp}>
@@ -88,8 +89,8 @@ export function Categories() {
           ))}
         </motion.div>
 
-        {/* mobile prev/next */}
-        <div className="flex md:hidden items-center justify-center gap-3 mt-6">
+        {/* prev/next visible below lg where the header buttons are hidden */}
+        <div className="flex md:hidden items-center justify-center gap-3 mt-5 sm:mt-6">
           <button
             type="button"
             onClick={() => scrollByPage(-1)}

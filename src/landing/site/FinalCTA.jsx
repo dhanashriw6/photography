@@ -23,8 +23,8 @@ export function FinalCTA() {
           Find verified photographers or join the creative network today.
         </motion.p>
         <motion.div variants={fadeUp} className="mt-9 flex flex-wrap gap-3 justify-center">
-          <Button variant="dark" icon={<ArrowRight size={16}/>} onClick={() => navigate("/find-photographer")}>Find a Photographer</Button>
-          <button onClick={() => navigate("/join-as-photographer")} className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold border-2 border-black text-black hover:bg-black hover:text-yellow transition">
+          <Button variant="dark" icon={<ArrowRight size={16}/>} onClick={() => navigate("/pre-launch/customer")}>Find a Photographer</Button>
+          <button onClick={() => navigate("/pre-launch/photographer")} className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold border-2 border-black text-black hover:bg-black hover:text-yellow transition">
             Join as Photographer
           </button>
         </motion.div>
