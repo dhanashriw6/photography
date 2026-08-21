@@ -153,9 +153,7 @@ const PreLaunchCustomer = () => {
       }
     } catch (err) {
       console.error('Customer lead submission failed:', err)
-      setStatus('error')
-      setForm(initialState);
-      setShowSuccessModal(true);
+     
     } finally {
       setSubmitting(false)
     }

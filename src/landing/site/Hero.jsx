@@ -27,7 +27,7 @@ export function Hero() {
     const rating = data?.rating ?? null;
     const reviewCount = data?.userRatingCount ?? null;
     const reviewers = (data?.reviewers ?? []).slice(0, 4);
-    return (<section id="top" className="hero-section relative overflow-hidden noise-bg flex items-center min-h-[100dvh] pt-[110px] pb-8">
+    return (<section id="top" className="hero-section relative overflow-hidden noise-bg flex items-center min-h-[100vh] mt-[30px] pb-8">
       {/* cinematic video background */}
       <video autoPlay loop muted playsInline preload="auto" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover opacity-[0.32] pointer-events-none [filter:brightness(0.55)_contrast(1.1)_saturate(1.05)]" src={heroBgVideo}/>
 

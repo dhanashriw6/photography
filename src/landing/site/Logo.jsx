@@ -1,5 +1,5 @@
 import logoAsset from "@/assets/Images/Final-logo.png";
-import whiteLogo from "@/assets/Images/white-variant.png";
+import whiteLogo from "@/assets/Images/fulltimelogo1.png";
 export function Logo({ className = "", variant = false }) {
   return (<a href="#top" className={`flex items-center gap-4 ${className}`}>
     <img

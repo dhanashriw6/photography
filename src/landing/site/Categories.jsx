@@ -73,15 +73,15 @@ export function Categories() {
           ref={trackRef}
           variants={stagger}
           {...inView}
-          className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth -mx-1 px-1 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth gap-6 sm:gap-8 lg:gap-10 -mx-3 px-3 py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {pages.map((page, pageIdx) => (
             <div
               key={pageIdx}
-              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 md:gap-5 min-w-full snap-start pr-0"
+              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 md:gap-5 w-full min-w-full shrink-0 snap-start"
             >
               {page.map((c) => (
-                <motion.div key={c.title} variants={fadeUp}>
+                <motion.div key={c.title} variants={fadeUp} className="h-full">
                   <CategoryCard {...c} />
                 </motion.div>
               ))}

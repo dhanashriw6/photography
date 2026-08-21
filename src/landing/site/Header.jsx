@@ -27,7 +27,7 @@ export function Header() {
         className="fixed top-3 md:top-4 inset-x-0 z-50 px-2"
       >
         <div
-          className={`mx-auto w-full h-[64px] md:h-[68px] px-3 md:px-6 flex items-center justify-between gap-3 md:gap-6 nav-pill transition-all duration-300 ${
+          className={`mx-auto w-full h-[74px] md:h-[82px] px-3 md:px-6 flex items-center justify-between gap-3 md:gap-6 nav-pill transition-all duration-300 ${
             scrolled ? "shadow-[0_18px_60px_-20px_rgba(0,0,0,0.7)]" : ""
           }`}
         >

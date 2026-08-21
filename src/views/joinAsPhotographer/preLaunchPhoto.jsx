@@ -15,19 +15,28 @@ import {
   FiX
 } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'
+import Select from "react-select";
 import '../index.css';
 
 const PHOTOGRAPHY_TYPES = [
-  'Wedding',
-  'Pre-Wedding',
-  'Engagement',
-  'Portrait',
-  'Event',
-  'Maternity',
-  'Product',
-  'Fashion',
-  'Corporate',
-  'Other'
+  { value: 'Wedding', label: 'Wedding' },
+  { value: 'Pre-Wedding', label: 'Pre-Wedding' },
+  { value: 'Engagement', label: 'Engagement' },
+  { value: 'Portrait', label: 'Portrait' },
+  { value: 'Event', label: 'Event' },
+  { value: 'Maternity', label: 'Maternity' },
+  { value: 'Product', label: 'Product' },
+  { value: 'Fashion', label: 'Fashion' },
+  { value: 'Corporate', label: 'Corporate' },
+  { value: 'Other', label: 'Other' },
+]
+
+const SKILL_OPTIONS = [
+  { value: 'Photographer', label: 'Photographer' },
+  { value: 'Videographer', label: 'Videographer' },
+  { value: 'Candid Photographer', label: 'Candid Photographer' },
+  { value: 'Cinematographer', label: 'Cinematographer' },
+  { value: 'Drone', label: 'Drone' },
 ]
 
 const EXPERIENCE_LEVELS = [
@@ -44,7 +53,8 @@ const initialState = {
   phone_code: '+91',
   mobile_number: '',
   city: '',
-  photography_type: '',
+  photography_type: [],
+  skills: [],
   experience: '',
   portfolio_link: '',
 }
@@ -127,7 +137,8 @@ const PreLaunchPhoto = () => {
     if (!form.mobile_number.trim()) next.mobile_number = 'Mobile / WhatsApp number is required'
     else if (!/^\d{7,15}$/.test(form.mobile_number.trim())) next.mobile_number = 'Enter a valid mobile number'
     if (!form.city.trim()) next.city = 'City is required'
-    if (!form.photography_type) next.photography_type = 'Please select a photography type'
+    if (!form.photography_type.length) next.photography_type = 'Please select at least one photography type'
+    if (!form.skills.length) next.skills = 'Please select at least one skill'
     if (!form.experience) next.experience = 'Please select your experience'
     if (form.portfolio_link.trim() && !/^https?:\/\/\S+\.\S+/.test(form.portfolio_link.trim())) {
       next.portfolio_link = 'Enter a valid URL (starting with http:// or https://)'
@@ -148,12 +159,12 @@ const PreLaunchPhoto = () => {
       phone_code: form.phone_code,
       mobile_number: form.mobile_number.trim(),
       city: form.city.trim(),
-      photography_type: form.photography_type,
+      photography_type: form.photography_type.join(', '),
       experience: experienceToNumber(form.experience),
       portfolio_link: form.portfolio_link.trim(),
+      area_of_expertise: form.skills,
       source: 'landing_page',
     }
-
     try {
       setSubmitting(true)
       const res = await joinPhotographerAndCustomer(payload)
@@ -164,14 +175,11 @@ const PreLaunchPhoto = () => {
         setShowSuccessModal(true)
       } else {
         setStatus('error')
-       
+
       }
     } catch (err) {
       console.error('Photographer lead submission failed:', err)
-       setForm(initialState);
-        setShowSuccessModal(true);
 
-      setStatus('error')
     } finally {
       setSubmitting(false)
     }
@@ -299,24 +307,93 @@ const PreLaunchPhoto = () => {
               {errors.city && <p className="su-error" style={{ marginTop: 6 }}>{errors.city}</p>}
             </div>
 
-            {/* Photography Type */}
-            <div className="su-field" style={{ marginBottom: FIELD_SPACING }}>
-              <label style={{ display: 'block', marginBottom: 8 }}>Photography Type <sup style={{ color: '#ef4444' }}>*</sup></label>
-              <div className="relative flex items-center">
-                <FiCamera size={17} className="absolute left-3.5 text-[#f5a623] pointer-events-none z-10" />
-                <select
-                  value={form.photography_type}
-                  onChange={handleChange('photography_type')}
-                  style={{ paddingLeft: '38px', ...(errors.photography_type ? { borderColor: '#ef4444' } : {}) }}
-                >
-                  <option value="">Select photography type</option>
-                  {PHOTOGRAPHY_TYPES.map((t) => (
-                    <option key={t} value={t}>{t}</option>
-                  ))}
-                </select>
-              </div>
-              {errors.photography_type && <p className="su-error" style={{ marginTop: 6 }}>{errors.photography_type}</p>}
-            </div>
+          {/* Photography Type */}
+<div className="su-field" style={{ marginBottom: FIELD_SPACING }}>
+  <label style={{ display: 'block', marginBottom: 8 }}>Photography Type <sup style={{ color: '#ef4444' }}>*</sup></label>
+
+  <Select
+    isMulti
+    options={PHOTOGRAPHY_TYPES}
+    value={PHOTOGRAPHY_TYPES.filter((option) =>
+      form.photography_type.includes(option.value)
+    )}
+    onChange={(selected) => {
+      const vals = selected ? selected.map((item) => item.value) : []
+      setForm((prev) => ({ ...prev, photography_type: vals }))
+      if (errors.photography_type) setErrors((prev) => ({ ...prev, photography_type: undefined }))
+    }}
+    placeholder="Select photography type(s)..."
+    closeMenuOnSelect={false}
+    hideSelectedOptions={false}
+    menuPortalTarget={document.body}
+    menuPosition="fixed"
+    styles={{
+      control: (base, state) => ({
+        ...base,
+        minHeight: 46,
+        borderRadius: 8,
+        borderColor: errors.photography_type ? '#ef4444' : state.isFocused ? '#f5a623' : '#d1d5db',
+        boxShadow: state.isFocused ? '0 0 0 3px rgba(245,166,35,0.15)' : 'none',
+        '&:hover': { borderColor: '#f5a623' },
+      }),
+      multiValue: (base) => ({ ...base, background: '#FFF3D6', borderRadius: 6 }),
+      multiValueLabel: (base) => ({ ...base, color: '#1a1a1a', fontWeight: 600 }),
+      multiValueRemove: (base) => ({
+        ...base,
+        cursor: 'pointer',
+        ':hover': { background: '#FFE5A3', color: '#000' },
+      }),
+      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+      menu: (base) => ({ ...base, zIndex: 9999 }),
+    }}
+  />
+
+  {errors.photography_type && <p className="su-error" style={{ marginTop: 6 }}>{errors.photography_type}</p>}
+</div>
+
+{/* Skills */}
+<div className="su-field" style={{ marginBottom: FIELD_SPACING }}>
+  <label style={{ display: 'block', marginBottom: 8 }}>Skills <sup style={{ color: '#ef4444' }}>*</sup></label>
+
+  <Select
+    isMulti
+    options={SKILL_OPTIONS}
+    value={SKILL_OPTIONS.filter((option) =>
+      form.skills.includes(option.value)
+    )}
+    onChange={(selected) => {
+      const vals = selected ? selected.map((item) => item.value) : []
+      setForm((prev) => ({ ...prev, skills: vals }))
+      if (errors.skills) setErrors((prev) => ({ ...prev, skills: undefined }))
+    }}
+    placeholder="Select skill(s)..."
+    closeMenuOnSelect={false}
+    hideSelectedOptions={false}
+    menuPortalTarget={document.body}
+    menuPosition="fixed"
+    styles={{
+      control: (base, state) => ({
+        ...base,
+        minHeight: 46,
+        borderRadius: 8,
+        borderColor: errors.skills ? '#ef4444' : state.isFocused ? '#f5a623' : '#d1d5db',
+        boxShadow: state.isFocused ? '0 0 0 3px rgba(245,166,35,0.15)' : 'none',
+        '&:hover': { borderColor: '#f5a623' },
+      }),
+      multiValue: (base) => ({ ...base, background: '#FFF3D6', borderRadius: 6 }),
+      multiValueLabel: (base) => ({ ...base, color: '#1a1a1a', fontWeight: 600 }),
+      multiValueRemove: (base) => ({
+        ...base,
+        cursor: 'pointer',
+        ':hover': { background: '#FFE5A3', color: '#000' },
+      }),
+      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+      menu: (base) => ({ ...base, zIndex: 9999 }),
+    }}
+  />
+
+  {errors.skills && <p className="su-error" style={{ marginTop: 6 }}>{errors.skills}</p>}
+</div>
 
             {/* Experience */}
             <div className="su-field" style={{ marginBottom: FIELD_SPACING }}>

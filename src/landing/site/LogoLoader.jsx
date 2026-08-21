@@ -1,50 +1,57 @@
-import { useEffect, useState } from "react";
-import "./FulltimeLogoLoader.css";
-import finalLogo from "@/assets/Images/Final-logo.png";
+import { useEffect, useState, useRef } from "react";
 
 export default function FulltimeLogoLoader({
-  logoSrc = finalLogo,
+  videoSrc = "/FULLTIME PHOTOGRAPHER LOGO_4K.mp4",
   onComplete,
 }) {
   const [hide, setHide] = useState(false);
-console.log(finalLogo);
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setHide(true);
+  const videoRef = useRef(null);
 
-      setTimeout(() => {
-        if (onComplete) onComplete();
-      }, 650);
-    }, 3000);
+  const handleEnded = () => {
+    setHide(true);
+    setTimeout(() => {
+      if (onComplete) onComplete();
+    }, 700);
+  };
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {
+        // Autoplay policy fallback
+      });
+    }
+
+    // Safety fallback timer in case onEnded is delayed
+    const timer = setTimeout(() => {
+      handleEnded();
+    }, 7000);
 
     return () => clearTimeout(timer);
-  }, [onComplete]);
+  }, []);
 
   return (
-    <div className={`ft-loader ${hide ? "ft-loader--hide" : ""}`}>
-      <div className="ft-loader-bg" />
-
-      <div className="ft-loader-logo-wrap">
-        {/* Animated icon build */}
-        <div className="ft-icon-build" aria-hidden="true">
-          <span className="ft-icon-dot" />
-          <span className="ft-icon-top" />
-          <span className="ft-icon-main" />
-          <span className="ft-icon-leg" />
-        </div>
-
-        {/* Final exact logo */}
-        <img
-          src={logoSrc}
-          alt="Fulltime Photographers"
-          className="ft-final-logo"
-        />
-
-        {/* Loading line */}
-        <div className="ft-loader-line">
-          <span />
-        </div>
-      </div>
+    <div
+      className={`fixed inset-0 z-[99999] bg-black flex items-center justify-center transition-opacity duration-700 ease-in-out ${
+        hide ? "opacity-0 pointer-events-none" : "opacity-100"
+      }`}
+    >
+      <video
+        ref={videoRef}
+        src={videoSrc}
+        autoPlay
+        muted
+        playsInline
+        preload="auto"
+        onEnded={handleEnded}
+        className="w-full h-full object-contain max-w-5xl max-h-[90vh] px-4"
+      />
+      <button
+        type="button"
+        onClick={handleEnded}
+        className="absolute bottom-6 right-6 text-xs text-white/60 hover:text-white bg-white/10 hover:bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/15 cursor-pointer transition z-[100000]"
+      >
+        Skip
+      </button>
     </div>
   );
 }
