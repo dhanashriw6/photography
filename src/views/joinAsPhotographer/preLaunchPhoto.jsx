@@ -179,7 +179,7 @@ const PreLaunchPhoto = () => {
       }
     } catch (err) {
       console.error('Photographer lead submission failed:', err)
-
+      setStatus('error')
     } finally {
       setSubmitting(false)
     }
@@ -217,17 +217,17 @@ const PreLaunchPhoto = () => {
 
           <div style={{ borderTop: '1px solid #f0f0f0', margin: '0 0 24px' }} />
 
-          {/* {status === 'error' && (
+          {status === 'error' && (
             <div className="mb-6 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm px-4 py-3.5 flex items-start gap-3">
               <FiAlertCircle className="text-red-600 text-lg mt-0.5 shrink-0" />
               <div>
                 <p className="font-semibold text-red-900">Submission Failed</p>
                 <p className="text-red-700 text-xs mt-0.5">
-                  Something went wrong while submitting your request. Please try again.
+                  Something went wrong while submitting your request. Please check your credentials or try again later.
                 </p>
               </div>
             </div>
-          )} */}
+          )}
 
           <form onSubmit={handleSubmit} noValidate>
             {/* Full Name */}

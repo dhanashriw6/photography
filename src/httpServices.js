@@ -51,7 +51,10 @@ axios.interceptors.response.use(
     const originalRequest = error.config;
 
     // Check if error is 401 (Unauthorized) and not already retrying
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Bypass automatic redirect for public endpoints (e.g. pre-launch leads)
+    const isPublicEndpoint = originalRequest?.url?.includes('/pre-launch-leads');
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isPublicEndpoint) {
       
       // If already refreshing, queue the request
       if (isRefreshing) {
