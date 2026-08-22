@@ -79,17 +79,19 @@ const SuccessModal = ({ onClose, onGoHome }) => (
         Thank You! Your requirement has been received.
       </h3>
 
-      <p className="text-sm text-gray-500 mb-6" style={{ padding: '5px' }}>
+      <p className="text-sm text-gray-500 mb-6" style={{ padding: '15px' }}>
         Our team will connect you with suitable photographers shortly.
       </p>
 
-      <button
-        type="button"
-        onClick={onGoHome}
-        className="su-btn-primary w-full flex items-center justify-center"
-      >
-        Done
-      </button>
+      <div className="w-full flex justify-center">
+        <button
+          type="button"
+          onClick={onGoHome}
+          className="su-btn-primary w-fit flex items-center justify-center"
+        >
+          Done
+        </button>
+      </div>
     </div>
   </div>
 )
@@ -600,7 +602,7 @@ const PreLaunchCustomer = () => {
                     <span>Submitting...</span>
                   </>
                 ) : (
-                  <span>Find a Photographer</span>
+                  <span>Submit</span>
                 )}
               </button>
             </div>
